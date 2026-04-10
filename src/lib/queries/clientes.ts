@@ -1,5 +1,9 @@
 import { templateRows } from "@/lib/db";
-import type { ClienteDetail, ClienteListItem } from "@/lib/types";
+import type {
+  ClienteDetail,
+  ClienteFormValues,
+  ClienteListItem,
+} from "@/lib/types";
 
 export async function listClientes(search?: string) {
   const normalizedSearch = search?.trim();
@@ -75,4 +79,36 @@ export async function getClienteById(id: number) {
   `;
 
   return rows[0] ?? null;
+}
+
+export async function createCliente(input: ClienteFormValues) {
+  const rows = await templateRows<{ id: number }>`
+    INSERT INTO clientes (nombre, apellido, direccion, telefono, mail)
+    VALUES (
+      ${input.nombre},
+      ${input.apellido},
+      ${input.direccion || null},
+      ${input.telefono || null},
+      ${input.mail || null}
+    )
+    RETURNING id
+  `;
+
+  return rows[0]?.id ?? null;
+}
+
+export async function updateCliente(id: number, input: ClienteFormValues) {
+  const rows = await templateRows<{ id: number }>`
+    UPDATE clientes
+    SET
+      nombre = ${input.nombre},
+      apellido = ${input.apellido},
+      direccion = ${input.direccion || null},
+      telefono = ${input.telefono || null},
+      mail = ${input.mail || null}
+    WHERE id = ${id}
+    RETURNING id
+  `;
+
+  return rows[0]?.id ?? null;
 }

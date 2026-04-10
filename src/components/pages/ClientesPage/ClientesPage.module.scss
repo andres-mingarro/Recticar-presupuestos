@@ -1,3 +1,32 @@
 .ClientesPage {
   width: 100%;
 }
+
+.ClientesPageSummaryGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.ClientesPageSummaryCard {
+  min-width: 0;
+}
+
+.ClientesPageTableLink {
+  text-decoration: none;
+}
+
+.ClientesPageMobileList {
+  display: grid;
+  gap: 1rem;
+}
+
+.ClientesPageMobileCard {
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .ClientesPageSummaryGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

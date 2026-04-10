@@ -86,10 +86,11 @@ async function main() {
       continue;
     }
 
-    const queries = statements.map((statement) => sql.unsafe(statement));
-    queries.push(sql`INSERT INTO schema_migrations (id) VALUES (${fileName})`);
+    for (const statement of statements) {
+      await sql.query(statement);
+    }
 
-    await sql.transaction(queries);
+    await sql`INSERT INTO schema_migrations (id) VALUES (${fileName})`;
     console.log(`applied ${fileName}`);
   }
 }

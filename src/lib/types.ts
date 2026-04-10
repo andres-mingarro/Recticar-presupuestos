@@ -18,6 +18,14 @@ export type ClienteDetail = ClienteListItem & {
   mail: string | null;
 };
 
+export type ClienteFormValues = {
+  nombre: string;
+  apellido: string;
+  direccion: string;
+  telefono: string;
+  mail: string;
+};
+
 export type PedidoListItem = {
   id: number;
   numero_pedido: number;
