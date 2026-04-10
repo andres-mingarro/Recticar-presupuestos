@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Recticar Presupuestos
 
-## Getting Started
+Aplicación web para gestión de presupuestos y seguimiento de clientes de una rectificadora de motores.
 
-First, run the development server:
+## Stack
+
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- Neon PostgreSQL con `@neondatabase/serverless`
+- Deploy objetivo: Vercel
+
+## Scripts
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npm run build
+npm run db:migrate
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Variables de entorno
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Crear `.env.local` con:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+DATABASE_URL=postgres://usuario:password@host/db
+```
 
-## Learn More
+## Migraciones
 
-To learn more about Next.js, take a look at the following resources:
+Las migraciones SQL están en `migrations/` y se ejecutan con:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run db:migrate
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+El runner registra cada archivo aplicado en la tabla `schema_migrations`.
 
-## Deploy on Vercel
+## Alcance implementado en esta etapa
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Dashboard inicial
+- Listado de clientes con búsqueda
+- Listado de pedidos con filtros por estado y prioridad
+- Conexión server-side a Neon
+- Capa de queries SQL directas
+- Migración inicial para `clientes`, `pedidos` y `pedido_trabajos`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Supuestos actuales
+
+- Las tablas existentes `marcas`, `modelos`, `motores`, `modelo_motor`, `categorias_trabajo` y `trabajos` usan `id` como PK.
+- Para los listados se asume que `marcas`, `modelos` y `motores` tienen una columna `nombre`.
+- Para futuros formularios se asume que `trabajos.categoria_id` referencia a `categorias_trabajo.id`.
+
