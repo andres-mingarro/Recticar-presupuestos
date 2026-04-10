@@ -1,5 +1,11 @@
 import { templateRows } from "@/lib/db";
-import type { Marca, Modelo, Motor, TrabajoAgrupado } from "@/lib/types";
+import type {
+  Marca,
+  Modelo,
+  ModeloMotorRelation,
+  Motor,
+  TrabajoAgrupado,
+} from "@/lib/types";
 
 export async function listMarcas() {
   return templateRows<Marca>`
@@ -11,9 +17,17 @@ export async function listMarcas() {
 
 export async function listModelosByMarca(marcaId: number) {
   return templateRows<Modelo>`
-    SELECT id, nombre
+    SELECT id, nombre, marca_id
     FROM modelos
     WHERE marca_id = ${marcaId}
+    ORDER BY nombre ASC
+  `;
+}
+
+export async function listModelos() {
+  return templateRows<Modelo>`
+    SELECT id, nombre, marca_id
+    FROM modelos
     ORDER BY nombre ASC
   `;
 }
@@ -25,6 +39,21 @@ export async function listMotoresByModelo(modeloId: number) {
     INNER JOIN modelo_motor mm ON mm.motor_id = m.id
     WHERE mm.modelo_id = ${modeloId}
     ORDER BY m.nombre ASC
+  `;
+}
+
+export async function listMotores() {
+  return templateRows<Motor>`
+    SELECT id, nombre
+    FROM motores
+    ORDER BY nombre ASC
+  `;
+}
+
+export async function listModeloMotorRelations() {
+  return templateRows<ModeloMotorRelation>`
+    SELECT modelo_id, motor_id
+    FROM modelo_motor
   `;
 }
 

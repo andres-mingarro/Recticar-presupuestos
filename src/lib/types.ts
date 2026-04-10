@@ -41,6 +41,20 @@ export type PedidoListItem = {
   numero_serie_motor: string;
 };
 
+export type ClientePedidoItem = PedidoListItem;
+
+export type PedidoFormValues = {
+  clienteId: string;
+  marcaId: string;
+  modeloId: string;
+  motorId: string;
+  numeroSerieMotor: string;
+  prioridad: PedidoPrioridad;
+  estado: Extract<PedidoEstado, "pendiente" | "aprobado">;
+  observaciones: string;
+  trabajosIds: string[];
+};
+
 export type Marca = {
   id: number;
   nombre: string;
@@ -55,6 +69,11 @@ export type Modelo = {
 export type Motor = {
   id: number;
   nombre: string;
+};
+
+export type ModeloMotorRelation = {
+  modelo_id: number;
+  motor_id: number;
 };
 
 export type TrabajoAgrupado = {

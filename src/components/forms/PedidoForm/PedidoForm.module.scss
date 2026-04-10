@@ -1,0 +1,44 @@
+.PedidoForm {
+  width: 100%;
+}
+
+.PedidoFormSection {
+  display: grid;
+  gap: 1rem;
+}
+
+.PedidoFormGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.PedidoFormField {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.PedidoFormOptionGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.PedidoFormChecklist {
+  display: grid;
+  gap: 1rem;
+}
+
+.PedidoFormActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .PedidoFormGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .PedidoFormOptionGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

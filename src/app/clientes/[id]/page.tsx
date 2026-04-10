@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { ClienteDetailPage } from "@/components/pages/ClienteDetailPage";
 import type { ClienteFormState } from "@/components/forms/ClienteForm";
 import { getClienteById, updateCliente } from "@/lib/queries/clientes";
+import { listPedidosByCliente } from "@/lib/queries/pedidos";
 import type { ClienteFormValues } from "@/lib/types";
 
 function normalizeString(value: FormDataEntryValue | null) {
@@ -23,11 +24,21 @@ export default async function Page({
     notFound();
   }
 
-  const cliente = await getClienteById(clienteId);
+  const [cliente, pedidos] = await Promise.all([
+    getClienteById(clienteId),
+    listPedidosByCliente(clienteId),
+  ]);
 
   if (!cliente) {
     notFound();
   }
+
+  const pedidosVigentes = pedidos.filter(
+    (pedido) => pedido.estado === "pendiente" || pedido.estado === "aprobado"
+  );
+  const pedidosFinalizados = pedidos.filter(
+    (pedido) => pedido.estado === "finalizado"
+  );
 
   const initialState: ClienteFormState = {
     error: null,
@@ -86,6 +97,8 @@ export default async function Page({
       action={updateClienteAction}
       initialState={initialState}
       wasUpdated={query?.updated === "1"}
+      pedidosVigentes={pedidosVigentes}
+      pedidosFinalizados={pedidosFinalizados}
     />
   );
 }

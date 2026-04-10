@@ -1,7 +1,15 @@
 import { neon } from "@neondatabase/serverless";
 
 type NeonSql = ReturnType<typeof neon>;
-type QueryParams = Array<string | number | boolean | null>;
+type QueryParamValue =
+  | string
+  | number
+  | boolean
+  | null
+  | string[]
+  | number[]
+  | boolean[];
+type QueryParams = QueryParamValue[];
 
 let cachedSql: NeonSql | null = null;
 
