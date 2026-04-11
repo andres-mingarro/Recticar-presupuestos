@@ -9,8 +9,8 @@ export function PageHeader({
   actions,
 }: {
   eyebrow: string;
-  title: string;
-  description: ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
   actions?: ReactNode;
 }) {
   return (
@@ -18,7 +18,7 @@ export function PageHeader({
       className={cn(
         "PageHeader",
         styles.PageHeader,
-        "flex flex-col gap-4 rounded-[28px] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.88))] p-6 shadow-[0_20px_70px_rgba(148,163,184,0.18)] md:flex-row md:items-end md:justify-between"
+        "flex flex-col gap-4 rounded-[28px] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.88))] p-6 shadow-[0_20px_70px_rgba(148,163,184,0.18)] md:justify-between"
       )}
     >
       <div className="space-y-2">
@@ -28,7 +28,7 @@ export function PageHeader({
         <h1 className="mb-4 text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
           {title}
         </h1>
-        <div className="max-w-2xl text-sm leading-6 text-[var(--color-foreground-muted)]">
+        <div className="text-sm leading-6 text-[var(--color-foreground-muted)]">
           {description}
         </div>
       </div>

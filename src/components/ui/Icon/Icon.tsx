@@ -7,6 +7,7 @@ type IconName =
   | "x"
   | "chevronLeft"
   | "chevronRight"
+  | "chevronDown"
   | "arrowRight"
   | "hash"
   | "user"
@@ -18,7 +19,10 @@ type IconName =
   | "clock"
   | "edit"
   | "mail"
-  | "mapPin";
+  | "mapPin"
+  | "check"
+  | "download"
+  | "tag";
 
 type IconProps = {
   name: IconName;
@@ -159,6 +163,33 @@ export function Icon({ name, className }: IconProps) {
         <svg {...commonProps}>
           <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" />
           <circle cx="12" cy="11" r="2.5" />
+        </svg>
+      );
+    case "chevronDown":
+      return (
+        <svg {...commonProps}>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      );
+    case "check":
+      return (
+        <svg {...commonProps}>
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      );
+    case "download":
+      return (
+        <svg {...commonProps}>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" x2="12" y1="15" y2="3" />
+        </svg>
+      );
+    case "tag":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l7.29-7.29a1 1 0 0 0 0-1.41Z" />
+          <circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none" />
         </svg>
       );
   }

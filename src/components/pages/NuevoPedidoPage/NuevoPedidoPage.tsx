@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type {
-  ClienteListItem,
   Marca,
   Modelo,
   ModeloMotorRelation,
@@ -20,7 +19,6 @@ type NuevoPedidoPageProps = {
     formData: FormData
   ) => Promise<PedidoFormState>;
   initialState: PedidoFormState;
-  clientes: ClienteListItem[];
   marcas: Marca[];
   modelos: Modelo[];
   motores: Motor[];
@@ -31,7 +29,6 @@ type NuevoPedidoPageProps = {
 export function NuevoPedidoPage({
   action,
   initialState,
-  clientes,
   marcas,
   modelos,
   motores,
@@ -60,7 +57,6 @@ export function NuevoPedidoPage({
         <PedidoForm
           action={action}
           initialState={initialState}
-          clientes={clientes}
           marcas={marcas}
           modelos={modelos}
           motores={motores}

@@ -8,7 +8,6 @@ import {
   listMotores,
   listTrabajosAgrupados,
 } from "@/lib/queries/catalogo";
-import { listClientes } from "@/lib/queries/clientes";
 import { createPedido } from "@/lib/queries/pedidos";
 import type { PedidoFormValues } from "@/lib/types";
 
@@ -34,9 +33,8 @@ function normalizeString(value: FormDataEntryValue | null) {
 }
 
 export default async function Page() {
-  const [clientes, marcas, modelos, motores, relations, trabajos] =
+  const [marcas, modelos, motores, relations, trabajos] =
     await Promise.all([
-      listClientes(),
       listMarcas(),
       listModelos(),
       listMotores(),
@@ -95,7 +93,6 @@ export default async function Page() {
     <NuevoPedidoPage
       action={createPedidoAction}
       initialState={initialState}
-      clientes={clientes}
       marcas={marcas}
       modelos={modelos}
       motores={motores}

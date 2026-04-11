@@ -9,6 +9,7 @@ const items = [
   { href: "/", label: "Dashboard", exact: true },
   { href: "/clientes", label: "Clientes", exact: false },
   { href: "/pedidos", label: "Pedidos", exact: false },
+  { href: "/precios", label: "Precios", exact: false },
 ];
 
 function isActive(pathname: string, href: string, exact: boolean) {

@@ -15,6 +15,9 @@ export type ClienteListItem = {
 
 export type ClienteDetail = ClienteListItem & {
   direccion: string | null;
+  ciudad: string | null;
+  provincia: string | null;
+  cp: string | null;
   mail: string | null;
 };
 
@@ -34,9 +37,12 @@ export type ClientePendingPedidoItem = {
 export type ClienteFormValues = {
   nombre: string;
   apellido: string;
-  direccion: string;
   telefono: string;
   mail: string;
+  ciudad: string;
+  direccion: string;
+  provincia: string;
+  cp: string;
 };
 
 export type PedidoListItem = {
@@ -54,6 +60,11 @@ export type PedidoListItem = {
   numero_serie_motor: string;
 };
 
+export type PedidoDetail = PedidoListItem & {
+  observaciones: string | null;
+  trabajos_ids: number[];
+};
+
 export type ClientePedidoItem = PedidoListItem;
 
 export type PedidoFormValues = {
@@ -63,7 +74,7 @@ export type PedidoFormValues = {
   motorId: string;
   numeroSerieMotor: string;
   prioridad: PedidoPrioridad;
-  estado: Extract<PedidoEstado, "pendiente" | "aprobado">;
+  estado: PedidoEstado;
   observaciones: string;
   trabajosIds: string[];
 };
@@ -95,5 +106,6 @@ export type TrabajoAgrupado = {
   trabajos: Array<{
     id: number;
     nombre: string;
+    precio: number;
   }>;
 };

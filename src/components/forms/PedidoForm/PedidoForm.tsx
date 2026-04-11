@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
 import type {
-  ClienteListItem,
   Marca,
   Modelo,
   ModeloMotorRelation,
@@ -14,11 +13,15 @@ import type {
   PedidoPrioridad,
   TrabajoAgrupado,
 } from "@/lib/types";
+import { useTrabajosSeleccion } from "./TrabajosSeleccionContext";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { EstadoStepper } from "@/components/ui/EstadoStepper";
+import { Icon } from "@/components/ui/Icon";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
+import { ClienteAutocomplete } from "@/components/search/ClienteAutocomplete";
 import styles from "./PedidoForm.module.scss";
 
 export type PedidoFormState = {
@@ -32,12 +35,13 @@ type PedidoFormProps = {
     formData: FormData
   ) => Promise<PedidoFormState>;
   initialState: PedidoFormState;
-  clientes: ClienteListItem[];
+  initialClienteLabel?: string;
   marcas: Marca[];
   modelos: Modelo[];
   motores: Motor[];
   relations: ModeloMotorRelation[];
   trabajos: TrabajoAgrupado[];
+  allowFinalizado?: boolean;
 };
 
 const prioridadCards: Array<{
@@ -53,14 +57,16 @@ const prioridadCards: Array<{
 export function PedidoForm({
   action,
   initialState,
-  clientes,
+  initialClienteLabel = "",
   marcas,
   modelos,
   motores,
   relations,
   trabajos,
+  allowFinalizado = false,
 }: PedidoFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
+  const { toggle: toggleTrabajo } = useTrabajosSeleccion();
   const [selectedMarca, setSelectedMarca] = useState(initialState.values.marcaId);
   const [selectedModelo, setSelectedModelo] = useState(initialState.values.modeloId);
 
@@ -108,19 +114,16 @@ export function PedidoForm({
           </h2>
         </div>
 
-        <label className={cn("PedidoFormField", styles.PedidoFormField)}>
+        <div className={cn("PedidoFormField", styles.PedidoFormField)}>
           <span className="text-sm font-medium text-[var(--color-foreground)]">
             Cliente asociado
           </span>
-          <Select name="clienteId" defaultValue={state.values.clienteId}>
-            <option value="">Sin cliente asignado</option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                #{cliente.numero_cliente} · {cliente.apellido}, {cliente.nombre}
-              </option>
-            ))}
-          </Select>
-        </label>
+          <ClienteAutocomplete
+            name="clienteId"
+            initialId={state.values.clienteId}
+            initialLabel={initialClienteLabel}
+          />
+        </div>
       </Card>
 
       <Card
@@ -224,14 +227,19 @@ export function PedidoForm({
         </div>
 
         <div className={cn("PedidoFormChecklist", styles.PedidoFormChecklist)}>
-          {trabajos.map((grupo) => (
+          {trabajos.map((grupo) => {
+            const hasSelected = grupo.trabajos.some((t) =>
+              state.values.trabajosIds.includes(String(t.id))
+            );
+            return (
             <details
               key={grupo.categoriaId}
-              open
-              className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4"
+              open={hasSelected}
+              className={cn("PedidoFormAccordion", styles.PedidoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4")}
             >
-              <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--color-foreground)]">
-                {grupo.categoriaNombre}
+              <summary className={cn("PedidoFormAccordionSummary", styles.PedidoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)]")}>
+                <span>{grupo.categoriaNombre}</span>
+                <Icon name="chevronDown" className={cn("PedidoFormAccordionChevron", styles.PedidoFormAccordionChevron, "h-4 w-4 text-[var(--color-foreground-muted)] transition-transform duration-200")} />
               </summary>
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 {grupo.trabajos.map((trabajo) => (
@@ -246,6 +254,7 @@ export function PedidoForm({
                       defaultChecked={state.values.trabajosIds.includes(
                         String(trabajo.id)
                       )}
+                      onChange={(e) => toggleTrabajo(trabajo.id, e.target.checked)}
                       className="mt-0.5 h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-accent)]"
                     />
                     <span>{trabajo.nombre}</span>
@@ -253,7 +262,8 @@ export function PedidoForm({
                 ))}
               </div>
             </details>
-          ))}
+          );
+          })}
         </div>
       </Card>
 
@@ -297,39 +307,12 @@ export function PedidoForm({
           ))}
         </div>
 
-        <div className={cn("PedidoFormOptionGrid", styles.PedidoFormOptionGrid)}>
-          {[
-            {
-              value: "pendiente",
-              label: "Pendiente",
-              description: "Puede guardarse con o sin cliente asignado.",
-            },
-            {
-              value: "aprobado",
-              label: "Aprobado",
-              description: "Requiere cliente asignado y registra fecha de aprobacion.",
-            },
-          ].map((item) => (
-            <label
-              key={item.value}
-              className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm"
-            >
-              <input
-                type="radio"
-                name="estado"
-                value={item.value}
-                defaultChecked={state.values.estado === item.value}
-                className="sr-only"
-              />
-              <span className="font-semibold text-[var(--color-foreground)]">
-                {item.label}
-              </span>
-              <p className="mt-2 text-[var(--color-foreground-muted)]">
-                {item.description}
-              </p>
-            </label>
-          ))}
-        </div>
+        <EstadoStepper
+          mode="form"
+          name="estado"
+          initialValue={state.values.estado}
+          allowFinalizado={allowFinalizado}
+        />
 
         <label className={cn("PedidoFormField", styles.PedidoFormField)}>
           <span className="text-sm font-medium text-[var(--color-foreground)]">

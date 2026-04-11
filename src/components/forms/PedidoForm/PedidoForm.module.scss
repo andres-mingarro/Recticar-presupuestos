@@ -27,6 +27,10 @@
   gap: 1rem;
 }
 
+.PedidoFormAccordion[open] .PedidoFormAccordionChevron {
+  transform: rotate(180deg);
+}
+
 .PedidoFormActions {
   display: flex;
   flex-wrap: wrap;

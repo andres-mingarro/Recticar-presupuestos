@@ -110,6 +110,9 @@ export async function getClienteById(id: number) {
       nombre,
       apellido,
       direccion,
+      ciudad,
+      provincia,
+      cp,
       telefono,
       mail,
       fecha_alta
@@ -161,13 +164,16 @@ export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
 
 export async function createCliente(input: ClienteFormValues) {
   const rows = await templateRows<{ id: number }>`
-    INSERT INTO clientes (nombre, apellido, direccion, telefono, mail)
+    INSERT INTO clientes (nombre, apellido, telefono, mail, ciudad, direccion, provincia, cp)
     VALUES (
       ${input.nombre},
       ${input.apellido},
-      ${input.direccion || null},
       ${input.telefono || null},
-      ${input.mail || null}
+      ${input.mail || null},
+      ${input.ciudad || null},
+      ${input.direccion || null},
+      ${input.provincia || null},
+      ${input.cp || null}
     )
     RETURNING id
   `;
@@ -181,9 +187,12 @@ export async function updateCliente(id: number, input: ClienteFormValues) {
     SET
       nombre = ${input.nombre},
       apellido = ${input.apellido},
-      direccion = ${input.direccion || null},
       telefono = ${input.telefono || null},
-      mail = ${input.mail || null}
+      mail = ${input.mail || null},
+      ciudad = ${input.ciudad || null},
+      direccion = ${input.direccion || null},
+      provincia = ${input.provincia || null},
+      cp = ${input.cp || null}
     WHERE id = ${id}
     RETURNING id
   `;

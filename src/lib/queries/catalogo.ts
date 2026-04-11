@@ -1,4 +1,4 @@
-import { templateRows } from "@/lib/db";
+import { queryRows, templateRows } from "@/lib/db";
 import type {
   Marca,
   Modelo,
@@ -63,12 +63,14 @@ export async function listTrabajosAgrupados() {
     categoria_nombre: string;
     trabajo_id: number;
     trabajo_nombre: string;
+    trabajo_precio: number;
   }>`
     SELECT
       c.id AS categoria_id,
       c.nombre AS categoria_nombre,
       t.id AS trabajo_id,
-      t.nombre AS trabajo_nombre
+      t.nombre AS trabajo_nombre,
+      t.precio AS trabajo_precio
     FROM categorias_trabajo c
     INNER JOIN trabajos t ON t.categoria_id = c.id
     ORDER BY c.nombre ASC, t.nombre ASC
@@ -83,6 +85,7 @@ export async function listTrabajosAgrupados() {
       category.trabajos.push({
         id: row.trabajo_id,
         nombre: row.trabajo_nombre,
+        precio: Number(row.trabajo_precio),
       });
       continue;
     }
@@ -94,10 +97,69 @@ export async function listTrabajosAgrupados() {
         {
           id: row.trabajo_id,
           nombre: row.trabajo_nombre,
+          precio: Number(row.trabajo_precio),
         },
       ],
     });
   }
 
   return Array.from(grouped.values());
+}
+
+export type TrabajoDetalleItem = {
+  categoriaId: number;
+  categoriaNombre: string;
+  trabajoId: number;
+  trabajoNombre: string;
+  precio: number;
+};
+
+export async function getTrabajosDetalleByPedido(pedidoId: number) {
+  const rows = await queryRows<{
+    categoria_id: number;
+    categoria_nombre: string;
+    trabajo_id: number;
+    trabajo_nombre: string;
+    precio: number;
+  }>(
+    `
+      SELECT
+        c.id AS categoria_id,
+        c.nombre AS categoria_nombre,
+        t.id AS trabajo_id,
+        t.nombre AS trabajo_nombre,
+        t.precio
+      FROM pedido_trabajos pt
+      INNER JOIN trabajos t ON t.id = pt.trabajo_id
+      INNER JOIN categorias_trabajo c ON c.id = t.categoria_id
+      WHERE pt.pedido_id = $1
+      ORDER BY c.nombre ASC, t.nombre ASC
+    `,
+    [pedidoId]
+  );
+
+  return rows.map((row) => ({
+    categoriaId: row.categoria_id,
+    categoriaNombre: row.categoria_nombre,
+    trabajoId: row.trabajo_id,
+    trabajoNombre: row.trabajo_nombre,
+    precio: Number(row.precio),
+  }));
+}
+
+export async function updateTrabajoPrecios(
+  updates: Array<{ id: number; precio: number }>
+) {
+  if (updates.length === 0) return;
+
+  const valuesSql = updates
+    .map((u) => `(${u.id}::integer, ${u.precio}::numeric)`)
+    .join(", ");
+
+  await queryRows(`
+    UPDATE trabajos AS t
+    SET precio = v.precio
+    FROM (VALUES ${valuesSql}) AS v(id, precio)
+    WHERE t.id = v.id
+  `);
 }

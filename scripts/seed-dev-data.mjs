@@ -64,6 +64,45 @@ const calles = [
   "Sarmiento",
 ];
 
+const ciudades = [
+  "Cordoba",
+  "Rosario",
+  "Mendoza",
+  "La Plata",
+  "Mar del Plata",
+  "Santa Fe",
+  "San Miguel de Tucuman",
+  "Salta",
+  "Neuquen",
+  "Rio Cuarto",
+];
+
+const provincias = [
+  "Cordoba",
+  "Santa Fe",
+  "Mendoza",
+  "Buenos Aires",
+  "Buenos Aires",
+  "Santa Fe",
+  "Tucuman",
+  "Salta",
+  "Neuquen",
+  "Cordoba",
+];
+
+const cps = [
+  "9100",
+  "2000",
+  "5500",
+  "1900",
+  "7600",
+  "3000",
+  "4000",
+  "4400",
+  "8300",
+  "5800",
+];
+
 function plusDays(baseDate, days) {
   const date = new Date(baseDate);
   date.setDate(date.getDate() + days);
@@ -144,13 +183,16 @@ async function main() {
     const nombre = nombres[index % nombres.length];
     const apellido = apellidos[index % apellidos.length];
     const direccion = `${calles[index % calles.length]} ${120 + index * 17}`;
+    const ciudad = ciudades[index % ciudades.length];
+    const provincia = provincias[index % provincias.length];
+    const cp = cps[index % cps.length];
     const telefono = `11${String(32000000 + index * 731).padStart(8, "0")}`;
     const mail = `${nombre.toLowerCase()}.${apellido.toLowerCase()}.${index + 1}${DEV_CLIENT_EMAIL_DOMAIN}`;
     const fechaAlta = toIso(plusDays(baseAlta, index));
 
     const inserted = await sql`
-      INSERT INTO clientes (nombre, apellido, direccion, telefono, mail, fecha_alta)
-      VALUES (${nombre}, ${apellido}, ${direccion}, ${telefono}, ${mail}, ${fechaAlta})
+      INSERT INTO clientes (nombre, apellido, telefono, mail, ciudad, direccion, provincia, cp, fecha_alta)
+      VALUES (${nombre}, ${apellido}, ${telefono}, ${mail}, ${ciudad}, ${direccion}, ${provincia}, ${cp}, ${fechaAlta})
       RETURNING id, numero_cliente, nombre, apellido
     `;
 

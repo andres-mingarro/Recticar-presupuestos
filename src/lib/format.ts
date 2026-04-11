@@ -57,6 +57,15 @@ export function getBusinessDaysSince(value: string | null | undefined) {
   return getBusinessDaysBetween(value, new Date().toISOString());
 }
 
+export function formatPrice(value: number) {
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 export function getVehicleLabel(parts: Array<string | null | undefined>) {
   const filtered = parts.map((part) => part?.trim()).filter(Boolean);
   return filtered.length > 0 ? filtered.join(" / ") : "Vehículo sin definir";

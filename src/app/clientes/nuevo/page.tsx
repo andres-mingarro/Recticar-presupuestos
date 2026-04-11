@@ -9,9 +9,12 @@ const initialState: ClienteFormState = {
   values: {
     nombre: "",
     apellido: "",
-    direccion: "",
     telefono: "",
     mail: "",
+    ciudad: "Trelew",
+    direccion: "",
+    provincia: "Chubut",
+    cp: "",
   },
 };
 
@@ -29,9 +32,12 @@ export default function Page() {
     const values: ClienteFormValues = {
       nombre: normalizeString(formData.get("nombre")),
       apellido: normalizeString(formData.get("apellido")),
-      direccion: normalizeString(formData.get("direccion")),
       telefono: normalizeString(formData.get("telefono")),
       mail: normalizeString(formData.get("mail")),
+      ciudad: normalizeString(formData.get("ciudad")),
+      direccion: normalizeString(formData.get("direccion")),
+      provincia: normalizeString(formData.get("provincia")),
+      cp: normalizeString(formData.get("cp")),
     };
 
     if (!values.nombre || !values.apellido) {

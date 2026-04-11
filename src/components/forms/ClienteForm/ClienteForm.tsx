@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
 import type { ClienteFormValues } from "@/lib/types";
 import { buttonStyles } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import styles from "./ClienteForm.module.scss";
 
 export type ClienteFormState = {
@@ -53,6 +54,112 @@ export function ClienteForm({
   const [state, formAction, isPending] = useActionState(action, initialState);
   const [internalIsEditing, setInternalIsEditing] = useState(!startInReadOnly);
   const isEditing = controlledIsEditing ?? internalIsEditing;
+  const [provincias, setProvincias] = useState<string[]>([]);
+  const [ciudades, setCiudades] = useState<string[]>([]);
+  const [selectedProvincia, setSelectedProvincia] = useState(
+    initialState.values.provincia || "Chubut"
+  );
+  const [selectedCiudad, setSelectedCiudad] = useState(
+    initialState.values.ciudad || "Trelew"
+  );
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const nextProvincia = state.values.provincia || "Chubut";
+    const nextCiudad = state.values.ciudad || "Trelew";
+    setSelectedProvincia(nextProvincia);
+    setSelectedCiudad(nextCiudad);
+  }, [state.values.provincia, state.values.ciudad]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProvincias() {
+      try {
+        const response = await fetch("/api/georef/provincias");
+        const data = (await response.json()) as {
+          provincias?: string[];
+          error?: string;
+        };
+
+        if (!response.ok) {
+          throw new Error(data.error || "No se pudieron cargar las provincias.");
+        }
+
+        if (!cancelled) {
+          setProvincias(data.provincias ?? []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setLocationError(
+            error instanceof Error
+              ? error.message
+              : "No se pudieron cargar las provincias."
+          );
+        }
+      }
+    }
+
+    loadProvincias();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCiudades() {
+      if (!selectedProvincia) {
+        setCiudades([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/georef/localidades?provincia=${encodeURIComponent(selectedProvincia)}`
+        );
+        const data = (await response.json()) as {
+          localidades?: string[];
+          error?: string;
+        };
+
+        if (!response.ok) {
+          throw new Error(data.error || "No se pudieron cargar las ciudades.");
+        }
+
+        if (cancelled) {
+          return;
+        }
+
+        const nextCiudades = data.localidades ?? [];
+        setCiudades(nextCiudades);
+
+        if (!nextCiudades.includes(selectedCiudad)) {
+          if (nextCiudades.includes("Trelew")) {
+            setSelectedCiudad("Trelew");
+          } else {
+            setSelectedCiudad(nextCiudades[0] ?? "");
+          }
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setLocationError(
+            error instanceof Error
+              ? error.message
+              : "No se pudieron cargar las ciudades."
+          );
+        }
+      }
+    }
+
+    loadCiudades();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedProvincia, selectedCiudad]);
 
   function handleCloseEditing() {
     if (onCancel) {
@@ -152,18 +259,6 @@ export function ClienteForm({
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
           <span className="text-sm font-medium text-[var(--color-foreground)]">
-            Dirección
-          </span>
-          <Input
-            name="direccion"
-            placeholder="Calle, altura, localidad"
-            defaultValue={state.values.direccion}
-            disabled={!isEditing}
-          />
-        </label>
-
-        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
             Teléfono
           </span>
           <Input
@@ -174,13 +269,7 @@ export function ClienteForm({
           />
         </label>
 
-        <label
-          className={cn(
-            "ClienteFormField",
-            styles.ClienteFormField,
-            "md:col-span-2"
-          )}
-        >
+        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
           <span className="text-sm font-medium text-[var(--color-foreground)]">
             Mail
           </span>
@@ -192,11 +281,89 @@ export function ClienteForm({
             disabled={!isEditing}
           />
         </label>
+
+        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
+          <span className="text-sm font-medium text-[var(--color-foreground)]">
+            Ciudad
+          </span>
+          <Select
+            name="ciudad"
+            value={selectedCiudad}
+            onChange={(event) => setSelectedCiudad(event.target.value)}
+            disabled={!isEditing}
+          >
+            {ciudades.length === 0 ? (
+              <option value={selectedCiudad || ""}>
+                {selectedCiudad || "Sin ciudades"}
+              </option>
+            ) : (
+              ciudades.map((ciudad) => (
+                <option key={ciudad} value={ciudad}>
+                  {ciudad}
+                </option>
+              ))
+            )}
+          </Select>
+        </label>
+
+        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
+          <span className="text-sm font-medium text-[var(--color-foreground)]">
+            Dirección
+          </span>
+          <Input
+            name="direccion"
+            placeholder="Calle, altura, barrio"
+            defaultValue={state.values.direccion}
+            disabled={!isEditing}
+          />
+        </label>
+
+        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
+          <span className="text-sm font-medium text-[var(--color-foreground)]">
+            Provincia
+          </span>
+          <Select
+            name="provincia"
+            value={selectedProvincia}
+            onChange={(event) => setSelectedProvincia(event.target.value)}
+            disabled={!isEditing}
+          >
+            {provincias.length === 0 ? (
+              <option value={selectedProvincia || ""}>
+                {selectedProvincia || "Sin provincias"}
+              </option>
+            ) : (
+              provincias.map((provincia) => (
+                <option key={provincia} value={provincia}>
+                  {provincia}
+                </option>
+              ))
+            )}
+          </Select>
+        </label>
+
+        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
+          <span className="text-sm font-medium text-[var(--color-foreground)]">
+            CP
+          </span>
+          <Input
+            name="cp"
+            placeholder="Ej. 9100"
+            defaultValue={state.values.cp}
+            disabled={!isEditing}
+          />
+        </label>
       </div>
 
       {state.error ? (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {state.error}
+        </div>
+      ) : null}
+
+      {locationError ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          {locationError}
         </div>
       ) : null}
 
