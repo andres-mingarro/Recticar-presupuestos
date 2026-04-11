@@ -66,7 +66,7 @@ export function PedidoForm({
   allowFinalizado = false,
 }: PedidoFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
-  const { toggle: toggleTrabajo } = useTrabajosSeleccion();
+  const { toggle: toggleTrabajo, listaPrecios, setListaPrecios } = useTrabajosSeleccion();
   const [selectedMarca, setSelectedMarca] = useState(initialState.values.marcaId);
   const [selectedModelo, setSelectedModelo] = useState(initialState.values.modeloId);
 
@@ -224,6 +224,36 @@ export function PedidoForm({
           <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
             Checklist por categoria
           </h2>
+        </div>
+
+        {/* Selector de lista de precios */}
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-[var(--color-foreground)]">Lista de precios</span>
+          <div className="flex gap-2">
+            {([1, 2, 3] as const).map((lista) => {
+              const colors = {
+                1: "border-sky-300 bg-sky-50 text-sky-700 ring-sky-400",
+                2: "border-violet-300 bg-violet-50 text-violet-700 ring-violet-400",
+                3: "border-emerald-300 bg-emerald-50 text-emerald-700 ring-emerald-400",
+              };
+              const active = listaPrecios === lista;
+              return (
+                <button
+                  key={lista}
+                  type="button"
+                  onClick={() => setListaPrecios(lista)}
+                  className={cn(
+                    "rounded-xl border px-4 py-2 text-sm font-semibold transition",
+                    colors[lista],
+                    active ? "ring-2" : "opacity-50 hover:opacity-80"
+                  )}
+                >
+                  Lista {lista}
+                </button>
+              );
+            })}
+          </div>
+          <input type="hidden" name="listaPrecios" value={listaPrecios} />
         </div>
 
         <div className={cn("PedidoFormChecklist", styles.PedidoFormChecklist)}>
