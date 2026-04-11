@@ -63,6 +63,7 @@ export type PedidoListItem = {
 export type PedidoDetail = PedidoListItem & {
   observaciones: string | null;
   trabajos_ids: number[];
+  lista_precio: 1 | 2 | 3;
 };
 
 export type ClientePedidoItem = PedidoListItem;
@@ -77,6 +78,7 @@ export type PedidoFormValues = {
   estado: PedidoEstado;
   observaciones: string;
   trabajosIds: string[];
+  listaPrecios: 1 | 2 | 3;
 };
 
 export type Marca = {
@@ -107,5 +109,8 @@ export type TrabajoAgrupado = {
     id: number;
     nombre: string;
     precio: number;
+    precioLista1: number;
+    precioLista2: number;
+    precioLista3: number;
   }>;
 };

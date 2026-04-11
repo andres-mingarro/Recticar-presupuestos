@@ -15,10 +15,8 @@ export async function GET(
     return new Response("ID inválido", { status: 400 });
   }
 
-  const [pedido, trabajos] = await Promise.all([
-    getPedidoDetailById(pedidoId),
-    getTrabajosDetalleByPedido(pedidoId),
-  ]);
+  const pedido = await getPedidoDetailById(pedidoId);
+  const trabajos = await getTrabajosDetalleByPedido(pedidoId, (pedido?.lista_precio as 1 | 2 | 3) ?? 1);
 
   if (!pedido) {
     return new Response("Pedido no encontrado", { status: 404 });

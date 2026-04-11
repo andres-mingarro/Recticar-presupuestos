@@ -25,6 +25,7 @@ const initialState: PedidoFormState = {
     estado: "pendiente",
     observaciones: "",
     trabajosIds: [],
+    listaPrecios: 1,
   },
 };
 
@@ -68,6 +69,7 @@ export default async function Page() {
       trabajosIds: formData
         .getAll("trabajosIds")
         .filter((value): value is string => typeof value === "string"),
+      listaPrecios: (Number(normalizeString(formData.get("listaPrecios"))) || 1) as 1 | 2 | 3,
     };
 
     if (values.estado === "aprobado" && !values.clienteId) {

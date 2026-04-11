@@ -55,26 +55,34 @@ function CategoriaCard({
       {/* ── Toolbar ── */}
       <div className="flex items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2">
 
-        {/* Nombre de categoría (editable inline) */}
-        <form action={renameFormAction} className="flex min-w-0 flex-1 items-center gap-1" key={grupo.categoriaNombre}>
-          <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
+        {/* Nombre de categoría */}
+        <div className="flex min-w-0 flex-1 items-center gap-1.5">
           <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
-          <input
-            type="text"
-            name="nombre"
-            defaultValue={grupo.categoriaNombre}
-            required
-            className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--color-foreground)] transition hover:border-[var(--color-border)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
-          />
-          <button
-            type="submit"
-            disabled={renamePending}
-            title="Guardar nombre"
-            className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-40"
-          >
-            <Icon name="check" className="h-3.5 w-3.5" />
-          </button>
-        </form>
+          {isEditing ? (
+            <form action={renameFormAction} className="flex min-w-0 flex-1 items-center gap-1" key={grupo.categoriaNombre}>
+              <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
+              <input
+                type="text"
+                name="nombre"
+                defaultValue={grupo.categoriaNombre}
+                required
+                className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--color-foreground)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+              />
+              <button
+                type="submit"
+                disabled={renamePending}
+                title="Guardar nombre"
+                className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-40"
+              >
+                <Icon name="check" className="h-3.5 w-3.5" />
+              </button>
+            </form>
+          ) : (
+            <span className="text-sm font-semibold uppercase tracking-widest text-[var(--color-foreground)]">
+              {grupo.categoriaNombre}
+            </span>
+          )}
+        </div>
 
         {/* Separador */}
         <div className="h-5 w-px bg-[var(--color-border)]" />
@@ -115,22 +123,30 @@ function CategoriaCard({
             className="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-foreground-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
           >
             <Icon name="edit" className="h-3.5 w-3.5" />
-            Editar precios
+            Editar categoría
           </button>
         )}
 
-        {/* Eliminar categoría */}
-        <form action={deleteFormAction}>
-          <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
-          <button
-            type="submit"
-            disabled={deletePending}
-            title="Eliminar categoría"
-            className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
+        {/* Eliminar categoría — solo en modo edición */}
+        {isEditing && (
+          <form
+            action={deleteFormAction}
+            onSubmit={(e) => {
+              if (!confirm(`¿Eliminar la categoría "${grupo.categoriaNombre}" y todos sus trabajos? Esta acción no se puede deshacer.`))
+                e.preventDefault();
+            }}
           >
-            <Icon name="trash" className="h-4 w-4" />
-          </button>
-        </form>
+            <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
+            <button
+              type="submit"
+              disabled={deletePending}
+              title="Eliminar categoría"
+              className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
+            >
+              <Icon name="trash" className="h-4 w-4" />
+            </button>
+          </form>
+        )}
       </div>
 
       {/* Errores */}
@@ -157,8 +173,8 @@ function CategoriaCard({
         />
       )}
 
-      {/* ── Footer: agregar trabajo ── */}
-      <div className="flex flex-wrap items-center gap-3 bg-sky-50 px-5 py-3" style={{ borderTop: "2px dashed #93c5fd" }}>
+      {/* ── Footer: agregar trabajo — solo en modo edición ── */}
+      {isEditing && <div className="flex flex-wrap items-center gap-3 bg-sky-50 px-5 py-3" style={{ borderTop: "2px dashed #93c5fd" }}>
         <form
           key={addState.resetKey ?? 0}
           action={addFormAction}
@@ -184,7 +200,7 @@ function CategoriaCard({
             <p className="text-xs text-rose-600">{addState.error}</p>
           )}
         </form>
-      </div>
+      </div>}
     </Card>
   );
 }

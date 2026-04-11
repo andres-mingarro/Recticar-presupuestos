@@ -133,7 +133,7 @@ export function PedidoDetailPage({
         </section>
       ) : null}
 
-      <TrabajosSeleccionProvider initialIds={pedido.trabajos_ids}>
+      <TrabajosSeleccionProvider initialIds={pedido.trabajos_ids} initialListaPrecios={(pedido.lista_precio as 1 | 2 | 3) ?? 1}>
       <div className={cn("PedidoDetailPageContent", styles.PedidoDetailPageContent)}>
         <PedidoForm
           formId={formId}

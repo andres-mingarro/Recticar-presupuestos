@@ -24,7 +24,10 @@ export async function updateCategoriaTrabajos(
   formData: FormData
 ): Promise<CatalogActionState> {
   const nombreUpdates: Array<{ id: number; nombre: string }> = [];
-  const precioUpdates: Array<{ id: number; precio: number }> = [];
+  const precioUpdates = new Map<
+    number,
+    { id: number; precioLista1: number; precioLista2: number; precioLista3: number }
+  >();
 
   for (const [key, value] of formData.entries()) {
     if (key.startsWith("nombre_")) {
@@ -32,16 +35,29 @@ export async function updateCategoriaTrabajos(
       const nombre = typeof value === "string" ? value.trim() : "";
       if (!Number.isNaN(id) && nombre) nombreUpdates.push({ id, nombre });
     }
-    if (key.startsWith("precio_")) {
-      const id = Number(key.replace("precio_", ""));
+    if (key.startsWith("precio_lista_")) {
+      const [, , lista, rawId] = key.split("_");
+      const id = Number(rawId);
       const precio = Number(value);
-      if (!Number.isNaN(id) && precio >= 0) precioUpdates.push({ id, precio });
+
+      if (Number.isNaN(id) || Number.isNaN(precio) || precio < 0) {
+        continue;
+      }
+
+      const current =
+        precioUpdates.get(id) ?? { id, precioLista1: 0, precioLista2: 0, precioLista3: 0 };
+
+      if (lista === "1") current.precioLista1 = precio;
+      if (lista === "2") current.precioLista2 = precio;
+      if (lista === "3") current.precioLista3 = precio;
+
+      precioUpdates.set(id, current);
     }
   }
 
   try {
     if (nombreUpdates.length > 0) await updateTrabajoNombres(nombreUpdates);
-    if (precioUpdates.length > 0) await updateTrabajoPrecios(precioUpdates);
+    if (precioUpdates.size > 0) await updateTrabajoPrecios(Array.from(precioUpdates.values()));
   } catch {
     return { error: "No se pudieron guardar los cambios. Probá nuevamente." };
   }

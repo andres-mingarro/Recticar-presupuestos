@@ -64,13 +64,19 @@ export async function listTrabajosAgrupados() {
     trabajo_id: number | null;
     trabajo_nombre: string | null;
     trabajo_precio: number | null;
+    trabajo_precio_lista_1: number | null;
+    trabajo_precio_lista_2: number | null;
+    trabajo_precio_lista_3: number | null;
   }>`
     SELECT
       c.id AS categoria_id,
       c.nombre AS categoria_nombre,
       t.id AS trabajo_id,
       t.nombre AS trabajo_nombre,
-      t.precio AS trabajo_precio
+      t.precio AS trabajo_precio,
+      t.precio_lista_1 AS trabajo_precio_lista_1,
+      t.precio_lista_2 AS trabajo_precio_lista_2,
+      t.precio_lista_3 AS trabajo_precio_lista_3
     FROM categorias_trabajo c
     LEFT JOIN trabajos t ON t.categoria_id = c.id
     ORDER BY c.nombre ASC, t.orden ASC, t.id ASC
@@ -87,6 +93,9 @@ export async function listTrabajosAgrupados() {
           id: row.trabajo_id,
           nombre: row.trabajo_nombre!,
           precio: Number(row.trabajo_precio),
+          precioLista1: Number(row.trabajo_precio_lista_1),
+          precioLista2: Number(row.trabajo_precio_lista_2),
+          precioLista3: Number(row.trabajo_precio_lista_3),
         });
       }
       continue;
@@ -97,7 +106,14 @@ export async function listTrabajosAgrupados() {
       categoriaNombre: row.categoria_nombre,
       trabajos:
         row.trabajo_id !== null
-          ? [{ id: row.trabajo_id, nombre: row.trabajo_nombre!, precio: Number(row.trabajo_precio) }]
+          ? [{
+              id: row.trabajo_id,
+              nombre: row.trabajo_nombre!,
+              precio: Number(row.trabajo_precio),
+              precioLista1: Number(row.trabajo_precio_lista_1),
+              precioLista2: Number(row.trabajo_precio_lista_2),
+              precioLista3: Number(row.trabajo_precio_lista_3),
+            }]
           : [],
     });
   }
@@ -137,10 +153,21 @@ export async function deleteCategoria(id: number) {
 
 export async function createTrabajo(categoriaId: number, nombre: string) {
   const rows = await templateRows<{ id: number }>`
-    INSERT INTO trabajos (categoria_id, nombre, precio, orden)
+    INSERT INTO trabajos (
+      categoria_id,
+      nombre,
+      precio,
+      precio_lista_1,
+      precio_lista_2,
+      precio_lista_3,
+      orden
+    )
     VALUES (
       ${categoriaId},
       ${nombre},
+      0,
+      0,
+      0,
       0,
       COALESCE((SELECT MAX(orden) + 1 FROM trabajos WHERE categoria_id = ${categoriaId}), 1)
     )
@@ -190,7 +217,9 @@ export type TrabajoDetalleItem = {
   precio: number;
 };
 
-export async function getTrabajosDetalleByPedido(pedidoId: number) {
+export async function getTrabajosDetalleByPedido(pedidoId: number, listaPrecios: 1 | 2 | 3 = 1) {
+  const precioCol = listaPrecios === 3 ? "t.precio_lista_3" : listaPrecios === 2 ? "t.precio_lista_2" : "t.precio_lista_1";
+
   const rows = await queryRows<{
     categoria_id: number;
     categoria_nombre: string;
@@ -204,7 +233,7 @@ export async function getTrabajosDetalleByPedido(pedidoId: number) {
         c.nombre AS categoria_nombre,
         t.id AS trabajo_id,
         t.nombre AS trabajo_nombre,
-        t.precio
+        ${precioCol} AS precio
       FROM pedido_trabajos pt
       INNER JOIN trabajos t ON t.id = pt.trabajo_id
       INNER JOIN categorias_trabajo c ON c.id = t.categoria_id
@@ -224,18 +253,30 @@ export async function getTrabajosDetalleByPedido(pedidoId: number) {
 }
 
 export async function updateTrabajoPrecios(
-  updates: Array<{ id: number; precio: number }>
+  updates: Array<{
+    id: number;
+    precioLista1: number;
+    precioLista2: number;
+    precioLista3: number;
+  }>
 ) {
   if (updates.length === 0) return;
 
   const valuesSql = updates
-    .map((u) => `(${u.id}::integer, ${u.precio}::numeric)`)
+    .map(
+      (u) =>
+        `(${u.id}::integer, ${u.precioLista1}::numeric, ${u.precioLista2}::numeric, ${u.precioLista3}::numeric)`
+    )
     .join(", ");
 
   await queryRows(`
     UPDATE trabajos AS t
-    SET precio = v.precio
-    FROM (VALUES ${valuesSql}) AS v(id, precio)
+    SET
+      precio = v.precio_lista_1,
+      precio_lista_1 = v.precio_lista_1,
+      precio_lista_2 = v.precio_lista_2,
+      precio_lista_3 = v.precio_lista_3
+    FROM (VALUES ${valuesSql}) AS v(id, precio_lista_1, precio_lista_2, precio_lista_3)
     WHERE t.id = v.id
   `);
 }

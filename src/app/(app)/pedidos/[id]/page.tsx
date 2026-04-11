@@ -64,6 +64,7 @@ export default async function Page({
       estado: pedido.estado,
       observaciones: pedido.observaciones ?? "",
       trabajosIds: pedido.trabajos_ids.map(String),
+      listaPrecios: (pedido.lista_precio as 1 | 2 | 3) ?? 1,
     },
   };
 
@@ -113,6 +114,7 @@ export default async function Page({
       trabajosIds: formData
         .getAll("trabajosIds")
         .filter((value): value is string => typeof value === "string"),
+      listaPrecios: (Number(normalizeString(formData.get("listaPrecios"))) || 1) as 1 | 2 | 3,
     };
 
     if (values.estado === "aprobado" && !values.clienteId) {

@@ -122,6 +122,7 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
         mt.nombre AS motor_nombre,
         p.numero_serie_motor,
         p.observaciones,
+        p.lista_precio,
         array_agg(pt.trabajo_id ORDER BY pt.trabajo_id)
           FILTER (WHERE pt.trabajo_id IS NOT NULL) AS trabajos_ids
       FROM pedidos p
@@ -158,6 +159,7 @@ export async function updatePedido(id: number, input: PedidoFormValues) {
       numero_serie_motor = ${input.numeroSerieMotor},
       prioridad      = ${input.prioridad},
       estado         = ${input.estado}::pedido_estado,
+      lista_precio   = ${input.listaPrecios},
       fecha_aprobacion = CASE
         WHEN ${input.estado}::text = 'aprobado' AND fecha_aprobacion IS NULL THEN now()
         ELSE fecha_aprobacion
@@ -202,7 +204,8 @@ export async function createPedido(input: PedidoFormValues) {
       prioridad,
       estado,
       fecha_aprobacion,
-      observaciones
+      observaciones,
+      lista_precio
     )
     VALUES (
       ${clienteId},
@@ -213,7 +216,8 @@ export async function createPedido(input: PedidoFormValues) {
       ${input.prioridad},
       ${input.estado},
       ${fechaAprobacion},
-      ${input.observaciones || null}
+      ${input.observaciones || null},
+      ${input.listaPrecios}
     )
     RETURNING id
   `;
