@@ -24,9 +24,9 @@ export async function GET(
     return new Response("Pedido no encontrado", { status: 404 });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buffer = await renderToBuffer(
-    React.createElement(PresupuestoPdf, { pedido, trabajos }) as any
+    // @ts-expect-error: @react-pdf/renderer types incompatibles con React 19
+    React.createElement(PresupuestoPdf, { pedido, trabajos })
   );
 
   return new Response(new Uint8Array(buffer), {

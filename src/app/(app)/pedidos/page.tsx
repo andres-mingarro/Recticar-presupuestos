@@ -1,3 +1,4 @@
+import { getSession } from "@/lib/auth";
 import { PedidosPage } from "@/components/pages/PedidosPage";
 import { listPedidos } from "@/lib/queries/pedidos";
 import { resolveSearchParams } from "@/lib/search-params";
@@ -34,6 +35,9 @@ export default async function Page({
       ? params.prioridad
       : undefined;
 
+  const session = await getSession();
+  const canEdit = session?.role !== "operador";
+
   let errorMessage: string | null = null;
   let pedidos: PedidoListItem[] = [];
 
@@ -50,6 +54,7 @@ export default async function Page({
       prioridad={prioridad}
       pedidos={pedidos}
       errorMessage={errorMessage}
+      canEdit={canEdit}
     />
   );
 }

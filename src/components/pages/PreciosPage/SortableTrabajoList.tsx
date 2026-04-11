@@ -18,7 +18,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/cn";
 import type { TrabajoAgrupado } from "@/lib/types";
-import type { CatalogActionState } from "@/app/precios/actions";
+import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { DeleteTrabajoForm } from "./DeleteTrabajoForm";
 
 type Trabajo = TrabajoAgrupado["trabajos"][number];

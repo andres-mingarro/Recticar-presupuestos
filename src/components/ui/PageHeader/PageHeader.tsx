@@ -18,21 +18,23 @@ export function PageHeader({
       className={cn(
         "PageHeader",
         styles.PageHeader,
-        "flex flex-col gap-4 rounded-[28px] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.88))] p-6 shadow-[0_20px_70px_rgba(148,163,184,0.18)] md:justify-between"
+        "flex flex-col gap-4 rounded-[28px] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.88))] p-6 shadow-[0_20px_70px_rgba(148,163,184,0.18)] sm:flex-row sm:items-center sm:justify-between sm:gap-6"
       )}
     >
-      <div className="space-y-2">
+      <div className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
           {eyebrow}
         </p>
-        <h1 className="mb-4 text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
+        <h1 className="text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
           {title}
         </h1>
-        <div className="text-sm leading-6 text-[var(--color-foreground-muted)]">
-          {description}
-        </div>
+        {description && (
+          <div className="text-sm leading-6 text-[var(--color-foreground-muted)]">
+            {description}
+          </div>
+        )}
       </div>
-      {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
+      {actions ? <div className="flex shrink-0 flex-wrap gap-3">{actions}</div> : null}
     </div>
   );
 }

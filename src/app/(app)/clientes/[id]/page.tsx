@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
 import { ClienteDetailPage } from "@/components/pages/ClienteDetailPage";
 import type { ClienteFormState } from "@/components/forms/ClienteForm";
 import { getClienteById, updateCliente } from "@/lib/queries/clientes";
@@ -23,6 +24,9 @@ export default async function Page({
   if (Number.isNaN(clienteId)) {
     notFound();
   }
+
+  const session = await getSession();
+  const canEdit = session?.role !== "operador";
 
   const [cliente, pedidos] = await Promise.all([
     getClienteById(clienteId),
@@ -105,6 +109,7 @@ export default async function Page({
       wasUpdated={query?.updated === "1"}
       pedidosVigentes={pedidosVigentes}
       pedidosFinalizados={pedidosFinalizados}
+      canEdit={canEdit}
     />
   );
 }

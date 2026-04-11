@@ -35,6 +35,7 @@ type PedidosPageProps = {
   prioridad?: PedidoPrioridad;
   pedidos: PedidoListItem[];
   errorMessage: string | null;
+  canEdit: boolean;
 };
 
 function PedidoTable({
@@ -173,6 +174,7 @@ export function PedidosPage({
   prioridad,
   pedidos,
   errorMessage,
+  canEdit,
 }: PedidosPageProps) {
   const pedidosActivos = pedidos.filter((pedido) => pedido.estado !== "finalizado");
   const pedidosFinalizados = pedidos.filter((pedido) => pedido.estado === "finalizado");
@@ -184,7 +186,7 @@ export function PedidosPage({
         title="Listado de pedidos"
         description="Filtrá presupuestos por estado y prioridad. La base ya queda lista para seguir con alta, edición, aprobación y PDF."
         actions={
-          <ButtonAdd href="/pedidos/nuevo">Nuevo pedido</ButtonAdd>
+          canEdit ? <ButtonAdd href="/pedidos/nuevo">Nuevo pedido</ButtonAdd> : undefined
         }
       />
 

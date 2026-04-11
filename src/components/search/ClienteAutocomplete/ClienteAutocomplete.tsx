@@ -197,7 +197,7 @@ export function ClienteAutocomplete({
 
       {!selectedId && query.trim().length >= 1 && !isLoading && !isOpen && (
         <p className="mt-1.5 text-xs text-[var(--color-foreground-muted)]">
-          No se encontraron coincidencias para "{query}".
+          No se encontraron coincidencias para &quot;{query}&quot;.
         </p>
       )}
     </div>

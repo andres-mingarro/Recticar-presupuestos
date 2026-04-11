@@ -24,6 +24,7 @@ type ClienteDetailPageProps = {
   wasUpdated: boolean;
   pedidosVigentes: ClientePedidoItem[];
   pedidosFinalizados: ClientePedidoItem[];
+  canEdit: boolean;
 };
 
 function PedidoTable({
@@ -122,6 +123,7 @@ export function ClienteDetailPage({
   wasUpdated,
   pedidosVigentes,
   pedidosFinalizados,
+  canEdit,
 }: ClienteDetailPageProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -141,27 +143,29 @@ export function ClienteDetailPage({
           styles.ClienteDetailPageTop
         )}
       >
-        <div
-          className={cn(
-            "ClienteDetailPageEditButtonWrap",
-            styles.ClienteDetailPageEditButtonWrap
-          )}
-        >
-          <button
-            type="button"
-            className={buttonStyles({
-              variant: "primary",
-              size: "sm",
-              className: "gap-2",
-            })}
-            aria-expanded={isEditOpen}
-            aria-controls="cliente-edit-panel"
-            onClick={() => setIsEditOpen((current) => !current)}
+        {canEdit && (
+          <div
+            className={cn(
+              "ClienteDetailPageEditButtonWrap",
+              styles.ClienteDetailPageEditButtonWrap
+            )}
           >
-            <Icon name="edit" className="h-4 w-4" />
-            {isEditOpen ? "Cerrar edicion" : "EDITAR"}
-          </button>
-        </div>
+            <button
+              type="button"
+              className={buttonStyles({
+                variant: "primary",
+                size: "sm",
+                className: "gap-2",
+              })}
+              aria-expanded={isEditOpen}
+              aria-controls="cliente-edit-panel"
+              onClick={() => setIsEditOpen((current) => !current)}
+            >
+              <Icon name="edit" className="h-4 w-4" />
+              {isEditOpen ? "Cerrar edicion" : "EDITAR"}
+            </button>
+          </div>
+        )}
 
         <PageHeader
           eyebrow="Clientes"

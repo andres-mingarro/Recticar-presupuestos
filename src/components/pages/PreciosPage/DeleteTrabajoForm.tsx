@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import type { CatalogActionState } from "@/app/precios/actions";
+import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { Icon } from "@/components/ui/Icon";
 
 export function DeleteTrabajoForm({

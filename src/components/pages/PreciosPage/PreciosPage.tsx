@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import type { TrabajoAgrupado } from "@/lib/types";
-import type { CatalogActionState } from "@/app/precios/actions";
+import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";

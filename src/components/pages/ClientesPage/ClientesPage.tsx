@@ -25,6 +25,7 @@ type ClientesPageProps = {
   currentPage: number;
   totalClientes: number;
   pageSize: number;
+  canEdit: boolean;
 };
 
 function ClientesPager({
@@ -123,6 +124,7 @@ export function ClientesPage({
   currentPage,
   totalClientes,
   pageSize,
+  canEdit,
 }: ClientesPageProps) {
   const totalPages = Math.max(1, Math.ceil(totalClientes / pageSize));
   const hasPreviousPage = currentPage > 1;
@@ -178,7 +180,7 @@ export function ClientesPage({
             </h1>
           </div>
 
-          <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>
+          {canEdit && <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>}
         </div>
 
         <form
