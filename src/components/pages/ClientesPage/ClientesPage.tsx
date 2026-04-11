@@ -12,6 +12,7 @@ import { ClienteSearchBox } from "@/components/search/ClienteSearchBox";
 import { buttonStyles } from "@/components/ui/Button";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
+import { Icon } from "@/components/ui/Icon";
 import { Table } from "@/components/ui/Table";
 import { getVehicleLabel } from "@/lib/format";
 import styles from "./ClientesPage.module.scss";
@@ -70,6 +71,7 @@ function ClientesPager({
               : undefined,
           })}
         >
+          <Icon name="chevronLeft" className="h-4 w-4" />
           Anterior
         </Link>
         <span className="px-2 text-sm text-[var(--color-foreground-muted)]">
@@ -86,6 +88,7 @@ function ClientesPager({
               : undefined,
           })}
         >
+          <Icon name="chevronRight" className="h-4 w-4" />
           Siguiente
         </Link>
       </div>
@@ -192,9 +195,11 @@ export function ClientesPage({
             <ClienteSearchBox initialValue={q} />
           </label>
           <button type="submit" className={buttonStyles()}>
+            <Icon name="search" className="h-4 w-4" />
             Buscar
           </button>
           <Link href="/clientes" className={buttonStyles({ variant: "secondary" })}>
+            <Icon name="x" className="h-4 w-4" />
             Limpiar
           </Link>
         </form>
@@ -228,10 +233,30 @@ export function ClientesPage({
           <table className="min-w-full text-left text-sm">
             <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
               <tr>
-                <th className="px-4 py-3 font-semibold">N° Cliente</th>
-                <th className="px-4 py-3 font-semibold">Nombre completo</th>
-                <th className="px-4 py-3 font-semibold">Teléfono</th>
-                <th className="px-4 py-3 font-semibold">Pendientes</th>
+                <th className="px-4 py-3 font-semibold">
+                  <span className="inline-flex items-center gap-2">
+                    <Icon name="hash" className="h-4 w-4" />
+                    N° Cliente
+                  </span>
+                </th>
+                <th className="px-4 py-3 font-semibold">
+                  <span className="inline-flex items-center gap-2">
+                    <Icon name="user" className="h-4 w-4" />
+                    Nombre completo
+                  </span>
+                </th>
+                <th className="px-4 py-3 font-semibold">
+                  <span className="inline-flex items-center gap-2">
+                    <Icon name="phone" className="h-4 w-4" />
+                    Teléfono
+                  </span>
+                </th>
+                <th className="px-4 py-3 font-semibold">
+                  <span className="inline-flex items-center gap-2">
+                    <Icon name="clipboard" className="h-4 w-4" />
+                    Pendientes
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -365,6 +390,7 @@ export function ClientesPage({
                 className={buttonStyles({ variant: "ghost", size: "sm" })}
                 onClick={closePanel}
               >
+                <Icon name="x" className="h-4 w-4" />
                 Cerrar
               </button>
             </div>
@@ -392,14 +418,20 @@ export function ClientesPage({
                   >
                     <div className="space-y-1">
                       <p className="text-sm font-semibold text-[var(--color-foreground)]">
-                        Pedido #{pedido.numero_pedido}
+                        <span className="inline-flex items-center gap-2">
+                          <Icon name="clipboard" className="h-4 w-4" />
+                          Pedido #{pedido.numero_pedido}
+                        </span>
                       </p>
                       <p className="text-sm text-[var(--color-foreground-muted)]">
-                        {getVehicleLabel([
-                          pedido.marca_nombre,
-                          pedido.modelo_nombre,
-                          pedido.motor_nombre,
-                        ])}
+                        <span className="inline-flex items-center gap-2">
+                          <Icon name="car" className="h-4 w-4" />
+                          {getVehicleLabel([
+                            pedido.marca_nombre,
+                            pedido.modelo_nombre,
+                            pedido.motor_nombre,
+                          ])}
+                        </span>
                       </p>
                       <p className="text-xs text-[var(--color-foreground-subtle)]">
                         Serie: {pedido.numero_serie_motor || "Sin serie"}

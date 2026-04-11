@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/Badge";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
+import { Icon } from "@/components/ui/Icon";
 import { Select } from "@/components/ui/Select";
 import { Table } from "@/components/ui/Table";
 import { buttonStyles } from "@/components/ui/Button";
@@ -55,7 +56,8 @@ function PedidoTable({
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
           {eyebrow}
         </p>
-        <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+        <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+          <Icon name="clipboard" className="h-5 w-5" />
           {title}
         </h2>
       </div>
@@ -64,14 +66,14 @@ function PedidoTable({
         <table className="min-w-full text-left text-sm">
           <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
             <tr>
-              <th className="px-4 py-3 font-semibold">N° Pedido</th>
-              <th className="px-4 py-3 font-semibold">Cliente</th>
-              <th className="px-4 py-3 font-semibold">Vehículo / Motor</th>
-              <th className="px-4 py-3 font-semibold">Prioridad</th>
-              <th className="px-4 py-3 font-semibold">Estado</th>
-              <th className="px-4 py-3 font-semibold">Creación</th>
-              <th className="px-4 py-3 font-semibold">Aprobación</th>
-              <th className="px-4 py-3 font-semibold">Días hábiles</th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="hash" className="h-4 w-4" />N° Pedido</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="user" className="h-4 w-4" />Cliente</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Vehículo / Motor</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="gauge" className="h-4 w-4" />Prioridad</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Estado</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Aprobación</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clock" className="h-4 w-4" />Días hábiles</span></th>
             </tr>
           </thead>
           <tbody>
@@ -213,9 +215,11 @@ export function PedidosPage({
           </Select>
 
           <button type="submit" className={buttonStyles()}>
+            <Icon name="search" className="h-4 w-4" />
             Filtrar
           </button>
           <Link href="/pedidos" className={buttonStyles({ variant: "secondary" })}>
+            <Icon name="x" className="h-4 w-4" />
             Limpiar
           </Link>
         </form>

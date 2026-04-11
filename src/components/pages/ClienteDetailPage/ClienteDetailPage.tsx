@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
 import { ContactBadge, PriorityBadge, StatusBadge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { Icon } from "@/components/ui/Icon";
 import { Table } from "@/components/ui/Table";
 import styles from "./ClienteDetailPage.module.scss";
 
@@ -42,7 +43,8 @@ function PedidoTable({
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
           {eyebrow}
         </p>
-        <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+        <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+          <Icon name="clipboard" className="h-5 w-5" />
           {title}
         </h2>
       </div>
@@ -51,13 +53,13 @@ function PedidoTable({
         <table className="min-w-full text-left text-sm">
           <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
             <tr>
-              <th className="px-4 py-3 font-semibold">N° Pedido</th>
-              <th className="px-4 py-3 font-semibold">Vehículo / Motor</th>
-              <th className="px-4 py-3 font-semibold">Serie</th>
-              <th className="px-4 py-3 font-semibold">Prioridad</th>
-              <th className="px-4 py-3 font-semibold">Estado</th>
-              <th className="px-4 py-3 font-semibold">Creación</th>
-              <th className="px-4 py-3 text-right font-semibold">Detalle</th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="hash" className="h-4 w-4" />N° Pedido</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Vehículo / Motor</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Serie</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="gauge" className="h-4 w-4" />Prioridad</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Estado</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación</span></th>
+              <th className="px-4 py-3 text-right font-semibold"><span className="inline-flex items-center gap-2"><Icon name="arrowRight" className="h-4 w-4" />Detalle</span></th>
             </tr>
           </thead>
           <tbody>
@@ -97,8 +99,9 @@ function PedidoTable({
                   <td className="px-4 py-4 text-right">
                     <Link
                       href={`/pedidos/${pedido.id}`}
-                      className={buttonStyles({ variant: "secondary", size: "sm" })}
+                      className={buttonStyles({ variant: "secondary", size: "sm", className: "gap-2" })}
                     >
+                      <Icon name="arrowRight" className="h-4 w-4" />
                       Ver pedido
                     </Link>
                   </td>
@@ -126,6 +129,7 @@ export function ClienteDetailPage({
     <div className={cn("ClienteDetailPage", styles.ClienteDetailPage, "space-y-6")}>
       <div>
         <Link href="/clientes" className={buttonStyles({ variant: "secondary" })}>
+          <Icon name="chevronLeft" className="h-4 w-4" />
           Volver al listado
         </Link>
       </div>
@@ -154,19 +158,7 @@ export function ClienteDetailPage({
             aria-controls="cliente-edit-panel"
             onClick={() => setIsEditOpen((current) => !current)}
           >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 20h9" />
-              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-            </svg>
+            <Icon name="edit" className="h-4 w-4" />
             {isEditOpen ? "Cerrar edicion" : "EDITAR"}
           </button>
         </div>
