@@ -9,11 +9,13 @@ export type ChangePrioridadActionState = { error: string | null };
 const OPTIONS: Array<{
   value: PedidoPrioridad;
   label: string;
+  tooltip: string;
   styles: { base: string; active: string };
 }> = [
   {
     value: "baja",
     label: "Baja",
+    tooltip: "Cambiar prioridad a baja",
     styles: {
       base: "border-slate-200 text-slate-600 hover:bg-slate-50",
       active: "border-slate-400 bg-slate-100 text-slate-700 font-semibold",
@@ -22,6 +24,7 @@ const OPTIONS: Array<{
   {
     value: "normal",
     label: "Normal",
+    tooltip: "Cambiar prioridad a normal",
     styles: {
       base: "border-sky-200 text-sky-600 hover:bg-sky-50",
       active: "border-sky-400 bg-sky-100 text-sky-700 font-semibold",
@@ -30,6 +33,7 @@ const OPTIONS: Array<{
   {
     value: "alta",
     label: "Alta",
+    tooltip: "Cambiar prioridad a alta",
     styles: {
       base: "border-rose-200 text-rose-600 hover:bg-rose-50",
       active: "border-rose-400 bg-rose-100 text-rose-700 font-semibold",
@@ -60,11 +64,13 @@ export function PrioridadSelector({ value, action }: PrioridadSelectorProps) {
               <button
                 type="submit"
                 disabled={isPending || isActive}
+                title={isActive ? `Prioridad actual: ${option.label}` : option.tooltip}
+                aria-label={isActive ? `Prioridad actual: ${option.label}` : option.tooltip}
                 className={cn(
                   "w-full rounded-lg border px-2 py-1.5 text-xs transition",
                   isActive ? option.styles.active : option.styles.base,
                   isPending && "opacity-60",
-                  isActive && "cursor-default"
+                  isActive ? "cursor-default" : "cursor-pointer"
                 )}
               >
                 {option.label}

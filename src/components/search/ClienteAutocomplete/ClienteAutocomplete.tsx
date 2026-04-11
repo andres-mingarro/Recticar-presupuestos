@@ -10,6 +10,7 @@ type ClienteAutocompleteProps = {
   initialId?: string;
   initialLabel?: string;
   placeholder?: string;
+  form?: string;
 };
 
 export function ClienteAutocomplete({
@@ -17,6 +18,7 @@ export function ClienteAutocomplete({
   initialId = "",
   initialLabel = "",
   placeholder = "Buscar por nombre o apellido...",
+  form,
 }: ClienteAutocompleteProps) {
   const [selectedId, setSelectedId] = useState(initialId);
   const [selectedLabel, setSelectedLabel] = useState(initialLabel);
@@ -114,7 +116,7 @@ export function ClienteAutocomplete({
   return (
     <div ref={containerRef} className="relative">
       {/* Hidden input for form submission */}
-      <input type="hidden" name={name} value={selectedId} />
+      <input type="hidden" name={name} value={selectedId} form={form} />
 
       {selectedId ? (
         /* Selected state: show label + clear button */

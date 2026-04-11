@@ -42,6 +42,8 @@ type PedidoFormProps = {
   relations: ModeloMotorRelation[];
   trabajos: TrabajoAgrupado[];
   allowFinalizado?: boolean;
+  formId?: string;
+  showClienteSection?: boolean;
 };
 
 const prioridadCards: Array<{
@@ -64,6 +66,8 @@ export function PedidoForm({
   relations,
   trabajos,
   allowFinalizado = false,
+  formId,
+  showClienteSection = true,
 }: PedidoFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
   const { toggle: toggleTrabajo } = useTrabajosSeleccion();
@@ -95,36 +99,17 @@ export function PedidoForm({
 
   return (
     <form
+      id={formId}
       action={formAction}
       className={cn("PedidoForm", styles.PedidoForm, "space-y-6")}
     >
-      <Card
-        as="section"
-        className={cn(
-          "PedidoFormSection",
-          styles.PedidoFormSection
-        )}
-      >
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-            Cliente
-          </p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
-            Asignación del cliente
-          </h2>
-        </div>
-
-        <div className={cn("PedidoFormField", styles.PedidoFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
-            Cliente asociado
-          </span>
-          <ClienteAutocomplete
-            name="clienteId"
-            initialId={state.values.clienteId}
-            initialLabel={initialClienteLabel}
-          />
-        </div>
-      </Card>
+      {showClienteSection ? (
+        <PedidoClienteSection
+          initialClienteId={state.values.clienteId}
+          initialClienteLabel={initialClienteLabel}
+          formId={formId}
+        />
+      ) : null}
 
       <Card
         as="section"
@@ -348,5 +333,46 @@ export function PedidoForm({
         </Link>
       </div>
     </form>
+  );
+}
+
+export function PedidoClienteSection({
+  initialClienteId = "",
+  initialClienteLabel = "",
+  formId,
+}: {
+  initialClienteId?: string;
+  initialClienteLabel?: string;
+  formId?: string;
+}) {
+  return (
+    <Card
+      as="section"
+      className={cn(
+        "PedidoFormSection",
+        styles.PedidoFormSection
+      )}
+    >
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+          Cliente
+        </p>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+          Asignación del cliente
+        </h2>
+      </div>
+
+      <div className={cn("PedidoFormField", styles.PedidoFormField)}>
+        <span className="text-sm font-medium text-[var(--color-foreground)]">
+          Cliente asociado
+        </span>
+        <ClienteAutocomplete
+          name="clienteId"
+          initialId={initialClienteId}
+          initialLabel={initialClienteLabel}
+          form={formId}
+        />
+      </div>
+    </Card>
   );
 }

@@ -8,7 +8,11 @@ import type {
   PedidoDetail,
   TrabajoAgrupado,
 } from "@/lib/types";
-import { PedidoForm, type PedidoFormState } from "@/components/forms/PedidoForm";
+import {
+  PedidoClienteSection,
+  PedidoForm,
+  type PedidoFormState,
+} from "@/components/forms/PedidoForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
 import {
@@ -62,6 +66,8 @@ export function PedidoDetailPage({
   relations,
   trabajos,
 }: PedidoDetailPageProps) {
+  const formId = `pedido-form-${pedido.id}`;
+
   return (
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
       {/* Top bar: back button + PDF download */}
@@ -130,6 +136,7 @@ export function PedidoDetailPage({
       <TrabajosSeleccionProvider initialIds={pedido.trabajos_ids}>
       <div className={cn("PedidoDetailPageContent", styles.PedidoDetailPageContent)}>
         <PedidoForm
+          formId={formId}
           action={action}
           initialState={initialState}
           initialClienteLabel={pedido.cliente_nombre ?? ""}
@@ -139,6 +146,7 @@ export function PedidoDetailPage({
           relations={relations}
           trabajos={trabajos}
           allowFinalizado
+          showClienteSection={false}
         />
 
         <aside className={cn("PedidoDetailPageSidebar", styles.PedidoDetailPageSidebar)}>
@@ -213,6 +221,12 @@ export function PedidoDetailPage({
               </div>
             </dl>
           </Card>
+
+          <PedidoClienteSection
+            initialClienteId={initialState.values.clienteId}
+            initialClienteLabel={pedido.cliente_nombre ?? ""}
+            formId={formId}
+          />
 
           <section className="rounded-[28px] border border-[var(--color-border)] bg-[linear-gradient(135deg,rgba(255,247,237,0.9),rgba(255,255,255,0.98))] p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
