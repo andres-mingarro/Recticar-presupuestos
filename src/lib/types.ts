@@ -18,6 +18,19 @@ export type ClienteDetail = ClienteListItem & {
   mail: string | null;
 };
 
+export type ClientePendingPedidoItem = {
+  cliente_id: number;
+  id: number;
+  numero_pedido: number;
+  estado: PedidoEstado;
+  prioridad: PedidoPrioridad;
+  fecha_creacion: string;
+  marca_nombre: string | null;
+  modelo_nombre: string | null;
+  motor_nombre: string | null;
+  numero_serie_motor: string;
+};
+
 export type ClienteFormValues = {
   nombre: string;
   apellido: string;

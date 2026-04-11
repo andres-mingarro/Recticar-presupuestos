@@ -1,7 +1,11 @@
 import { ClientesPage } from "@/components/pages/ClientesPage";
-import { countClientes, listClientes } from "@/lib/queries/clientes";
+import {
+  countClientes,
+  listClientes,
+  listPendingPedidosByClienteIds,
+} from "@/lib/queries/clientes";
 import { resolveSearchParams } from "@/lib/search-params";
-import type { ClienteListItem } from "@/lib/types";
+import type { ClienteListItem, ClientePendingPedidoItem } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +26,7 @@ export default async function Page({
   let errorMessage: string | null = null;
   let clientes: ClienteListItem[] = [];
   let totalClientes = 0;
+  let pendingPedidosByCliente: Record<number, ClientePendingPedidoItem[]> = {};
 
   try {
     [clientes, totalClientes] = await Promise.all([
@@ -32,6 +37,21 @@ export default async function Page({
       }),
       countClientes(q),
     ]);
+
+    const pendingPedidos = await listPendingPedidosByClienteIds(
+      clientes.map((cliente) => cliente.id)
+    );
+
+    pendingPedidosByCliente = pendingPedidos.reduce<
+      Record<number, ClientePendingPedidoItem[]>
+    >((acc, pedido) => {
+      if (!acc[pedido.cliente_id]) {
+        acc[pedido.cliente_id] = [];
+      }
+
+      acc[pedido.cliente_id].push(pedido);
+      return acc;
+    }, {});
   } catch (error) {
     errorMessage =
       error instanceof Error ? error.message : "No se pudo cargar clientes.";
@@ -41,6 +61,7 @@ export default async function Page({
     <ClientesPage
       q={q}
       clientes={clientes}
+      pendingPedidosByCliente={pendingPedidosByCliente}
       errorMessage={errorMessage}
       currentPage={currentPage}
       totalClientes={totalClientes}

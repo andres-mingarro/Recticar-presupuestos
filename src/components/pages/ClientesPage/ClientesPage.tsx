@@ -1,17 +1,25 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
-import type { ClienteListItem } from "@/lib/types";
+import type {
+  ClienteListItem,
+  ClientePendingPedidoItem,
+} from "@/lib/types";
 import { ClienteSearchBox } from "@/components/search/ClienteSearchBox";
 import { buttonStyles } from "@/components/ui/Button";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
 import { Table } from "@/components/ui/Table";
-import { formatDate } from "@/lib/format";
+import { getVehicleLabel } from "@/lib/format";
 import styles from "./ClientesPage.module.scss";
 
 type ClientesPageProps = {
   q: string;
   clientes: ClienteListItem[];
+  pendingPedidosByCliente: Record<number, ClientePendingPedidoItem[]>;
   errorMessage: string | null;
   currentPage: number;
   totalClientes: number;
@@ -100,9 +108,14 @@ function buildClientesHref(q: string, page: number) {
   return query ? `/clientes?${query}` : "/clientes";
 }
 
+function normalizePhoneLink(value: string) {
+  return value.replace(/\D/g, "");
+}
+
 export function ClientesPage({
   q,
   clientes,
+  pendingPedidosByCliente,
   errorMessage,
   currentPage,
   totalClientes,
@@ -113,6 +126,36 @@ export function ClientesPage({
   const hasNextPage = currentPage < totalPages;
   const pageStart = totalClientes === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const pageEnd = Math.min(currentPage * pageSize, totalClientes);
+  const router = useRouter();
+  const [panelClientId, setPanelClientId] = useState<number | null>(null);
+  const [isPanelVisible, setIsPanelVisible] = useState(false);
+  const panelPedidos =
+    panelClientId !== null ? pendingPedidosByCliente[panelClientId] ?? [] : [];
+  const panelClient = clientes.find((cliente) => cliente.id === panelClientId) ?? null;
+
+  useEffect(() => {
+    if (panelClientId === null) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setIsPanelVisible(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [panelClientId]);
+
+  function openPanel(clienteId: number) {
+    setPanelClientId(clienteId);
+  }
+
+  function closePanel() {
+    setIsPanelVisible(false);
+
+    window.setTimeout(() => {
+      setPanelClientId(null);
+    }, 220);
+  }
 
   return (
     <div className={cn("ClientesPage", styles.ClientesPage, "space-y-6")}>
@@ -188,15 +231,14 @@ export function ClientesPage({
                 <th className="px-4 py-3 font-semibold">N° Cliente</th>
                 <th className="px-4 py-3 font-semibold">Nombre completo</th>
                 <th className="px-4 py-3 font-semibold">Teléfono</th>
-                <th className="px-4 py-3 font-semibold">Alta</th>
-                <th className="px-4 py-3 text-right font-semibold">Detalles</th>
+                <th className="px-4 py-3 font-semibold">Pendientes</th>
               </tr>
             </thead>
             <tbody>
               {clientes.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={4}
                     className="px-4 py-12 text-center text-[var(--color-foreground-muted)]"
                   >
                     No hay clientes para mostrar.
@@ -206,7 +248,16 @@ export function ClientesPage({
                 clientes.map((cliente) => (
                   <tr
                     key={cliente.id}
-                    className="border-t border-[var(--color-border)] text-[var(--color-foreground)]"
+                    className="group cursor-pointer border-t border-[var(--color-border)] text-[var(--color-foreground)] transition hover:bg-[var(--color-surface-alt)] focus-within:bg-[var(--color-surface-alt)]"
+                    role="link"
+                    tabIndex={0}
+                    onClick={() => router.push(`/clientes/${cliente.id}`)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        router.push(`/clientes/${cliente.id}`);
+                      }
+                    }}
                   >
                     <td className="px-4 py-4 font-semibold">
                       #{cliente.numero_cliente}
@@ -215,25 +266,48 @@ export function ClientesPage({
                       <span
                         className={cn(
                           "ClientesPageTableLink",
-                          styles.ClientesPageTableLink
+                          styles.ClientesPageTableLink,
+                          "transition group-hover:text-[var(--color-accent)]"
                         )}
                       >
                         {cliente.apellido}, {cliente.nombre}
                       </span>
                     </td>
                     <td className="px-4 py-4">
-                      {cliente.telefono || "Sin teléfono"}
+                      {cliente.telefono ? (
+                        <a
+                          href={`tel:${normalizePhoneLink(cliente.telefono)}`}
+                          className="relative z-[1] -mx-1 rounded-md px-1 font-medium text-[var(--color-accent)] underline decoration-[var(--color-accent)] underline-offset-4 transition hover:bg-orange-50 hover:text-[var(--color-accent-strong)] hover:decoration-[var(--color-accent-strong)] group-hover:text-[var(--color-accent-strong)] group-hover:decoration-[var(--color-accent-strong)]"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          {cliente.telefono}
+                        </a>
+                      ) : (
+                        "Sin teléfono"
+                      )}
                     </td>
                     <td className="px-4 py-4">
-                      {formatDate(cliente.fecha_alta)}
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <Link
-                        href={`/clientes/${cliente.id}`}
-                        className={buttonStyles({ variant: "secondary", size: "sm" })}
+                      <button
+                        type="button"
+                        className={cn(
+                          "ClientesPagePendingBadge",
+                          styles.ClientesPagePendingBadge
+                        )}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openPanel(cliente.id);
+                        }}
                       >
-                        Detalles
-                      </Link>
+                        <span
+                          className={cn(
+                            "ClientesPagePendingBadgeCount",
+                            styles.ClientesPagePendingBadgeCount
+                          )}
+                        >
+                          {(pendingPedidosByCliente[cliente.id] ?? []).length}
+                        </span>
+                        <span>Pendientes</span>
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -253,6 +327,91 @@ export function ClientesPage({
           hasNextPage={hasNextPage}
         />
       </Card>
+
+      {panelClient ? (
+        <div
+          className={cn(
+            "ClientesPagePanelOverlay",
+            styles.ClientesPagePanelOverlay,
+            isPanelVisible && styles.ClientesPagePanelOverlayVisible
+          )}
+          onClick={closePanel}
+        >
+          <aside
+            className={cn(
+              "ClientesPagePanel",
+              styles.ClientesPagePanel,
+              isPanelVisible && styles.ClientesPagePanelVisible
+            )}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div
+              className={cn(
+                "ClientesPagePanelHeader",
+                styles.ClientesPagePanelHeader
+              )}
+            >
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+                  Pendientes
+                </p>
+                <h3 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                  {panelClient.apellido}, {panelClient.nombre}
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                className={buttonStyles({ variant: "ghost", size: "sm" })}
+                onClick={closePanel}
+              >
+                Cerrar
+              </button>
+            </div>
+
+            <div
+              className={cn(
+                "ClientesPagePanelList",
+                styles.ClientesPagePanelList
+              )}
+            >
+              {panelPedidos.length === 0 ? (
+                <p className="text-sm text-[var(--color-foreground-muted)]">
+                  Este cliente no tiene trabajos pendientes.
+                </p>
+              ) : (
+                panelPedidos.map((pedido) => (
+                  <Link
+                    key={pedido.id}
+                    href={`/pedidos/${pedido.id}`}
+                    className={cn(
+                      "ClientesPagePanelItem",
+                      styles.ClientesPagePanelItem
+                    )}
+                    onClick={closePanel}
+                  >
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-[var(--color-foreground)]">
+                        Pedido #{pedido.numero_pedido}
+                      </p>
+                      <p className="text-sm text-[var(--color-foreground-muted)]">
+                        {getVehicleLabel([
+                          pedido.marca_nombre,
+                          pedido.modelo_nombre,
+                          pedido.motor_nombre,
+                        ])}
+                      </p>
+                      <p className="text-xs text-[var(--color-foreground-subtle)]">
+                        Serie: {pedido.numero_serie_motor || "Sin serie"}
+                      </p>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
+          </aside>
+        </div>
+      ) : null}
     </div>
   );
 }

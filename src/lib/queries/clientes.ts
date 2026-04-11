@@ -1,8 +1,9 @@
-import { templateRows } from "@/lib/db";
+import { queryRows, templateRows } from "@/lib/db";
 import type {
   ClienteDetail,
   ClienteFormValues,
   ClienteListItem,
+  ClientePendingPedidoItem,
 } from "@/lib/types";
 
 type ListClientesParams = {
@@ -118,6 +119,44 @@ export async function getClienteById(id: number) {
   `;
 
   return rows[0] ?? null;
+}
+
+export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
+  if (clienteIds.length === 0) {
+    return [] as ClientePendingPedidoItem[];
+  }
+
+  return queryRows<ClientePendingPedidoItem>(
+    `
+      SELECT
+        p.cliente_id,
+        p.id,
+        p.numero_pedido,
+        p.estado,
+        p.prioridad,
+        p.fecha_creacion,
+        ma.nombre AS marca_nombre,
+        mo.nombre AS modelo_nombre,
+        mt.nombre AS motor_nombre,
+        p.numero_serie_motor
+      FROM pedidos p
+      LEFT JOIN marcas ma ON ma.id = p.marca_id
+      LEFT JOIN modelos mo ON mo.id = p.modelo_id
+      LEFT JOIN motores mt ON mt.id = p.motor_id
+      WHERE p.cliente_id = ANY($1::int[])
+        AND p.estado <> 'finalizado'
+      ORDER BY
+        p.cliente_id ASC,
+        CASE
+          WHEN p.prioridad = 'alta' THEN 1
+          WHEN p.prioridad = 'normal' THEN 2
+          ELSE 3
+        END,
+        p.fecha_creacion ASC,
+        p.numero_pedido ASC
+    `,
+    [clienteIds]
+  );
 }
 
 export async function createCliente(input: ClienteFormValues) {

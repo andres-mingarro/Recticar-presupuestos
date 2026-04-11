@@ -24,6 +24,119 @@
   flex-wrap: wrap;
 }
 
+.ClientesPagePendingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  border: 1px solid #bef264;
+  border-radius: 999px;
+  background: #f7fee7;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: #4d7c0f;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.ClientesPagePendingBadge:hover {
+  border-color: #a3e635;
+  background: #ecfccb;
+  color: #3f6212;
+}
+
+.ClientesPagePendingBadgeCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  background: #d9f99d;
+  border: 1px solid #bef264;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+  color: inherit;
+}
+
+.ClientesPagePanelOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.24);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 40;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.ClientesPagePanelOverlayVisible {
+  opacity: 1;
+}
+
+.ClientesPagePanel {
+  width: min(420px, 100%);
+  height: 100%;
+  background: white;
+  border-left: 1px solid var(--color-border);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.14);
+  padding: 1.5rem;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
+  transform: translateX(32px);
+  opacity: 0;
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease;
+}
+
+.ClientesPagePanelVisible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.ClientesPagePanelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ClientesPagePanelList {
+  display: grid;
+  align-content: start;
+  grid-auto-rows: max-content;
+  gap: 0.75rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.ClientesPagePanelItem {
+  display: block;
+  align-self: start;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: white;
+  padding: 1rem;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.ClientesPagePanelItem:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
 @media (min-width: 900px) {
   .ClientesPageHeader {
     grid-template-columns: minmax(0, 1fr) auto;
