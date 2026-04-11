@@ -12,8 +12,8 @@ export interface SessionPayload {
 }
 
 function secret() {
-  const s = process.env.AUTH_SECRET;
-  if (!s) throw new Error("AUTH_SECRET no está definido en .env.local");
+  const s = process.env.JWT_SECRET;
+  if (!s) throw new Error("JWT_SECRET no está definido en .env.local");
   return new TextEncoder().encode(s);
 }
 

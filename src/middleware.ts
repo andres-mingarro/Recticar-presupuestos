@@ -4,8 +4,8 @@ import { jwtVerify } from "jose";
 const COOKIE_NAME = "recticar_token";
 
 function secret() {
-  const s = process.env.AUTH_SECRET;
-  if (!s) throw new Error("AUTH_SECRET no está definido");
+  const s = process.env.JWT_SECRET;
+  if (!s) throw new Error("JWT_SECRET no está definido");
   return new TextEncoder().encode(s);
 }
 
