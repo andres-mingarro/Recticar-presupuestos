@@ -21,7 +21,7 @@ export function PageHeader({
         "flex flex-col gap-4 rounded-[28px] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.88))] p-6 shadow-[0_20px_70px_rgba(148,163,184,0.18)] sm:flex-row sm:items-center sm:justify-between sm:gap-6"
       )}
     >
-      <div className="space-y-1">
+      <div className="min-w-0 flex-1 space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
           {eyebrow}
         </p>

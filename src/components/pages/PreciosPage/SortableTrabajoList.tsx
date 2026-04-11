@@ -114,12 +114,14 @@ export function SortableTrabajoList({
   formId,
   deleteTrabajoAction,
   reorderAction,
+  dndId,
 }: {
   trabajos: Trabajo[];
   isEditing: boolean;
   formId: string;
   deleteTrabajoAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
   reorderAction: (orderedIds: number[]) => Promise<void>;
+  dndId: string;
 }) {
   const [optimisticTrabajos, setOptimisticTrabajos] = useOptimistic(trabajos);
   const [, startTransition] = useTransition();
@@ -143,7 +145,7 @@ export function SortableTrabajoList({
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={optimisticTrabajos.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div className="divide-y divide-[var(--color-border)]">
           {optimisticTrabajos.map((trabajo, index) => (
