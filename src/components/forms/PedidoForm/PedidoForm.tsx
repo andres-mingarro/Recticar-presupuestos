@@ -15,6 +15,7 @@ import type {
   TrabajoAgrupado,
 } from "@/lib/types";
 import { buttonStyles } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -91,11 +92,11 @@ export function PedidoForm({
       action={formAction}
       className={cn("PedidoForm", styles.PedidoForm, "space-y-6")}
     >
-      <section
+      <Card
+        as="section"
         className={cn(
           "PedidoFormSection",
-          styles.PedidoFormSection,
-          "rounded-[28px] border border-[var(--color-border)] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
+          styles.PedidoFormSection
         )}
       >
         <div>
@@ -120,13 +121,13 @@ export function PedidoForm({
             ))}
           </Select>
         </label>
-      </section>
+      </Card>
 
-      <section
+      <Card
+        as="section"
         className={cn(
           "PedidoFormSection",
-          styles.PedidoFormSection,
-          "rounded-[28px] border border-[var(--color-border)] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
+          styles.PedidoFormSection
         )}
       >
         <div>
@@ -204,13 +205,13 @@ export function PedidoForm({
             />
           </label>
         </div>
-      </section>
+      </Card>
 
-      <section
+      <Card
+        as="section"
         className={cn(
           "PedidoFormSection",
-          styles.PedidoFormSection,
-          "rounded-[28px] border border-[var(--color-border)] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
+          styles.PedidoFormSection
         )}
       >
         <div>
@@ -254,13 +255,13 @@ export function PedidoForm({
             </details>
           ))}
         </div>
-      </section>
+      </Card>
 
-      <section
+      <Card
+        as="section"
         className={cn(
           "PedidoFormSection",
-          styles.PedidoFormSection,
-          "rounded-[28px] border border-[var(--color-border)] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
+          styles.PedidoFormSection
         )}
       >
         <div>
@@ -340,7 +341,7 @@ export function PedidoForm({
             defaultValue={state.values.observaciones}
           />
         </label>
-      </section>
+      </Card>
 
       {state.error ? (
         <section className="rounded-[24px] border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">

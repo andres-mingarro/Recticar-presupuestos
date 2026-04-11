@@ -10,7 +10,7 @@ export function PageHeader({
 }: {
   eyebrow: string;
   title: string;
-  description: string;
+  description: ReactNode;
   actions?: ReactNode;
 }) {
   return (
@@ -28,9 +28,9 @@ export function PageHeader({
         <h1 className="text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
           {title}
         </h1>
-        <p className="max-w-2xl text-sm leading-6 text-[var(--color-foreground-muted)]">
+        <div className="max-w-2xl text-sm leading-6 text-[var(--color-foreground-muted)]">
           {description}
-        </p>
+        </div>
       </div>
       {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
     </div>

@@ -2,31 +2,36 @@
   width: 100%;
 }
 
-.ClientesPageSummaryGrid {
+.ClientesPageHeader {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-.ClientesPageSummaryCard {
-  min-width: 0;
+.ClientesPageSearch {
+  display: grid;
+  gap: 0.75rem;
 }
 
 .ClientesPageTableLink {
   text-decoration: none;
 }
 
-.ClientesPageMobileList {
-  display: grid;
+.ClientesPagePager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.ClientesPageMobileCard {
-  min-width: 0;
-}
+@media (min-width: 900px) {
+  .ClientesPageHeader {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
 
-@media (min-width: 768px) {
-  .ClientesPageSummaryGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .ClientesPageSearch {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: end;
   }
 }

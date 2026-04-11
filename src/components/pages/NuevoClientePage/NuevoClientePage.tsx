@@ -3,6 +3,7 @@ import { cn } from "@/lib/cn";
 import { ClienteForm, type ClienteFormState } from "@/components/forms/ClienteForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import styles from "./NuevoClientePage.module.scss";
 
 type NuevoClientePageProps = {
@@ -42,7 +43,7 @@ export function NuevoClientePage({
           styles.NuevoClientePageContent
         )}
       >
-        <section className="rounded-[28px] border border-[var(--color-border)] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+        <Card as="section">
           <div className="mb-6">
             <h2 className="text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
               Datos del cliente
@@ -54,7 +55,7 @@ export function NuevoClientePage({
           </div>
 
           <ClienteForm action={action} initialState={initialState} />
-        </section>
+        </Card>
 
         <aside
           className={cn(
@@ -73,7 +74,7 @@ export function NuevoClientePage({
             </ul>
           </section>
 
-          <section className="rounded-[28px] border border-[var(--color-border)] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+          <Card as="section">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Siguiente paso
             </p>
@@ -81,7 +82,7 @@ export function NuevoClientePage({
               Cuando terminemos esta pantalla, el paso natural es completar la
               ficha individual del cliente con edición y sus pedidos asociados.
             </p>
-          </section>
+          </Card>
         </aside>
       </div>
     </div>

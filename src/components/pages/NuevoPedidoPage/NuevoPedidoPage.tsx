@@ -11,6 +11,7 @@ import type {
 import { PedidoForm, type PedidoFormState } from "@/components/forms/PedidoForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import styles from "./NuevoPedidoPage.module.scss";
 
 type NuevoPedidoPageProps = {
@@ -84,7 +85,7 @@ export function NuevoPedidoPage({
             </ul>
           </section>
 
-          <section className="rounded-[28px] border border-[var(--color-border)] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+          <Card as="section">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Proximo paso
             </p>
@@ -92,7 +93,7 @@ export function NuevoPedidoPage({
               Después de crear el pedido, lo vamos a usar como base para la
               edición completa, la aprobacion, el PDF y el link de WhatsApp.
             </p>
-          </section>
+          </Card>
         </aside>
       </div>
     </div>

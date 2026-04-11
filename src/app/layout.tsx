@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MainMenu } from "@/components/navigation/MainMenu";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,26 +33,7 @@ export default function RootLayout({
                     Presupuestos, clientes y seguimiento de trabajos.
                   </p>
                 </div>
-                <nav className="flex flex-wrap gap-2 text-sm">
-                  <Link
-                    href="/"
-                    className="rounded-full px-3 py-2 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-foreground)]"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/clientes"
-                    className="rounded-full px-3 py-2 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-foreground)]"
-                  >
-                    Clientes
-                  </Link>
-                  <Link
-                    href="/pedidos"
-                    className="rounded-full px-3 py-2 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-foreground)]"
-                  >
-                    Pedidos
-                  </Link>
-                </nav>
+                <MainMenu />
               </div>
             </header>
             <main className="flex-1">{children}</main>

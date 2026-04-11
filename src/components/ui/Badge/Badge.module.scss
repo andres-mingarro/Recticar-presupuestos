@@ -1,3 +1,23 @@
 .Badge {
   display: inline-flex;
 }
+
+.ContactBadge {
+  max-width: 100%;
+}
+
+.ContactBadgeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ContactBadgeLabel {
+  font-weight: 700;
+}
+
+.ContactBadgeValue {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

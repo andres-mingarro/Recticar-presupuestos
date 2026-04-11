@@ -2,27 +2,72 @@
   width: 100%;
 }
 
-.ClienteDetailPageGrid {
+.ClienteDetailPageTop {
   display: grid;
   gap: 1.5rem;
+  position: relative;
 }
 
-.ClienteDetailPageMain {
+.ClienteDetailPageEditButtonWrap {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ClienteDetailPageStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ClienteDetailPageStatItem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.ClienteDetailPageHeaderData {
   display: grid;
-  gap: 1.5rem;
+  gap: 0.85rem;
 }
 
-.ClienteDetailPagePedidoList {
+.ClienteDetailPageHeaderMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.ClienteDetailPageAccordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    grid-template-rows 180ms ease,
+    opacity 180ms ease,
+    margin-top 180ms ease;
+}
+
+.ClienteDetailPageAccordionOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.ClienteDetailPageAccordionInner {
+  min-height: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.5rem;
   display: grid;
   gap: 1rem;
 }
 
-.ClienteDetailPagePedidoCard {
-  min-width: 0;
-}
-
-@media (min-width: 1024px) {
-  .ClienteDetailPageGrid {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+@media (min-width: 768px) {
+  .ClienteDetailPageEditButtonWrap {
+    position: absolute;
+    top: 3.1rem;
+    right: 3rem;
+    z-index: 1;
   }
 }

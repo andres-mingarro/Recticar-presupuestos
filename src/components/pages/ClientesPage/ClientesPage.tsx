@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type { ClienteListItem } from "@/lib/types";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Input } from "@/components/ui/Input";
-import { Table } from "@/components/ui/Table";
+import { ClienteSearchBox } from "@/components/search/ClienteSearchBox";
 import { buttonStyles } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Table } from "@/components/ui/Table";
 import { formatDate } from "@/lib/format";
 import styles from "./ClientesPage.module.scss";
 
@@ -12,118 +12,76 @@ type ClientesPageProps = {
   q: string;
   clientes: ClienteListItem[];
   errorMessage: string | null;
+  currentPage: number;
+  totalClientes: number;
+  pageSize: number;
 };
 
-function getSearchLabel(q: string) {
-  return q ? `Buscando: "${q}"` : "Mostrando todos los clientes";
+function buildClientesHref(q: string, page: number) {
+  const params = new URLSearchParams();
+
+  if (q) {
+    params.set("q", q);
+  }
+
+  if (page > 1) {
+    params.set("page", String(page));
+  }
+
+  const query = params.toString();
+  return query ? `/clientes?${query}` : "/clientes";
 }
 
 export function ClientesPage({
   q,
   clientes,
   errorMessage,
+  currentPage,
+  totalClientes,
+  pageSize,
 }: ClientesPageProps) {
-  const totalClientes = clientes.length;
-  const ultimoCliente = clientes[0] ?? null;
+  const totalPages = Math.max(1, Math.ceil(totalClientes / pageSize));
+  const hasPreviousPage = currentPage > 1;
+  const hasNextPage = currentPage < totalPages;
+  const pageStart = totalClientes === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const pageEnd = Math.min(currentPage * pageSize, totalClientes);
 
   return (
     <div className={cn("ClientesPage", styles.ClientesPage, "space-y-6")}>
-      <PageHeader
-        eyebrow="Clientes"
-        title="Listado de clientes"
-        description="Organizá la cartera del taller, encontrá clientes rápido y dejá lista la base para sus próximos pedidos, seguimientos y presupuestos."
-        actions={
+      <Card as="section">
+        <div
+          className={cn(
+            "ClientesPageHeader",
+            styles.ClientesPageHeader
+          )}
+        >
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+              Clientes
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
+              Listado de clientes
+            </h1>
+          </div>
+
           <Link href="/clientes/nuevo" className={buttonStyles()}>
             Nuevo cliente
           </Link>
-        }
-      />
-
-      <section
-        className={cn(
-          "ClientesPageSummaryGrid",
-          styles.ClientesPageSummaryGrid
-        )}
-      >
-        <article
-          className={cn(
-            "ClientesPageSummaryCard",
-            styles.ClientesPageSummaryCard,
-            "rounded-[28px] border border-[var(--color-border)] bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
-          )}
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-            Resultados
-          </p>
-          <p className="mt-3 text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
-            {totalClientes}
-          </p>
-          <p className="mt-2 text-sm text-[var(--color-foreground-muted)]">
-            {totalClientes === 1
-              ? "cliente visible en pantalla"
-              : "clientes visibles en pantalla"}
-          </p>
-        </article>
-
-        <article
-          className={cn(
-            "ClientesPageSummaryCard",
-            styles.ClientesPageSummaryCard,
-            "rounded-[28px] border border-[var(--color-border)] bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
-          )}
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-            Contexto
-          </p>
-          <p className="mt-3 text-lg font-semibold tracking-tight text-[var(--color-foreground)]">
-            {getSearchLabel(q)}
-          </p>
-          <p className="mt-2 text-sm text-[var(--color-foreground-muted)]">
-            Usá el buscador para ubicar clientes por nombre o apellido.
-          </p>
-        </article>
-
-        <article
-          className={cn(
-            "ClientesPageSummaryCard",
-            styles.ClientesPageSummaryCard,
-            "rounded-[28px] border border-[var(--color-border)] bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
-          )}
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-            Último visible
-          </p>
-          <p className="mt-3 text-lg font-semibold tracking-tight text-[var(--color-foreground)]">
-            {ultimoCliente
-              ? `#${ultimoCliente.numero_cliente} · ${ultimoCliente.apellido}, ${ultimoCliente.nombre}`
-              : "Sin registros"}
-          </p>
-          <p className="mt-2 text-sm text-[var(--color-foreground-muted)]">
-            {ultimoCliente
-              ? `Alta ${formatDate(ultimoCliente.fecha_alta)}`
-              : "Todavía no hay clientes cargados."}
-          </p>
-        </article>
-      </section>
-
-      <section className="rounded-[28px] border border-[var(--color-border)] bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
-        <div className="mb-4 flex flex-col gap-1">
-          <h2 className="text-lg font-semibold tracking-tight text-[var(--color-foreground)]">
-            Buscar cliente
-          </h2>
-          <p className="text-sm text-[var(--color-foreground-muted)]">
-            La búsqueda filtra por nombre y apellido.
-          </p>
         </div>
 
-        <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
-          <Input
-            type="search"
-            name="q"
-            defaultValue={q}
-            placeholder="Ej. Pérez o Juan"
-            className="ClientesPageSearchInput"
-          />
+        <form
+          className={cn(
+            "ClientesPageSearch",
+            styles.ClientesPageSearch,
+            "mt-6"
+          )}
+        >
+          <label className="grid gap-2">
+            <span className="text-sm font-medium text-[var(--color-foreground)]">
+              Busqueda de cliente
+            </span>
+            <ClienteSearchBox initialValue={q} />
+          </label>
           <button type="submit" className={buttonStyles()}>
             Buscar
           </button>
@@ -131,7 +89,7 @@ export function ClientesPage({
             Limpiar
           </Link>
         </form>
-      </section>
+      </Card>
 
       {errorMessage ? (
         <section className="rounded-[28px] border border-rose-200 bg-rose-50 p-5 text-sm text-rose-700">
@@ -140,126 +98,116 @@ export function ClientesPage({
       ) : null}
 
       <section className="space-y-4">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
-              Clientes registrados
-            </h2>
-            <p className="text-sm text-[var(--color-foreground-muted)]">
-              Vista principal para consultar la base de clientes del taller.
-            </p>
-          </div>
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+            Listado de clientes
+          </h2>
         </div>
 
-        <div className="hidden md:block">
-          <Table>
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
+        <Table>
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
+              <tr>
+                <th className="px-4 py-3 font-semibold">N° Cliente</th>
+                <th className="px-4 py-3 font-semibold">Nombre completo</th>
+                <th className="px-4 py-3 font-semibold">Teléfono</th>
+                <th className="px-4 py-3 font-semibold">Alta</th>
+                <th className="px-4 py-3 text-right font-semibold">Detalles</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clientes.length === 0 ? (
                 <tr>
-                  <th className="px-4 py-3 font-semibold">N° Cliente</th>
-                  <th className="px-4 py-3 font-semibold">Nombre completo</th>
-                  <th className="px-4 py-3 font-semibold">Teléfono</th>
-                  <th className="px-4 py-3 font-semibold">Alta</th>
+                  <td
+                    colSpan={5}
+                    className="px-4 py-12 text-center text-[var(--color-foreground-muted)]"
+                  >
+                    No hay clientes para mostrar.
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {clientes.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="px-4 py-12 text-center text-[var(--color-foreground-muted)]"
-                    >
-                      No hay clientes para mostrar.
+              ) : (
+                clientes.map((cliente) => (
+                  <tr
+                    key={cliente.id}
+                    className="border-t border-[var(--color-border)] text-[var(--color-foreground)]"
+                  >
+                    <td className="px-4 py-4 font-semibold">
+                      #{cliente.numero_cliente}
+                    </td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={cn(
+                          "ClientesPageTableLink",
+                          styles.ClientesPageTableLink
+                        )}
+                      >
+                        {cliente.apellido}, {cliente.nombre}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      {cliente.telefono || "Sin teléfono"}
+                    </td>
+                    <td className="px-4 py-4">
+                      {formatDate(cliente.fecha_alta)}
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <Link
+                        href={`/clientes/${cliente.id}`}
+                        className={buttonStyles({ variant: "secondary", size: "sm" })}
+                      >
+                        Detalles
+                      </Link>
                     </td>
                   </tr>
-                ) : (
-                  clientes.map((cliente) => (
-                    <tr
-                      key={cliente.id}
-                      className="border-t border-[var(--color-border)] text-[var(--color-foreground)]"
-                    >
-                      <td className="px-4 py-4 font-semibold">
-                        #{cliente.numero_cliente}
-                      </td>
-                      <td className="px-4 py-4">
-                        <Link
-                          href={`/clientes/${cliente.id}`}
-                          className={cn(
-                            "ClientesPageTableLink",
-                            styles.ClientesPageTableLink,
-                            "transition hover:text-[var(--color-accent)]"
-                          )}
-                        >
-                          {cliente.apellido}, {cliente.nombre}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-4">
-                        {cliente.telefono || "Sin teléfono"}
-                      </td>
-                      <td className="px-4 py-4">
-                        {formatDate(cliente.fecha_alta)}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </Table>
-        </div>
+                ))
+              )}
+            </tbody>
+          </table>
+        </Table>
 
         <div
           className={cn(
-            "ClientesPageMobileList",
-            styles.ClientesPageMobileList,
-            "md:hidden"
+            "ClientesPagePager",
+            styles.ClientesPagePager
           )}
         >
-          {clientes.length === 0 ? (
-            <div className="rounded-[24px] border border-dashed border-[var(--color-border)] bg-white/80 p-6 text-center text-sm text-[var(--color-foreground-muted)]">
-              No hay clientes para mostrar.
-            </div>
-          ) : (
-            clientes.map((cliente) => (
-              <Link
-                key={cliente.id}
-                href={`/clientes/${cliente.id}`}
-                className={cn(
-                  "ClientesPageMobileCard",
-                  styles.ClientesPageMobileCard,
-                  "rounded-[24px] border border-[var(--color-border)] bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
-                )}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)]">
-                      Cliente #{cliente.numero_cliente}
-                    </p>
-                    <h3 className="mt-2 text-lg font-semibold tracking-tight text-[var(--color-foreground)]">
-                      {cliente.apellido}, {cliente.nombre}
-                    </h3>
-                  </div>
-                  <span className="rounded-full bg-[var(--color-surface-alt)] px-3 py-1 text-xs font-medium text-[var(--color-foreground-muted)]">
-                    Ver
-                  </span>
-                </div>
+          <p className="text-sm text-[var(--color-foreground-muted)]">
+            {totalClientes === 0
+              ? "Sin resultados"
+              : `Mostrando ${pageStart}-${pageEnd} de ${totalClientes} clientes`}
+          </p>
 
-                <div className="mt-4 grid gap-3 text-sm text-[var(--color-foreground-muted)]">
-                  <p>
-                    <span className="font-medium text-[var(--color-foreground)]">
-                      Teléfono:
-                    </span>{" "}
-                    {cliente.telefono || "Sin teléfono"}
-                  </p>
-                  <p>
-                    <span className="font-medium text-[var(--color-foreground)]">
-                      Alta:
-                    </span>{" "}
-                    {formatDate(cliente.fecha_alta)}
-                  </p>
-                </div>
-              </Link>
-            ))
-          )}
+          <div className="flex items-center gap-2">
+            <Link
+              href={buildClientesHref(q, currentPage - 1)}
+              aria-disabled={!hasPreviousPage}
+              className={buttonStyles({
+                variant: "secondary",
+                size: "sm",
+                className: !hasPreviousPage
+                  ? "pointer-events-none opacity-50"
+                  : undefined,
+              })}
+            >
+              Anterior
+            </Link>
+            <span className="px-2 text-sm text-[var(--color-foreground-muted)]">
+              Página {currentPage} de {totalPages}
+            </span>
+            <Link
+              href={buildClientesHref(q, currentPage + 1)}
+              aria-disabled={!hasNextPage}
+              className={buttonStyles({
+                variant: "secondary",
+                size: "sm",
+                className: !hasNextPage
+                  ? "pointer-events-none opacity-50"
+                  : undefined,
+              })}
+            >
+              Siguiente
+            </Link>
+          </div>
         </div>
       </section>
     </div>

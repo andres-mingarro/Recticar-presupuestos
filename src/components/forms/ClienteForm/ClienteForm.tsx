@@ -29,6 +29,9 @@ type ClienteFormProps = {
   description?: string;
   eyebrow?: string;
   cancelMode?: "link" | "toggle";
+  isEditing?: boolean;
+  showEditToggle?: boolean;
+  onCancel?: () => void;
 };
 
 export function ClienteForm({
@@ -43,9 +46,22 @@ export function ClienteForm({
   description,
   eyebrow,
   cancelMode = "link",
+  isEditing: controlledIsEditing,
+  showEditToggle = true,
+  onCancel,
 }: ClienteFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
-  const [isEditing, setIsEditing] = useState(!startInReadOnly);
+  const [internalIsEditing, setInternalIsEditing] = useState(!startInReadOnly);
+  const isEditing = controlledIsEditing ?? internalIsEditing;
+
+  function handleCloseEditing() {
+    if (onCancel) {
+      onCancel();
+      return;
+    }
+
+    setInternalIsEditing(false);
+  }
 
   return (
     <form
@@ -77,14 +93,14 @@ export function ClienteForm({
             ) : null}
           </div>
 
-          {startInReadOnly ? (
+          {startInReadOnly && showEditToggle ? (
             <button
               type="button"
               className={buttonStyles({
                 variant: isEditing ? "secondary" : "ghost",
                 className: "shrink-0 gap-2",
               })}
-              onClick={() => setIsEditing((current) => !current)}
+              onClick={() => setInternalIsEditing((current) => !current)}
             >
               <svg
                 aria-hidden="true"
@@ -198,7 +214,7 @@ export function ClienteForm({
             <button
               type="button"
               className={buttonStyles({ variant: "secondary" })}
-              onClick={() => setIsEditing(false)}
+              onClick={handleCloseEditing}
             >
               {cancelLabel}
             </button>

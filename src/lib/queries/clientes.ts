@@ -5,8 +5,20 @@ import type {
   ClienteListItem,
 } from "@/lib/types";
 
-export async function listClientes(search?: string) {
+type ListClientesParams = {
+  search?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export async function listClientes({
+  search,
+  limit,
+  offset,
+}: ListClientesParams = {}) {
   const normalizedSearch = search?.trim();
+  const normalizedLimit = limit ?? 20;
+  const normalizedOffset = offset ?? 0;
 
   if (normalizedSearch) {
     return templateRows<ClienteListItem>`
@@ -22,6 +34,8 @@ export async function listClientes(search?: string) {
         nombre ILIKE ${`%${normalizedSearch}%`}
         OR apellido ILIKE ${`%${normalizedSearch}%`}
       ORDER BY numero_cliente DESC
+      LIMIT ${normalizedLimit}
+      OFFSET ${normalizedOffset}
     `;
   }
 
@@ -35,7 +49,32 @@ export async function listClientes(search?: string) {
       fecha_alta
     FROM clientes
     ORDER BY numero_cliente DESC
+    LIMIT ${normalizedLimit}
+    OFFSET ${normalizedOffset}
   `;
+}
+
+export async function countClientes(search?: string) {
+  const normalizedSearch = search?.trim();
+
+  if (normalizedSearch) {
+    const rows = await templateRows<{ total: number }>`
+      SELECT COUNT(*)::int AS total
+      FROM clientes
+      WHERE
+        nombre ILIKE ${`%${normalizedSearch}%`}
+        OR apellido ILIKE ${`%${normalizedSearch}%`}
+    `;
+
+    return rows[0]?.total ?? 0;
+  }
+
+  const rows = await templateRows<{ total: number }>`
+    SELECT COUNT(*)::int AS total
+    FROM clientes
+  `;
+
+  return rows[0]?.total ?? 0;
 }
 
 export async function findClientesByName(search: string) {
