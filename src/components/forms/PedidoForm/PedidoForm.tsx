@@ -214,7 +214,7 @@ export function PedidoForm({
         {/* Selector de lista de precios */}
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium text-[var(--color-foreground)]">Lista de precios</span>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {([1, 2, 3] as const).map((lista) => {
               const colors = {
                 1: "border-sky-300 bg-sky-50 text-sky-700 ring-sky-400",
