@@ -39,8 +39,7 @@ export async function crearUsuarioAction(formData: FormData) {
     throw new Error("Sin permiso para crear superusers");
 
   const hash = await bcrypt.hash(password, 12);
-  // el nombre es también el identificador de login (columna email en DB)
-  await createUsuario(nombre, nombre, hash, nuevoRol);
+  await createUsuario(nombre, nombre, hash, password, nuevoRol);
   revalidatePath("/admin/usuarios");
 }
 
@@ -65,7 +64,7 @@ export async function cambiarPasswordAction(
   const role = await getSessionRole();
   if (!canManage(role, targetRole)) throw new Error("Sin permiso");
   const hash = await bcrypt.hash(password, 12);
-  await updateUsuarioPassword(email, hash);
+  await updateUsuarioPassword(email, hash, password);
   revalidatePath("/admin/usuarios");
 }
 
