@@ -22,7 +22,8 @@ type IconName =
   | "mapPin"
   | "check"
   | "download"
-  | "tag";
+  | "tag"
+  | "trash";
 
 type IconProps = {
   name: IconName;
@@ -190,6 +191,14 @@ export function Icon({ name, className }: IconProps) {
         <svg {...commonProps}>
           <path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l7.29-7.29a1 1 0 0 0 0-1.41Z" />
           <circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case "trash":
+      return (
+        <svg {...commonProps}>
+          <path d="M3 6h18" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
         </svg>
       );
   }
