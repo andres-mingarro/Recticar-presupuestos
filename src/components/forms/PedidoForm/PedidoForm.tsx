@@ -333,10 +333,17 @@ export function PedidoForm({
       ) : null}
 
       <div className={cn("PedidoFormActions", styles.PedidoFormActions)}>
-        <button type="submit" className={buttonStyles()} disabled={isPending}>
+        <button
+          type="submit"
+          className={buttonStyles({ className: "w-full sm:w-auto" })}
+          disabled={isPending}
+        >
           {isPending ? "Guardando pedido..." : "Guardar pedido"}
         </button>
-        <Link href="/pedidos" className={buttonStyles({ variant: "secondary" })}>
+        <Link
+          href="/pedidos"
+          className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
+        >
           Cancelar
         </Link>
       </div>

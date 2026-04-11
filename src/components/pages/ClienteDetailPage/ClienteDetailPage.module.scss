@@ -38,8 +38,8 @@
 
 .ClienteDetailPageHeaderMeta {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
 .ClienteDetailPageHeaderMetaCol {
@@ -74,6 +74,11 @@
 }
 
 @media (min-width: 768px) {
+  .ClienteDetailPageHeaderMeta {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
   .ClienteDetailPageEditButtonWrap {
     position: absolute;
     top: 4.5rem;

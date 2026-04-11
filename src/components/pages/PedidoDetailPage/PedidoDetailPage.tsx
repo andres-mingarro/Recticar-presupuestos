@@ -65,8 +65,11 @@ export function PedidoDetailPage({
   return (
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
       {/* Top bar: back button + PDF download */}
-      <div className="flex items-center justify-between gap-4">
-        <Link href="/pedidos" className={buttonStyles({ variant: "secondary" })}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Link
+          href="/pedidos"
+          className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
+        >
           <Icon name="chevronLeft" className="h-4 w-4" />
           Volver al listado
         </Link>
@@ -75,7 +78,10 @@ export function PedidoDetailPage({
           href={`/api/pedidos/${pedido.id}/pdf`}
           target="_blank"
           rel="noopener noreferrer"
-          className={buttonStyles({ className: "gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white" })}
+          className={buttonStyles({
+            className:
+              "w-full gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white sm:w-auto",
+          })}
         >
           <Icon name="download" className="h-4 w-4" />
           DESCARGAR PRESUPUESTO
@@ -85,14 +91,14 @@ export function PedidoDetailPage({
       <PageHeader
         eyebrow="Pedidos"
         title={
-          <span className="flex w-full items-center justify-between gap-4">
-            <span>
+          <span className="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <span className="min-w-0">
               {pedido.cliente_nombre ?? "Sin cliente"} | Pedido #{pedido.numero_pedido}
             </span>
             {pedido.cliente_id ? (
               <Link
                 href={`/clientes/${pedido.cliente_id}`}
-                className="inline-flex items-center gap-1 shrink-0 text-sm font-medium text-[var(--color-accent)] underline underline-offset-4 transition-opacity hover:opacity-70"
+                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--color-accent)] underline underline-offset-4 transition-opacity hover:opacity-70 sm:shrink-0"
               >
                 Ver ficha del cliente
                 <Icon name="arrowRight" className="h-3.5 w-3.5" />
@@ -142,7 +148,7 @@ export function PedidoDetailPage({
             </p>
 
             <dl className="space-y-3 text-sm">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
                   <Icon name="gauge" className="h-4 w-4 shrink-0" />
                   Prioridad
@@ -152,18 +158,18 @@ export function PedidoDetailPage({
                 </dd>
               </div>
 
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
                   <Icon name="car" className="h-4 w-4 shrink-0" />
                   Vehículo
                 </dt>
-                <dd className="text-right font-medium text-[var(--color-foreground)]">
+                <dd className="font-medium text-[var(--color-foreground)] sm:text-right">
                   {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre, pedido.motor_nombre])}
                 </dd>
               </div>
 
               {pedido.numero_serie_motor ? (
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
                     <Icon name="hash" className="h-4 w-4 shrink-0" />
                     Serie
@@ -174,7 +180,7 @@ export function PedidoDetailPage({
                 </div>
               ) : null}
 
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
                   <Icon name="calendar" className="h-4 w-4 shrink-0" />
                   Creación
@@ -185,7 +191,7 @@ export function PedidoDetailPage({
               </div>
 
               {pedido.fecha_aprobacion ? (
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
                     <Icon name="calendar" className="h-4 w-4 shrink-0" />
                     Aprobación
@@ -197,7 +203,7 @@ export function PedidoDetailPage({
               ) : null}
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
                     <Icon name="clipboard" className="h-4 w-4 shrink-0" />
                     Trabajos

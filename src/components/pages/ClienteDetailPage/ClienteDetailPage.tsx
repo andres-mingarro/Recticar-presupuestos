@@ -51,7 +51,7 @@ function PedidoTable({
       </div>
 
       <Table>
-        <table className="min-w-full text-left text-sm">
+        <table className="min-w-[720px] w-full text-left text-sm">
           <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
             <tr>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="hash" className="h-4 w-4" />N° Pedido</span></th>
@@ -130,7 +130,10 @@ export function ClienteDetailPage({
   return (
     <div className={cn("ClienteDetailPage", styles.ClienteDetailPage, "space-y-6")}>
       <div>
-        <Link href="/clientes" className={buttonStyles({ variant: "secondary" })}>
+        <Link
+          href="/clientes"
+          className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
+        >
           <Icon name="chevronLeft" className="h-4 w-4" />
           Volver al listado
         </Link>

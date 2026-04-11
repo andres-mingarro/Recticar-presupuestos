@@ -74,7 +74,7 @@ function StepVisual({
         <svg
           aria-hidden="true"
           viewBox="0 0 8 40"
-          className="absolute -right-px top-0 h-full w-2 text-[var(--color-border)]"
+          className="absolute -right-px top-0 hidden h-full w-2 text-[var(--color-border)] md:block"
           preserveAspectRatio="none"
         >
           <polyline
@@ -115,7 +115,7 @@ export function EstadoStepper(props: EstadoStepperProps) {
   const displayValue = isForm ? selected : props.value;
 
   return (
-    <div className="flex w-full items-stretch overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+    <div className="flex w-full flex-col items-stretch overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] md:flex-row">
       {isForm && <input type="hidden" name={props.name} value={selected} />}
 
       {visibleSteps.map((step, index) => {
@@ -129,11 +129,11 @@ export function EstadoStepper(props: EstadoStepperProps) {
             disabled={!isForm}
             onClick={isForm ? () => setSelected(step.value) : undefined}
             className={cn(
-              "relative flex flex-1 items-center gap-3 px-5 py-4 text-left text-sm transition",
+              "relative flex flex-1 items-center gap-3 px-4 py-4 text-left text-sm transition sm:px-5",
               isForm && "cursor-pointer hover:bg-[var(--color-surface-alt)]",
               !isForm && "cursor-default",
               status === "active" && "bg-[var(--color-surface-alt)]",
-              !isLast && "border-r border-[var(--color-border)]"
+              !isLast && "border-b border-[var(--color-border)] md:border-b-0 md:border-r"
             )}
           >
             <StepVisual step={step} status={status} isLast={isLast} />
@@ -161,7 +161,7 @@ export function EstadoStepperAction({ value, action }: EstadoStepperActionProps)
 
   return (
     <div className="space-y-2">
-      <div className="flex w-full items-stretch overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+      <div className="flex w-full flex-col items-stretch overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] md:flex-row">
         {STEPS.map((step, index) => {
           const status = stepStatus(step.value, value);
           const isLast = index === STEPS.length - 1;
@@ -171,17 +171,17 @@ export function EstadoStepperAction({ value, action }: EstadoStepperActionProps)
             <form
               key={step.value}
               action={formAction}
-              className={cn(
-                "relative flex flex-1",
-                !isLast && "border-r border-[var(--color-border)]"
-              )}
-            >
+                className={cn(
+                  "relative flex flex-1",
+                  !isLast && "border-b border-[var(--color-border)] md:border-b-0 md:border-r"
+                )}
+              >
               <input type="hidden" name="estado" value={step.value} />
               <button
                 type="submit"
                 disabled={isPending || isCurrent}
                 className={cn(
-                  "relative flex w-full items-center gap-3 px-5 py-4 text-left text-sm transition",
+                  "relative flex w-full items-center gap-3 px-4 py-4 text-left text-sm transition sm:px-5",
                   !isCurrent && !isPending && "cursor-pointer hover:bg-[var(--color-surface-alt)]",
                   isCurrent && "cursor-default",
                   status === "active" && "bg-[var(--color-surface-alt)]",

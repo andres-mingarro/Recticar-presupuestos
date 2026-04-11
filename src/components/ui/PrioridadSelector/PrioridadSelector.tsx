@@ -50,7 +50,7 @@ export function PrioridadSelector({ value, action }: PrioridadSelectorProps) {
 
   return (
     <div className="space-y-1.5">
-      <div className="flex gap-1.5">
+      <div className="flex flex-col gap-1.5 sm:flex-row">
         {OPTIONS.map((option) => {
           const isActive = option.value === value;
 

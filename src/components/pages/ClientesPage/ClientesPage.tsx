@@ -60,16 +60,17 @@ function ClientesPager({
           : `Mostrando ${pageStart}-${pageEnd} de ${totalClientes} clientes`}
       </p>
 
-      <div className="flex items-center gap-2">
+      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
         <Link
           href={buildClientesHref(q, currentPage - 1)}
           aria-disabled={!hasPreviousPage}
           className={buttonStyles({
             variant: "secondary",
             size: "sm",
-            className: !hasPreviousPage
-              ? "pointer-events-none opacity-50"
-              : undefined,
+            className: cn(
+              "w-full sm:w-auto",
+              !hasPreviousPage ? "pointer-events-none opacity-50" : undefined
+            ),
           })}
         >
           <Icon name="chevronLeft" className="h-4 w-4" />
@@ -84,9 +85,10 @@ function ClientesPager({
           className={buttonStyles({
             variant: "secondary",
             size: "sm",
-            className: !hasNextPage
-              ? "pointer-events-none opacity-50"
-              : undefined,
+            className: cn(
+              "w-full sm:w-auto",
+              !hasNextPage ? "pointer-events-none opacity-50" : undefined
+            ),
           })}
         >
           <Icon name="chevronRight" className="h-4 w-4" />
@@ -196,11 +198,14 @@ export function ClientesPage({
             </span>
             <ClienteSearchBox initialValue={q} />
           </label>
-          <button type="submit" className={buttonStyles()}>
+          <button type="submit" className={buttonStyles({ className: "w-full sm:w-auto" })}>
             <Icon name="search" className="h-4 w-4" />
             Buscar
           </button>
-          <Link href="/clientes" className={buttonStyles({ variant: "secondary" })}>
+          <Link
+            href="/clientes"
+            className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
+          >
             <Icon name="x" className="h-4 w-4" />
             Limpiar
           </Link>
@@ -232,7 +237,7 @@ export function ClientesPage({
         />
 
         <Table>
-          <table className="min-w-full text-left text-sm">
+          <table className="min-w-[840px] w-full text-left text-sm">
             <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
               <tr>
                 <th className="px-4 py-3 font-semibold">

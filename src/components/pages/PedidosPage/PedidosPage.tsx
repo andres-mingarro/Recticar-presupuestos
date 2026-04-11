@@ -64,7 +64,7 @@ function PedidoTable({
       </div>
 
       <Table>
-        <table className="min-w-full text-left text-sm">
+        <table className="min-w-[760px] w-full text-left text-sm">
           <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
             <tr>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="hash" className="h-4 w-4" />N° Pedido</span></th>
@@ -216,11 +216,14 @@ export function PedidosPage({
             ))}
           </Select>
 
-          <button type="submit" className={buttonStyles()}>
+          <button type="submit" className={buttonStyles({ className: "w-full md:w-auto" })}>
             <Icon name="search" className="h-4 w-4" />
             Filtrar
           </button>
-          <Link href="/pedidos" className={buttonStyles({ variant: "secondary" })}>
+          <Link
+            href="/pedidos"
+            className={buttonStyles({ variant: "secondary", className: "w-full md:w-auto" })}
+          >
             <Icon name="x" className="h-4 w-4" />
             Limpiar
           </Link>
