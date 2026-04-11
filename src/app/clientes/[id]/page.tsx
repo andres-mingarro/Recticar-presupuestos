@@ -45,9 +45,12 @@ export default async function Page({
     values: {
       nombre: cliente.nombre,
       apellido: cliente.apellido,
-      direccion: cliente.direccion ?? "",
       telefono: cliente.telefono ?? "",
       mail: cliente.mail ?? "",
+      ciudad: cliente.ciudad ?? "Trelew",
+      direccion: cliente.direccion ?? "",
+      provincia: cliente.provincia ?? "Chubut",
+      cp: cliente.cp ?? "",
     },
   };
 
@@ -60,9 +63,12 @@ export default async function Page({
     const values: ClienteFormValues = {
       nombre: normalizeString(formData.get("nombre")),
       apellido: normalizeString(formData.get("apellido")),
-      direccion: normalizeString(formData.get("direccion")),
       telefono: normalizeString(formData.get("telefono")),
       mail: normalizeString(formData.get("mail")),
+      ciudad: normalizeString(formData.get("ciudad")),
+      direccion: normalizeString(formData.get("direccion")),
+      provincia: normalizeString(formData.get("provincia")),
+      cp: normalizeString(formData.get("cp")),
     };
 
     if (!values.nombre || !values.apellido) {

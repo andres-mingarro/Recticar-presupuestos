@@ -11,6 +11,10 @@
 .ClienteDetailPageEditButtonWrap {
   display: flex;
   justify-content: flex-end;
+
+  button {
+    min-width: 210px;
+  }
 }
 
 .ClienteDetailPageStats {
@@ -33,9 +37,15 @@
 }
 
 .ClienteDetailPageHeaderMeta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.ClienteDetailPageHeaderMetaCol {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
 .ClienteDetailPageAccordion {
@@ -66,8 +76,8 @@
 @media (min-width: 768px) {
   .ClienteDetailPageEditButtonWrap {
     position: absolute;
-    top: 3.1rem;
-    right: 3rem;
+    top: 4.5rem;
+    right: 3.2rem;
     z-index: 1;
   }
 }

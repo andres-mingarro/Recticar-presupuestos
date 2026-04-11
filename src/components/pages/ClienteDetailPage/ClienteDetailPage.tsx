@@ -179,18 +179,35 @@ export function ClienteDetailPage({
                   styles.ClienteDetailPageHeaderMeta
                 )}
               >
-                <ContactBadge
-                  variant="phone"
-                  value={cliente.telefono || "Sin telefono"}
-                />
-                <ContactBadge
-                  variant="mail"
-                  value={cliente.mail || "Sin mail"}
-                />
-                <ContactBadge
-                  variant="address"
-                  value={cliente.direccion || "Sin direccion"}
-                />
+                <div className={styles.ClienteDetailPageHeaderMetaCol}>
+                  <ContactBadge
+                    variant="phone"
+                    value={cliente.telefono || "Sin telefono"}
+                  />
+                  <ContactBadge
+                    variant="mail"
+                    value={cliente.mail || "Sin mail"}
+                  />
+                  <ContactBadge
+                    variant="address"
+                    value={cliente.direccion || "Sin direccion"}
+                    mapQuery={[cliente.direccion, cliente.ciudad, cliente.provincia].filter(Boolean).join(", ")}
+                  />
+                </div>
+                <div className={styles.ClienteDetailPageHeaderMetaCol}>
+                  <ContactBadge
+                    variant="city"
+                    value={cliente.ciudad || "Sin ciudad"}
+                  />
+                  <ContactBadge
+                    variant="province"
+                    value={cliente.provincia || "Sin provincia"}
+                  />
+                  <ContactBadge
+                    variant="postalCode"
+                    value={cliente.cp || "Sin CP"}
+                  />
+                </div>
               </div>
             </div>
           }

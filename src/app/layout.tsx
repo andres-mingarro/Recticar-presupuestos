@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { MainMenu } from "@/components/navigation/MainMenu";
 import "./globals.css";
 
@@ -23,15 +24,16 @@ export default function RootLayout({
             <header className="mb-8 rounded-[28px] border border-white/60 bg-white/80 px-5 py-4 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <Link
-                    href="/"
-                    className="inline-flex items-center text-lg font-semibold tracking-tight text-[var(--color-foreground)]"
-                  >
-                    Recticar Presupuestos
+                  <Link href="/" className="inline-flex items-center">
+                    <Image
+                      src="/logo.png"
+                      alt="Recticar Presupuestos"
+                      width={180}
+                      height={60}
+                      className="h-12 w-auto"
+                      priority
+                    />
                   </Link>
-                  <p className="text-sm text-[var(--color-foreground-muted)]">
-                    Presupuestos, clientes y seguimiento de trabajos.
-                  </p>
                 </div>
                 <MainMenu />
               </div>

@@ -25,7 +25,7 @@ export function PageHeader({
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
           {eyebrow}
         </p>
-        <h1 className="text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
+        <h1 className="mb-4 text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
           {title}
         </h1>
         <div className="max-w-2xl text-sm leading-6 text-[var(--color-foreground-muted)]">
