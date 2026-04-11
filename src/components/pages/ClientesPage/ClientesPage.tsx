@@ -3,6 +3,7 @@ import { cn } from "@/lib/cn";
 import type { ClienteListItem } from "@/lib/types";
 import { ClienteSearchBox } from "@/components/search/ClienteSearchBox";
 import { buttonStyles } from "@/components/ui/Button";
+import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
 import { Table } from "@/components/ui/Table";
 import { formatDate } from "@/lib/format";
@@ -16,6 +17,73 @@ type ClientesPageProps = {
   totalClientes: number;
   pageSize: number;
 };
+
+function ClientesPager({
+  q,
+  currentPage,
+  totalPages,
+  totalClientes,
+  pageStart,
+  pageEnd,
+  hasPreviousPage,
+  hasNextPage,
+}: {
+  q: string;
+  currentPage: number;
+  totalPages: number;
+  totalClientes: number;
+  pageStart: number;
+  pageEnd: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "ClientesPagePager",
+        styles.ClientesPagePager
+      )}
+    >
+      <p className="text-sm text-[var(--color-foreground-muted)]">
+        {totalClientes === 0
+          ? "Sin resultados"
+          : `Mostrando ${pageStart}-${pageEnd} de ${totalClientes} clientes`}
+      </p>
+
+      <div className="flex items-center gap-2">
+        <Link
+          href={buildClientesHref(q, currentPage - 1)}
+          aria-disabled={!hasPreviousPage}
+          className={buttonStyles({
+            variant: "secondary",
+            size: "sm",
+            className: !hasPreviousPage
+              ? "pointer-events-none opacity-50"
+              : undefined,
+          })}
+        >
+          Anterior
+        </Link>
+        <span className="px-2 text-sm text-[var(--color-foreground-muted)]">
+          Página {currentPage} de {totalPages}
+        </span>
+        <Link
+          href={buildClientesHref(q, currentPage + 1)}
+          aria-disabled={!hasNextPage}
+          className={buttonStyles({
+            variant: "secondary",
+            size: "sm",
+            className: !hasNextPage
+              ? "pointer-events-none opacity-50"
+              : undefined,
+          })}
+        >
+          Siguiente
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 function buildClientesHref(q: string, page: number) {
   const params = new URLSearchParams();
@@ -64,9 +132,7 @@ export function ClientesPage({
             </h1>
           </div>
 
-          <Link href="/clientes/nuevo" className={buttonStyles()}>
-            Nuevo cliente
-          </Link>
+          <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>
         </div>
 
         <form
@@ -97,12 +163,23 @@ export function ClientesPage({
         </section>
       ) : null}
 
-      <section className="space-y-4">
+      <Card as="section" className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
             Listado de clientes
           </h2>
         </div>
+
+        <ClientesPager
+          q={q}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalClientes={totalClientes}
+          pageStart={pageStart}
+          pageEnd={pageEnd}
+          hasPreviousPage={hasPreviousPage}
+          hasNextPage={hasNextPage}
+        />
 
         <Table>
           <table className="min-w-full text-left text-sm">
@@ -165,51 +242,17 @@ export function ClientesPage({
           </table>
         </Table>
 
-        <div
-          className={cn(
-            "ClientesPagePager",
-            styles.ClientesPagePager
-          )}
-        >
-          <p className="text-sm text-[var(--color-foreground-muted)]">
-            {totalClientes === 0
-              ? "Sin resultados"
-              : `Mostrando ${pageStart}-${pageEnd} de ${totalClientes} clientes`}
-          </p>
-
-          <div className="flex items-center gap-2">
-            <Link
-              href={buildClientesHref(q, currentPage - 1)}
-              aria-disabled={!hasPreviousPage}
-              className={buttonStyles({
-                variant: "secondary",
-                size: "sm",
-                className: !hasPreviousPage
-                  ? "pointer-events-none opacity-50"
-                  : undefined,
-              })}
-            >
-              Anterior
-            </Link>
-            <span className="px-2 text-sm text-[var(--color-foreground-muted)]">
-              Página {currentPage} de {totalPages}
-            </span>
-            <Link
-              href={buildClientesHref(q, currentPage + 1)}
-              aria-disabled={!hasNextPage}
-              className={buttonStyles({
-                variant: "secondary",
-                size: "sm",
-                className: !hasNextPage
-                  ? "pointer-events-none opacity-50"
-                  : undefined,
-              })}
-            >
-              Siguiente
-            </Link>
-          </div>
-        </div>
-      </section>
+        <ClientesPager
+          q={q}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalClientes={totalClientes}
+          pageStart={pageStart}
+          pageEnd={pageEnd}
+          hasPreviousPage={hasPreviousPage}
+          hasNextPage={hasNextPage}
+        />
+      </Card>
     </div>
   );
 }

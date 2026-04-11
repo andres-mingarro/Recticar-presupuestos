@@ -130,3 +130,26 @@ export function ContactBadge({
     </span>
   );
 }
+
+export function BusinessDaysBadge({
+  days,
+  prefix,
+}: {
+  days: number;
+  prefix?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "BusinessDaysBadge",
+        "Badge",
+        styles.Badge,
+        styles.BusinessDaysBadge,
+        "inline-flex items-center rounded-full border border-[var(--color-border)] px-2.5 py-1 text-xs font-medium text-[var(--color-foreground-muted)]"
+      )}
+    >
+      {prefix ? `${prefix} ` : null}
+      {days} {days === 1 ? "dia habil" : "dias habiles"}
+    </span>
+  );
+}

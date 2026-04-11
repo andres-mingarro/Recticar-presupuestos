@@ -38,7 +38,7 @@ export function MainMenu() {
             className={cn(
               "rounded-lg px-3 py-2 transition",
               active
-                ? "bg-[var(--color-accent)] text-white shadow-[0_10px_30px_rgba(234,88,12,0.18)]"
+                ? "bg-[var(--color-accent)] !text-white shadow-[0_10px_30px_rgba(234,88,12,0.18)]"
                 : "text-[var(--color-foreground-muted)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-foreground)]"
             )}
           >

@@ -1,0 +1,39 @@
+# Recticar Presupuestos
+
+## Stack
+- Next.js 15 con App Router
+- TypeScript
+- Tailwind CSS
+- SCSS Modules por componente
+- Neon PostgreSQL con `@neondatabase/serverless`
+- Sin ORM
+
+## Convenciones UI
+- Cada componente vive en su propia carpeta
+- Cada componente tiene `index.ts`
+- Cada componente tiene su archivo `*.module.scss`
+- Cada componente debe incluir una `className` raiz con el nombre del componente
+- Reutilizar `Card`, `Button`, `Badge`, `Table` y `PageHeader` antes de crear estilos nuevos
+
+## Estructura actual
+- `src/app/clientes`: listado, alta y detalle de clientes
+- `src/app/pedidos`: listado y alta de pedidos
+- `src/app/api/clientes/search`: autocomplete de clientes
+- `src/components/pages`: pantallas principales
+- `src/components/forms`: formularios de clientes y pedidos
+- `src/components/ui`: componentes base reutilizables
+- `src/components/navigation`: menu principal
+- `src/components/search`: buscador con sugerencias
+- `src/lib/queries`: queries SQL directas
+
+## Estado actual
+- `/clientes` usa buscador con autocomplete y paginacion de 10 resultados
+- `/clientes/[id]` muestra datos del cliente en el `PageHeader`
+- La edicion del cliente se abre en un acordeon desde el boton `EDITAR`
+- Los pedidos del cliente se muestran en dos cards: vigentes y finalizados
+- `/pedidos/nuevo` ya tiene formulario funcional conectado a Neon
+
+## Notas
+- `DATABASE_URL` se lee desde `.env.local`
+- Las migraciones SQL viven en `migrations/`
+- Los scripts de desarrollo para seed/reset viven en `scripts/`

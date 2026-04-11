@@ -53,7 +53,14 @@ export async function listPedidos(filters: PedidoFilters = {}) {
       LEFT JOIN modelos mo ON mo.id = p.modelo_id
       LEFT JOIN motores mt ON mt.id = p.motor_id
       ${whereClause}
-      ORDER BY p.numero_pedido DESC
+      ORDER BY
+        CASE
+          WHEN p.prioridad = 'alta' THEN 1
+          WHEN p.prioridad = 'normal' THEN 2
+          ELSE 3
+        END,
+        p.fecha_creacion ASC,
+        p.numero_pedido ASC
     `,
     params
   );
