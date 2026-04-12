@@ -3,18 +3,64 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
-import type { ClienteListItem } from "@/lib/types";
+import type { ClienteListItem, PedidoListItem } from "@/lib/types";
 import { Input } from "@/components/ui/Input";
 import { buttonStyles } from "@/components/ui/Button";
-import styles from "./ClienteSearchBox.module.scss";
+import styles from "./SearchBox.module.scss";
 
-type ClienteSearchBoxProps = {
+export type SearchEntity = "clientes" | "pedidos";
+
+type SearchItem = ClienteListItem | PedidoListItem;
+
+type SearchConfig<TItem extends SearchItem> = {
+  emptyMessage: string;
+  endpoint: string;
+  label: string;
+  placeholder: string;
+  responseKey: string;
+  clearHref: string;
+  getHref: (item: TItem) => string;
+  getTitle: (item: TItem) => string;
+  getSubtitle: (item: TItem) => string;
+};
+
+const searchConfigs: {
+  clientes: SearchConfig<ClienteListItem>;
+  pedidos: SearchConfig<PedidoListItem>;
+} = {
+  clientes: {
+    emptyMessage: "No se encontraron coincidencias.",
+    endpoint: "/api/clientes/search",
+    label: "Busqueda de clientes",
+    placeholder: "Buscar por nombre o apellido",
+    responseKey: "clientes",
+    clearHref: "/clientes",
+    getHref: (item) => `/clientes/${item.id}`,
+    getTitle: (item) => `#${item.numero_cliente} · ${item.apellido}, ${item.nombre}`,
+    getSubtitle: (item) => item.telefono || "Sin teléfono",
+  },
+  pedidos: {
+    emptyMessage: "No se encontraron pedidos.",
+    endpoint: "/api/pedidos/search",
+    label: "Busqueda de pedidos",
+    placeholder: "Buscar por numero o ID de pedido",
+    responseKey: "pedidos",
+    clearHref: "/pedidos",
+    getHref: (item) => `/pedidos/${item.id}`,
+    getTitle: (item) => `Pedido #${item.numero_pedido}`,
+    getSubtitle: (item) => item.cliente_nombre || "Sin cliente asignado",
+  },
+};
+
+type SearchBoxProps = {
+  entity: SearchEntity;
   initialValue: string;
 };
 
-export function ClienteSearchBox({ initialValue }: ClienteSearchBoxProps) {
+export function SearchBox({ entity, initialValue }: SearchBoxProps) {
+  const config = searchConfigs[entity];
   const [query, setQuery] = useState(initialValue);
-  const [results, setResults] = useState<ClienteListItem[]>([]);
+  const [results, setResults] = useState<SearchItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -34,11 +80,11 @@ export function ClienteSearchBox({ initialValue }: ClienteSearchBoxProps) {
     const timeoutId = window.setTimeout(async () => {
       try {
         const response = await fetch(
-          `/api/clientes/search?q=${encodeURIComponent(query)}`,
+          `${config.endpoint}?q=${encodeURIComponent(query)}`,
           { signal: controller.signal }
         );
-        const data = (await response.json()) as { clientes: ClienteListItem[] };
-        setResults(data.clientes);
+        const data = (await response.json()) as Record<string, SearchItem[]>;
+        setResults(data[config.responseKey] ?? []);
         setIsOpen(true);
       } catch {
         setResults([]);
@@ -52,7 +98,7 @@ export function ClienteSearchBox({ initialValue }: ClienteSearchBoxProps) {
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [query]);
+  }, [config.endpoint, config.responseKey, query]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -66,10 +112,7 @@ export function ClienteSearchBox({ initialValue }: ClienteSearchBoxProps) {
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className={cn("ClienteSearchBox", styles.ClienteSearchBox)}
-    >
+    <div ref={containerRef} className={cn("SearchBox", styles.SearchBox)}>
       <Input
         type="search"
         name="q"
@@ -80,7 +123,7 @@ export function ClienteSearchBox({ initialValue }: ClienteSearchBoxProps) {
             setIsOpen(true);
           }
         }}
-        placeholder="Buscar por nombre o apellido"
+        placeholder={config.placeholder}
         autoComplete="off"
       />
 
@@ -91,37 +134,27 @@ export function ClienteSearchBox({ initialValue }: ClienteSearchBoxProps) {
       ) : null}
 
       {isOpen ? (
-        <div
-          className={cn(
-            "ClienteSearchBoxDropdown",
-            styles.ClienteSearchBoxDropdown
-          )}
-        >
+        <div className={cn("SearchBoxDropdown", styles.SearchBoxDropdown)}>
           <div className="rounded-2xl border border-[var(--color-border)] bg-white p-3 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
             {results.length === 0 ? (
               <p className="px-2 py-3 text-sm text-[var(--color-foreground-muted)]">
-                No se encontraron coincidencias.
+                {config.emptyMessage}
               </p>
             ) : (
-              <div
-                className={cn(
-                  "ClienteSearchBoxList",
-                  styles.ClienteSearchBoxList
-                )}
-              >
-                {results.map((cliente) => (
+              <div className={cn("SearchBoxList", styles.SearchBoxList)}>
+                {results.map((item) => (
                   <Link
-                    key={cliente.id}
-                    href={`/clientes/${cliente.id}`}
+                    key={item.id}
+                    href={config.getHref(item as never)}
                     className="flex items-center justify-between gap-3 rounded-xl bg-[var(--color-surface)] px-3 py-3 transition hover:bg-[var(--color-surface-alt)]"
                     onClick={() => setIsOpen(false)}
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-[var(--color-foreground)]">
-                        #{cliente.numero_cliente} · {cliente.apellido}, {cliente.nombre}
+                        {config.getTitle(item as never)}
                       </p>
                       <p className="truncate text-xs text-[var(--color-foreground-muted)]">
-                        {cliente.telefono || "Sin teléfono"}
+                        {config.getSubtitle(item as never)}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
@@ -145,3 +178,5 @@ export function ClienteSearchBox({ initialValue }: ClienteSearchBoxProps) {
     </div>
   );
 }
+
+export { searchConfigs };

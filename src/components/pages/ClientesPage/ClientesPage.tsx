@@ -8,7 +8,7 @@ import type {
   ClienteListItem,
   ClientePendingPedidoItem,
 } from "@/lib/types";
-import { ClienteSearchBox } from "@/components/search/ClienteSearchBox";
+import { SearchForm } from "@/components/search/SearchForm";
 import { buttonStyles } from "@/components/ui/Button";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
@@ -173,43 +173,17 @@ export function ClientesPage({
             styles.ClientesPageHeader
           )}
         >
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-              Clientes
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
-              Listado de clientes
-            </h1>
-          </div>
-
+          <SearchForm
+            entity="clientes"
+            initialValue={q}
+            className={cn(
+              "ClientesPageSearch",
+              styles.ClientesPageSearch
+            )}
+          />
           {canEdit && <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>}
         </div>
 
-        <form
-          className={cn(
-            "ClientesPageSearch",
-            styles.ClientesPageSearch,
-            "mt-6"
-          )}
-        >
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-[var(--color-foreground)]">
-              Busqueda de cliente
-            </span>
-            <ClienteSearchBox initialValue={q} />
-          </label>
-          <button type="submit" className={buttonStyles({ className: "w-full sm:w-auto" })}>
-            <Icon name="search" className="h-4 w-4" />
-            Buscar
-          </button>
-          <Link
-            href="/clientes"
-            className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
-          >
-            <Icon name="x" className="h-4 w-4" />
-            Limpiar
-          </Link>
-        </form>
       </Card>
 
       {errorMessage ? (
