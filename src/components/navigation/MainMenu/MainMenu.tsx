@@ -27,12 +27,8 @@ export function MainMenu({ role, onClose }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const items = [
-    ...baseItems,
-    ...(role === "admin" || role === "superuser"
-      ? [{ href: "/admin/usuarios", label: "Usuarios", icon: "shieldUser" as const, exact: false }]
-      : []),
-  ];
+  const items = [...baseItems];
+  const canManageUsuarios = role === "admin" || role === "superuser";
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -61,6 +57,31 @@ export function MainMenu({ role, onClose }: Props) {
       </nav>
 
       <div className={styles.footer}>
+        {canManageUsuarios && (
+          <Link
+            href="/admin/usuarios"
+            onClick={onClose}
+            className={cn(
+              styles.tecnicaLink,
+              isActive(pathname, "/admin/usuarios", false) && styles.tecnicaLinkActive
+            )}
+          >
+            <Icon name="shieldUser" className="h-4 w-4 shrink-0" />
+            Usuarios
+          </Link>
+        )}
+        <Link
+          href="/informacion-tecnica"
+          onClick={onClose}
+          className={cn(
+            styles.tecnicaLink,
+            isActive(pathname, "/informacion-tecnica", false) && styles.tecnicaLinkActive
+          )}
+        >
+          <Icon name="car" className="h-4 w-4 shrink-0" />
+          Información técnica
+        </Link>
+        <div className={styles.divider} />
         <button type="button" onClick={handleLogout} className={styles.logoutBtn}>
           <Icon name="power" className="h-4 w-4" />
           Salir

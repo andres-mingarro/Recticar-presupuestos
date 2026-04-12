@@ -117,6 +117,33 @@ export type ModeloMotorRelation = {
   motor_id: number;
 };
 
+export type TechnicalMarca = {
+  id: number;
+  nombre: string;
+};
+
+export type TechnicalModelo = {
+  id: number;
+  nombre: string;
+  marcaId: number;
+  marcaNombre: string | null;
+};
+
+export type TechnicalMotor = {
+  id: number;
+  nombre: string;
+  cilindrada: string | null;
+};
+
+export type TechnicalVehiculo = {
+  id: number;
+  modeloId: number;
+  modeloNombre: string;
+  marcaNombre: string | null;
+  motorId: number;
+  motorNombre: string;
+};
+
 export type TrabajoAgrupado = {
   categoriaId: number;
   categoriaNombre: string;

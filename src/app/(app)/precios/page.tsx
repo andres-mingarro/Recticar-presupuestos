@@ -10,8 +10,6 @@ import {
   updateCategoriaTrabajos,
 } from "./actions";
 
-export const dynamic = "force-dynamic";
-
 export default async function Page() {
   const trabajos = await listTrabajosAgrupados();
 

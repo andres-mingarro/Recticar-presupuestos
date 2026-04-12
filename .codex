@@ -30,6 +30,7 @@
 - `src/app/(app)/clientes`: listado, alta y detalle de clientes
 - `src/app/(app)/pedidos`: listado, alta y detalle de pedidos
 - `src/app/(app)/precios`: administracion de trabajos y listas de precios
+- `src/app/(app)/informacion-tecnica`: administracion del catalogo tecnico externo
 - `src/app/api/clientes/search`: autocomplete de clientes
 - `src/components/pages`: pantallas principales
 - `src/components/forms`: formularios de clientes y pedidos
@@ -46,11 +47,14 @@
 - `/pedidos/nuevo` usa la base tecnica externa para marca, modelo y motor
 - `/pedidos/[id]` resuelve los nombres tecnicos desde la base externa
 - El PDF y los listados de pedidos tambien hidratan marca/modelo/motor desde la base externa
+- `/informacion-tecnica` permite ver y editar `marcas`, `modelos`, `motores` y `vehiculos`
+- `/informacion-tecnica` carga por seccion activa, con busqueda y paginacion server-side para evitar timeouts por volumen
+- `admin` y `superuser` pueden editar informacion tecnica; `operador` queda en solo lectura
 
 ## Notas
 - `DATABASE_URL` y `TECHNICAL_DATABASE_URL` se leen desde `.env.local`
 - Las migraciones SQL viven en `migrations/`
 - Los scripts de desarrollo para seed/reset viven en `scripts/`
 - `npm run db:migrate` aplica migraciones sobre la base principal
-- `npm run db:reset:dev` limpia la base principal para desarrollo, incluyendo el catalogo tecnico local viejo si existe
-- `npm run db:seed:dev` arma datos demo usando combinaciones de la base tecnica externa
+- `npm run db:reset:dev` borra solo clientes y pedidos fake marcados como `DEV-SEED`
+- `npm run db:seed:dev` crea 15 clientes fake y 15 pedidos fake usando combinaciones de la base tecnica externa

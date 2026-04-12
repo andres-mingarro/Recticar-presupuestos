@@ -4,6 +4,8 @@ import { loadDotEnvLocal } from "./lib/env.mjs";
 
 const DEV_CLIENT_EMAIL_DOMAIN = "@dev.recticar.local";
 const DEV_PEDIDO_TAG = "[DEV-SEED]";
+const DEV_CLIENTS_COUNT = 15;
+const DEV_PEDIDOS_COUNT = 15;
 
 const nombres = [
   "Andres",
@@ -178,9 +180,9 @@ async function main() {
   const clientes = [];
   const baseAlta = new Date("2026-01-15T09:00:00.000Z");
 
-  console.log("Creando 20 clientes de desarrollo...");
+  console.log(`Creando ${DEV_CLIENTS_COUNT} clientes de desarrollo...`);
 
-  for (let index = 0; index < 20; index += 1) {
+  for (let index = 0; index < DEV_CLIENTS_COUNT; index += 1) {
     const nombre = nombres[index % nombres.length];
     const apellido = apellidos[index % apellidos.length];
     const direccion = `${calles[index % calles.length]} ${120 + index * 17}`;
@@ -200,14 +202,14 @@ async function main() {
     clientes.push(inserted[0]);
   }
 
-  console.log("Creando 40 pedidos de desarrollo...");
+  console.log(`Creando ${DEV_PEDIDOS_COUNT} pedidos de desarrollo...`);
 
   const basePedido = new Date("2026-03-01T10:00:00.000Z");
   const prioridades = ["baja", "normal", "alta"];
   const estados = ["pendiente", "aprobado", "finalizado"];
   let pedidosCreados = 0;
 
-  for (let index = 0; index < 40; index += 1) {
+  for (let index = 0; index < DEV_PEDIDOS_COUNT; index += 1) {
     const cliente = clientes[index % clientes.length];
     const combinacion = combinaciones[index % combinaciones.length];
     const estado = estados[index % estados.length];

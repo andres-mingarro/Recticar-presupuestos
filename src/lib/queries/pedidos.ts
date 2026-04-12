@@ -1,5 +1,5 @@
 import { queryRows, templateRows } from "@/lib/db";
-import { hydrateTechnicalLabels } from "@/lib/queries/catalogo";
+import { hydrateTechnicalLabels, listMarcas, listModelos, listMotores } from "@/lib/queries/catalogo";
 import type {
   PedidoDetail,
   PedidoEstado,
@@ -42,41 +42,55 @@ export async function listPedidos(filters: PedidoFilters = {}) {
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  const rows = await queryRows<PedidoListRow>(
-    `
-      SELECT
-        p.id,
-        p.numero_pedido,
-        p.cobrado,
-        p.estado,
-        p.prioridad,
-        p.fecha_creacion,
-        p.fecha_aprobacion,
-        p.cliente_id,
-        p.marca_id,
-        p.modelo_id,
-        p.motor_id,
-        CASE
-          WHEN c.id IS NULL THEN NULL
-          ELSE concat(c.apellido, ', ', c.nombre)
-        END AS cliente_nombre,
-        p.numero_serie_motor
-      FROM pedidos p
-      LEFT JOIN clientes c ON c.id = p.cliente_id
-      ${whereClause}
-      ORDER BY
-        CASE
-          WHEN p.prioridad = 'alta' THEN 1
-          WHEN p.prioridad = 'normal' THEN 2
-          ELSE 3
-        END,
-        p.fecha_creacion ASC,
-        p.numero_pedido ASC
-    `,
-    params
-  );
+  const [rows, [marcas, modelos, motores]] = await Promise.all([
+    queryRows<PedidoListRow>(
+      `
+        SELECT
+          p.id,
+          p.numero_pedido,
+          p.cobrado,
+          p.estado,
+          p.prioridad,
+          p.fecha_creacion,
+          p.fecha_aprobacion,
+          p.cliente_id,
+          p.marca_id,
+          p.modelo_id,
+          p.motor_id,
+          CASE
+            WHEN c.id IS NULL THEN NULL
+            ELSE concat(c.apellido, ', ', c.nombre)
+          END AS cliente_nombre,
+          p.numero_serie_motor
+        FROM pedidos p
+        LEFT JOIN clientes c ON c.id = p.cliente_id
+        ${whereClause}
+        ORDER BY
+          CASE
+            WHEN p.prioridad = 'alta' THEN 1
+            WHEN p.prioridad = 'normal' THEN 2
+            ELSE 3
+          END,
+          p.fecha_creacion ASC,
+          p.numero_pedido ASC
+      `,
+      params
+    ),
+    Promise.all([listMarcas(), listModelos(), listMotores()]),
+  ]);
 
-  return hydrateTechnicalLabels(rows);
+  if (rows.length === 0) return [] as PedidoListItem[];
+
+  const marcasById = new Map(marcas.map((m) => [m.id, m.nombre]));
+  const modelosById = new Map(modelos.map((m) => [m.id, m.nombre]));
+  const motoresById = new Map(motores.map((m) => [m.id, m.nombre]));
+
+  return rows.map((item) => ({
+    ...item,
+    marca_nombre: item.marca_id ? (marcasById.get(item.marca_id) ?? null) : null,
+    modelo_nombre: item.modelo_id ? (modelosById.get(item.modelo_id) ?? null) : null,
+    motor_nombre: item.motor_id ? (motoresById.get(item.motor_id) ?? null) : null,
+  }));
 }
 
 export async function getPedidoById(id: number) {

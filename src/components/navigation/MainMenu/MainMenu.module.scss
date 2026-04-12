@@ -42,8 +42,45 @@
 }
 
 .footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-top: auto;
   padding-top: 1rem;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-sidebar-border);
+  margin: 0.25rem 0;
+}
+
+.tecnicaLink {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-sidebar-text);
+  opacity: 0.6;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.tecnicaLink:hover {
+  background: var(--color-sidebar-surface-hover);
+  color: white;
+  opacity: 1;
+}
+
+.tecnicaLinkActive {
+  opacity: 1;
+  color: white;
+  background: var(--color-sidebar-surface-hover);
 }
 
 .logoutBtn {
