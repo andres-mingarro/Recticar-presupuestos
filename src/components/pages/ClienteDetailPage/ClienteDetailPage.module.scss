@@ -1,70 +1,176 @@
-.ClienteDetailPage {
+.page {
   width: 100%;
 }
 
-.ClienteDetailPageTop {
+/* ─── Header card ─── */
+.headerCard {
   display: grid;
-  gap: 1.5rem;
-  position: relative;
+  gap: 1.75rem;
 }
 
-.ClienteDetailPageEditButtonWrap {
+.headerTop {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 1.25rem;
+}
 
-  button {
-    min-width: 210px;
+.headerTitles {
+  flex: 1;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ─── Stats ─── */
+.stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  padding: 0.6rem 1.1rem;
+  background: var(--color-surface-alt);
+}
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.statValue {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-lg);
+  font-weight: 700;
+  color: var(--color-foreground);
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-foreground-muted);
+}
+
+.statDivider {
+  width: 1px;
+  height: 1.25rem;
+  background: var(--color-border);
+}
+
+/* ─── Info grid ─── */
+.infoGrid {
+  border: 1px solid var(--color-border);
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.infoGridRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-bottom: 1px solid var(--color-border);
+
+  &:last-child {
+    border-bottom: none;
   }
 }
 
-.ClienteDetailPageStats {
+/* ─── Info row ─── */
+.infoRow {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
   align-items: center;
-  justify-content: flex-end;
-}
-
-.ClienteDetailPageStatItem {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.35rem;
-}
-
-.ClienteDetailPageHeaderData {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.ClienteDetailPageHeaderMeta {
-  display: grid;
-  grid-template-columns: 1fr;
   gap: 1rem;
+  padding: 0.85rem 1.25rem;
 }
 
-.ClienteDetailPageHeaderMetaCol {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+.infoLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 9rem;
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-weight: 600;
+  color: var(--color-foreground-muted);
 }
 
-.ClienteDetailPageAccordion {
+.infoValue {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  font-weight: 500;
+  color: var(--color-foreground);
+  flex: 1;
+  min-width: 0;
+}
+
+.infoEmpty {
+  color: var(--color-foreground-subtle);
+  font-style: italic;
+}
+
+.infoActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.infoLink {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.infoChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  padding: 0.2rem 0.65rem;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-weight: 600;
+  color: var(--color-foreground-muted);
+  text-decoration: none;
+  background: var(--color-surface-alt);
+  transition: border-color 150ms ease, color 150ms ease;
+
+  &:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+}
+
+/* ─── Accordion (edición) ─── */
+.accordion {
   display: grid;
   grid-template-rows: 0fr;
   overflow: hidden;
   opacity: 0;
   transition:
     grid-template-rows 180ms ease,
-    opacity 180ms ease,
-    margin-top 180ms ease;
+    opacity 180ms ease;
 }
 
-.ClienteDetailPageAccordionOpen {
+.accordionOpen {
   grid-template-rows: 1fr;
   opacity: 1;
 }
 
-.ClienteDetailPageAccordionInner {
+.accordionInner {
   min-height: 0;
   overflow: hidden;
   border-top: 1px solid var(--color-border);
@@ -73,16 +179,19 @@
   gap: 1rem;
 }
 
+/* ─── Desktop ─── */
 @media (min-width: 768px) {
-  .ClienteDetailPageHeaderMeta {
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+  .headerTop {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
   }
 
-  .ClienteDetailPageEditButtonWrap {
-    position: absolute;
-    top: 4.5rem;
-    right: 3.2rem;
-    z-index: 1;
+  .infoGridRow {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .infoRow:first-child {
+    border-right: 1px solid var(--color-border);
   }
 }
