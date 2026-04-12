@@ -8,6 +8,17 @@
 - Neon PostgreSQL con `@neondatabase/serverless`
 - Sin ORM
 
+## Bases de datos
+- `DATABASE_URL` apunta a la base principal de la app: clientes, pedidos, trabajos, usuarios
+- `TECHNICAL_DATABASE_URL` apunta al catalogo tecnico externo usado en "Seleccion tecnica"
+- Si `TECHNICAL_DATABASE_URL` no esta definida, el codigo hace fallback a `DATABASE_URL`
+- La base tecnica externa hoy espera estas tablas:
+- `marcas(id, nombre)`
+- `modelos(id, nombre, marca_id)`
+- `motores(id, nombre, cilindrada)`
+- `vehiculos(id, modelo_id, motor_id)`
+- La base principal ya no depende por FK de `marcas`, `modelos` y `motores` para guardar pedidos
+
 ## Convenciones UI
 - Cada componente vive en su propia carpeta
 - Cada componente tiene `index.ts`
@@ -16,8 +27,9 @@
 - Reutilizar `Card`, `Button`, `Badge`, `Table` y `PageHeader` antes de crear estilos nuevos
 
 ## Estructura actual
-- `src/app/clientes`: listado, alta y detalle de clientes
-- `src/app/pedidos`: listado y alta de pedidos
+- `src/app/(app)/clientes`: listado, alta y detalle de clientes
+- `src/app/(app)/pedidos`: listado, alta y detalle de pedidos
+- `src/app/(app)/precios`: administracion de trabajos y listas de precios
 - `src/app/api/clientes/search`: autocomplete de clientes
 - `src/components/pages`: pantallas principales
 - `src/components/forms`: formularios de clientes y pedidos
@@ -31,9 +43,14 @@
 - `/clientes/[id]` muestra datos del cliente en el `PageHeader`
 - La edicion del cliente se abre en un acordeon desde el boton `EDITAR`
 - Los pedidos del cliente se muestran en dos cards: vigentes y finalizados
-- `/pedidos/nuevo` ya tiene formulario funcional conectado a Neon
+- `/pedidos/nuevo` usa la base tecnica externa para marca, modelo y motor
+- `/pedidos/[id]` resuelve los nombres tecnicos desde la base externa
+- El PDF y los listados de pedidos tambien hidratan marca/modelo/motor desde la base externa
 
 ## Notas
-- `DATABASE_URL` se lee desde `.env.local`
+- `DATABASE_URL` y `TECHNICAL_DATABASE_URL` se leen desde `.env.local`
 - Las migraciones SQL viven en `migrations/`
 - Los scripts de desarrollo para seed/reset viven en `scripts/`
+- `npm run db:migrate` aplica migraciones sobre la base principal
+- `npm run db:reset:dev` limpia la base principal para desarrollo, incluyendo el catalogo tecnico local viejo si existe
+- `npm run db:seed:dev` arma datos demo usando combinaciones de la base tecnica externa
