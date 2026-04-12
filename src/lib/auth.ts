@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { randomUUID } from "node:crypto";
 import type { UserRole } from "@/lib/queries/usuarios";
 
 const COOKIE_NAME = "recticar_token";
@@ -9,6 +10,7 @@ export interface SessionPayload {
   email: string;
   nombre: string;
   role: UserRole;
+  sessionId: string;
 }
 
 function secret() {
@@ -17,8 +19,10 @@ function secret() {
   return new TextEncoder().encode(s);
 }
 
-export async function createToken(payload: SessionPayload): Promise<string> {
-  return new SignJWT({ ...payload })
+export async function createToken(
+  payload: Omit<SessionPayload, "sessionId">
+): Promise<string> {
+  return new SignJWT({ ...payload, sessionId: randomUUID() })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${EXPIRES_IN}s`)
@@ -28,7 +32,21 @@ export async function createToken(payload: SessionPayload): Promise<string> {
 export async function verifyToken(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, secret());
-    return payload as unknown as SessionPayload;
+    if (
+      typeof payload.email !== "string" ||
+      typeof payload.nombre !== "string" ||
+      typeof payload.role !== "string"
+    ) {
+      return null;
+    }
+
+    return {
+      email: payload.email,
+      nombre: payload.nombre,
+      role: payload.role as UserRole,
+      sessionId:
+        typeof payload.sessionId === "string" ? payload.sessionId : `legacy-${token.slice(-12)}`,
+    };
   } catch {
     return null;
   }
