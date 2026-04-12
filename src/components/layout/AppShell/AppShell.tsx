@@ -4,8 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
+import { Date } from "@/components/layout/Date";
 import { MainMenu } from "@/components/navigation/MainMenu";
-import { Icon } from "@/components/ui/Icon";
 import styles from "./AppShell.module.scss";
 
 type Props = {
@@ -15,11 +15,6 @@ type Props = {
 
 export function AppShell({ children, role }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const formattedDate = new Intl.DateTimeFormat("es-AR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date());
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -46,10 +41,7 @@ export function AppShell({ children, role }: Props) {
             priority
           />
         </Link>
-        <div className={styles.topBarMeta}>
-          <Icon name="calendar" className={styles.topBarMetaIcon} />
-          <span className={styles.topBarDate}>{formattedDate}</span>
-        </div>
+        <Date />
         <button
           type="button"
           className={styles.hamburger}
