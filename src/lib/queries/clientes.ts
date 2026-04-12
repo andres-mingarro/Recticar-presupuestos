@@ -137,6 +137,7 @@ export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
         p.cliente_id,
         p.id,
         p.numero_pedido,
+        p.cobrado,
         p.estado,
         p.prioridad,
         p.fecha_creacion,

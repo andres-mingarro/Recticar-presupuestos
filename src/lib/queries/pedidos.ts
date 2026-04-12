@@ -35,6 +35,7 @@ export async function listPedidos(filters: PedidoFilters = {}) {
       SELECT
         p.id,
         p.numero_pedido,
+        p.cobrado,
         p.estado,
         p.prioridad,
         p.fecha_creacion,
@@ -73,6 +74,7 @@ export async function getPedidoById(id: number) {
       SELECT
         p.id,
         p.numero_pedido,
+        p.cobrado,
         p.estado,
         p.prioridad,
         p.fecha_creacion,
@@ -108,6 +110,7 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
       SELECT
         p.id,
         p.numero_pedido,
+        p.cobrado,
         p.estado,
         p.prioridad,
         p.fecha_creacion,
@@ -159,6 +162,7 @@ export async function updatePedido(id: number, input: PedidoFormValues) {
       modelo_id      = ${modeloId},
       motor_id       = ${motorId},
       numero_serie_motor = ${input.numeroSerieMotor},
+      cobrado        = ${input.cobrado},
       prioridad      = ${input.prioridad},
       estado         = ${input.estado}::pedido_estado,
       lista_precio   = ${input.listaPrecios},
@@ -203,6 +207,7 @@ export async function createPedido(input: PedidoFormValues) {
       modelo_id,
       motor_id,
       numero_serie_motor,
+      cobrado,
       prioridad,
       estado,
       fecha_aprobacion,
@@ -215,6 +220,7 @@ export async function createPedido(input: PedidoFormValues) {
       ${modeloId},
       ${motorId},
       ${input.numeroSerieMotor},
+      ${input.cobrado},
       ${input.prioridad},
       ${input.estado},
       ${fechaAprobacion},
@@ -253,6 +259,7 @@ export async function listPedidosByCliente(clienteId: number) {
       SELECT
         p.id,
         p.numero_pedido,
+        p.cobrado,
         p.estado,
         p.prioridad,
         p.fecha_creacion,

@@ -13,6 +13,7 @@ import {
 import { PageHeader } from "@/components/ui/PageHeader";
 import {
   BusinessDaysBadge,
+  PaymentBadge,
   PriorityBadge,
   StatusBadge,
 } from "@/components/ui/Badge";
@@ -71,6 +72,7 @@ function PedidoTable({
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="user" className="h-4 w-4" />Cliente</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Vehículo / Motor</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="gauge" className="h-4 w-4" />Prioridad</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="check" className="h-4 w-4" />Cobro</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Estado</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Aprobación</span></th>
@@ -81,7 +83,7 @@ function PedidoTable({
             {pedidos.length === 0 ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   className="px-4 py-10 text-center text-[var(--color-foreground-muted)]"
                 >
                   {emptyMessage}
@@ -134,6 +136,9 @@ function PedidoTable({
                   </td>
                   <td className="px-4 py-4">
                     <PriorityBadge prioridad={pedido.prioridad} />
+                  </td>
+                  <td className="px-4 py-4">
+                    <PaymentBadge cobrado={pedido.cobrado} />
                   </td>
                   <td className="px-4 py-4">
                     <StatusBadge estado={pedido.estado} />

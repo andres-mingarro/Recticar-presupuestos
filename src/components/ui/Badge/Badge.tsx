@@ -60,6 +60,24 @@ export function StatusBadge({ estado }: { estado: PedidoEstado }) {
   );
 }
 
+export function PaymentBadge({ cobrado }: { cobrado: boolean }) {
+  return (
+    <span
+      className={cn(
+        "PaymentBadge",
+        "Badge",
+        styles.Badge,
+        "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold",
+        cobrado
+          ? "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success-text-strong)]"
+          : "border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]"
+      )}
+    >
+      {cobrado ? "Cobrado" : "No cobrado"}
+    </span>
+  );
+}
+
 export function ContactBadge({
   variant,
   value,

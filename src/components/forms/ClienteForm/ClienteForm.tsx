@@ -63,6 +63,8 @@ export function ClienteForm({
     initialState.values.ciudad || "Trelew"
   );
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [dniValue, setDniValue] = useState(initialState.values.dni ?? "");
+  const [cuitValue, setCuitValue] = useState(initialState.values.cuit ?? "");
 
   useEffect(() => {
     const nextProvincia = state.values.provincia || "Chubut";
@@ -160,6 +162,21 @@ export function ClienteForm({
       cancelled = true;
     };
   }, [selectedProvincia, selectedCiudad]);
+
+  function formatDNI(raw: string): string {
+    const digits = raw.replace(/\D/g, "").slice(0, 8);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6)
+      return `${digits.slice(0, digits.length - 3)}.${digits.slice(-3)}`;
+    return `${digits.slice(0, digits.length - 6)}.${digits.slice(-6, -3)}.${digits.slice(-3)}`;
+  }
+
+  function formatCUIT(raw: string): string {
+    const digits = raw.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 10) return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+    return `${digits.slice(0, 2)}-${digits.slice(2, 10)}-${digits.slice(10)}`;
+  }
 
   function handleCloseEditing() {
     if (onCancel) {
@@ -360,9 +377,11 @@ export function ClienteForm({
           </span>
           <Input
             name="dni"
-            placeholder="Ej. 30123456"
-            defaultValue={state.values.dni}
+            placeholder="29.645.893"
+            value={dniValue}
+            onChange={(e) => setDniValue(formatDNI(e.target.value))}
             disabled={!isEditing}
+            inputMode="numeric"
           />
         </label>
 
@@ -372,9 +391,11 @@ export function ClienteForm({
           </span>
           <Input
             name="cuit"
-            placeholder="Ej. 20-30123456-9"
-            defaultValue={state.values.cuit}
+            placeholder="20-29645893-8"
+            value={cuitValue}
+            onChange={(e) => setCuitValue(formatCUIT(e.target.value))}
             disabled={!isEditing}
+            inputMode="numeric"
           />
         </label>
       </div>

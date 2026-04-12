@@ -21,6 +21,7 @@ const initialState: PedidoFormState = {
     modeloId: "",
     motorId: "",
     numeroSerieMotor: "",
+    cobrado: false,
     prioridad: "normal",
     estado: "pendiente",
     observaciones: "",
@@ -55,6 +56,7 @@ export default async function Page() {
       modeloId: normalizeString(formData.get("modeloId")),
       motorId: normalizeString(formData.get("motorId")),
       numeroSerieMotor: normalizeString(formData.get("numeroSerieMotor")),
+      cobrado: formData.get("cobrado") === "on",
       prioridad:
         normalizeString(formData.get("prioridad")) === "alta"
           ? "alta"

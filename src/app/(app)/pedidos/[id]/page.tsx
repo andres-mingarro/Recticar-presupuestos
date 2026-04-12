@@ -60,6 +60,7 @@ export default async function Page({
       modeloId: "",
       motorId: "",
       numeroSerieMotor: pedido.numero_serie_motor,
+      cobrado: pedido.cobrado,
       prioridad: pedido.prioridad,
       estado: pedido.estado,
       observaciones: pedido.observaciones ?? "",
@@ -103,6 +104,7 @@ export default async function Page({
       modeloId: normalizeString(formData.get("modeloId")),
       motorId: normalizeString(formData.get("motorId")),
       numeroSerieMotor: normalizeString(formData.get("numeroSerieMotor")),
+      cobrado: formData.get("cobrado") === "true",
       prioridad:
         normalizeString(formData.get("prioridad")) === "alta"
           ? "alta"

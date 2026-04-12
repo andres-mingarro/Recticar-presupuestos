@@ -11,6 +11,7 @@ import type {
 import { SearchForm } from "@/components/search/SearchForm";
 import { Pager } from "@/components/pagination/Pager";
 import { buttonStyles } from "@/components/ui/Button";
+import { PaymentBadge, StatusBadge } from "@/components/ui/Badge";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
@@ -338,12 +339,18 @@ export function ClientesPage({
                     onClick={closePanel}
                   >
                     <div className="space-y-1">
-                      <p className="text-sm font-semibold text-[var(--color-foreground)]">
-                        <span className="inline-flex items-center gap-2">
-                          <Icon name="clipboard" className="h-4 w-4" />
-                          Pedido #{pedido.numero_pedido}
-                        </span>
-                      </p>
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-sm font-semibold text-[var(--color-foreground)]">
+                          <span className="inline-flex items-center gap-2">
+                            <Icon name="clipboard" className="h-4 w-4" />
+                            Pedido #{pedido.numero_pedido}
+                          </span>
+                        </p>
+                        <PaymentBadge cobrado={pedido.cobrado} />
+                      </div>
+                      <div>
+                        <StatusBadge estado={pedido.estado} />
+                      </div>
                       <p className="text-sm text-[var(--color-foreground-muted)]">
                         <span className="inline-flex items-center gap-2">
                           <Icon name="car" className="h-4 w-4" />

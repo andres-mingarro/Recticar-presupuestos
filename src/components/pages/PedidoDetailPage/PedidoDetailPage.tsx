@@ -13,8 +13,9 @@ import {
   PedidoForm,
   type PedidoFormState,
 } from "@/components/forms/PedidoForm";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
+import { StatusBadge } from "@/components/ui/Badge";
+import { CobradoBadge, CobradoProvider, CobradoToggle } from "@/components/ui/CobradoToggle";
 import {
   EstadoStepperAction,
   type ChangeEstadoActionState,
@@ -69,6 +70,7 @@ export function PedidoDetailPage({
   const formId = `pedido-form-${pedido.id}`;
 
   return (
+    <CobradoProvider initialValue={pedido.cobrado}>
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
       {/* Top bar: back button + PDF download */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -94,38 +96,36 @@ export function PedidoDetailPage({
         </a>
       </div>
 
-      <PageHeader
-        eyebrow="Pedidos"
-        title={
-          <span className="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <span className="min-w-0">
-              {pedido.cliente_nombre ?? "Sin cliente"} | Pedido #{pedido.numero_pedido}
-            </span>
+      <Card as="section" className="space-y-5">
+        {/* Title row */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
+              Pedido #{pedido.numero_pedido}
+            </p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">
+              {pedido.cliente_nombre ?? "Sin cliente"}
+            </h1>
+          </div>
+          <div className="flex shrink-0 items-center gap-4">
+            <CobradoToggle form={formId} />
             {pedido.cliente_id ? (
               <Link
                 href={`/clientes/${pedido.cliente_id}`}
-                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--color-accent)] underline underline-offset-4 transition-opacity hover:opacity-70 sm:shrink-0"
+                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--color-accent)] underline underline-offset-4 transition-opacity hover:opacity-70"
               >
                 Ver ficha del cliente
                 <Icon name="arrowRight" className="h-3.5 w-3.5" />
               </Link>
-            ) : null}
-          </span>
-        }
-        description={
-          <div className="space-y-3 pt-1">
-            <EstadoStepperAction
-              value={pedido.estado}
-              action={changeEstadoAction}
-            />
-            {!pedido.cliente_id ? (
-              <span className="text-sm text-[var(--color-foreground-muted)]">
-                Sin cliente asignado
-              </span>
-            ) : null}
+            ) : (
+              <span className="text-sm text-[var(--color-foreground-muted)]">Sin cliente asignado</span>
+            )}
           </div>
-        }
-      />
+        </div>
+
+        {/* Estado stepper */}
+        <EstadoStepperAction value={pedido.estado} action={changeEstadoAction} />
+      </Card>
 
       {wasUpdated ? (
         <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
@@ -147,6 +147,7 @@ export function PedidoDetailPage({
           trabajos={trabajos}
           allowFinalizado
           showClienteSection={false}
+          showPrioridadSection={false}
         />
 
         <aside className={cn("PedidoDetailPageSidebar", styles.PedidoDetailPageSidebar)}>
@@ -156,6 +157,26 @@ export function PedidoDetailPage({
             </p>
 
             <dl className="space-y-3 text-sm">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+                  <Icon name="clipboard" className="h-4 w-4 shrink-0" />
+                  Estado
+                </dt>
+                <dd>
+                  <StatusBadge estado={pedido.estado} />
+                </dd>
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+                  <Icon name="check" className="h-4 w-4 shrink-0" />
+                  Cobro
+                </dt>
+                <dd>
+                  <CobradoBadge />
+                </dd>
+              </div>
+
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
                   <Icon name="gauge" className="h-4 w-4 shrink-0" />
@@ -242,5 +263,6 @@ export function PedidoDetailPage({
       </div>
       </TrabajosSeleccionProvider>
     </div>
+    </CobradoProvider>
   );
 }

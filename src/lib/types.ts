@@ -27,6 +27,7 @@ export type ClientePendingPedidoItem = {
   cliente_id: number;
   id: number;
   numero_pedido: number;
+  cobrado: boolean;
   estado: PedidoEstado;
   prioridad: PedidoPrioridad;
   fecha_creacion: string;
@@ -52,6 +53,7 @@ export type ClienteFormValues = {
 export type PedidoListItem = {
   id: number;
   numero_pedido: number;
+  cobrado: boolean;
   estado: PedidoEstado;
   prioridad: PedidoPrioridad;
   fecha_creacion: string;
@@ -80,6 +82,7 @@ export type PedidoFormValues = {
   modeloId: string;
   motorId: string;
   numeroSerieMotor: string;
+  cobrado: boolean;
   prioridad: PedidoPrioridad;
   estado: PedidoEstado;
   observaciones: string;

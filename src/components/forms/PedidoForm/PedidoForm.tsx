@@ -44,6 +44,7 @@ type PedidoFormProps = {
   allowFinalizado?: boolean;
   formId?: string;
   showClienteSection?: boolean;
+  showPrioridadSection?: boolean;
 };
 
 const prioridadCards: Array<{
@@ -80,12 +81,12 @@ export function PedidoForm({
   allowFinalizado = false,
   formId,
   showClienteSection = true,
+  showPrioridadSection = true,
 }: PedidoFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
   const { toggle: toggleTrabajo, listaPrecios, setListaPrecios } = useTrabajosSeleccion();
   const [selectedMarca, setSelectedMarca] = useState(initialState.values.marcaId);
   const [selectedModelo, setSelectedModelo] = useState(initialState.values.modeloId);
-
   const modelosFiltrados = useMemo(
     () =>
       modelos.filter((modelo) =>
@@ -294,64 +295,91 @@ export function PedidoForm({
         </div>
       </Card>
 
-      <Card
-        as="section"
-        className={cn(
-          "PedidoFormSection",
-          styles.PedidoFormSection
-        )}
-      >
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-            Prioridad y estado
-          </p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
-            Definicion del pedido
-          </h2>
-        </div>
+      {showPrioridadSection ? (
+        <Card
+          as="section"
+          className={cn(
+            "PedidoFormSection",
+            styles.PedidoFormSection
+          )}
+        >
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+              Prioridad y estado
+            </p>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+              Definicion del pedido
+            </h2>
+          </div>
 
-        <div className={cn("PedidoFormOptionGrid", styles.PedidoFormOptionGrid)}>
-          {prioridadCards.map((item) => (
-            <label
-              key={item.value}
-              className={cn(
-                "rounded-2xl border p-4 text-sm",
-                item.tone,
-                state.values.prioridad === item.value && "ring-2 ring-[var(--color-accent-soft)]"
-              )}
-            >
-              <input
-                type="radio"
-                name="prioridad"
-                value={item.value}
-                defaultChecked={state.values.prioridad === item.value}
-                className="sr-only"
-              />
-              <span className="font-semibold text-[var(--color-foreground)]">
-                {item.label}
-              </span>
-            </label>
-          ))}
-        </div>
+          <div className={cn("PedidoFormOptionGrid", styles.PedidoFormOptionGrid)}>
+            {prioridadCards.map((item) => (
+              <label
+                key={item.value}
+                className={cn(
+                  "rounded-2xl border p-4 text-sm",
+                  item.tone,
+                  state.values.prioridad === item.value && "ring-2 ring-[var(--color-accent-soft)]"
+                )}
+              >
+                <input
+                  type="radio"
+                  name="prioridad"
+                  value={item.value}
+                  defaultChecked={state.values.prioridad === item.value}
+                  className="sr-only"
+                />
+                <span className="font-semibold text-[var(--color-foreground)]">
+                  {item.label}
+                </span>
+              </label>
+            ))}
+          </div>
 
-        <EstadoStepper
-          mode="form"
-          name="estado"
-          initialValue={state.values.estado}
-          allowFinalizado={allowFinalizado}
-        />
-
-        <label className={cn("PedidoFormField", styles.PedidoFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
-            Observaciones
-          </span>
-          <Textarea
-            name="observaciones"
-            placeholder="Notas adicionales del pedido, aclaraciones del trabajo o comentarios del cliente."
-            defaultValue={state.values.observaciones}
+          <EstadoStepper
+            mode="form"
+            name="estado"
+            initialValue={state.values.estado}
+            allowFinalizado={allowFinalizado}
           />
-        </label>
-      </Card>
+
+          <label className={cn("PedidoFormField", styles.PedidoFormField)}>
+            <span className="text-sm font-medium text-[var(--color-foreground)]">
+              Observaciones
+            </span>
+            <Textarea
+              name="observaciones"
+              placeholder="Notas adicionales del pedido, aclaraciones del trabajo o comentarios del cliente."
+              defaultValue={state.values.observaciones}
+            />
+          </label>
+        </Card>
+      ) : (
+        <>
+          <input type="hidden" name="prioridad" value={state.values.prioridad} />
+          <input type="hidden" name="estado" value={state.values.estado} />
+          <Card
+            as="section"
+            className={cn("PedidoFormSection", styles.PedidoFormSection)}
+          >
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+                Notas
+              </p>
+              <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                Observaciones
+              </h2>
+            </div>
+            <label className={cn("PedidoFormField", styles.PedidoFormField)}>
+              <Textarea
+                name="observaciones"
+                placeholder="Notas adicionales del pedido, aclaraciones del trabajo o comentarios del cliente."
+                defaultValue={state.values.observaciones}
+              />
+            </label>
+          </Card>
+        </>
+      )}
 
       {state.error ? (
         <section className="rounded-[24px] border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] px-5 py-4 text-sm text-[var(--color-danger-text)]">
