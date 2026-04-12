@@ -250,6 +250,15 @@ export function ClienteDetailPage({
               {cliente.cp || <span className={styles.infoEmpty}>Sin CP</span>}
             </InfoRow>
           </div>
+
+          <div className={styles.infoGridRow}>
+            <InfoRow label="DNI" icon={<Icon name="idCard" className="h-3.5 w-3.5" />}>
+              {cliente.dni || <span className={styles.infoEmpty}>Sin DNI</span>}
+            </InfoRow>
+            <InfoRow label="CUIT" icon={<Icon name="idCard" className="h-3.5 w-3.5" />}>
+              {cliente.cuit || <span className={styles.infoEmpty}>Sin CUIT</span>}
+            </InfoRow>
+          </div>
         </div>
 
         {wasUpdated && (

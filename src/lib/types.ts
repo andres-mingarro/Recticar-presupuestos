@@ -19,6 +19,8 @@ export type ClienteDetail = ClienteListItem & {
   provincia: string | null;
   cp: string | null;
   mail: string | null;
+  dni: string | null;
+  cuit: string | null;
 };
 
 export type ClientePendingPedidoItem = {
@@ -43,6 +45,8 @@ export type ClienteFormValues = {
   direccion: string;
   provincia: string;
   cp: string;
+  dni: string;
+  cuit: string;
 };
 
 export type PedidoListItem = {
@@ -64,6 +68,8 @@ export type PedidoDetail = PedidoListItem & {
   observaciones: string | null;
   trabajos_ids: number[];
   lista_precio: 1 | 2 | 3;
+  cliente_dni: string | null;
+  cliente_cuit: string | null;
 };
 
 export type ClientePedidoItem = PedidoListItem;

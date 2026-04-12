@@ -13,6 +13,7 @@ import { Pager } from "@/components/pagination/Pager";
 import { buttonStyles } from "@/components/ui/Button";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
+import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
 import { Table } from "@/components/ui/Table";
 import { getVehicleLabel } from "@/lib/format";
@@ -111,6 +112,7 @@ export function ClientesPage({
               styles.ClientesPageSearch
             )}
           />
+          {canEdit ? <Divider className="md:hidden" /> : null}
           {canEdit && <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>}
         </div>
 

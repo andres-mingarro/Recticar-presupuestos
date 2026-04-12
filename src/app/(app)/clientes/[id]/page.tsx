@@ -55,6 +55,8 @@ export default async function Page({
       direccion: cliente.direccion ?? "",
       provincia: cliente.provincia ?? "Chubut",
       cp: cliente.cp ?? "",
+      dni: cliente.dni ?? "",
+      cuit: cliente.cuit ?? "",
     },
   };
 
@@ -73,6 +75,8 @@ export default async function Page({
       direccion: normalizeString(formData.get("direccion")),
       provincia: normalizeString(formData.get("provincia")),
       cp: normalizeString(formData.get("cp")),
+      dni: normalizeString(formData.get("dni")),
+      cuit: normalizeString(formData.get("cuit")),
     };
 
     if (!values.nombre || !values.apellido) {

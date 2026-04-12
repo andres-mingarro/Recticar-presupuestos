@@ -27,18 +27,20 @@ export function SearchForm({
         <SearchBox entity={entity} initialValue={initialValue} />
       </label>
 
-      <button type="submit" className={buttonStyles({ className: "w-full sm:w-auto" })}>
-        <Icon name="search" className="h-4 w-4" />
-        Buscar
-      </button>
+      <div className="flex w-full gap-3 sm:w-auto">
+        <button type="submit" className={buttonStyles({ className: "flex-1 sm:flex-none" })}>
+          <Icon name="search" className="h-4 w-4" />
+          Buscar
+        </button>
 
-      <Link
-        href={config.clearHref}
-        className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
-      >
-        <Icon name="x" className="h-4 w-4" />
-        Limpiar
-      </Link>
+        <Link
+          href={config.clearHref}
+          className={buttonStyles({ variant: "secondary", className: "flex-1 sm:flex-none" })}
+        >
+          <Icon name="x" className="h-4 w-4" />
+          Limpiar
+        </Link>
+      </div>
     </form>
   );
 }

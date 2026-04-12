@@ -117,6 +117,8 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
           WHEN c.id IS NULL THEN NULL
           ELSE concat(c.apellido, ', ', c.nombre)
         END AS cliente_nombre,
+        c.dni AS cliente_dni,
+        c.cuit AS cliente_cuit,
         ma.nombre AS marca_nombre,
         mo.nombre AS modelo_nombre,
         mt.nombre AS motor_nombre,

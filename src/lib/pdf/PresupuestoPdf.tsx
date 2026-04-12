@@ -249,6 +249,18 @@ export function PresupuestoPdf({ pedido, trabajos }: Props) {
                   {pedido.cliente_nombre ?? "Sin asignar"}
                 </Text>
               </View>
+              {pedido.cliente_dni ? (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>DNI</Text>
+                  <Text style={styles.infoValue}>{pedido.cliente_dni}</Text>
+                </View>
+              ) : null}
+              {pedido.cliente_cuit ? (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>CUIT</Text>
+                  <Text style={styles.infoValue}>{pedido.cliente_cuit}</Text>
+                </View>
+              ) : null}
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Prioridad</Text>
                 <View style={prioridadStyle}>

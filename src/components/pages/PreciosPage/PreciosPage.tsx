@@ -10,6 +10,7 @@ import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
 import { SortableList } from "@/components/sortable/SortableList";
 
@@ -211,7 +212,7 @@ function CategoriaCard({
         </div>
 
         {/* Separador */}
-        <div className="h-5 w-px bg-[var(--color-border)]" />
+        <Divider orientation="vertical" className="h-5" />
 
         {/* Contador */}
         <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--color-foreground-muted)]">
@@ -219,7 +220,7 @@ function CategoriaCard({
         </span>
 
         {/* Separador */}
-        <div className="h-5 w-px bg-[var(--color-border)]" />
+        <Divider orientation="vertical" className="h-5" />
 
         {/* Editar precios / Guardar+Cancelar */}
         {isEditing ? (

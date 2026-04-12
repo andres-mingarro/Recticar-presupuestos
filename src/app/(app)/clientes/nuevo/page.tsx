@@ -15,6 +15,8 @@ const initialState: ClienteFormState = {
     direccion: "",
     provincia: "Chubut",
     cp: "",
+    dni: "",
+    cuit: "",
   },
 };
 
@@ -38,6 +40,8 @@ export default function Page() {
       direccion: normalizeString(formData.get("direccion")),
       provincia: normalizeString(formData.get("provincia")),
       cp: normalizeString(formData.get("cp")),
+      dni: normalizeString(formData.get("dni")),
+      cuit: normalizeString(formData.get("cuit")),
     };
 
     if (!values.nombre || !values.apellido) {

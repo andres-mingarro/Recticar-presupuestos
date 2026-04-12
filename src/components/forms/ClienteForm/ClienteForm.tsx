@@ -353,6 +353,30 @@ export function ClienteForm({
             disabled={!isEditing}
           />
         </label>
+
+        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
+          <span className="text-sm font-medium text-[var(--color-foreground)]">
+            DNI
+          </span>
+          <Input
+            name="dni"
+            placeholder="Ej. 30123456"
+            defaultValue={state.values.dni}
+            disabled={!isEditing}
+          />
+        </label>
+
+        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
+          <span className="text-sm font-medium text-[var(--color-foreground)]">
+            CUIT
+          </span>
+          <Input
+            name="cuit"
+            placeholder="Ej. 20-30123456-9"
+            defaultValue={state.values.cuit}
+            disabled={!isEditing}
+          />
+        </label>
       </div>
 
       {state.error ? (
