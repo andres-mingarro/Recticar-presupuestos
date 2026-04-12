@@ -3,10 +3,6 @@ import path from "node:path";
 import process from "node:process";
 
 export function loadDotEnvLocal() {
-  if (process.env.DATABASE_URL) {
-    return Promise.resolve();
-  }
-
   const envPath = path.join(process.cwd(), ".env.local");
 
   return fs

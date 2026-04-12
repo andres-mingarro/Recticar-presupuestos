@@ -1,4 +1,5 @@
 import { queryRows, templateRows } from "@/lib/db";
+import { hydrateTechnicalLabels } from "@/lib/queries/catalogo";
 import type {
   ClienteDetail,
   ClienteFormValues,
@@ -11,6 +12,11 @@ type ListClientesParams = {
   limit?: number;
   offset?: number;
 };
+
+type ClientePendingPedidoRow = Omit<
+  ClientePendingPedidoItem,
+  "marca_nombre" | "modelo_nombre" | "motor_nombre"
+>;
 
 export async function listClientes({
   search,
@@ -131,7 +137,7 @@ export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
     return [] as ClientePendingPedidoItem[];
   }
 
-  return queryRows<ClientePendingPedidoItem>(
+  const rows = await queryRows<ClientePendingPedidoRow>(
     `
       SELECT
         p.cliente_id,
@@ -141,14 +147,11 @@ export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
         p.estado,
         p.prioridad,
         p.fecha_creacion,
-        ma.nombre AS marca_nombre,
-        mo.nombre AS modelo_nombre,
-        mt.nombre AS motor_nombre,
+        p.marca_id,
+        p.modelo_id,
+        p.motor_id,
         p.numero_serie_motor
       FROM pedidos p
-      LEFT JOIN marcas ma ON ma.id = p.marca_id
-      LEFT JOIN modelos mo ON mo.id = p.modelo_id
-      LEFT JOIN motores mt ON mt.id = p.motor_id
       WHERE p.cliente_id = ANY($1::int[])
         AND p.estado <> 'finalizado'
       ORDER BY
@@ -163,6 +166,8 @@ export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
     `,
     [clienteIds]
   );
+
+  return hydrateTechnicalLabels(rows);
 }
 
 export async function createCliente(input: ClienteFormValues) {

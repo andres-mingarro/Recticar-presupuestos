@@ -121,6 +121,7 @@ async function main() {
   }
 
   const sql = neon(process.env.DATABASE_URL);
+  const technicalSql = neon(process.env.TECHNICAL_DATABASE_URL ?? process.env.DATABASE_URL);
 
   console.log("Limpiando datos DEV-SEED previos...");
 
@@ -144,19 +145,19 @@ async function main() {
     WHERE mail ILIKE ${`%${DEV_CLIENT_EMAIL_DOMAIN}`}
   `;
 
-  const combinaciones = await sql`
+  const combinaciones = await technicalSql`
     SELECT
       ma.id AS marca_id,
       ma.nombre AS marca_nombre,
       mo.id AS modelo_id,
       mo.nombre AS modelo_nombre,
-      mt.id AS motor_id,
-      mt.nombre AS motor_nombre
-    FROM modelo_motor mm
-    INNER JOIN modelos mo ON mo.id = mm.modelo_id
+      m.id AS motor_id,
+      m.nombre AS motor_nombre
+    FROM vehiculos v
+    INNER JOIN modelos mo ON mo.id = v.modelo_id
     INNER JOIN marcas ma ON ma.id = mo.marca_id
-    INNER JOIN motores mt ON mt.id = mm.motor_id
-    ORDER BY ma.nombre ASC, mo.nombre ASC, mt.nombre ASC
+    INNER JOIN motores m ON m.id = v.motor_id
+    ORDER BY ma.nombre ASC, mo.nombre ASC, m.nombre ASC
     LIMIT 120
   `;
 

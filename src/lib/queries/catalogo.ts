@@ -1,4 +1,9 @@
-import { queryRows, templateRows } from "@/lib/db";
+import {
+  queryRows,
+  queryRowsFromTechnical,
+  templateRows,
+  templateRowsFromTechnical,
+} from "@/lib/db";
 import type {
   Marca,
   Modelo,
@@ -8,7 +13,7 @@ import type {
 } from "@/lib/types";
 
 export async function listMarcas() {
-  return templateRows<Marca>`
+  return templateRowsFromTechnical<Marca>`
     SELECT id, nombre
     FROM marcas
     ORDER BY nombre ASC
@@ -16,7 +21,7 @@ export async function listMarcas() {
 }
 
 export async function listModelosByMarca(marcaId: number) {
-  return templateRows<Modelo>`
+  return templateRowsFromTechnical<Modelo>`
     SELECT id, nombre, marca_id
     FROM modelos
     WHERE marca_id = ${marcaId}
@@ -25,7 +30,7 @@ export async function listModelosByMarca(marcaId: number) {
 }
 
 export async function listModelos() {
-  return templateRows<Modelo>`
+  return templateRowsFromTechnical<Modelo>`
     SELECT id, nombre, marca_id
     FROM modelos
     ORDER BY nombre ASC
@@ -33,17 +38,17 @@ export async function listModelos() {
 }
 
 export async function listMotoresByModelo(modeloId: number) {
-  return templateRows<Motor>`
-    SELECT m.id, m.nombre
-    FROM motores m
-    INNER JOIN modelo_motor mm ON mm.motor_id = m.id
-    WHERE mm.modelo_id = ${modeloId}
+  return templateRowsFromTechnical<Motor>`
+    SELECT DISTINCT m.id, m.nombre
+    FROM vehiculos v
+    INNER JOIN motores m ON m.id = v.motor_id
+    WHERE v.modelo_id = ${modeloId}
     ORDER BY m.nombre ASC
   `;
 }
 
 export async function listMotores() {
-  return templateRows<Motor>`
+  return templateRowsFromTechnical<Motor>`
     SELECT id, nombre
     FROM motores
     ORDER BY nombre ASC
@@ -51,10 +56,74 @@ export async function listMotores() {
 }
 
 export async function listModeloMotorRelations() {
-  return templateRows<ModeloMotorRelation>`
-    SELECT modelo_id, motor_id
-    FROM modelo_motor
+  return templateRowsFromTechnical<ModeloMotorRelation>`
+    SELECT DISTINCT modelo_id, motor_id
+    FROM vehiculos
   `;
+}
+
+type TechnicalRef = {
+  marca_id: number | null;
+  modelo_id: number | null;
+  motor_id: number | null;
+};
+
+export async function hydrateTechnicalLabels<T extends TechnicalRef>(items: T[]) {
+  if (items.length === 0) {
+    return [] as Array<
+      T & {
+        marca_nombre: string | null;
+        modelo_nombre: string | null;
+        motor_nombre: string | null;
+      }
+    >;
+  }
+
+  const [marcas, modelos, motores] = await Promise.all([
+    listMarcas(),
+    listModelos(),
+    listMotores(),
+  ]);
+
+  const marcasById = new Map(marcas.map((marca) => [marca.id, marca.nombre]));
+  const modelosById = new Map(modelos.map((modelo) => [modelo.id, modelo.nombre]));
+  const motoresById = new Map(motores.map((motor) => [motor.id, motor.nombre]));
+
+  return items.map((item) => ({
+    ...item,
+    marca_nombre: item.marca_id ? marcasById.get(item.marca_id) ?? null : null,
+    modelo_nombre: item.modelo_id ? modelosById.get(item.modelo_id) ?? null : null,
+    motor_nombre: item.motor_id ? motoresById.get(item.motor_id) ?? null : null,
+  }));
+}
+
+export async function listTechnicalCombinations(limit?: number) {
+  const rows = await queryRowsFromTechnical<{
+    marca_id: number;
+    marca_nombre: string;
+    modelo_id: number;
+    modelo_nombre: string;
+    motor_id: number;
+    motor_nombre: string;
+  }>(
+    `
+      SELECT
+        ma.id AS marca_id,
+        ma.nombre AS marca_nombre,
+        mo.id AS modelo_id,
+        mo.nombre AS modelo_nombre,
+        m.id AS motor_id,
+        m.nombre AS motor_nombre
+      FROM vehiculos v
+      INNER JOIN modelos mo ON mo.id = v.modelo_id
+      INNER JOIN marcas ma ON ma.id = mo.marca_id
+      INNER JOIN motores m ON m.id = v.motor_id
+      ORDER BY ma.nombre ASC, mo.nombre ASC, m.nombre ASC
+      ${limit ? `LIMIT ${limit}` : ""}
+    `
+  );
+
+  return rows;
 }
 
 export async function listTrabajosAgrupados() {

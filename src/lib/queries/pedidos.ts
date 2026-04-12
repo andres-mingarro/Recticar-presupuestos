@@ -1,6 +1,6 @@
 import { queryRows, templateRows } from "@/lib/db";
+import { hydrateTechnicalLabels } from "@/lib/queries/catalogo";
 import type {
-  ClientePedidoItem,
   PedidoDetail,
   PedidoEstado,
   PedidoFormValues,
@@ -11,6 +11,18 @@ import type {
 type PedidoFilters = {
   estado?: PedidoEstado;
   prioridad?: PedidoPrioridad;
+};
+
+type PedidoListRow = Omit<
+  PedidoListItem,
+  "marca_nombre" | "modelo_nombre" | "motor_nombre"
+>;
+
+type PedidoDetailRow = Omit<
+  PedidoDetail,
+  "trabajos_ids" | "marca_nombre" | "modelo_nombre" | "motor_nombre"
+> & {
+  trabajos_ids: number[] | null;
 };
 
 export async function listPedidos(filters: PedidoFilters = {}) {
@@ -30,7 +42,7 @@ export async function listPedidos(filters: PedidoFilters = {}) {
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  return queryRows<PedidoListItem>(
+  const rows = await queryRows<PedidoListRow>(
     `
       SELECT
         p.id,
@@ -41,19 +53,16 @@ export async function listPedidos(filters: PedidoFilters = {}) {
         p.fecha_creacion,
         p.fecha_aprobacion,
         p.cliente_id,
+        p.marca_id,
+        p.modelo_id,
+        p.motor_id,
         CASE
           WHEN c.id IS NULL THEN NULL
           ELSE concat(c.apellido, ', ', c.nombre)
         END AS cliente_nombre,
-        ma.nombre AS marca_nombre,
-        mo.nombre AS modelo_nombre,
-        mt.nombre AS motor_nombre,
         p.numero_serie_motor
       FROM pedidos p
       LEFT JOIN clientes c ON c.id = p.cliente_id
-      LEFT JOIN marcas ma ON ma.id = p.marca_id
-      LEFT JOIN modelos mo ON mo.id = p.modelo_id
-      LEFT JOIN motores mt ON mt.id = p.motor_id
       ${whereClause}
       ORDER BY
         CASE
@@ -66,10 +75,12 @@ export async function listPedidos(filters: PedidoFilters = {}) {
     `,
     params
   );
+
+  return hydrateTechnicalLabels(rows);
 }
 
 export async function getPedidoById(id: number) {
-  const rows = await queryRows<PedidoListItem>(
+  const rows = await queryRows<PedidoListRow>(
     `
       SELECT
         p.id,
@@ -80,32 +91,28 @@ export async function getPedidoById(id: number) {
         p.fecha_creacion,
         p.fecha_aprobacion,
         p.cliente_id,
+        p.marca_id,
+        p.modelo_id,
+        p.motor_id,
         CASE
           WHEN c.id IS NULL THEN NULL
           ELSE concat(c.apellido, ', ', c.nombre)
         END AS cliente_nombre,
-        ma.nombre AS marca_nombre,
-        mo.nombre AS modelo_nombre,
-        mt.nombre AS motor_nombre,
         p.numero_serie_motor
       FROM pedidos p
       LEFT JOIN clientes c ON c.id = p.cliente_id
-      LEFT JOIN marcas ma ON ma.id = p.marca_id
-      LEFT JOIN modelos mo ON mo.id = p.modelo_id
-      LEFT JOIN motores mt ON mt.id = p.motor_id
       WHERE p.id = $1
       LIMIT 1
     `,
     [id]
   );
 
-  return rows[0] ?? null;
+  const hydrated = await hydrateTechnicalLabels(rows);
+  return hydrated[0] ?? null;
 }
 
 export async function getPedidoDetailById(id: number): Promise<PedidoDetail | null> {
-  type Row = Omit<PedidoDetail, "trabajos_ids"> & { trabajos_ids: number[] | null };
-
-  const rows = await queryRows<Row>(
+  const rows = await queryRows<PedidoDetailRow>(
     `
       SELECT
         p.id,
@@ -116,15 +123,15 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
         p.fecha_creacion,
         p.fecha_aprobacion,
         p.cliente_id,
+        p.marca_id,
+        p.modelo_id,
+        p.motor_id,
         CASE
           WHEN c.id IS NULL THEN NULL
           ELSE concat(c.apellido, ', ', c.nombre)
         END AS cliente_nombre,
         c.dni AS cliente_dni,
         c.cuit AS cliente_cuit,
-        ma.nombre AS marca_nombre,
-        mo.nombre AS modelo_nombre,
-        mt.nombre AS motor_nombre,
         p.numero_serie_motor,
         p.observaciones,
         p.lista_precio,
@@ -132,12 +139,9 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
           FILTER (WHERE pt.trabajo_id IS NOT NULL) AS trabajos_ids
       FROM pedidos p
       LEFT JOIN clientes c ON c.id = p.cliente_id
-      LEFT JOIN marcas ma ON ma.id = p.marca_id
-      LEFT JOIN modelos mo ON mo.id = p.modelo_id
-      LEFT JOIN motores mt ON mt.id = p.motor_id
       LEFT JOIN pedido_trabajos pt ON pt.pedido_id = p.id
       WHERE p.id = $1
-      GROUP BY p.id, c.id, ma.id, mo.id, mt.id
+      GROUP BY p.id, c.id
       LIMIT 1
     `,
     [id]
@@ -146,7 +150,8 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
   const row = rows[0];
   if (!row) return null;
 
-  return { ...row, trabajos_ids: row.trabajos_ids ?? [] };
+  const hydrated = await hydrateTechnicalLabels([{ ...row, trabajos_ids: row.trabajos_ids ?? [] }]);
+  return hydrated[0] ?? null;
 }
 
 export async function updatePedido(id: number, input: PedidoFormValues) {
@@ -254,7 +259,7 @@ export async function createPedido(input: PedidoFormValues) {
 }
 
 export async function listPedidosByCliente(clienteId: number) {
-  return queryRows<ClientePedidoItem>(
+  const rows = await queryRows<PedidoListRow>(
     `
       SELECT
         p.id,
@@ -265,19 +270,16 @@ export async function listPedidosByCliente(clienteId: number) {
         p.fecha_creacion,
         p.fecha_aprobacion,
         p.cliente_id,
+        p.marca_id,
+        p.modelo_id,
+        p.motor_id,
         CASE
           WHEN c.id IS NULL THEN NULL
           ELSE concat(c.apellido, ', ', c.nombre)
         END AS cliente_nombre,
-        ma.nombre AS marca_nombre,
-        mo.nombre AS modelo_nombre,
-        mt.nombre AS motor_nombre,
         p.numero_serie_motor
       FROM pedidos p
       LEFT JOIN clientes c ON c.id = p.cliente_id
-      LEFT JOIN marcas ma ON ma.id = p.marca_id
-      LEFT JOIN modelos mo ON mo.id = p.modelo_id
-      LEFT JOIN motores mt ON mt.id = p.motor_id
       WHERE p.cliente_id = $1
       ORDER BY
         CASE
@@ -289,4 +291,6 @@ export async function listPedidosByCliente(clienteId: number) {
     `,
     [clienteId]
   );
+
+  return hydrateTechnicalLabels(rows);
 }

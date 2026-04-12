@@ -25,7 +25,10 @@ Crear `.env.local` con:
 
 ```bash
 DATABASE_URL=postgres://usuario:password@host/db
+TECHNICAL_DATABASE_URL=postgres://usuario:password@host/db-catalogo
 ```
+
+`TECHNICAL_DATABASE_URL` se usa para la información de selección técnica (`marcas`, `modelos`, `motores`, `modelo_motor`). Si no está definida, la app usa `DATABASE_URL` como fallback.
 
 ## Migraciones
 
@@ -51,4 +54,3 @@ El runner registra cada archivo aplicado en la tabla `schema_migrations`.
 - Las tablas existentes `marcas`, `modelos`, `motores`, `modelo_motor`, `categorias_trabajo` y `trabajos` usan `id` como PK.
 - Para los listados se asume que `marcas`, `modelos` y `motores` tienen una columna `nombre`.
 - Para futuros formularios se asume que `trabajos.categoria_id` referencia a `categorias_trabajo.id`.
-

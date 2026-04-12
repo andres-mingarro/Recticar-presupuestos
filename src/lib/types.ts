@@ -31,6 +31,9 @@ export type ClientePendingPedidoItem = {
   estado: PedidoEstado;
   prioridad: PedidoPrioridad;
   fecha_creacion: string;
+  marca_id: number | null;
+  modelo_id: number | null;
+  motor_id: number | null;
   marca_nombre: string | null;
   modelo_nombre: string | null;
   motor_nombre: string | null;
@@ -60,6 +63,9 @@ export type PedidoListItem = {
   fecha_aprobacion: string | null;
   cliente_id: number | null;
   cliente_nombre: string | null;
+  marca_id: number | null;
+  modelo_id: number | null;
+  motor_id: number | null;
   marca_nombre: string | null;
   modelo_nombre: string | null;
   motor_nombre: string | null;

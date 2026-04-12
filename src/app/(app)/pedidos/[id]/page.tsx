@@ -56,9 +56,9 @@ export default async function Page({
     error: null,
     values: {
       clienteId: pedido.cliente_id ? String(pedido.cliente_id) : "",
-      marcaId: "",
-      modeloId: "",
-      motorId: "",
+      marcaId: pedido.marca_id ? String(pedido.marca_id) : "",
+      modeloId: pedido.modelo_id ? String(pedido.modelo_id) : "",
+      motorId: pedido.motor_id ? String(pedido.motor_id) : "",
       numeroSerieMotor: pedido.numero_serie_motor,
       cobrado: pedido.cobrado,
       prioridad: pedido.prioridad,
@@ -68,21 +68,6 @@ export default async function Page({
       listaPrecios: (pedido.lista_precio as 1 | 2 | 3) ?? 1,
     },
   };
-
-  // Populate marcaId/modeloId/motorId from catalog
-  const matchedMotor = pedido.motor_nombre
-    ? motores.find((m) => m.nombre === pedido.motor_nombre)
-    : null;
-  const matchedModelo = pedido.modelo_nombre
-    ? modelos.find((m) => m.nombre === pedido.modelo_nombre)
-    : null;
-  const matchedMarca = pedido.marca_nombre
-    ? marcas.find((m) => m.nombre === pedido.marca_nombre)
-    : null;
-
-  if (matchedMarca) initialState.values.marcaId = String(matchedMarca.id);
-  if (matchedModelo) initialState.values.modeloId = String(matchedModelo.id);
-  if (matchedMotor) initialState.values.motorId = String(matchedMotor.id);
 
   async function updatePedidoAction(
     _previousState: PedidoFormState,
