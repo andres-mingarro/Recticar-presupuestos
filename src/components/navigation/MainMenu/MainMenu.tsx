@@ -2,17 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import styles from "./MainMenu.module.scss";
 
 const baseItems = [
-  { href: "/", label: "Dashboard", exact: true },
-  { href: "/clientes", label: "Clientes", exact: false },
-  { href: "/pedidos", label: "Pedidos", exact: false },
-  { href: "/precios", label: "Precios", exact: false },
+  { href: "/", label: "Dashboard", icon: "gauge" as const, exact: true },
+  { href: "/clientes", label: "Clientes", icon: "user" as const, exact: false },
+  { href: "/pedidos", label: "Pedidos", icon: "clipboard" as const, exact: false },
+  { href: "/precios", label: "Precios", icon: "tag" as const, exact: false },
 ];
 
 function isActive(pathname: string, href: string, exact: boolean) {
@@ -22,157 +20,52 @@ function isActive(pathname: string, href: string, exact: boolean) {
 
 type Props = {
   role?: string;
+  onClose?: () => void;
 };
 
-export function MainMenu({ role }: Props) {
+export function MainMenu({ role, onClose }: Props) {
   const pathname = usePathname();
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
   const items = [
     ...baseItems,
     ...(role === "admin" || role === "superuser"
-      ? [{ href: "/admin/usuarios", label: "Usuarios", exact: false }]
+      ? [{ href: "/admin/usuarios", label: "Usuarios", icon: "shieldUser" as const, exact: false }]
       : []),
   ];
 
-  function closeMenu() {
-    setIsClosing(true);
-    window.setTimeout(() => {
-      setMenuOpen(false);
-      setIsClosing(false);
-    }, 200);
-  }
-
-  useEffect(() => {
-    if (menuOpen) {
-      closeMenu();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
-
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    setMenuOpen(false);
+    onClose?.();
     router.replace("/login");
   }
 
   return (
-    <>
-      <div className="flex w-full items-center justify-end gap-3">
-        <nav
-          className={cn("MainMenu", styles.MainMenu, styles.desktopNav, "text-sm")}
-          aria-label="Principal"
-        >
-          {items.map((item) => {
-            const active = isActive(pathname, item.href, item.exact);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  styles.link,
-                  active && styles.linkActive
-                )}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+    <div className={styles.MainMenu}>
+      <nav className={styles.nav} aria-label="Principal">
+        {items.map((item) => {
+          const active = isActive(pathname, item.href, item.exact);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={cn(styles.link, active && styles.linkActive)}
+              onClick={onClose}
+            >
+              <Icon name={item.icon} className="h-[1.1rem] w-[1.1rem] shrink-0" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
 
-        <button
-          onClick={handleLogout}
-          className={styles.desktopLogout}
-        >
+      <div className={styles.footer}>
+        <button type="button" onClick={handleLogout} className={styles.logoutBtn}>
+          <Icon name="power" className="h-4 w-4" />
           Salir
         </button>
-
-        <button
-          type="button"
-          className={cn(styles.hamburger, styles.mobileToggle, menuOpen && styles.hamburgerOpen)}
-          onClick={() => (menuOpen ? closeMenu() : setMenuOpen(true))}
-          aria-label={menuOpen ? "Cerrar menu" : "Abrir menu"}
-          aria-expanded={menuOpen}
-        >
-          <span className={styles.hamburgerBar} />
-          <span className={styles.hamburgerBar} />
-          <span className={styles.hamburgerBar} />
-        </button>
       </div>
-
-      {isMounted && (menuOpen || isClosing)
-        ? createPortal(
-            <div
-              className={cn(
-                styles.mobileOverlay,
-                isClosing && styles.mobileOverlayClosing
-              )}
-              onClick={closeMenu}
-            >
-              <div
-                className={cn(styles.mobileMenu, isClosing && styles.mobileMenuClosing)}
-                onClick={(event) => event.stopPropagation()}
-              >
-                <div className={styles.mobileMenuHeader}>
-                  <p className={styles.mobileMenuEyebrow}>Navegacion</p>
-                  <button
-                    type="button"
-                    className={styles.mobileClose}
-                    onClick={closeMenu}
-                    aria-label="Cerrar menu"
-                  >
-                    <Icon name="x" className="h-5 w-5" />
-                  </button>
-                </div>
-
-                <nav className={styles.mobileNav} aria-label="Principal mobile">
-                  {items.map((item) => {
-                    const active = isActive(pathname, item.href, item.exact);
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(styles.mobileLink, active && styles.mobileLinkActive)}
-                        onClick={closeMenu}
-                      >
-                        <span>{item.label}</span>
-                        <Icon name="arrowRight" className="h-4 w-4" />
-                      </Link>
-                    );
-                  })}
-                </nav>
-
-                <div className={styles.mobileDivider} />
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className={styles.mobileLogout}
-                >
-                  <Icon name="power" className="h-4 w-4" />
-                  Salir
-                </button>
-              </div>
-            </div>,
-            document.body
-          )
-        : null}
-    </>
+    </div>
   );
 }
