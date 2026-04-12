@@ -19,6 +19,7 @@ type NuevoPedidoPageProps = {
     formData: FormData
   ) => Promise<PedidoFormState>;
   initialState: PedidoFormState;
+  initialClienteLabel?: string;
   marcas: Marca[];
   modelos: Modelo[];
   motores: Motor[];
@@ -29,6 +30,7 @@ type NuevoPedidoPageProps = {
 export function NuevoPedidoPage({
   action,
   initialState,
+  initialClienteLabel = "",
   marcas,
   modelos,
   motores,
@@ -57,6 +59,7 @@ export function NuevoPedidoPage({
         <PedidoForm
           action={action}
           initialState={initialState}
+          initialClienteLabel={initialClienteLabel}
           marcas={marcas}
           modelos={modelos}
           motores={motores}

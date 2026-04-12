@@ -8,6 +8,7 @@ import { formatDate, getVehicleLabel } from "@/lib/format";
 import { ClienteForm, type ClienteFormState } from "@/components/forms/ClienteForm";
 import { buttonStyles } from "@/components/ui/Button";
 import { PaymentBadge, PriorityBadge, StatusBadge } from "@/components/ui/Badge";
+import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
 import { Table } from "@/components/ui/Table";
@@ -163,6 +164,9 @@ export function ClienteDetailPage({
           </div>
 
           <div className={styles.headerActions}>
+            <ButtonAdd href={`/pedidos/nuevo?clienteId=${cliente.id}`}>
+              Nuevo pedido
+            </ButtonAdd>
             {/* Stats */}
             <div className={styles.stats}>
               <div className={styles.stat}>
@@ -176,18 +180,7 @@ export function ClienteDetailPage({
               </div>
             </div>
 
-            {canEdit && (
-              <button
-                type="button"
-                className={buttonStyles({ variant: "primary", size: "sm", className: "gap-2" })}
-                aria-expanded={isEditOpen}
-                aria-controls="cliente-edit-panel"
-                onClick={() => setIsEditOpen((v) => !v)}
-              >
-                <Icon name="edit" className="h-4 w-4" />
-                {isEditOpen ? "Cerrar" : "Editar"}
-              </button>
-            )}
+            
           </div>
         </div>
 
@@ -261,6 +254,21 @@ export function ClienteDetailPage({
               {cliente.cuit || <span className={styles.infoEmpty}>Sin CUIT</span>}
             </InfoRow>
           </div>
+        </div>
+
+        <div>
+          {canEdit && (
+            <button
+              type="button"
+              className={buttonStyles({ variant: "primary", size: "sm", className: "gap-2" })}
+              aria-expanded={isEditOpen}
+              aria-controls="cliente-edit-panel"
+              onClick={() => setIsEditOpen((v) => !v)}
+            >
+              <Icon name="edit" className="h-4 w-4" />
+              {isEditOpen ? "Cerrar" : "Editar"}
+            </button>
+          )}
         </div>
 
         {wasUpdated && (

@@ -9,6 +9,7 @@ import {
   listTrabajosAgrupados,
 } from "@/lib/queries/catalogo";
 import { createPedido } from "@/lib/queries/pedidos";
+import { getClienteById } from "@/lib/queries/clientes";
 import type { PedidoFormValues } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -34,15 +35,38 @@ function normalizeString(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export default async function Page() {
-  const [marcas, modelos, motores, relations, trabajos] =
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: Promise<{ clienteId?: string }>;
+}) {
+  const params = await searchParams;
+  const clienteIdParam =
+    typeof params?.clienteId === "string" ? Number(params.clienteId) : Number.NaN;
+  const selectedClienteId =
+    Number.isFinite(clienteIdParam) && clienteIdParam > 0 ? String(clienteIdParam) : "";
+
+  const [marcas, modelos, motores, relations, trabajos, cliente] =
     await Promise.all([
       listMarcas(),
       listModelos(),
       listMotores(),
       listModeloMotorRelations(),
       listTrabajosAgrupados(),
+      selectedClienteId ? getClienteById(Number(selectedClienteId)) : Promise.resolve(null),
     ]);
+
+  const initialStateWithCliente: PedidoFormState = {
+    ...initialState,
+    values: {
+      ...initialState.values,
+      clienteId: cliente ? String(cliente.id) : "",
+    },
+  };
+
+  const initialClienteLabel = cliente
+    ? `#${cliente.numero_cliente} · ${cliente.apellido}, ${cliente.nombre}`
+    : "";
 
   async function createPedidoAction(
     _previousState: PedidoFormState,
@@ -96,7 +120,8 @@ export default async function Page() {
   return (
     <NuevoPedidoPage
       action={createPedidoAction}
-      initialState={initialState}
+      initialState={initialStateWithCliente}
+      initialClienteLabel={initialClienteLabel}
       marcas={marcas}
       modelos={modelos}
       motores={motores}
