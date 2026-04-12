@@ -13,7 +13,7 @@
 }
 
 .value {
-  font-size: 0.95rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-foreground);
   text-transform: capitalize;

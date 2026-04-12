@@ -17,8 +17,9 @@ const OPTIONS: Array<{
     label: "Baja",
     tooltip: "Cambiar prioridad a baja",
     styles: {
-      base: "border-slate-200 text-slate-600 hover:bg-slate-50",
-      active: "border-slate-400 bg-slate-100 text-slate-700 font-semibold",
+      base: "border-[var(--color-neutral-border)] text-[var(--color-neutral-text)] hover:bg-[var(--color-neutral-bg)]",
+      active:
+        "border-[var(--color-neutral-border-strong)] bg-[var(--color-neutral-bg)] text-[var(--color-neutral-text-strong)] font-semibold",
     },
   },
   {
@@ -26,8 +27,9 @@ const OPTIONS: Array<{
     label: "Normal",
     tooltip: "Cambiar prioridad a normal",
     styles: {
-      base: "border-sky-200 text-sky-600 hover:bg-sky-50",
-      active: "border-sky-400 bg-sky-100 text-sky-700 font-semibold",
+      base: "border-[var(--color-info-border)] text-[var(--color-info-text)] hover:bg-[var(--color-info-bg)]",
+      active:
+        "border-[var(--color-info-border-strong)] bg-[var(--color-info-bg-strong)] text-[var(--color-info-text-strong)] font-semibold",
     },
   },
   {
@@ -35,8 +37,9 @@ const OPTIONS: Array<{
     label: "Alta",
     tooltip: "Cambiar prioridad a alta",
     styles: {
-      base: "border-rose-200 text-rose-600 hover:bg-rose-50",
-      active: "border-rose-400 bg-rose-100 text-rose-700 font-semibold",
+      base: "border-[var(--color-danger-border)] text-[var(--color-danger-text)] hover:bg-[var(--color-danger-bg)]",
+      active:
+        "border-[var(--color-priority-high-border)] bg-[var(--color-danger-bg-strong)] text-[var(--color-priority-high-text)] font-semibold",
     },
   },
 ];
@@ -80,7 +83,7 @@ export function PrioridadSelector({ value, action }: PrioridadSelectorProps) {
         })}
       </div>
       {state.error ? (
-        <p className="text-xs text-rose-600">{state.error}</p>
+        <p className="text-xs text-[var(--color-danger-text)]">{state.error}</p>
       ) : null}
     </div>
   );

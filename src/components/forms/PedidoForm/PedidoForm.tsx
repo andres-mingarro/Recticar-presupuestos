@@ -51,9 +51,21 @@ const prioridadCards: Array<{
   label: string;
   tone: string;
 }> = [
-  { value: "baja", label: "Baja", tone: "border-slate-200 bg-slate-50" },
-  { value: "normal", label: "Normal", tone: "border-sky-200 bg-sky-50" },
-  { value: "alta", label: "Alta", tone: "border-rose-200 bg-rose-50" },
+  {
+    value: "baja",
+    label: "Baja",
+    tone: "border-[var(--color-priority-low-border)] bg-[var(--color-priority-low-bg)]",
+  },
+  {
+    value: "normal",
+    label: "Normal",
+    tone: "border-[var(--color-priority-normal-border)] bg-[var(--color-priority-normal-bg)]",
+  },
+  {
+    value: "alta",
+    label: "Alta",
+    tone: "border-[var(--color-priority-high-border)] bg-[var(--color-priority-high-bg)]",
+  },
 ];
 
 export function PedidoForm({
@@ -217,9 +229,9 @@ export function PedidoForm({
           <div className="grid grid-cols-3 gap-2">
             {([1, 2, 3] as const).map((lista) => {
               const colors = {
-                1: "border-sky-300 bg-sky-50 text-sky-700 ring-sky-400",
-                2: "border-violet-300 bg-violet-50 text-violet-700 ring-violet-400",
-                3: "border-emerald-300 bg-emerald-50 text-emerald-700 ring-emerald-400",
+                1: "border-[var(--color-info-border-strong)] bg-[var(--color-info-bg)] text-[var(--color-info-text-strong)] ring-[var(--color-info-border-strong)]",
+                2: "border-[var(--color-violet-border)] bg-[var(--color-violet-bg)] text-[var(--color-violet-text)] ring-[var(--color-violet-border)]",
+                3: "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success-text-strong)] ring-[var(--color-success-border)]",
               };
               const active = listaPrecios === lista;
               return (
@@ -342,7 +354,7 @@ export function PedidoForm({
       </Card>
 
       {state.error ? (
-        <section className="rounded-[24px] border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <section className="rounded-[24px] border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] px-5 py-4 text-sm text-[var(--color-danger-text)]">
           {state.error}
         </section>
       ) : null}

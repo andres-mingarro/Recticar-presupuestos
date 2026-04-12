@@ -3,6 +3,22 @@
 :root {
   --background: #f6f7fb;
   --foreground: #111827;
+  --font-size-xs: 0.75rem;
+  --line-height-xs: 1rem;
+  --font-size-sm: 0.875rem;
+  --line-height-sm: 1.25rem;
+  --font-size-base: 1rem;
+  --line-height-base: 1.5rem;
+  --font-size-lg: 1.125rem;
+  --line-height-lg: 1.75rem;
+  --font-size-xl: 1.25rem;
+  --line-height-xl: 1.8rem;
+  --font-size-2xl: 1.5rem;
+  --line-height-2xl: 2rem;
+  --font-size-3xl: 1.875rem;
+  --line-height-3xl: 2.25rem;
+  --font-size-4xl: 2.25rem;
+  --line-height-4xl: 2.5rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-foreground-muted: #475569;
@@ -13,6 +29,60 @@
   --color-accent: #ea580c;
   --color-accent-strong: #c2410c;
   --color-accent-soft: rgba(251, 146, 60, 0.2);
+  --color-selection: rgba(249, 115, 22, 0.18);
+  --color-shadow-sm: rgba(15, 23, 42, 0.06);
+  --color-shadow-md: rgba(15, 23, 42, 0.08);
+  --color-shadow-lg: rgba(15, 23, 42, 0.14);
+  --color-shadow-xl: rgba(15, 23, 42, 0.22);
+  --color-overlay: rgba(15, 23, 42, 0.5);
+  --color-overlay-soft: rgba(15, 23, 42, 0.24);
+  --color-sidebar-text: rgba(226, 232, 240, 0.72);
+  --color-sidebar-text-strong: rgba(226, 232, 240, 0.9);
+  --color-sidebar-surface: rgba(255, 255, 255, 0.04);
+  --color-sidebar-surface-hover: rgba(255, 255, 255, 0.08);
+  --color-sidebar-border: rgba(255, 255, 255, 0.1);
+  --color-sidebar-border-strong: rgba(255, 255, 255, 0.2);
+  --color-sidebar-gradient-start: rgba(15, 23, 42, 0.98);
+  --color-sidebar-gradient-end: rgba(30, 41, 59, 0.96);
+  --color-sidebar-accent-glow: rgba(249, 115, 22, 0.28);
+  --color-sidebar-highlight: rgba(255, 255, 255, 0.15);
+  --color-success-bg: #f7fee7;
+  --color-success-bg-strong: #ecfccb;
+  --color-success-border: #bef264;
+  --color-success-border-strong: #a3e635;
+  --color-success-fill: #d9f99d;
+  --color-success-text: #4d7c0f;
+  --color-success-text-strong: #3f6212;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-text: #be123c;
+  --color-danger-bg-strong: #ffe4e6;
+  --color-info-bg: #f0f9ff;
+  --color-info-bg-strong: #e0f2fe;
+  --color-info-border: #bae6fd;
+  --color-info-border-strong: #7dd3fc;
+  --color-info-text: #0369a1;
+  --color-info-text-strong: #075985;
+  --color-warning-bg: #fff7ed;
+  --color-warning-border: #fed7aa;
+  --color-warning-text: #c2410c;
+  --color-neutral-bg: #f1f5f9;
+  --color-neutral-border: #cbd5e1;
+  --color-neutral-border-strong: #94a3b8;
+  --color-neutral-text: #475569;
+  --color-neutral-text-strong: #334155;
+  --color-violet-bg: #f5f3ff;
+  --color-violet-border: #d8b4fe;
+  --color-violet-text: #6d28d9;
+  --color-priority-low-bg: var(--color-neutral-bg);
+  --color-priority-low-border: var(--color-neutral-border);
+  --color-priority-low-text: var(--color-neutral-text-strong);
+  --color-priority-normal-bg: var(--color-info-bg-strong);
+  --color-priority-normal-border: var(--color-info-border);
+  --color-priority-normal-text: var(--color-info-text-strong);
+  --color-priority-high-bg: var(--color-danger-bg-strong);
+  --color-priority-high-border: #fda4af;
+  --color-priority-high-text: #be123c;
 }
 
 @theme inline {
@@ -36,15 +106,64 @@ body {
   font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
-@media (min-width: 1024px) {
-  :where(.text-xs) {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-  }
+:where(.text-xs) {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
 
-  :where(.text-sm) {
-    font-size: 1.05rem;
-    line-height: 1.6rem;
+:where(.text-sm) {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+:where(.text-base) {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+:where(.text-lg) {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-lg);
+}
+
+:where(.text-xl) {
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-xl);
+}
+
+:where(.text-2xl) {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-2xl);
+}
+
+:where(.text-3xl) {
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-3xl);
+}
+
+:where(.text-4xl) {
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-4xl);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --font-size-xs: 0.875rem;
+    --line-height-xs: 1.25rem;
+    --font-size-sm: 1rem;
+    --line-height-sm: 1.55rem;
+    --font-size-base: 1.125rem;
+    --line-height-base: 1.7rem;
+    --font-size-lg: 1.25rem;
+    --line-height-lg: 1.85rem;
+    --font-size-xl: 1.5rem;
+    --line-height-xl: 2rem;
+    --font-size-2xl: 1.875rem;
+    --line-height-2xl: 2.25rem;
+    --font-size-3xl: 2.25rem;
+    --line-height-3xl: 2.5rem;
+    --font-size-4xl: 3rem;
+    --line-height-4xl: 1.1;
   }
 }
 
@@ -54,5 +173,5 @@ a {
 }
 
 ::selection {
-  background: rgba(249, 115, 22, 0.18);
+  background: var(--color-selection);
 }

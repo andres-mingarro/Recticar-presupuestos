@@ -12,9 +12,12 @@ type ContactBadgeVariant =
 
 export function PriorityBadge({ prioridad }: { prioridad: PedidoPrioridad }) {
   const priorityStyles = {
-    baja: "bg-slate-100 text-slate-700 border-slate-200",
-    normal: "bg-sky-100 text-sky-700 border-sky-200",
-    alta: "bg-rose-100 text-rose-700 border-rose-200",
+    baja:
+      "border-[var(--color-priority-low-border)] bg-[var(--color-priority-low-bg)] text-[var(--color-priority-low-text)]",
+    normal:
+      "border-[var(--color-priority-normal-border)] bg-[var(--color-priority-normal-bg)] text-[var(--color-priority-normal-text)]",
+    alta:
+      "border-[var(--color-priority-high-border)] bg-[var(--color-priority-high-bg)] text-[var(--color-priority-high-text)]",
   };
 
   return (
@@ -34,9 +37,12 @@ export function PriorityBadge({ prioridad }: { prioridad: PedidoPrioridad }) {
 
 export function StatusBadge({ estado }: { estado: PedidoEstado }) {
   const statusStyles = {
-    pendiente: "bg-amber-100 text-amber-800 border-amber-200",
-    aprobado: "bg-emerald-100 text-emerald-800 border-emerald-200",
-    finalizado: "bg-slate-100 text-slate-700 border-slate-200",
+    pendiente:
+      "border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]",
+    aprobado:
+      "border-[var(--color-success-border)] bg-[var(--color-success-fill)] text-[var(--color-success-text-strong)]",
+    finalizado:
+      "border-[var(--color-neutral-border)] bg-[var(--color-neutral-bg)] text-[var(--color-neutral-text)]",
   };
 
   return (
@@ -171,7 +177,7 @@ export function ContactBadge({
     "Badge",
     styles.Badge,
     styles.ContactBadge,
-    "inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-medium text-emerald-800"
+    "inline-flex items-center gap-2 rounded-full border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-3.5 py-2 text-sm font-medium text-[var(--color-success-text-strong)]"
   );
 
   const inner = (

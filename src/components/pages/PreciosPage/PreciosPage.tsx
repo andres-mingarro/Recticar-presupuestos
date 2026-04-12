@@ -18,9 +18,9 @@ import { SortableList } from "@/components/sortable/SortableList";
 type Trabajo = TrabajoAgrupado["trabajos"][number];
 
 const LISTA_COLORS = [
-  "bg-sky-50 text-sky-700 border-sky-200",
-  "bg-violet-50 text-violet-700 border-violet-200",
-  "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "bg-[var(--color-info-bg)] text-[var(--color-info-text-strong)] border-[var(--color-info-border)]",
+  "bg-[var(--color-violet-bg)] text-[var(--color-violet-text)] border-[var(--color-violet-border)]",
+  "bg-[var(--color-success-bg)] text-[var(--color-success-text-strong)] border-[var(--color-success-border)]",
 ];
 
 function formatPrecio(value: number | null | undefined) {
@@ -198,7 +198,7 @@ function CategoriaCard({
                 type="submit"
                 disabled={renamePending}
                 title="Guardar nombre"
-                className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-40"
+                  className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-success-bg)] hover:text-[var(--color-success-text)] disabled:opacity-40"
               >
                 <Icon name="check" className="h-3.5 w-3.5" />
               </button>
@@ -228,7 +228,7 @@ function CategoriaCard({
               form={formId}
               type="submit"
               disabled={savePending}
-              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
             >
               <Icon name="check" className="h-3.5 w-3.5" />
               {savePending ? "Guardando…" : "Guardar"}
@@ -267,7 +267,7 @@ function CategoriaCard({
               type="submit"
               disabled={deletePending}
               title="Eliminar categoría"
-              className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
+              className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] disabled:opacity-40"
             >
               <Icon name="trash" className="h-4 w-4" />
             </button>
@@ -277,7 +277,7 @@ function CategoriaCard({
 
       {/* Errores */}
       {(renameState.error || deleteState.error || saveState.error) && (
-        <p className="px-5 py-2 text-xs text-rose-600">
+        <p className="px-5 py-2 text-xs text-[var(--color-danger-text)]">
           {renameState.error ?? deleteState.error ?? saveState.error}
         </p>
       )}
@@ -328,7 +328,7 @@ function CategoriaCard({
       )}
 
       {/* ── Footer: agregar trabajo — solo en modo edición ── */}
-      {isEditing && <div className="flex flex-wrap items-center gap-3 bg-sky-50 px-5 py-3" style={{ borderTop: "2px dashed #93c5fd" }}>
+      {isEditing && <div className="flex flex-wrap items-center gap-3 bg-[var(--color-info-bg)] px-5 py-3" style={{ borderTop: "2px dashed var(--color-info-border-strong)" }}>
         <form
           key={addState.resetKey ?? 0}
           action={addFormAction}
@@ -340,18 +340,18 @@ function CategoriaCard({
             name="nombre"
             placeholder="Nombre del nuevo trabajo…"
             required
-            className="flex-1 rounded-xl border border-sky-200 bg-white/80 px-3 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-sky-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300/40 backdrop-blur-sm"
+            className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-3 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 backdrop-blur-sm"
           />
           <button
             type="submit"
             disabled={addPending}
-            className={buttonStyles({ className: "gap-2 !text-white bg-sky-600 uppercase hover:bg-sky-700" })}
+            className={buttonStyles({ className: "gap-2 !text-white bg-[var(--color-info-text)] uppercase hover:bg-[var(--color-info-text-strong)]" })}
           >
             <Icon name="plus" className="h-4 w-4" />
             {addPending ? "Agregando…" : "Agregar trabajo"}
           </button>
           {addState.error && (
-            <p className="text-xs text-rose-600">{addState.error}</p>
+            <p className="text-xs text-[var(--color-danger-text)]">{addState.error}</p>
           )}
         </form>
       </div>}
@@ -370,25 +370,25 @@ function AddCategoriaForm({
 
   return (
     <div className="space-y-2">
-      <form key={state.resetKey ?? 0} action={formAction} className="flex gap-3 rounded-[18px] bg-sky-50 px-4 py-3" style={{ border: "2px dashed #93c5fd" }}>
+      <form key={state.resetKey ?? 0} action={formAction} className="flex gap-3 rounded-[18px] bg-[var(--color-info-bg)] px-4 py-3" style={{ border: "2px dashed var(--color-info-border-strong)" }}>
         <input
           type="text"
           name="nombre"
           placeholder="Nombre de la nueva categoría…"
           required
-          className="flex-1 rounded-xl border border-sky-200 bg-white/80 px-4 py-2 text-sm text-[var(--color-foreground)] placeholder:text-sky-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300/40"
+          className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-4 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40"
         />
         <button
           type="submit"
           disabled={isPending}
-          className={buttonStyles({ className: "gap-2 !text-white bg-sky-600 uppercase hover:bg-sky-700" })}
+          className={buttonStyles({ className: "gap-2 !text-white bg-[var(--color-info-text)] uppercase hover:bg-[var(--color-info-text-strong)]" })}
         >
           <Icon name="plus" className="h-4 w-4" />
           {isPending ? "Creando…" : "Nueva categoría"}
         </button>
       </form>
       {state.error && (
-        <p className="text-sm text-rose-600">{state.error}</p>
+        <p className="text-sm text-[var(--color-danger-text)]">{state.error}</p>
       )}
     </div>
   );

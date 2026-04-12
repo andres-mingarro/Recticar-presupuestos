@@ -28,13 +28,13 @@ export function DeleteItemForm({
           disabled={isPending}
           tabIndex={-1}
           title={title}
-          className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
+          className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] disabled:opacity-40"
         >
           <Icon name="trash" className="h-4 w-4" />
         </button>
       </form>
       {state.error ? (
-        <p className="mt-1 text-xs text-rose-600">{state.error}</p>
+        <p className="mt-1 text-xs text-[var(--color-danger-text)]">{state.error}</p>
       ) : null}
     </div>
   );
