@@ -74,13 +74,23 @@ export function PedidoDetailPage({
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
       {/* Top bar: back button + PDF download */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Link
-          href="/pedidos"
-          className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
-        >
-          <Icon name="chevronLeft" className="h-4 w-4" />
-          Volver al listado
-        </Link>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Link
+            href="/pedidos"
+            className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
+          >
+            <Icon name="chevronLeft" className="h-4 w-4" />
+            Volver al listado
+          </Link>
+
+          <button
+            type="submit"
+            form={formId}
+            className={buttonStyles({ className: "w-full sm:w-auto" })}
+          >
+            Guardar pedido
+          </button>
+        </div>
 
         <a
           href={`/api/pedidos/${pedido.id}/pdf`}

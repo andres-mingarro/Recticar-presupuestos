@@ -45,6 +45,7 @@ type PedidoFormProps = {
   formId?: string;
   showClienteSection?: boolean;
   showPrioridadSection?: boolean;
+  showActions?: boolean;
 };
 
 const prioridadCards: Array<{
@@ -82,6 +83,7 @@ export function PedidoForm({
   formId,
   showClienteSection = true,
   showPrioridadSection = true,
+  showActions = true,
 }: PedidoFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
   const { toggle: toggleTrabajo, listaPrecios, setListaPrecios } = useTrabajosSeleccion();
@@ -114,7 +116,7 @@ export function PedidoForm({
     <form
       id={formId}
       action={formAction}
-      className={cn("PedidoForm", styles.PedidoForm, "space-y-6")}
+      className={cn("PedidoForm", styles.PedidoForm, "mb-12 space-y-6")}
     >
       {showClienteSection ? (
         <PedidoClienteSection
@@ -387,21 +389,23 @@ export function PedidoForm({
         </section>
       ) : null}
 
-      <div className={cn("PedidoFormActions", styles.PedidoFormActions)}>
-        <button
-          type="submit"
-          className={buttonStyles({ className: "w-full sm:w-auto" })}
-          disabled={isPending}
-        >
-          {isPending ? "Guardando pedido..." : "Guardar pedido"}
-        </button>
-        <Link
-          href="/pedidos"
-          className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
-        >
-          Cancelar
-        </Link>
-      </div>
+      {showActions ? (
+        <div className={cn("PedidoFormActions", styles.PedidoFormActions)}>
+          <button
+            type="submit"
+            className={buttonStyles({ className: "w-full flex-1" })}
+            disabled={isPending}
+          >
+            {isPending ? "Guardando pedido..." : "Guardar pedido"}
+          </button>
+          <Link
+            href="/pedidos"
+            className={buttonStyles({ variant: "secondary", className: "w-full flex-1" })}
+          >
+            Cancelar
+          </Link>
+        </div>
+      ) : null}
     </form>
   );
 }
