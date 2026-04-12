@@ -9,6 +9,7 @@ import type {
   ClientePendingPedidoItem,
 } from "@/lib/types";
 import { SearchForm } from "@/components/search/SearchForm";
+import { Pager } from "@/components/pagination/Pager";
 import { buttonStyles } from "@/components/ui/Button";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
@@ -28,75 +29,8 @@ type ClientesPageProps = {
   canEdit: boolean;
 };
 
-function ClientesPager({
-  q,
-  currentPage,
-  totalPages,
-  totalClientes,
-  pageStart,
-  pageEnd,
-  hasPreviousPage,
-  hasNextPage,
-}: {
-  q: string;
-  currentPage: number;
-  totalPages: number;
-  totalClientes: number;
-  pageStart: number;
-  pageEnd: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "ClientesPagePager",
-        styles.ClientesPagePager
-      )}
-    >
-      <p className="text-sm text-[var(--color-foreground-muted)]">
-        {totalClientes === 0
-          ? "Sin resultados"
-          : `Mostrando ${pageStart}-${pageEnd} de ${totalClientes} clientes`}
-      </p>
-
-      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
-        <Link
-          href={buildClientesHref(q, currentPage - 1)}
-          aria-disabled={!hasPreviousPage}
-          className={buttonStyles({
-            variant: "secondary",
-            size: "sm",
-            className: cn(
-              "w-full sm:w-auto",
-              !hasPreviousPage ? "pointer-events-none opacity-50" : undefined
-            ),
-          })}
-        >
-          <Icon name="chevronLeft" className="h-4 w-4" />
-          Anterior
-        </Link>
-        <span className="px-2 text-sm text-[var(--color-foreground-muted)]">
-          Página {currentPage} de {totalPages}
-        </span>
-        <Link
-          href={buildClientesHref(q, currentPage + 1)}
-          aria-disabled={!hasNextPage}
-          className={buttonStyles({
-            variant: "secondary",
-            size: "sm",
-            className: cn(
-              "w-full sm:w-auto",
-              !hasNextPage ? "pointer-events-none opacity-50" : undefined
-            ),
-          })}
-        >
-          <Icon name="chevronRight" className="h-4 w-4" />
-          Siguiente
-        </Link>
-      </div>
-    </div>
-  );
+function normalizePhoneLink(value: string) {
+  return value.replace(/\D/g, "");
 }
 
 function buildClientesHref(q: string, page: number) {
@@ -112,10 +46,6 @@ function buildClientesHref(q: string, page: number) {
 
   const query = params.toString();
   return query ? `/clientes?${query}` : "/clientes";
-}
-
-function normalizePhoneLink(value: string) {
-  return value.replace(/\D/g, "");
 }
 
 export function ClientesPage({
@@ -199,15 +129,19 @@ export function ClientesPage({
           </h2>
         </div>
 
-        <ClientesPager
-          q={q}
+        <Pager
           currentPage={currentPage}
           totalPages={totalPages}
-          totalClientes={totalClientes}
-          pageStart={pageStart}
-          pageEnd={pageEnd}
           hasPreviousPage={hasPreviousPage}
           hasNextPage={hasNextPage}
+          previousHref={buildClientesHref(q, currentPage - 1)}
+          nextHref={buildClientesHref(q, currentPage + 1)}
+          summary={
+            totalClientes === 0
+              ? "Sin resultados"
+              : `Mostrando ${pageStart}-${pageEnd} de ${totalClientes} clientes`
+          }
+          className={cn("ClientesPagePager", styles.ClientesPagePager)}
         />
 
         <Table>
@@ -322,15 +256,19 @@ export function ClientesPage({
           </table>
         </Table>
 
-        <ClientesPager
-          q={q}
+        <Pager
           currentPage={currentPage}
           totalPages={totalPages}
-          totalClientes={totalClientes}
-          pageStart={pageStart}
-          pageEnd={pageEnd}
           hasPreviousPage={hasPreviousPage}
           hasNextPage={hasNextPage}
+          previousHref={buildClientesHref(q, currentPage - 1)}
+          nextHref={buildClientesHref(q, currentPage + 1)}
+          summary={
+            totalClientes === 0
+              ? "Sin resultados"
+              : `Mostrando ${pageStart}-${pageEnd} de ${totalClientes} clientes`
+          }
+          className={cn("ClientesPagePager", styles.ClientesPagePager)}
         />
       </Card>
 

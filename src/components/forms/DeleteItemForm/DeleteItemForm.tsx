@@ -4,24 +4,30 @@ import { useActionState } from "react";
 import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { Icon } from "@/components/ui/Icon";
 
-export function DeleteTrabajoForm({
-  trabajoId,
-  action,
-}: {
-  trabajoId: number;
+type DeleteItemFormProps = {
+  itemId: number;
   action: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
-}) {
+  idFieldName?: string;
+  title?: string;
+};
+
+export function DeleteItemForm({
+  itemId,
+  action,
+  idFieldName = "itemId",
+  title = "Eliminar item",
+}: DeleteItemFormProps) {
   const [state, formAction, isPending] = useActionState(action, { error: null });
 
   return (
     <div>
       <form action={formAction}>
-        <input type="hidden" name="trabajoId" value={trabajoId} />
+        <input type="hidden" name={idFieldName} value={itemId} />
         <button
           type="submit"
           disabled={isPending}
           tabIndex={-1}
-          title="Eliminar trabajo"
+          title={title}
           className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
         >
           <Icon name="trash" className="h-4 w-4" />
