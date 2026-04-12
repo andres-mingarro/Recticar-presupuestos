@@ -44,11 +44,13 @@ function PedidoTable({
   eyebrow,
   pedidos,
   emptyMessage,
+  showBusinessDays = true,
 }: {
   title: string;
   eyebrow: string;
   pedidos: PedidoListItem[];
   emptyMessage: string;
+  showBusinessDays?: boolean;
 }) {
   const router = useRouter();
 
@@ -76,14 +78,16 @@ function PedidoTable({
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Estado</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Aprobación</span></th>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clock" className="h-4 w-4" />Días hábiles</span></th>
+              {showBusinessDays ? (
+                <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clock" className="h-4 w-4" />Días hábiles</span></th>
+              ) : null}
             </tr>
           </thead>
           <tbody>
             {pedidos.length === 0 ? (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={showBusinessDays ? 9 : 8}
                   className="px-4 py-10 text-center text-[var(--color-foreground-muted)]"
                 >
                   {emptyMessage}
@@ -149,21 +153,23 @@ function PedidoTable({
                   <td className="px-4 py-4">
                     {formatDate(pedido.fecha_aprobacion)}
                   </td>
-                  <td className="px-4 py-4">
-                    <BusinessDaysBadge
-                      days={
-                        pedido.estado === "finalizado"
-                          ? getBusinessDaysBetween(
-                              pedido.fecha_creacion,
-                              pedido.fecha_aprobacion ?? pedido.fecha_creacion
-                            )
-                          : getBusinessDaysSince(pedido.fecha_creacion)
-                      }
-                      prefix={
-                        pedido.estado === "finalizado" ? "Entregado en" : undefined
-                      }
-                    />
-                  </td>
+                  {showBusinessDays ? (
+                    <td className="px-4 py-4">
+                      <BusinessDaysBadge
+                        days={
+                          pedido.estado === "finalizado"
+                            ? getBusinessDaysBetween(
+                                pedido.fecha_creacion,
+                                pedido.fecha_aprobacion ?? pedido.fecha_creacion
+                              )
+                            : getBusinessDaysSince(pedido.fecha_creacion)
+                        }
+                        prefix={
+                          pedido.estado === "finalizado" ? "Entregado en" : undefined
+                        }
+                      />
+                    </td>
+                  ) : null}
                 </tr>
               ))
             )}
@@ -246,6 +252,7 @@ export function PedidosPage({
           title="Pedidos finalizados"
           pedidos={pedidosFinalizados}
           emptyMessage="No hay pedidos finalizados para mostrar."
+          showBusinessDays={false}
         />
       </Card>
     </div>
