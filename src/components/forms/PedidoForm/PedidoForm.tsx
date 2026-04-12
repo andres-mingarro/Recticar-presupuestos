@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
 import type {
@@ -89,6 +89,12 @@ export function PedidoForm({
   const { toggle: toggleTrabajo, listaPrecios, setListaPrecios } = useTrabajosSeleccion();
   const [selectedMarca, setSelectedMarca] = useState(initialState.values.marcaId);
   const [selectedModelo, setSelectedModelo] = useState(initialState.values.modeloId);
+  const [selectedPrioridad, setSelectedPrioridad] = useState(initialState.values.prioridad);
+
+  useEffect(() => {
+    setSelectedPrioridad(state.values.prioridad);
+  }, [state.values.prioridad]);
+
   const modelosFiltrados = useMemo(
     () =>
       modelos.filter((modelo) =>
@@ -316,27 +322,24 @@ export function PedidoForm({
 
           <div className={cn("PedidoFormOptionGrid", styles.PedidoFormOptionGrid)}>
             {prioridadCards.map((item) => (
-              <label
+              <button
                 key={item.value}
+                type="button"
+                onClick={() => setSelectedPrioridad(item.value)}
+                aria-pressed={selectedPrioridad === item.value}
                 className={cn(
                   "rounded-2xl border p-4 text-sm",
                   item.tone,
-                  state.values.prioridad === item.value && "ring-2 ring-[var(--color-accent-soft)]"
+                  selectedPrioridad === item.value && "ring-2 ring-[var(--color-accent-soft)]"
                 )}
               >
-                <input
-                  type="radio"
-                  name="prioridad"
-                  value={item.value}
-                  defaultChecked={state.values.prioridad === item.value}
-                  className="sr-only"
-                />
                 <span className="font-semibold text-[var(--color-foreground)]">
                   {item.label}
                 </span>
-              </label>
+              </button>
             ))}
           </div>
+          <input type="hidden" name="prioridad" value={selectedPrioridad} />
 
           <EstadoStepper
             mode="form"
