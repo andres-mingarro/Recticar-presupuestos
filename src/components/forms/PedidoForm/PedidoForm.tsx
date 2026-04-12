@@ -51,22 +51,25 @@ type PedidoFormProps = {
 const prioridadCards: Array<{
   value: PedidoPrioridad;
   label: string;
-  tone: string;
+  activeTone: string;
 }> = [
   {
     value: "baja",
     label: "Baja",
-    tone: "border-[var(--color-priority-low-border)] bg-[var(--color-priority-low-bg)]",
+    activeTone:
+      "border-slate-600 bg-slate-700 text-white shadow-[0_10px_24px_rgba(51,65,85,0.28)]",
   },
   {
     value: "normal",
     label: "Normal",
-    tone: "border-[var(--color-priority-normal-border)] bg-[var(--color-priority-normal-bg)]",
+    activeTone:
+      "border-sky-600 bg-sky-600 text-white shadow-[0_10px_24px_rgba(2,132,199,0.3)]",
   },
   {
     value: "alta",
     label: "Alta",
-    tone: "border-[var(--color-priority-high-border)] bg-[var(--color-priority-high-bg)]",
+    activeTone:
+      "border-rose-600 bg-rose-600 text-white shadow-[0_10px_24px_rgba(225,29,72,0.3)]",
   },
 ];
 
@@ -320,7 +323,7 @@ export function PedidoForm({
             </h2>
           </div>
 
-          <div className={cn("PedidoFormOptionGrid", styles.PedidoFormOptionGrid)}>
+          <div className="inline-flex w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5">
             {prioridadCards.map((item) => (
               <button
                 key={item.value}
@@ -328,14 +331,13 @@ export function PedidoForm({
                 onClick={() => setSelectedPrioridad(item.value)}
                 aria-pressed={selectedPrioridad === item.value}
                 className={cn(
-                  "rounded-2xl border p-4 text-sm",
-                  item.tone,
-                  selectedPrioridad === item.value && "ring-2 ring-[var(--color-accent-soft)]"
+                  "flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]",
+                  selectedPrioridad === item.value
+                    ? item.activeTone
+                    : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]"
                 )}
               >
-                <span className="font-semibold text-[var(--color-foreground)]">
-                  {item.label}
-                </span>
+                {item.label}
               </button>
             ))}
           </div>
