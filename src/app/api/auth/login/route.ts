@@ -2,12 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { createToken, COOKIE_NAME, EXPIRES_IN } from "@/lib/auth";
 import { getUsuarioByEmail } from "@/lib/queries/usuarios";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export async function POST(req: NextRequest) {
-  const { username, password } = await req.json() as { username: string; password: string };
+  const { username, password, turnstileToken } = await req.json() as {
+    username: string;
+    password: string;
+    turnstileToken?: string;
+  };
 
   if (!username || !password) {
     return NextResponse.json({ error: "Datos incompletos" }, { status: 400 });
+  }
+
+  const remoteIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const turnstile = await verifyTurnstileToken({ token: turnstileToken, remoteIp });
+
+  if (!turnstile.ok) {
+    return NextResponse.json({ error: turnstile.error }, { status: turnstile.status });
   }
 
   // Admin hardcodeado en .env

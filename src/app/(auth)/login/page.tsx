@@ -1,30 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Input } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
+import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
+  const turnstileEnabled = Boolean(turnstileSiteKey);
+
+  const handleTurnstileTokenChange = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
     const form = e.currentTarget;
     const username = (form.elements.namedItem("username") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
+    if (turnstileEnabled && !turnstileToken) {
+      setError("Confirmá el captcha para continuar.");
+      return;
+    }
+
+    setLoading(true);
+
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, turnstileToken }),
     });
 
     if (res.ok) {
@@ -32,6 +47,8 @@ export default function LoginPage() {
     } else {
       const data = await res.json() as { error?: string };
       setError(data.error ?? "Error al iniciar sesión.");
+      setTurnstileToken("");
+      setTurnstileResetKey((value) => value + 1);
       setLoading(false);
     }
   }
@@ -99,9 +116,23 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {turnstileEnabled ? (
+            <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-white px-3 py-3">
+              <TurnstileWidget
+                siteKey={turnstileSiteKey}
+                onTokenChange={handleTurnstileTokenChange}
+                resetKey={turnstileResetKey}
+              />
+            </div>
+          ) : (
+            <p className="text-xs text-[var(--color-foreground-muted)]">
+              El captcha está desactivado hasta configurar `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
+            </p>
+          )}
+
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <Button type="submit" disabled={loading} className="mt-2 w-full">
+          <Button type="submit" disabled={loading || (turnstileEnabled && !turnstileToken)} className="mt-2 w-full">
             {loading ? "Ingresando..." : "Ingresar"}
           </Button>
         </form>

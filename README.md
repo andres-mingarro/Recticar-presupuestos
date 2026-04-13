@@ -28,9 +28,13 @@ Crear `.env.local` con:
 ```bash
 DATABASE_URL=postgres://usuario:password@host/db
 TECHNICAL_DATABASE_URL=postgres://usuario:password@host/db-catalogo
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=tu_site_key_de_cloudflare
+TURNSTILE_SECRET_KEY=tu_secret_key_de_cloudflare
 ```
 
 `TECHNICAL_DATABASE_URL` se usa para la información de selección técnica. Si no está definida, la app usa `DATABASE_URL` como fallback.
+
+El captcha de login usa Cloudflare Turnstile. Si definís solo una de las dos variables de Turnstile, el backend va a responder error de configuración para evitar dejar la validación a medias.
 
 La base técnica externa hoy se espera con este esquema:
 
