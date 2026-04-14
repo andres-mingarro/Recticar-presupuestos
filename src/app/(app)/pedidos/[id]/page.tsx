@@ -10,6 +10,7 @@ import {
   listTrabajosAgrupados,
 } from "@/lib/queries/catalogo";
 import { getPedidoDetailById, updatePedido } from "@/lib/queries/pedidos";
+import { generateQrSvg } from "@/lib/qr";
 import { queryRows } from "@/lib/db";
 import type { PedidoEstado, PedidoFormValues, PedidoPrioridad } from "@/lib/types";
 import type { ChangePrioridadActionState } from "@/components/ui/PrioridadSelector";
@@ -51,6 +52,9 @@ export default async function Page({
   if (!pedido) {
     notFound();
   }
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const qrSvg = await generateQrSvg(`${baseUrl}/pedidos/${pedidoId}`);
 
   const initialState: PedidoFormState = {
     error: null,
@@ -178,15 +182,13 @@ export default async function Page({
       [pedidoId, raw]
     );
 
-    redirect(`/pedidos/${pedidoId}?updated=1`);
+    return { error: null, success: true };
   }
 
   return (
     <PedidoDetailPage
       pedido={pedido}
       action={updatePedidoAction}
-      changeEstadoAction={changeEstadoAction}
-      changePrioridadAction={changePrioridadAction}
       initialState={initialState}
       wasUpdated={query?.updated === "1"}
       marcas={marcas}
@@ -194,6 +196,7 @@ export default async function Page({
       motores={motores}
       relations={relations}
       trabajos={trabajos}
+      qrSvg={qrSvg}
     />
   );
 }

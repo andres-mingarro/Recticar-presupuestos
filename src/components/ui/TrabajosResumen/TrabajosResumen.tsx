@@ -37,7 +37,7 @@ export function TrabajosResumen({ trabajos }: TrabajosResumenProps) {
   if (selectedTrabajos.length === 0) return null;
 
   return (
-    <div className="space-y-1 rounded-xl bg-[var(--color-surface)] p-3 text-xs">
+    <div className="TrabajosResumen space-y-1 rounded-xl bg-[var(--color-surface)] p-3 text-xs">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">Resumen</span>
         <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${LISTA_COLORS[listaPrecios]}`}>

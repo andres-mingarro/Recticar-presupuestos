@@ -3,44 +3,33 @@
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
 import type { PedidoPrioridad } from "@/lib/types";
+import { usePrioridad } from "./PrioridadContext";
 
-export type ChangePrioridadActionState = { error: string | null };
+export type ChangePrioridadActionState = { error: string | null; success?: boolean };
 
 const OPTIONS: Array<{
   value: PedidoPrioridad;
   label: string;
   tooltip: string;
-  styles: { base: string; active: string };
+  activeTone: string;
 }> = [
   {
     value: "baja",
     label: "Baja",
     tooltip: "Cambiar prioridad a baja",
-    styles: {
-      base: "border-[var(--color-neutral-border)] text-[var(--color-neutral-text)] hover:bg-[var(--color-neutral-bg)]",
-      active:
-        "border-[var(--color-neutral-border-strong)] bg-[var(--color-neutral-bg)] text-[var(--color-neutral-text-strong)] font-semibold",
-    },
+    activeTone: "border-slate-600 bg-[linear-gradient(135deg,#475569,#1e293b)] text-white shadow-[0_10px_24px_rgba(51,65,85,0.28)]",
   },
   {
     value: "normal",
     label: "Normal",
     tooltip: "Cambiar prioridad a normal",
-    styles: {
-      base: "border-[var(--color-info-border)] text-[var(--color-info-text)] hover:bg-[var(--color-info-bg)]",
-      active:
-        "border-[var(--color-info-border-strong)] bg-[var(--color-info-bg-strong)] text-[var(--color-info-text-strong)] font-semibold",
-    },
+    activeTone: "border-sky-600 bg-[linear-gradient(135deg,#0284c7,#38bdf8)] text-white shadow-[0_10px_24px_rgba(2,132,199,0.3)]",
   },
   {
     value: "alta",
     label: "Alta",
     tooltip: "Cambiar prioridad a alta",
-    styles: {
-      base: "border-[var(--color-danger-border)] text-[var(--color-danger-text)] hover:bg-[var(--color-danger-bg)]",
-      active:
-        "border-[var(--color-priority-high-border)] bg-[var(--color-danger-bg-strong)] text-[var(--color-priority-high-text)] font-semibold",
-    },
+    activeTone: "border-rose-600 bg-[linear-gradient(135deg,#e11d48,#fb7185)] text-white shadow-[0_10px_24px_rgba(225,29,72,0.3)]",
   },
 ];
 
@@ -54,15 +43,20 @@ type PrioridadSelectorProps = {
 
 export function PrioridadSelector({ value, action }: PrioridadSelectorProps) {
   const [state, formAction, isPending] = useActionState(action, { error: null });
+  const { prioridad, setPrioridad } = usePrioridad();
 
   return (
-    <div className="space-y-1.5">
-      <div className="flex flex-col gap-1.5 sm:flex-row">
+    <div className="PrioridadSelector space-y-1.5">
+      <div className="inline-flex rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5">
         {OPTIONS.map((option) => {
-          const isActive = option.value === value;
+          const isActive = option.value === prioridad;
 
           return (
-            <form key={option.value} action={formAction} className="flex-1">
+            <form
+              key={option.value}
+              action={formAction}
+              onSubmit={() => setPrioridad(option.value)}
+            >
               <input type="hidden" name="prioridad" value={option.value} />
               <button
                 type="submit"
@@ -70,8 +64,10 @@ export function PrioridadSelector({ value, action }: PrioridadSelectorProps) {
                 title={isActive ? `Prioridad actual: ${option.label}` : option.tooltip}
                 aria-label={isActive ? `Prioridad actual: ${option.label}` : option.tooltip}
                 className={cn(
-                  "w-full rounded-lg border px-2 py-1.5 text-xs transition",
-                  isActive ? option.styles.active : option.styles.base,
+                  "rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
+                  isActive
+                    ? option.activeTone
+                    : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]",
                   isPending && "opacity-60",
                   isActive ? "cursor-default" : "cursor-pointer"
                 )}

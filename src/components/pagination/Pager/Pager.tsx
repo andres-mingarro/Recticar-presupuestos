@@ -25,7 +25,7 @@ export function Pager({
   className,
 }: PagerProps) {
   return (
-    <div className={className}>
+    <div className={cn("Pager", className)}>
       <p className="text-sm text-[var(--color-foreground-muted)]">{summary}</p>
 
       <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">

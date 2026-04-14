@@ -28,7 +28,7 @@ export function AppShell({ children, role }: Props) {
   }
 
   return (
-    <div className={styles.shell}>
+    <div className={cn("AppShell", styles.shell)}>
       {/* Top bar — siempre visible */}
       <header className={styles.topBar}>
         <Link href="/" aria-label="Ir al dashboard">

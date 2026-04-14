@@ -87,5 +87,5 @@ export function TurnstileWidget({ siteKey, onTokenChange, resetKey = 0 }: Props)
     window.turnstile.reset(widgetIdRef.current);
   }, [onTokenChange, resetKey]);
 
-  return <div id={containerId} className="min-h-[65px]" />;
+  return <div id={containerId} className="TurnstileWidget min-h-[65px]" />;
 }

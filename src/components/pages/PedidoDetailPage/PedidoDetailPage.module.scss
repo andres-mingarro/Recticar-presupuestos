@@ -7,6 +7,10 @@
   gap: 1.5rem;
 }
 
+.PedidoDetailPageMain {
+  min-width: 0;
+}
+
 .PedidoDetailPageSidebar {
   display: grid;
   gap: 1rem;
@@ -16,5 +20,107 @@
   .PedidoDetailPageContent {
     grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.75fr);
     align-items: start;
+  }
+}
+
+/* ─── Etiqueta QR ─── */
+.etiquetaWrapper {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.etiqueta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-surface);
+}
+
+.etiquetaQr {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}
+
+.etiquetaInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.etiquetaNumero {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.etiquetaCliente {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.etiquetaVehiculo {
+  font-size: 0.875rem;
+  color: var(--color-foreground-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Print: solo la etiqueta ─── */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .etiquetaWrapper,
+  .etiquetaWrapper * {
+    visibility: visible !important;
+  }
+
+  .etiquetaWrapper {
+    position: fixed !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+
+  .etiqueta {
+    width: 8cm;
+    height: 6cm;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    background: white !important;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .etiquetaQr {
+    width: 3.5cm;
+    height: 3.5cm;
+  }
+
+  .etiquetaCliente {
+    font-size: 1rem;
   }
 }
