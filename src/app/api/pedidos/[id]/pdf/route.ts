@@ -6,6 +6,16 @@ import { getRepuestosDetalleByPedido } from "@/lib/queries/repuestos";
 import { PresupuestoPdf } from "@/lib/pdf/PresupuestoPdf";
 import { generateQrDataUrl } from "@/lib/qr";
 
+function slugifyFilenamePart(value: string | null | undefined) {
+  return (value ?? "sin-cliente")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    || "sin-cliente";
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -34,11 +44,13 @@ export async function GET(
     // @ts-expect-error: @react-pdf/renderer types incompatibles con React 19
     React.createElement(PresupuestoPdf, { pedido, trabajos, repuestos, qrDataUrl })
   );
+  const clienteSlug = slugifyFilenamePart(pedido.cliente_nombre);
+  const fileName = `presupuesto-${pedido.numero_pedido}-${clienteSlug}.pdf`;
 
   return new Response(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="presupuesto-${pedido.numero_pedido}.pdf"`,
+      "Content-Disposition": `inline; filename="${fileName}"`,
       "Cache-Control": "no-store",
     },
   });
