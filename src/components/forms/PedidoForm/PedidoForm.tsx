@@ -30,6 +30,7 @@ import { ButtonGroup } from "@/components/ui/ButtonGroup";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Tabs } from "@/components/ui/Tabs";
+import { Incrementor } from "@/components/ui/Incrementor";
 import styles from "./PedidoForm.module.scss";
 
 export type PedidoFormState = {
@@ -467,27 +468,13 @@ export function PedidoForm({
                               }
                               className="text-right"
                             />
-                            <div className="flex items-center justify-start gap-2 md:justify-center">
-                              <button
-                                type="button"
-                                onClick={() => decrementCantidad(repuesto.id)}
-                                disabled={!selectedRepuestoIds.has(repuesto.id)}
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-base font-semibold text-[var(--color-foreground)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40"
-                              >
-                                -
-                              </button>
-                              <span className="inline-flex min-w-8 justify-center rounded-full bg-[var(--color-surface-alt)] px-2 py-1 text-sm font-semibold text-[var(--color-foreground)]">
-                                {selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => incrementCantidad(repuesto.id)}
-                                disabled={!selectedRepuestoIds.has(repuesto.id)}
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-base font-semibold text-[var(--color-foreground)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40"
-                              >
-                                +
-                              </button>
-                            </div>
+                            <Incrementor
+                              value={selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
+                              onDecrement={() => decrementCantidad(repuesto.id)}
+                              onIncrement={() => incrementCantidad(repuesto.id)}
+                              disabled={!selectedRepuestoIds.has(repuesto.id)}
+                              className="justify-start md:justify-center"
+                            />
                             <span className="text-left text-base font-bold text-[var(--color-foreground)] md:text-right">
                               {formatPrice(
                                 (selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0) *

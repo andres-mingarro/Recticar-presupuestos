@@ -16,6 +16,7 @@ import { Icon } from "@/components/ui/Icon";
 import { SortableList } from "@/components/sortable/SortableList";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { Incrementor } from "@/components/ui/Incrementor";
 
 // ─── Category card ────────────────────────────────────────────────────────────
 
@@ -29,6 +30,15 @@ const LISTA_COLORS = [
 
 function formatPrecio(value: number | null | undefined) {
   return formatPrice(value ?? 0);
+}
+
+function formatPrecioInput(value: number) {
+  return `$${Math.max(0, Math.round(value)).toLocaleString("es-AR")}`;
+}
+
+function parsePrecioInput(value: string) {
+  const digits = value.replace(/\D/g, "");
+  return digits ? Number(digits) : 0;
 }
 
 function DragHandle(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -57,19 +67,27 @@ function SortableTrabajoRow({
   index,
   isEditing,
   formId,
+  preciosDraft,
+  onPrecioChange,
   deleteTrabajoAction,
 }: {
   trabajo: Trabajo;
   index: number;
   isEditing: boolean;
   formId: string;
+  preciosDraft?: { precioLista1: number; precioLista2: number; precioLista3: number };
+  onPrecioChange: (trabajoId: number, lista: 1 | 2 | 3, value: number) => void;
   deleteTrabajoAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: trabajo.id });
 
   const style = { transform: CSS.Transform.toString(transform), transition };
-  const precios = [trabajo.precioLista1, trabajo.precioLista2, trabajo.precioLista3];
+  const precios = [
+    preciosDraft?.precioLista1 ?? trabajo.precioLista1,
+    preciosDraft?.precioLista2 ?? trabajo.precioLista2,
+    preciosDraft?.precioLista3 ?? trabajo.precioLista3,
+  ];
   const names = ["precio_lista_1", "precio_lista_2", "precio_lista_3"];
 
   return (
@@ -90,6 +108,7 @@ function SortableTrabajoRow({
         name={`nombre_${trabajo.id}`}
         defaultValue={trabajo.nombre}
         disabled={!isEditing}
+        tabIndex={isEditing ? -1 : undefined}
         required
         className={cn(
           "flex-1 rounded-lg px-2 py-1 text-sm text-[var(--color-foreground)] transition",
@@ -102,27 +121,37 @@ function SortableTrabajoRow({
       <div className="flex shrink-0 items-center gap-2">
         {precios.map((precio, i) =>
           isEditing ? (
-            <input
-              key={i}
-              form={formId}
-              type="number"
-              name={`${names[i]}_${trabajo.id}`}
-              defaultValue={precio ?? 0}
-              min="0"
-              step="1"
-              inputMode="numeric"
-              className="w-24 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--color-foreground)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
-            />
+            <div key={i} className="relative">
+              <input
+                form={formId}
+                type="hidden"
+                name={`${names[i]}_${trabajo.id}`}
+                value={precio ?? 0}
+              />
+              <input
+                type="text"
+                value={formatPrecioInput(precio ?? 0)}
+                inputMode="numeric"
+                onChange={(event) =>
+                  onPrecioChange(
+                    trabajo.id,
+                    (i + 1) as 1 | 2 | 3,
+                    parsePrecioInput(event.target.value)
+                  )
+                }
+                className="w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--color-foreground)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+              />
+            </div>
           ) : (
             <span
               key={i}
               className={cn(
-                "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold",
+                "inline-flex min-w-[128px] items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold",
                 LISTA_COLORS[i]
               )}
             >
               <span className="opacity-60">L{i + 1}</span>
-              {formatPrecio(precio)}
+              <span className="ml-auto text-right">{formatPrecio(precio)}</span>
             </span>
           )
         )}
@@ -159,6 +188,14 @@ function CategoriaCard({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [ajustesPorcentaje, setAjustesPorcentaje] = useState<Record<1 | 2 | 3, number>>({
+    1: 0,
+    2: 0,
+    3: 0,
+  });
+  const [precioDrafts, setPrecioDrafts] = useState<
+    Record<number, { precioLista1: number; precioLista2: number; precioLista3: number }>
+  >({});
 
   const [renameState, renameFormAction, renamePending] = useActionState(renameCategoriaAction, { error: null });
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteCategoriaAction, { error: null });
@@ -169,11 +206,96 @@ function CategoriaCard({
     if (saveState.success) setIsEditing(false);
   }, [saveState]);
 
+  useEffect(() => {
+    setPrecioDrafts(
+      Object.fromEntries(
+        grupo.trabajos.map((trabajo) => [
+          trabajo.id,
+          {
+            precioLista1: trabajo.precioLista1,
+            precioLista2: trabajo.precioLista2,
+            precioLista3: trabajo.precioLista3,
+          },
+        ])
+      )
+    );
+    setAjustesPorcentaje({ 1: 0, 2: 0, 3: 0 });
+  }, [grupo]);
+
   const formId = `save-cat-${grupo.categoriaId}`;
 
   function handleCancel() {
     setIsEditing(false);
     setResetKey((k) => k + 1);
+    setPrecioDrafts(
+      Object.fromEntries(
+        grupo.trabajos.map((trabajo) => [
+          trabajo.id,
+          {
+            precioLista1: trabajo.precioLista1,
+            precioLista2: trabajo.precioLista2,
+            precioLista3: trabajo.precioLista3,
+          },
+        ])
+      )
+    );
+    setAjustesPorcentaje({ 1: 0, 2: 0, 3: 0 });
+  }
+
+  function handlePrecioChange(trabajoId: number, lista: 1 | 2 | 3, value: number) {
+    const precio = Number.isFinite(value) && value >= 0 ? Math.round(value) : 0;
+
+    setPrecioDrafts((prev) => {
+      const current = prev[trabajoId] ?? {
+        precioLista1: 0,
+        precioLista2: 0,
+        precioLista3: 0,
+      };
+
+      return {
+        ...prev,
+        [trabajoId]: {
+          ...current,
+          ...(lista === 1
+            ? { precioLista1: precio }
+            : lista === 2
+              ? { precioLista2: precio }
+              : { precioLista3: precio }),
+        },
+      };
+    });
+  }
+
+  function applyListaAdjustment(lista: 1 | 2 | 3, delta: number) {
+    const factor = 1 + delta / 100;
+
+    setPrecioDrafts((prev) => {
+      const next = { ...prev };
+
+      for (const trabajo of grupo.trabajos) {
+        const current = next[trabajo.id] ?? {
+          precioLista1: trabajo.precioLista1,
+          precioLista2: trabajo.precioLista2,
+          precioLista3: trabajo.precioLista3,
+        };
+
+        next[trabajo.id] = {
+          ...current,
+          ...(lista === 1
+            ? { precioLista1: Math.max(0, Math.round(current.precioLista1 * factor)) }
+            : lista === 2
+              ? { precioLista2: Math.max(0, Math.round(current.precioLista2 * factor)) }
+              : { precioLista3: Math.max(0, Math.round(current.precioLista3 * factor)) }),
+        };
+      }
+
+      return next;
+    });
+
+    setAjustesPorcentaje((prev) => ({
+      ...prev,
+      [lista]: prev[lista] + delta,
+    }));
   }
 
   return (
@@ -230,9 +352,10 @@ function CategoriaCard({
             <PulsatingButton
               form={formId}
               type="submit"
+              size="sm"
               pulsing={!savePending}
               disabled={savePending}
-              className="flex items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
             >
               {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
               {savePending ? "Guardando…" : "Guardar"}
@@ -305,13 +428,20 @@ function CategoriaCard({
                   Trabajo
                 </span>
                 <div className="flex shrink-0 gap-2">
-                  {["Lista 1", "Lista 2", "Lista 3"].map((label) => (
-                    <span
-                      key={label}
-                      className="w-24 text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]"
-                    >
-                      {label}
-                    </span>
+                  {[1, 2, 3].map((lista) => (
+                    <div key={lista} className="flex w-28 flex-col items-center gap-1">
+                      <span className="text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
+                        Lista {lista}
+                      </span>
+                      <Incrementor
+                        incrementoSmall
+                        value={ajustesPorcentaje[lista as 1 | 2 | 3]}
+                        onDecrement={() => applyListaAdjustment(lista as 1 | 2 | 3, -1)}
+                        onIncrement={() => applyListaAdjustment(lista as 1 | 2 | 3, 1)}
+                        valueClassName="min-w-0"
+                        formatValue={(value) => `${value > 0 ? "+" : ""}${value}%`}
+                      />
+                    </div>
                   ))}
                 </div>
                 <div className="w-7" />
@@ -325,6 +455,8 @@ function CategoriaCard({
               index={index}
               isEditing={isEditing}
               formId={formId}
+              preciosDraft={precioDrafts[trabajo.id]}
+              onPrecioChange={handlePrecioChange}
               deleteTrabajoAction={deleteTrabajoAction}
             />
           )}

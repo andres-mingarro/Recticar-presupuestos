@@ -9,6 +9,7 @@ const DEFAULT_PULSE_COLOR = "var(--color-accent)";
 type PulsatingButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   pulsing?: boolean;
   variant?: "pulse" | "ripple";
+  size?: "md" | "sm";
   distance?: string;
   duration?: string;
   pulseColor?: string;
@@ -19,6 +20,7 @@ export function PulsatingButton({
   children,
   pulsing = false,
   variant = "pulse",
+  size = "md",
   distance = DEFAULT_DISTANCE,
   duration = DEFAULT_DURATION,
   pulseColor = DEFAULT_PULSE_COLOR,
@@ -35,7 +37,7 @@ export function PulsatingButton({
   return (
     <>
       <button
-        className={buttonStyles({ className: cn("relative isolate overflow-visible", className) })}
+        className={buttonStyles({ size, className: cn("relative isolate overflow-visible", className) })}
         style={buttonStyle}
         {...props}
       >
