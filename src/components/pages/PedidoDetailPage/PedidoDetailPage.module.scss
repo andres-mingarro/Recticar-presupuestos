@@ -85,13 +85,18 @@
 
 /* ─── Print: solo la etiqueta ─── */
 @media print {
-  body * {
+  .PedidoDetailPage > * {
     visibility: hidden !important;
   }
 
   .etiquetaWrapper,
   .etiquetaWrapper * {
     visibility: visible !important;
+  }
+
+  .PedidoDetailPageMain,
+  .PedidoDetailPageSidebar > :not(.etiquetaWrapper) {
+    display: none !important;
   }
 
   .etiquetaWrapper {

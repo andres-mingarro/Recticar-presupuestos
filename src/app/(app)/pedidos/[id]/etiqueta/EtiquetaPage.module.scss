@@ -67,26 +67,6 @@
 
 /* ─── Print ─── */
 @media print {
-  /* Ocultar todo el chrome de la app */
-  :global(header),
-  :global(aside),
-  :global(.hamburger) {
-    display: none !important;
-  }
-
-  /* Liberar el scroll del shell para que imprima bien */
-  :global(.shell),
-  :global(body),
-  :global(html) {
-    height: auto !important;
-    overflow: visible !important;
-  }
-
-  :global(main) {
-    overflow: visible !important;
-    padding: 0 !important;
-  }
-
   .wrapper {
     min-height: unset;
     padding: 0;
