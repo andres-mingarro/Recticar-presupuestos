@@ -9,7 +9,6 @@ import {
   renameCategoriaRepuesto,
   reorderRepuestos,
   updateRepuestoNombres,
-  updateRepuestoPrecios,
 } from "@/lib/queries/repuestos";
 
 export type RepuestosActionState = {
@@ -28,7 +27,6 @@ export async function updateCategoriaRepuestos(
   formData: FormData
 ): Promise<RepuestosActionState> {
   const nombreUpdates: Array<{ id: number; nombre: string }> = [];
-  const precioUpdates: Array<{ id: number; precio: number }> = [];
 
   for (const [key, value] of formData.entries()) {
     if (key.startsWith("nombre_")) {
@@ -36,19 +34,10 @@ export async function updateCategoriaRepuestos(
       const nombre = typeof value === "string" ? value.trim() : "";
       if (!Number.isNaN(id) && nombre) nombreUpdates.push({ id, nombre });
     }
-
-    if (key.startsWith("precio_")) {
-      const id = Number(key.replace("precio_", ""));
-      const precio = Number(value);
-      if (!Number.isNaN(id) && !Number.isNaN(precio) && precio >= 0) {
-        precioUpdates.push({ id, precio });
-      }
-    }
   }
 
   try {
     if (nombreUpdates.length > 0) await updateRepuestoNombres(nombreUpdates);
-    if (precioUpdates.length > 0) await updateRepuestoPrecios(precioUpdates);
   } catch {
     return { error: "No se pudieron guardar los cambios. Probá nuevamente." };
   }

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { NuevoPedidoPage } from "@/components/pages/NuevoPedidoPage";
 import type { PedidoFormState } from "@/components/forms/PedidoForm";
+import { parsePedidoRepuestos } from "@/lib/pedido-repuestos";
 import {
   listMarcas,
   listModeloMotorRelations,
@@ -29,6 +30,7 @@ const initialState: PedidoFormState = {
     observaciones: "",
     trabajosIds: [],
     repuestosIds: [],
+    repuestos: [],
     listaPrecios: 1,
   },
 };
@@ -101,6 +103,7 @@ export default async function Page({
       repuestosIds: formData
         .getAll("repuestosIds")
         .filter((value): value is string => typeof value === "string"),
+      repuestos: parsePedidoRepuestos(formData),
       listaPrecios: (Number(normalizeString(formData.get("listaPrecios"))) || 1) as 1 | 2 | 3,
     };
 

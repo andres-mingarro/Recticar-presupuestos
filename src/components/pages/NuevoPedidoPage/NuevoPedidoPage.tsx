@@ -84,7 +84,7 @@ export function NuevoPedidoPage({
         )}
       >
         <TrabajosSeleccionProvider initialIds={[]} initialListaPrecios={initialState.values.listaPrecios}>
-          <RepuestosSeleccionProvider initialIds={[]}>
+          <RepuestosSeleccionProvider initialItems={[]}>
             <>
               <PedidoForm
                 action={action}

@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
   },
   tableRowAlt: { backgroundColor: palette.surface },
   colNombre: { flex: 1 },
+  colCantidad: { width: 48, textAlign: "center" },
   colPrecio: { width: 72, textAlign: "right" },
   tableCell: { fontSize: 10, color: palette.foreground },
   tableCellMuted: { fontSize: 10, color: palette.muted },
@@ -128,6 +129,25 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     width: 220,
     gap: 8,
+  },
+  totalsSection: {
+    marginTop: 12,
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 16,
+  },
+  observationsCard: {
+    flex: 1,
+    gap: 8,
+  },
+  observationsLabel: {
+    fontSize: 9,
+    color: palette.muted,
+  },
+  observationsValue: {
+    fontSize: 10,
+    color: palette.foreground,
+    lineHeight: 1.4,
   },
   totalsLine: {
     flexDirection: "row",
@@ -224,7 +244,7 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
   const groups = groupByCategory(trabajos);
   const repuestoGroups = groupRepuestosByCategory(repuestos);
   const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio, 0);
-  const totalRepuestos = repuestos.reduce((sum, r) => sum + r.precio, 0);
+  const totalRepuestos = repuestos.reduce((sum, r) => sum + r.total, 0);
   const totalGeneral = totalTrabajos + totalRepuestos;
 
   const allRows: Array<
@@ -269,6 +289,7 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
                 </Text>
               ) : null}
             </View>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image src={qrDataUrl} style={styles.qr} />
           </View>
         </View>
@@ -413,8 +434,14 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
                 <Text style={[styles.tableHeaderText, styles.colNombre]}>
                   Repuesto
                 </Text>
+                <Text style={[styles.tableHeaderText, styles.colCantidad]}>
+                  Cant.
+                </Text>
                 <Text style={[styles.tableHeaderText, styles.colPrecio]}>
-                  Precio
+                  Unit.
+                </Text>
+                <Text style={[styles.tableHeaderText, styles.colPrecio]}>
+                  Total
                 </Text>
               </View>
 
@@ -430,8 +457,14 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
                     <Text style={[styles.tableCell, styles.colNombre]}>
                       {item.repuestoNombre}
                     </Text>
+                    <Text style={[styles.tableCell, styles.colCantidad]}>
+                      {item.cantidad}
+                    </Text>
                     <Text style={[styles.tableCell, styles.colPrecio]}>
-                      {item.precio > 0 ? formatPrecio(item.precio) : "-"}
+                      {item.precioUnitario > 0 ? formatPrecio(item.precioUnitario) : "-"}
+                    </Text>
+                    <Text style={[styles.tableCell, styles.colPrecio]}>
+                      {item.total > 0 ? formatPrecio(item.total) : "-"}
                     </Text>
                   </View>
                 )),
@@ -449,18 +482,26 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Totales</Text>
-          <View style={[styles.card, styles.totalsCard]}>
-            <View style={styles.totalsLine}>
-              <Text style={styles.subtotalLabel}>Trabajos</Text>
-              <Text style={styles.subtotalValue}>{formatPrecio(totalTrabajos)}</Text>
+          <View style={styles.totalsSection}>
+            <View style={[styles.card, styles.observationsCard]}>
+              <Text style={styles.observationsLabel}>Observaciones</Text>
+              <Text style={styles.observationsValue}>
+                {pedido.observaciones?.trim() || "Sin observaciones."}
+              </Text>
             </View>
-            <View style={styles.totalsLine}>
-              <Text style={styles.subtotalLabel}>Repuestos</Text>
-              <Text style={styles.subtotalValue}>{formatPrecio(totalRepuestos)}</Text>
-            </View>
-            <View style={[styles.totalsLine, styles.totalsLineStrong]}>
-              <Text style={styles.totalLabel}>Total general</Text>
-              <Text style={styles.totalValue}>{formatPrecio(totalGeneral)}</Text>
+            <View style={[styles.card, styles.totalsCard]}>
+              <View style={styles.totalsLine}>
+                <Text style={styles.subtotalLabel}>Trabajos</Text>
+                <Text style={styles.subtotalValue}>{formatPrecio(totalTrabajos)}</Text>
+              </View>
+              <View style={styles.totalsLine}>
+                <Text style={styles.subtotalLabel}>Repuestos</Text>
+                <Text style={styles.subtotalValue}>{formatPrecio(totalRepuestos)}</Text>
+              </View>
+              <View style={[styles.totalsLine, styles.totalsLineStrong]}>
+                <Text style={styles.totalLabel}>Total general</Text>
+                <Text style={styles.totalValue}>{formatPrecio(totalGeneral)}</Text>
+              </View>
             </View>
           </View>
         </View>

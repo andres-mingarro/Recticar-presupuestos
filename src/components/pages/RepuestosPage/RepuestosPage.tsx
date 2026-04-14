@@ -18,11 +18,6 @@ import { PulsatingButton } from "@/components/ui/PulsatingButton";
 
 type Repuesto = RepuestoAgrupado["repuestos"][number];
 
-function formatPrecio(value: number | null | undefined) {
-  if (!value) return "$0";
-  return `$${value.toLocaleString("es-AR")}`;
-}
-
 function DragHandle(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
@@ -91,23 +86,6 @@ function SortableRepuestoRow({
             : "border border-transparent bg-transparent font-medium"
         )}
       />
-
-      {isEditing ? (
-        <input
-          form={formId}
-          type="number"
-          name={`precio_${repuesto.id}`}
-          defaultValue={repuesto.precio ?? 0}
-          min="0"
-          step="1"
-          inputMode="numeric"
-          className="w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--color-foreground)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
-        />
-      ) : (
-        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--color-info-border)] bg-[var(--color-info-bg)] px-3 py-1 text-xs font-semibold text-[var(--color-info-text-strong)]">
-          {formatPrecio(repuesto.precio)}
-        </span>
-      )}
 
       {isEditing && (
         <DeleteItemForm
@@ -289,9 +267,6 @@ function CategoriaCard({
                 <div className="w-4" />
                 <span className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
                   Repuesto
-                </span>
-                <span className="w-28 text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
-                  Valor
                 </span>
                 <div className="w-7" />
               </div>

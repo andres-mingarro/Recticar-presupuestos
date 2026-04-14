@@ -83,7 +83,13 @@ export function PedidoDetailPage({
   return (
     <PrioridadProvider initialValue={pedido.prioridad}>
     <CobradoProvider initialValue={pedido.cobrado}>
-    <RepuestosSeleccionProvider initialIds={pedido.repuestos_ids}>
+    <RepuestosSeleccionProvider
+      initialItems={pedido.repuestos.map((repuesto) => ({
+        repuestoId: Number(repuesto.repuestoId),
+        precioUnitario: repuesto.precioUnitario,
+        cantidad: repuesto.cantidad,
+      }))}
+    >
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
       {/* Top bar: back button + save */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

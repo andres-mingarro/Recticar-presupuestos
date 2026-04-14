@@ -6,7 +6,9 @@ export type RepuestoDetalleItem = {
   categoriaNombre: string;
   repuestoId: number;
   repuestoNombre: string;
-  precio: number;
+  precioUnitario: number;
+  cantidad: number;
+  total: number;
 };
 
 export async function listRepuestosAgrupados() {
@@ -141,7 +143,8 @@ export async function getRepuestosDetalleByPedido(pedidoId: number) {
     categoria_nombre: string;
     repuesto_id: number;
     repuesto_nombre: string;
-    precio: number;
+    precio_unitario: number;
+    cantidad: number;
   }>(
     `
       SELECT
@@ -149,7 +152,8 @@ export async function getRepuestosDetalleByPedido(pedidoId: number) {
         c.nombre AS categoria_nombre,
         r.id AS repuesto_id,
         r.nombre AS repuesto_nombre,
-        r.precio AS precio
+        pr.precio AS precio_unitario,
+        pr.cantidad AS cantidad
       FROM pedido_repuestos pr
       INNER JOIN repuestos r ON r.id = pr.repuesto_id
       INNER JOIN categorias_repuesto c ON c.id = r.categoria_id
@@ -164,6 +168,8 @@ export async function getRepuestosDetalleByPedido(pedidoId: number) {
     categoriaNombre: row.categoria_nombre,
     repuestoId: row.repuesto_id,
     repuestoNombre: row.repuesto_nombre,
-    precio: Number(row.precio),
+    precioUnitario: Number(row.precio_unitario),
+    cantidad: Number(row.cantidad),
+    total: Number(row.precio_unitario) * Number(row.cantidad),
   }));
 }

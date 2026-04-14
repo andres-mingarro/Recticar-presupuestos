@@ -76,6 +76,7 @@ export type PedidoDetail = PedidoListItem & {
   observaciones: string | null;
   trabajos_ids: number[];
   repuestos_ids: number[];
+  repuestos: PedidoRepuestoValue[];
   lista_precio: 1 | 2 | 3;
   cliente_dni: string | null;
   cliente_cuit: string | null;
@@ -83,6 +84,12 @@ export type PedidoDetail = PedidoListItem & {
 };
 
 export type ClientePedidoItem = PedidoListItem;
+
+export type PedidoRepuestoValue = {
+  repuestoId: string;
+  precioUnitario: number;
+  cantidad: number;
+};
 
 export type PedidoFormValues = {
   clienteId: string;
@@ -96,6 +103,7 @@ export type PedidoFormValues = {
   observaciones: string;
   trabajosIds: string[];
   repuestosIds: string[];
+  repuestos: PedidoRepuestoValue[];
   listaPrecios: 1 | 2 | 3;
 };
 

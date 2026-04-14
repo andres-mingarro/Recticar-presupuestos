@@ -27,6 +27,7 @@ import { ClienteAutocomplete } from "@/components/search/ClienteAutocomplete";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { Tabs } from "@/components/ui/Tabs";
 import styles from "./PedidoForm.module.scss";
 
 export type PedidoFormState = {
@@ -125,7 +126,14 @@ export function PedidoForm({
     listaPrecios,
     setListaPrecios,
   } = useTrabajosSeleccion();
-  const { selectedIds: selectedRepuestoIds, toggle: toggleRepuesto } = useRepuestosSeleccion();
+  const {
+    selectedIds: selectedRepuestoIds,
+    selectedItems: selectedRepuestoItems,
+    toggle: toggleRepuesto,
+    setPrecioUnitario,
+    incrementCantidad,
+    decrementCantidad,
+  } = useRepuestosSeleccion();
   const [selectedMarca, setSelectedMarca] = useState(initialState.values.marcaId);
   const [selectedModelo, setSelectedModelo] = useState(initialState.values.modeloId);
   const [selectedMotor, setSelectedMotor] = useState(initialState.values.motorId);
@@ -221,8 +229,12 @@ export function PedidoForm({
       {Array.from(selectedTrabajoIds).map((id) => (
         <input key={`trabajo-hidden-${id}`} type="hidden" name="trabajosIds" value={id} />
       ))}
-      {Array.from(selectedRepuestoIds).map((id) => (
-        <input key={`repuesto-hidden-${id}`} type="hidden" name="repuestosIds" value={id} />
+      {Object.entries(selectedRepuestoItems).map(([id, item]) => (
+        <div key={`repuesto-hidden-${id}`}>
+          <input type="hidden" name="repuestosIds" value={id} />
+          <input type="hidden" name={`repuestoPrecio_${id}`} value={item.precioUnitario} />
+          <input type="hidden" name={`repuestoCantidad_${id}`} value={item.cantidad} />
+        </div>
       ))}
 
       {showClienteSection ? (
@@ -329,32 +341,15 @@ export function PedidoForm({
       </Card>
 
       <div className="space-y-0">
-        <div className="flex items-end gap-1 px-4">
-          <button
-            type="button"
-            onClick={() => setSelectedItemsTab("trabajos")}
-            className={cn(
-              "rounded-t-2xl border border-b-0 px-6 py-3 text-sm font-semibold transition",
-              selectedItemsTab === "trabajos"
-                ? "border-[var(--color-border)] bg-white text-[var(--color-accent)]"
-                : "border-transparent bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)] hover:text-[var(--color-foreground)]"
-            )}
-          >
-            Trabajos
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedItemsTab("repuestos")}
-            className={cn(
-              "rounded-t-2xl border border-b-0 px-6 py-3 text-sm font-semibold transition",
-              selectedItemsTab === "repuestos"
-                ? "border-[var(--color-border)] bg-white text-[var(--color-accent)]"
-                : "border-transparent bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)] hover:text-[var(--color-foreground)]"
-            )}
-          >
-            Repuestos
-          </button>
-        </div>
+        <Tabs
+          expand
+          value={selectedItemsTab}
+          onChange={setSelectedItemsTab}
+          options={[
+            { value: "trabajos", label: "Trabajos", icon: "car" },
+            { value: "repuestos", label: "Repuestos", icon: "settings" },
+          ]}
+        />
 
         <Card
           as="section"
@@ -451,11 +446,11 @@ export function PedidoForm({
                         <span>{grupo.categoriaNombre}</span>
                         <Icon name="chevronDown" className={cn("PedidoFormAccordionChevron", styles.PedidoFormAccordionChevron, "h-4 w-4 text-[var(--color-foreground-muted)] transition-transform duration-200")} />
                       </summary>
-                      <div className="mt-4 grid gap-3 md:grid-cols-2">
+                      <div className="mt-4 grid gap-3">
                         {grupo.repuestos.map((repuesto) => (
                           <label
                             key={repuesto.id}
-                            className="flex items-start justify-between gap-3 rounded-xl bg-white px-4 py-3 text-sm text-[var(--color-foreground)]"
+                            className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-xl bg-white px-4 py-3 text-sm text-[var(--color-foreground)] md:grid-cols-[auto_minmax(0,1.3fr)_120px_132px_120px]"
                           >
                             <div className="flex items-start gap-3">
                               <input
@@ -465,10 +460,46 @@ export function PedidoForm({
                                 onChange={(e) => toggleRepuesto(repuesto.id, e.target.checked)}
                                 className="mt-0.5 h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-accent)]"
                               />
-                              <span>{repuesto.nombre}</span>
                             </div>
-                            <span className="shrink-0 font-medium text-[var(--color-foreground-muted)]">
-                              ${repuesto.precio.toLocaleString("es-AR")}
+                            <span className="min-w-0">{repuesto.nombre}</span>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              inputMode="numeric"
+                              value={selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0}
+                              disabled={!selectedRepuestoIds.has(repuesto.id)}
+                              onChange={(event) =>
+                                setPrecioUnitario(repuesto.id, Number(event.target.value))
+                              }
+                              className="text-right"
+                            />
+                            <div className="flex items-center justify-start gap-2 md:justify-center">
+                              <button
+                                type="button"
+                                onClick={() => decrementCantidad(repuesto.id)}
+                                disabled={!selectedRepuestoIds.has(repuesto.id)}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-base font-semibold text-[var(--color-foreground)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                              >
+                                -
+                              </button>
+                              <span className="inline-flex min-w-8 justify-center rounded-full bg-[var(--color-surface-alt)] px-2 py-1 text-sm font-semibold text-[var(--color-foreground)]">
+                                {selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => incrementCantidad(repuesto.id)}
+                                disabled={!selectedRepuestoIds.has(repuesto.id)}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-base font-semibold text-[var(--color-foreground)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                              >
+                                +
+                              </button>
+                            </div>
+                            <span className="text-left font-semibold text-[var(--color-foreground)] md:text-right">
+                              ${(
+                                (selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0) *
+                                (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
+                              ).toLocaleString("es-AR")}
                             </span>
                           </label>
                         ))}

@@ -25,7 +25,7 @@ const LISTA_COLORS: Record<1 | 2 | 3, string> = {
 
 export function TrabajosResumen({ trabajos, repuestos = [] }: TrabajosResumenProps) {
   const { selectedIds, listaPrecios } = useTrabajosSeleccion();
-  const { selectedIds: selectedRepuestosIds } = useRepuestosSeleccion();
+  const { selectedItems: selectedRepuestoItems } = useRepuestosSeleccion();
 
   const selectedTrabajos = useMemo(
     () => trabajos.flatMap((g) => g.trabajos).filter((t) => selectedIds.has(t.id)),
@@ -33,14 +33,26 @@ export function TrabajosResumen({ trabajos, repuestos = [] }: TrabajosResumenPro
   );
 
   const selectedRepuestos = useMemo(
-    () => repuestos.flatMap((g) => g.repuestos).filter((r) => selectedRepuestosIds.has(r.id)),
-    [repuestos, selectedRepuestosIds]
+    () =>
+      Object.entries(selectedRepuestoItems).map(([id, item]) => {
+        const repuesto = repuestos
+          .flatMap((g) => g.repuestos)
+          .find((current) => current.id === Number(id));
+
+        return {
+          id: Number(id),
+          nombre: repuesto?.nombre ?? "Repuesto",
+          cantidad: item.cantidad,
+          total: item.precioUnitario * item.cantidad,
+        };
+      }),
+    [repuestos, selectedRepuestoItems]
   );
 
   const total = useMemo(
     () =>
       selectedTrabajos.reduce((sum, t) => sum + getPrecio(t, listaPrecios), 0) +
-      selectedRepuestos.reduce((sum, r) => sum + r.precio, 0),
+      selectedRepuestos.reduce((sum, r) => sum + r.total, 0),
     [selectedTrabajos, selectedRepuestos, listaPrecios]
   );
 
@@ -76,9 +88,9 @@ export function TrabajosResumen({ trabajos, repuestos = [] }: TrabajosResumenPro
           </div>
           {selectedRepuestos.map((r) => (
             <div key={`repuesto-${r.id}`} className="flex items-baseline justify-between gap-2">
-              <span className="text-[var(--color-foreground-muted)]">{r.nombre}</span>
+              <span className="text-[var(--color-foreground-muted)]">{r.nombre} x{r.cantidad}</span>
               <span className="shrink-0 font-medium text-[var(--color-foreground)]">
-                {formatPrice(r.precio)}
+                {formatPrice(r.total)}
               </span>
             </div>
           ))}

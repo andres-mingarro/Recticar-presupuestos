@@ -4,6 +4,7 @@ import type {
   PedidoDetail,
   PedidoEstado,
   PedidoFormValues,
+  PedidoRepuestoValue,
   PedidoListItem,
   PedidoPrioridad,
 } from "@/lib/types";
@@ -20,7 +21,7 @@ type PedidoListRow = Omit<
 
 type PedidoDetailRow = Omit<
   PedidoDetail,
-  "trabajos_ids" | "repuestos_ids" | "marca_nombre" | "modelo_nombre" | "motor_nombre"
+  "trabajos_ids" | "repuestos_ids" | "repuestos" | "marca_nombre" | "modelo_nombre" | "motor_nombre"
 > & {
   trabajos_ids: number[] | null;
   repuestos_ids: number[] | null;
@@ -172,11 +173,33 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
   const row = rows[0];
   if (!row) return null;
 
+  const repuestos = await queryRows<{
+    repuesto_id: number;
+    precio: number;
+    cantidad: number;
+  }>(
+    `
+      SELECT
+        pr.repuesto_id,
+        pr.precio,
+        pr.cantidad
+      FROM pedido_repuestos pr
+      WHERE pr.pedido_id = $1
+      ORDER BY pr.repuesto_id ASC
+    `,
+    [id]
+  );
+
   const hydrated = await hydrateTechnicalLabels([
     {
       ...row,
       trabajos_ids: row.trabajos_ids ?? [],
       repuestos_ids: row.repuestos_ids ?? [],
+      repuestos: repuestos.map((item) => ({
+        repuestoId: String(item.repuesto_id),
+        precioUnitario: Number(item.precio),
+        cantidad: Number(item.cantidad),
+      })) satisfies PedidoRepuestoValue[],
     },
   ]);
   return hydrated[0] ?? null;
@@ -223,13 +246,20 @@ export async function updatePedido(id: number, input: PedidoFormValues) {
     );
   }
 
-  if (input.repuestosIds.length > 0) {
-    const valuesSql = input.repuestosIds
-      .map((repuestoId) => `(${id}, ${Number(repuestoId)})`)
+  if (input.repuestos.length > 0) {
+    const valuesSql = input.repuestos
+      .map(
+        (repuesto) =>
+          `(${id}, ${Number(repuesto.repuestoId)}, ${repuesto.precioUnitario}::numeric, ${repuesto.cantidad}::integer)`
+      )
       .join(", ");
 
     await queryRows(
-      `INSERT INTO pedido_repuestos (pedido_id, repuesto_id) VALUES ${valuesSql} ON CONFLICT DO NOTHING`
+      `
+        INSERT INTO pedido_repuestos (pedido_id, repuesto_id, precio, cantidad)
+        VALUES ${valuesSql}
+        ON CONFLICT (pedido_id, repuesto_id) DO NOTHING
+      `
     );
   }
 
@@ -294,14 +324,17 @@ export async function createPedido(input: PedidoFormValues) {
     );
   }
 
-  if (input.repuestosIds.length > 0) {
-    const valuesSql = input.repuestosIds
-      .map((repuestoId) => `(${pedidoId}, ${Number(repuestoId)})`)
+  if (input.repuestos.length > 0) {
+    const valuesSql = input.repuestos
+      .map(
+        (repuesto) =>
+          `(${pedidoId}, ${Number(repuesto.repuestoId)}, ${repuesto.precioUnitario}::numeric, ${repuesto.cantidad}::integer)`
+      )
       .join(", ");
 
     await queryRows(
       `
-        INSERT INTO pedido_repuestos (pedido_id, repuesto_id)
+        INSERT INTO pedido_repuestos (pedido_id, repuesto_id, precio, cantidad)
         VALUES ${valuesSql}
         ON CONFLICT (pedido_id, repuesto_id) DO NOTHING
       `

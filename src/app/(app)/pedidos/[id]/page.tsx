@@ -13,6 +13,7 @@ import { listRepuestosAgrupados } from "@/lib/queries/repuestos";
 import { getPedidoDetailById, updatePedido } from "@/lib/queries/pedidos";
 import { generateQrSvg } from "@/lib/qr";
 import { queryRows } from "@/lib/db";
+import { parsePedidoRepuestos } from "@/lib/pedido-repuestos";
 import type { PedidoEstado, PedidoFormValues, PedidoPrioridad } from "@/lib/types";
 import type { ChangePrioridadActionState } from "@/components/ui/PrioridadSelector";
 
@@ -72,6 +73,7 @@ export default async function Page({
       observaciones: pedido.observaciones ?? "",
       trabajosIds: pedido.trabajos_ids.map(String),
       repuestosIds: pedido.repuestos_ids.map(String),
+      repuestos: pedido.repuestos,
       listaPrecios: (pedido.lista_precio as 1 | 2 | 3) ?? 1,
     },
   };
@@ -111,6 +113,7 @@ export default async function Page({
       repuestosIds: formData
         .getAll("repuestosIds")
         .filter((value): value is string => typeof value === "string"),
+      repuestos: parsePedidoRepuestos(formData),
       listaPrecios: (Number(normalizeString(formData.get("listaPrecios"))) || 1) as 1 | 2 | 3,
     };
 
