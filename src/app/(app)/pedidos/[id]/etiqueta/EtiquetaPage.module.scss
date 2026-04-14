@@ -66,10 +66,39 @@
 }
 
 /* ─── Print ─── */
+@page {
+  size: auto;
+  margin: 0;
+}
+
 @media print {
+  :global(html),
+  :global(body) {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  :global(.AppShell > header),
+  :global(.AppShell > div > aside) {
+    display: none !important;
+  }
+
+  :global(.AppShell > div),
+  :global(.AppShell > div > main) {
+    display: block !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
   .wrapper {
+    width: 100vw;
+    height: 100vh;
     min-height: unset;
     padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Tamaño tipo sticker ~8cm × 6cm */
@@ -86,5 +115,9 @@
   .qr {
     width: 3.5cm;
     height: 3.5cm;
+  }
+
+  :global(button) {
+    display: none !important;
   }
 }

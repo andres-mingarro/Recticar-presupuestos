@@ -85,7 +85,8 @@
 
 /* ─── Print: solo la etiqueta ─── */
 @media print {
-  .PedidoDetailPage > * {
+  /* Ocultar todo el body, luego revelar solo la etiqueta */
+  :global(body *) {
     visibility: hidden !important;
   }
 
@@ -94,26 +95,19 @@
     visibility: visible !important;
   }
 
-  .PedidoDetailPageMain,
-  .PedidoDetailPageSidebar > :not(.etiquetaWrapper) {
-    display: none !important;
-  }
-
   .etiquetaWrapper {
     position: fixed !important;
-    inset: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     border: none !important;
-    width: 100vw !important;
-    height: 100vh !important;
+    overflow: visible !important;
   }
 
   .etiqueta {
     width: 8cm;
     height: 6cm;
-    border: 1px solid #ccc;
+    border: 1px solid #ccc !important;
     border-radius: 0.5rem;
     background: white !important;
     padding: 1rem;
@@ -123,9 +117,5 @@
   .etiquetaQr {
     width: 3.5cm;
     height: 3.5cm;
-  }
-
-  .etiquetaCliente {
-    font-size: 1rem;
   }
 }
