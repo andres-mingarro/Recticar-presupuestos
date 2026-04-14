@@ -37,7 +37,7 @@ export default async function EtiquetaPage({
   ]);
 
   return (
-    <div className={styles.wrapper}>
+    <div id="etiqueta-qr-print" className={styles.wrapper}>
       <div className={styles.etiqueta}>
         <div
           className={styles.qr}

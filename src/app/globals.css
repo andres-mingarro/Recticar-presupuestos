@@ -180,16 +180,66 @@ body {
 
 /* ─── Print: etiqueta QR pedido ─── */
 @media print {
+  .print-etiqueta * {
+    visibility: hidden !important;
+  }
+
+  .print-etiqueta .AppShell {
+    visibility: visible !important;
+  }
+
+  .print-etiqueta .AppShell > header,
+  .print-etiqueta .AppShell > div > aside {
+    display: none !important;
+  }
+
+  .print-etiqueta .AppShell > div,
+  .print-etiqueta .AppShell > div > main {
+    display: block !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .print-etiqueta #etiqueta-qr-print,
+  .print-etiqueta #etiqueta-qr-print * {
+    visibility: visible !important;
+  }
+
+  .print-etiqueta #etiqueta-qr-print {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+
   body:has(#etiqueta-qr-print) * {
     visibility: hidden !important;
   }
 
-  #etiqueta-qr-print,
-  #etiqueta-qr-print * {
+  body:has(#etiqueta-qr-print) .AppShell {
     visibility: visible !important;
   }
 
-  #etiqueta-qr-print {
+  body:has(#etiqueta-qr-print) .AppShell > header,
+  body:has(#etiqueta-qr-print) .AppShell > div > aside {
+    display: none !important;
+  }
+
+  body:has(#etiqueta-qr-print) .AppShell > div,
+  body:has(#etiqueta-qr-print) .AppShell > div > main {
+    display: block !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  body:has(#etiqueta-qr-print) #etiqueta-qr-print,
+  body:has(#etiqueta-qr-print) #etiqueta-qr-print * {
+    visibility: visible !important;
+  }
+
+  body:has(#etiqueta-qr-print) #etiqueta-qr-print {
     position: fixed !important;
     top: 50% !important;
     left: 50% !important;
