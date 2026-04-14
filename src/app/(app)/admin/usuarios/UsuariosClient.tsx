@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/Button/Button";
 import { ButtonAdd } from "@/components/ui/ButtonAdd/ButtonAdd";
 import { Input } from "@/components/ui/Input/Input";
 import { Icon } from "@/components/ui/Icon";
+import { Spinner } from "@/components/ui/Spinner";
+import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import type { UserRole, UsuarioPublico } from "@/lib/queries/usuarios";
 import {
   crearUsuarioAction,
@@ -175,7 +177,8 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
               <p className="col-span-3 text-sm text-red-600">{error}</p>
             )}
             <div className="col-span-3 flex justify-end">
-              <Button type="submit" disabled={pending}>
+              <Button type="submit" disabled={pending} className="gap-2">
+                {pending ? <Spinner className="h-4 w-4" /> : null}
                 {pending ? "Guardando..." : "Crear usuario"}
               </Button>
             </div>
@@ -277,9 +280,16 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
                             />
                             <EyeToggle visible={showEditPassword} onToggle={() => setShowEditPassword((v) => !v)} />
                           </div>
-                          <Button size="sm" disabled={pending} onClick={() => handleCambiarPassword(u.email, u.role)}>
-                            Guardar
-                          </Button>
+                          <PulsatingButton
+                            type="button"
+                            pulsing={!pending}
+                            disabled={pending}
+                            className="h-9 px-3 text-sm gap-1.5"
+                            onClick={() => handleCambiarPassword(u.email, u.role)}
+                          >
+                            {pending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                            {pending ? "Guardando..." : "Guardar"}
+                          </PulsatingButton>
                           <Button
                             size="sm"
                             variant="ghost"

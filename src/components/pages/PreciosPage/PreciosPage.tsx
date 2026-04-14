@@ -13,6 +13,8 @@ import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
 import { SortableList } from "@/components/sortable/SortableList";
+import { Spinner } from "@/components/ui/Spinner";
+import { PulsatingButton } from "@/components/ui/PulsatingButton";
 
 // ─── Category card ────────────────────────────────────────────────────────────
 
@@ -199,9 +201,9 @@ function CategoriaCard({
                 type="submit"
                 disabled={renamePending}
                 title="Guardar nombre"
-                  className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-success-bg)] hover:text-[var(--color-success-text)] disabled:opacity-40"
+                className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-success-bg)] hover:text-[var(--color-success-text)] disabled:opacity-40"
               >
-                <Icon name="check" className="h-3.5 w-3.5" />
+                {renamePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
               </button>
             </form>
           ) : (
@@ -225,15 +227,16 @@ function CategoriaCard({
         {/* Editar precios / Guardar+Cancelar */}
         {isEditing ? (
           <div className="flex items-center gap-1.5">
-            <button
+            <PulsatingButton
               form={formId}
               type="submit"
+              pulsing={!savePending}
               disabled={savePending}
               className="flex items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
             >
-              <Icon name="check" className="h-3.5 w-3.5" />
+              {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
               {savePending ? "Guardando…" : "Guardar"}
-            </button>
+            </PulsatingButton>
             <button
               type="button"
               onClick={handleCancel}
@@ -348,7 +351,7 @@ function CategoriaCard({
             disabled={addPending}
             className={buttonStyles({ className: "gap-2 !text-white bg-[var(--color-info-text)] uppercase hover:bg-[var(--color-info-text-strong)]" })}
           >
-            <Icon name="plus" className="h-4 w-4" />
+            {addPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
             {addPending ? "Agregando…" : "Agregar trabajo"}
           </button>
           {addState.error && (
@@ -384,7 +387,7 @@ function AddCategoriaForm({
           disabled={isPending}
           className={buttonStyles({ className: "gap-2 !text-white bg-[var(--color-info-text)] uppercase hover:bg-[var(--color-info-text-strong)]" })}
         >
-          <Icon name="plus" className="h-4 w-4" />
+          {isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
           {isPending ? "Creando…" : "Nueva categoría"}
         </button>
       </form>

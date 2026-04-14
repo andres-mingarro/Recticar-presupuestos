@@ -16,6 +16,8 @@ import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
 import { buttonStyles } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import styles from "./InformacionTecnicaPage.module.scss";
 
 type ActionFn = (
@@ -292,9 +294,10 @@ function MarcaRow({
         />
         {canEdit && (
           <>
-            <button type="submit" disabled={isPending} className={saveRowBtnCls}>
-              Guardar
-            </button>
+            <PulsatingButton type="submit" pulsing={!isPending} disabled={isPending} className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}>
+              {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
+              {isPending ? "Guardando…" : "Guardar"}
+            </PulsatingButton>
             <DeleteButton form={deleteFormId} disabled={deletePending} />
           </>
         )}
@@ -352,9 +355,10 @@ function ModeloRow({
                 <option key={m.id} value={m.id}>{m.nombre}</option>
               ))}
             </select>
-            <button type="submit" disabled={isPending} className={saveRowBtnCls}>
-              Guardar
-            </button>
+            <PulsatingButton type="submit" pulsing={!isPending} disabled={isPending} className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}>
+              {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
+              {isPending ? "Guardando…" : "Guardar"}
+            </PulsatingButton>
             <DeleteButton form={deleteFormId} disabled={deletePending} />
           </>
         ) : (
@@ -415,9 +419,10 @@ function MotorRow({
               disabled={isPending}
               className={fieldCls}
             />
-            <button type="submit" disabled={isPending} className={saveRowBtnCls}>
-              Guardar
-            </button>
+            <PulsatingButton type="submit" pulsing={!isPending} disabled={isPending} className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}>
+              {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
+              {isPending ? "Guardando…" : "Guardar"}
+            </PulsatingButton>
             <DeleteButton form={deleteFormId} disabled={deletePending} />
           </>
         ) : (
@@ -491,9 +496,9 @@ function VehiculoRow({
               </option>
             ))}
           </select>
-          <button type="submit" disabled={isPending} className={saveRowBtnCls}>
+          <PulsatingButton type="submit" pulsing={!isPending} disabled={isPending} className={saveRowBtnCls}>
             Guardar
-          </button>
+          </PulsatingButton>
           <button
             type="button"
             onClick={() => setIsEditing(false)}
@@ -573,7 +578,7 @@ function AddMarcaForm({ action }: { action: ActionFn }) {
           className={cn("min-w-0 flex-1", addFieldCls)}
         />
         <button type="submit" disabled={isPending} className={addBtnCls}>
-          <Icon name="plus" className="h-4 w-4" />
+          {isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
           {isPending ? "Agregando…" : "Agregar marca"}
         </button>
       </form>
@@ -626,7 +631,7 @@ function AddModeloForm({
           ))}
         </select>
         <button type="submit" disabled={isPending} className={addBtnCls}>
-          <Icon name="plus" className="h-4 w-4" />
+          {isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
           {isPending ? "Agregando…" : "Agregar modelo"}
         </button>
       </form>
@@ -663,7 +668,7 @@ function AddMotorForm({ action }: { action: ActionFn }) {
           className={cn("w-40 shrink-0", addFieldCls)}
         />
         <button type="submit" disabled={isPending} className={addBtnCls}>
-          <Icon name="plus" className="h-4 w-4" />
+          {isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
           {isPending ? "Agregando…" : "Agregar motor"}
         </button>
       </form>
@@ -727,7 +732,7 @@ function AddVehiculoForm({
           ))}
         </select>
         <button type="submit" disabled={isPending} className={addBtnCls}>
-          <Icon name="plus" className="h-4 w-4" />
+          {isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
           {isPending ? "Agregando…" : "Agregar relación"}
         </button>
       </form>

@@ -1,13 +1,41 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { PedidoEstado } from "@/lib/types";
 
-const STEPS: Array<{ value: PedidoEstado; label: string; num: string }> = [
-  { value: "pendiente", label: "Pendiente", num: "01" },
-  { value: "aprobado", label: "Aprobado", num: "02" },
-  { value: "finalizado", label: "Finalizado", num: "03" },
+const STEPS: Array<{
+  value: PedidoEstado;
+  label: string;
+  num: string;
+  activeBg: string;
+  activeText: string;
+  isLight: boolean;
+}> = [
+  {
+    value: "pendiente",
+    label: "Presupuesto entregado",
+    num: "01",
+    activeBg: "bg-[linear-gradient(135deg,#fff7ed,#fed7aa)]",
+    activeText: "text-orange-700",
+    isLight: true,
+  },
+  {
+    value: "aprobado",
+    label: "Presupuesto aceptado",
+    num: "02",
+    activeBg: "bg-[linear-gradient(135deg,#ea580c,#fb923c)]",
+    activeText: "text-white",
+    isLight: false,
+  },
+  {
+    value: "finalizado",
+    label: "Pedido finalizado",
+    num: "03",
+    activeBg: "bg-[linear-gradient(135deg,#059669,#34d399)]",
+    activeText: "text-white",
+    isLight: false,
+  },
 ];
 
 function stepStatus(stepValue: PedidoEstado, currentValue: PedidoEstado) {
@@ -18,188 +46,147 @@ function stepStatus(stepValue: PedidoEstado, currentValue: PedidoEstado) {
   return "pending";
 }
 
-// Shared circle + label render
-function StepVisual({
-  step,
+function StepCircle({
   status,
-  isLast,
+  num,
+  light,
 }: {
-  step: (typeof STEPS)[number];
   status: "completed" | "active" | "pending";
-  isLast: boolean;
+  num: string;
+  light?: boolean;
 }) {
-  return (
-    <>
-      <span
-        className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition-all",
-          status === "completed" &&
-            "border-[var(--color-accent)] bg-[var(--color-accent)] text-white",
-          status === "active" &&
-            "border-[var(--color-accent)] bg-transparent text-[var(--color-accent)]",
-          status === "pending" &&
-            "border-[var(--color-border)] bg-transparent text-[var(--color-foreground-muted)]"
-        )}
-      >
-        {status === "completed" ? (
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M20 6 9 17l-5-5" />
-          </svg>
-        ) : (
-          <span className="text-xs font-bold">{step.num}</span>
-        )}
-      </span>
+  const base = "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition-all";
 
-      <span
-        className={cn(
-          "font-semibold leading-tight",
-          status === "active" && "text-[var(--color-accent)]",
-          status === "completed" && "text-[var(--color-foreground)]",
-          status === "pending" && "text-[var(--color-foreground-muted)]"
-        )}
-      >
-        {step.label}
-      </span>
-
-      {!isLast && (
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 8 40"
-          className="absolute -right-px top-0 hidden h-full w-2 text-[var(--color-border)] md:block"
-          preserveAspectRatio="none"
-        >
-          <polyline
-            points="0,0 8,20 0,40"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-          />
+  if (status === "completed") {
+    return (
+      <span className={cn(base, light ? "border-orange-300 bg-orange-100 text-orange-700" : "border-white/40 bg-white/20 text-white")}>
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 6 9 17l-5-5" />
         </svg>
-      )}
-    </>
+      </span>
+    );
+  }
+  if (status === "active") {
+    return (
+      <span className={cn(base, light ? "border-orange-500 bg-white text-orange-600" : "border-white bg-white/20 text-white")}>
+        <span className="text-xs font-bold">{num}</span>
+      </span>
+    );
+  }
+  return (
+    <span className={cn(base, "border-[var(--color-border)] bg-transparent text-[var(--color-foreground-muted)]")}>
+      <span className="text-xs font-bold">{num}</span>
+    </span>
   );
 }
 
-// ─── Display / Form mode ─────────────────────────────────────────────────────
-
-type EstadoStepperProps =
-  | { mode: "display"; value: PedidoEstado }
-  | {
-      mode: "form";
-      initialValue: PedidoEstado;
-      name: string;
-      allowFinalizado?: boolean;
-    };
-
-export function EstadoStepper(props: EstadoStepperProps) {
-  const isForm = props.mode === "form";
-
-  const [selected, setSelected] = useState<PedidoEstado>(
-    isForm ? props.initialValue : props.value
+function StepDivider({ light }: { light?: boolean }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 8 40" className={cn("absolute -right-px top-0 hidden h-full w-2 md:block", light ? "text-orange-200" : "text-white/20")} preserveAspectRatio="none">
+      <polyline points="0,0 8,20 0,40" fill="none" stroke="currentColor" strokeWidth="1" />
+    </svg>
   );
+}
 
-  const visibleSteps =
-    isForm && props.allowFinalizado === false
-      ? STEPS.filter((s) => s.value !== "finalizado")
-      : STEPS;
+const CONTAINER = "flex w-full flex-col items-stretch overflow-hidden rounded-2xl border border-[var(--color-border)] md:flex-row";
+const BORDER_RIGHT = "border-b border-[var(--color-border)] md:border-b-0 md:border-r";
 
-  const displayValue = isForm ? selected : props.value;
+// ─── Display mode ─────────────────────────────────────────────────────────────
+
+export function EstadoStepperDisplay({ value }: { value: PedidoEstado }) {
+  return (
+    <div className="EstadoStepperDisplay flex flex-col gap-1.5">
+      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">Estado</span>
+    <div className={CONTAINER}>
+      {STEPS.map((step, index) => {
+        const status = stepStatus(step.value, value);
+        const isLast = index === STEPS.length - 1;
+        const isPainted = status === "active" || status === "completed";
+
+        return (
+          <div
+            key={step.value}
+            className={cn(
+              "relative flex flex-1 items-center gap-3 px-4 py-4 text-left text-sm transition sm:px-5",
+              "cursor-default",
+              isPainted ? step.activeBg : "bg-[var(--color-surface)]",
+              !isLast && BORDER_RIGHT
+            )}
+          >
+            <StepCircle status={status} num={step.num} light={step.isLight} />
+            <span className={cn("font-semibold leading-tight", isPainted ? step.activeText : "text-[var(--color-foreground-muted)]")}>
+              {step.label}
+            </span>
+            {!isLast && <StepDivider light={step.isLight} />}
+          </div>
+        );
+      })}
+    </div>
+    </div>
+  );
+}
+
+// ─── Form mode ────────────────────────────────────────────────────────────────
+
+type EstadoStepperProps = {
+  initialValue: PedidoEstado;
+  name: string;
+  allowFinalizado?: boolean;
+  form?: string;
+  value?: PedidoEstado;
+  onChange?: (value: PedidoEstado) => void;
+};
+
+export function EstadoStepper({ initialValue, name, allowFinalizado, form, value, onChange }: EstadoStepperProps) {
+  const [internalSelected, setInternalSelected] = useState<PedidoEstado>(initialValue);
+  const selected = value ?? internalSelected;
+
+  useEffect(() => {
+    setInternalSelected(initialValue);
+  }, [initialValue]);
+
+  const visibleSteps = allowFinalizado === false
+    ? STEPS.filter((s) => s.value !== "finalizado")
+    : STEPS;
 
   return (
-    <div className="flex w-full flex-col items-stretch overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] md:flex-row">
-      {isForm && <input type="hidden" name={props.name} value={selected} />}
-
+    <div className="EstadoStepper flex flex-col gap-1.5">
+      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">Estado</span>
+    <div className={CONTAINER}>
+      <input type="hidden" name={name} value={selected} form={form} />
       {visibleSteps.map((step, index) => {
-        const status = stepStatus(step.value, displayValue);
+        const status = stepStatus(step.value, selected);
         const isLast = index === visibleSteps.length - 1;
+        const isPainted = status === "active" || status === "completed";
 
         return (
           <button
             key={step.value}
-            type={isForm ? "button" : undefined}
-            disabled={!isForm}
-            onClick={isForm ? () => setSelected(step.value) : undefined}
+            type="button"
+            onClick={() => {
+              setInternalSelected(step.value);
+              onChange?.(step.value);
+            }}
             className={cn(
               "relative flex flex-1 items-center gap-3 px-4 py-4 text-left text-sm transition sm:px-5",
-              isForm && "cursor-pointer hover:bg-[var(--color-surface-alt)]",
-              !isForm && "cursor-default",
-              status === "active" && "bg-[var(--color-surface-alt)]",
-              !isLast && "border-b border-[var(--color-border)] md:border-b-0 md:border-r"
+              "cursor-pointer hover:brightness-95",
+              isPainted ? step.activeBg : "bg-[var(--color-surface)] hover:bg-[var(--color-surface-alt)]",
+              !isLast && BORDER_RIGHT
             )}
           >
-            <StepVisual step={step} status={status} isLast={isLast} />
+            <StepCircle status={status} num={step.num} light={step.isLight} />
+            <span className={cn("font-semibold leading-tight", isPainted ? step.activeText : "text-[var(--color-foreground-muted)]")}>
+              {step.label}
+            </span>
+            {!isLast && <StepDivider light={step.isLight} />}
           </button>
         );
       })}
     </div>
-  );
-}
-
-// ─── Action mode (one form per step → server action) ─────────────────────────
-
-export type ChangeEstadoActionState = { error: string | null };
-
-type EstadoStepperActionProps = {
-  value: PedidoEstado;
-  action: (
-    prevState: ChangeEstadoActionState,
-    formData: FormData
-  ) => Promise<ChangeEstadoActionState>;
-};
-
-export function EstadoStepperAction({ value, action }: EstadoStepperActionProps) {
-  const [state, formAction, isPending] = useActionState(action, { error: null });
-
-  return (
-    <div className="space-y-2">
-      <div className="flex w-full flex-col items-stretch overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] md:flex-row">
-        {STEPS.map((step, index) => {
-          const status = stepStatus(step.value, value);
-          const isLast = index === STEPS.length - 1;
-          const isCurrent = step.value === value;
-
-          return (
-            <form
-              key={step.value}
-              action={formAction}
-                className={cn(
-                  "relative flex flex-1",
-                  !isLast && "border-b border-[var(--color-border)] md:border-b-0 md:border-r"
-                )}
-              >
-              <input type="hidden" name="estado" value={step.value} />
-              <button
-                type="submit"
-                disabled={isPending || isCurrent}
-                className={cn(
-                  "relative flex w-full items-center gap-3 px-4 py-4 text-left text-sm transition sm:px-5",
-                  !isCurrent && !isPending && "cursor-pointer hover:bg-[var(--color-surface-alt)]",
-                  isCurrent && "cursor-default",
-                  status === "active" && "bg-[var(--color-surface-alt)]",
-                  isPending && "opacity-60"
-                )}
-              >
-                <StepVisual step={step} status={status} isLast={isLast} />
-              </button>
-            </form>
-          );
-        })}
-      </div>
-
-      {state.error ? (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
-          {state.error}
-        </p>
-      ) : null}
     </div>
   );
 }
+
+// ─── Compat ───────────────────────────────────────────────────────────────────
+
+export type ChangeEstadoActionState = { error: string | null };
