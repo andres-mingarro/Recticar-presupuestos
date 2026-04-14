@@ -83,7 +83,21 @@ Existe en dos variantes: `EstadoStepper` (form mode, clickeable) y `EstadoSteppe
 `StatusBadge`, `PriorityBadge`, `PaymentBadge`, `ContactBadge`, `BusinessDaysBadge` en `src/components/ui/Badge/Badge.tsx`.
 
 ### Etiqueta QR
-El QR se genera server-side con `generateQrSvg()` (`src/lib/qr.ts`, usa el paquete `qrcode`). Se muestra inline en el sidebar del detalle de pedido. El botón `PrintButton` llama a `window.print()` y el CSS de impresión en `PedidoDetailPage.module.scss` oculta todo excepto la etiqueta.
+El QR se genera server-side con `generateQrSvg()` (`src/lib/qr.ts`, usa el paquete `qrcode`). Se muestra inline en el sidebar del detalle de pedido. El botón `PrintButton` llama a `window.print()`.
+
+#### CSS de impresión — patrón obligatorio
+CSS Modules **no permite selectores globales puros** (`:global(body *)`, `:global(html)`, etc.) — el build falla con "Selector is not pure". La solución es:
+
+1. El wrapper de la etiqueta tiene `id="etiqueta-qr-print"` (ID estable, no hasheado).
+2. Las reglas globales viven en `src/app/globals.css` scoped con `body:has(#etiqueta-qr-print)` para no afectar otras páginas:
+   ```css
+   @media print {
+     body:has(#etiqueta-qr-print) * { visibility: hidden !important; }
+     #etiqueta-qr-print, #etiqueta-qr-print * { visibility: visible !important; }
+     #etiqueta-qr-print { position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; }
+   }
+   ```
+3. El módulo SCSS solo maneja sizing local (`.etiqueta`, `.etiquetaQr`) — sin `:global()` puros.
 
 ---
 
