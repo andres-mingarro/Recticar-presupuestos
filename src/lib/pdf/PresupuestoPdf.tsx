@@ -250,7 +250,7 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
                 </Text>
               ) : null}
             </View>
-            <Image src={qrDataUrl} style={styles.qr} alt="" />
+            <Image src={qrDataUrl} style={styles.qr} />
           </View>
         </View>
 
