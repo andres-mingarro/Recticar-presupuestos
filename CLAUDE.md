@@ -4,7 +4,28 @@
 
 ## Estado actual del proyecto
 
-App interna para gestión de pedidos de rectificación de motores. Empleados logueados (no clientes). Stack: Next.js 15 App Router, React 19, TypeScript, Tailwind CSS v4, PostgreSQL.
+App interna para gestión de pedidos de rectificación de motores. Empleados logueados (no clientes). Stack: Next.js 15 App Router, React 19, TypeScript, Tailwind CSS v4, SCSS Modules por componente, PostgreSQL (Neon serverless).
+
+---
+
+## Stack
+
+- Next.js 15 con App Router
+- TypeScript
+- Tailwind CSS v4 + SCSS Modules por componente
+- Neon PostgreSQL con `@neondatabase/serverless`
+- `qrcode` para generar SVG de etiquetas
+- Font Awesome para iconografía (via `src/components/ui/Icon`)
+- Sin ORM — SQL directo con `queryRows<T>()`
+
+---
+
+## Bases de datos
+
+- `DATABASE_URL` → base principal: clientes, pedidos, trabajos, usuarios
+- `TECHNICAL_DATABASE_URL` → catálogo técnico externo usado en "Selección técnica" (marcas, modelos, motores, vehículos). Si no está definida, hace fallback a `DATABASE_URL`.
+- La base principal **no depende por FK** de marcas/modelos/motores para guardar pedidos.
+- Tablas esperadas en la base técnica: `marcas(id, nombre)`, `modelos(id, nombre, marca_id)`, `motores(id, nombre, cilindrada)`, `vehiculos(id, modelo_id, motor_id)`.
 
 ---
 
@@ -12,7 +33,11 @@ App interna para gestión de pedidos de rectificación de motores. Empleados log
 
 ### Componentes
 - **Todo componente tiene su nombre como className** en el elemento raíz. Ej: `<div className="CobradoToggle flex-1">`.
+- Cada componente vive en su propia carpeta con `index.ts` y su `*.module.scss`.
 - Los archivos de componentes viven en `src/components/` organizados por tipo (`ui/`, `forms/`, `pages/`, `layout/`, `navigation/`, `search/`, `pagination/`, `sortable/`).
+- Reutilizar `Card`, `Button`, `Badge`, `Table` y `PageHeader` antes de crear estilos nuevos.
+- Para toggles y segmentados, priorizar `ButtonGroup`, `Tabs`, `Incrementor`, `CobradoToggle`, `PrioridadToggle` y `EstadoStepper`.
+- Los iconos deben pasar por `src/components/ui/Icon` — no SVG inline salvo casos muy puntuales.
 
 ### Formularios y guardado
 - **Los cambios siempre se guardan con un único botón "Guardar"**. No hay auto-save ni acciones individuales por widget dentro del detalle de pedido.
@@ -23,6 +48,25 @@ App interna para gestión de pedidos de rectificación de motores. Empleados log
 - **`Spinner`** (`src/components/ui/Spinner.tsx`): SVG `animate-spin`, se usa en todos los botones de guardar mientras `isPending`.
 - **`PulsatingButton`** (`src/components/ui/PulsatingButton.tsx`): botón que pulsa via `box-shadow` animado cuando `pulsing={true}`. Se usa para indicar cambios sin guardar (`dirty && !isPending`). Props: `pulsing`, `variant` (`"pulse"` | `"ripple"`), `distance`, `duration`, `pulseColor`.
 - El estado `dirty` se activa con `onClickCapture` en toggles y `onInput` en el form. Se resetea con `useEffect` cuando `isPending` pasa a `true`.
+
+### Valores monetarios
+- Los importes se muestran y persisten como **enteros**, sin decimales.
+
+---
+
+## Estructura de rutas
+
+| Ruta | Descripción |
+|---|---|
+| `src/app/(app)/clientes` | Listado con autocomplete y paginación de 10 resultados |
+| `src/app/(app)/clientes/[id]` | Datos del cliente en `PageHeader`; edición en acordeón desde botón EDITAR; pedidos vigentes y finalizados en cards separadas |
+| `src/app/(app)/pedidos` | Listado de pedidos |
+| `src/app/(app)/pedidos/nuevo` | Alta de pedido; usa base técnica externa para marca/modelo/motor |
+| `src/app/(app)/pedidos/[id]` | Edición de pedido; concentra cobrado, prioridad, estado y form en un único guardado |
+| `src/app/(app)/pedidos/[id]/etiqueta` | Vista imprimible de etiqueta con QR (sin header ni menú del AppShell) |
+| `src/app/(app)/precios` | Administración de trabajos y listas de precios con ajustes porcentuales por categoría (`Incrementor`) |
+| `src/app/(app)/informacion-tecnica` | Edición del catálogo técnico externo (marcas, modelos, motores, vehículos); búsqueda y paginación server-side; solo `admin` y `superuser` pueden editar |
+| `src/app/api/clientes/search` | Autocomplete de clientes |
 
 ---
 
@@ -45,7 +89,7 @@ PrioridadProvider
             div[onInput → dirty]
               PedidoForm       (externalFormAction, externalState, externalIsPending)
           [PedidoDetailPageSidebar]
-            Card (PDF + QR etiqueta + PrintButton)
+            Card (PDF + QR etiqueta con id="etiqueta-qr-print" + PrintButton)
             PedidoDatosCard    (lee CobradoContext + PrioridadContext reactivamente)
             PedidoClienteSection
             Card (Reglas de estado)
@@ -62,6 +106,11 @@ PrioridadProvider
 | `TrabajosSeleccionProvider` | `TrabajosSeleccionContext` | checkboxes en PedidoForm | `TrabajosResumen` |
 | `RepuestosSeleccionProvider` | `RepuestosSeleccionContext` | inputs en PedidoForm | resumen en sidebar |
 
+### Pedidos — detalles
+- `PedidoForm` usa `PedidoItemCard` y `CheckboxBeauti` para los ítems de trabajos y repuestos.
+- Los repuestos guardan `precio` y `cantidad` en `pedido_repuestos`. El catálogo `/repuestos` no define el precio final; ese valor se decide por pedido.
+- El PDF y los listados hidratan marca/modelo/motor desde la base técnica externa.
+
 ---
 
 ## Componentes UI clave
@@ -70,6 +119,7 @@ PrioridadProvider
 - `Button` / `buttonStyles()` — variantes: `primary` (naranja gradient), `secondary`, `ghost`, `dark` (slate gradient).
 - `ButtonGroup<T>` — selector multi-opción (Lista 1/2/3, prioridad en nuevo pedido). Props: `options`, `value`, `onChange`, `activeTone` por opción.
 - `PulsatingButton` — extiende `buttonStyles`, agrega anillo pulsante.
+- `Incrementor` — ajuste porcentual, usado en `/precios`.
 
 ### EstadoStepper
 Tres estados con gradientes de color progresivos:
@@ -82,14 +132,15 @@ Existe en dos variantes: `EstadoStepper` (form mode, clickeable) y `EstadoSteppe
 ### Badges
 `StatusBadge`, `PriorityBadge`, `PaymentBadge`, `ContactBadge`, `BusinessDaysBadge` en `src/components/ui/Badge/Badge.tsx`.
 
-### Etiqueta QR
-El QR se genera server-side con `generateQrSvg()` (`src/lib/qr.ts`, usa el paquete `qrcode`). Se muestra inline en el sidebar del detalle de pedido. El botón `PrintButton` llama a `window.print()`.
+### Etiqueta QR y CSS de impresión
+El QR se genera server-side con `generateQrSvg()` (`src/lib/qr.ts`). La URL base usa `NEXT_PUBLIC_BASE_URL` (fallback: `http://localhost:3000`).
 
-#### CSS de impresión — patrón obligatorio
-CSS Modules **no permite selectores globales puros** (`:global(body *)`, `:global(html)`, etc.) — el build falla con "Selector is not pure". La solución es:
+El botón `PrintButton` llama a `window.print()`.
 
-1. El wrapper de la etiqueta tiene `id="etiqueta-qr-print"` (ID estable, no hasheado).
-2. Las reglas globales viven en `src/app/globals.css` scoped con `body:has(#etiqueta-qr-print)` para no afectar otras páginas:
+**CSS Modules no permite selectores globales puros** (`:global(body *)`, `:global(html)`, etc.) — el build falla con "Selector is not pure". Patrón obligatorio:
+
+1. El wrapper de la etiqueta tiene `id="etiqueta-qr-print"` (ID estable, no hasheado por CSS Modules).
+2. Las reglas globales viven en `src/app/globals.css` scoped con `body:has(#etiqueta-qr-print)`:
    ```css
    @media print {
      body:has(#etiqueta-qr-print) * { visibility: hidden !important; }
@@ -123,9 +174,18 @@ CSS Modules **no permite selectores globales puros** (`:global(body *)`, `:globa
 ## Base de datos
 
 - ORM: ninguno. SQL directo con `queryRows<T>()`.
-- Migraciones en `migrations/` (numeradas, aplicar manualmente con `psql`).
+- Migraciones en `migrations/` (numeradas). Aplicar con `npm run db:migrate`.
 - Tipos enum en PostgreSQL: `pedido_estado` (`pendiente`, `aprobado`, `finalizado`), `pedido_prioridad` (`baja`, `normal`, `alta`).
-- El valor `entregado` existe en el enum de la DB (migración 011) pero no se usa en la UI.
+- El valor `entregado` existe en el enum (migración 011) pero no se usa en la UI.
+- Migración 014: agrega `precio` y `cantidad` a `pedido_repuestos`.
+- Al agregar estados nuevos: revisar consistencia entre enum DB, labels del stepper y filtros/listados.
+
+### Scripts útiles
+```
+npm run db:migrate       # aplica migraciones sobre la base principal
+npm run db:reset:dev     # borra clientes y pedidos fake marcados como DEV-SEED
+npm run db:seed:dev      # crea 15 clientes fake y 15 pedidos fake
+```
 
 ---
 
@@ -136,3 +196,4 @@ CSS Modules **no permite selectores globales puros** (`:global(body *)`, `:globa
 - `redirect()` de Next.js lanza una excepción internamente — no poner dentro de `try/catch`.
 - En WSL2 con archivos en Linux FS nativo, el HMR funciona sin `WATCHPACK_POLLING`.
 - `src/middleware.ts` (no en raíz) por la estructura con `src/`.
+- Variables de entorno en `.env.local`: `DATABASE_URL`, `TECHNICAL_DATABASE_URL`, `NEXT_PUBLIC_BASE_URL`.
