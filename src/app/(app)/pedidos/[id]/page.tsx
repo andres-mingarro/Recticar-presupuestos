@@ -9,6 +9,7 @@ import {
   listMotores,
   listTrabajosAgrupados,
 } from "@/lib/queries/catalogo";
+import { listRepuestosAgrupados } from "@/lib/queries/repuestos";
 import { getPedidoDetailById, updatePedido } from "@/lib/queries/pedidos";
 import { generateQrSvg } from "@/lib/qr";
 import { queryRows } from "@/lib/db";
@@ -39,7 +40,7 @@ export default async function Page({
     notFound();
   }
 
-  const [pedido, marcas, modelos, motores, relations, trabajos] =
+  const [pedido, marcas, modelos, motores, relations, trabajos, repuestos] =
     await Promise.all([
       getPedidoDetailById(pedidoId),
       listMarcas(),
@@ -47,6 +48,7 @@ export default async function Page({
       listMotores(),
       listModeloMotorRelations(),
       listTrabajosAgrupados(),
+      listRepuestosAgrupados(),
     ]);
 
   if (!pedido) {
@@ -69,6 +71,7 @@ export default async function Page({
       estado: pedido.estado,
       observaciones: pedido.observaciones ?? "",
       trabajosIds: pedido.trabajos_ids.map(String),
+      repuestosIds: pedido.repuestos_ids.map(String),
       listaPrecios: (pedido.lista_precio as 1 | 2 | 3) ?? 1,
     },
   };
@@ -104,6 +107,9 @@ export default async function Page({
       observaciones: normalizeString(formData.get("observaciones")),
       trabajosIds: formData
         .getAll("trabajosIds")
+        .filter((value): value is string => typeof value === "string"),
+      repuestosIds: formData
+        .getAll("repuestosIds")
         .filter((value): value is string => typeof value === "string"),
       listaPrecios: (Number(normalizeString(formData.get("listaPrecios"))) || 1) as 1 | 2 | 3,
     };
@@ -196,6 +202,7 @@ export default async function Page({
       motores={motores}
       relations={relations}
       trabajos={trabajos}
+      repuestos={repuestos}
       qrSvg={qrSvg}
     />
   );

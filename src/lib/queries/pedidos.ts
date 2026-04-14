@@ -20,9 +20,10 @@ type PedidoListRow = Omit<
 
 type PedidoDetailRow = Omit<
   PedidoDetail,
-  "trabajos_ids" | "marca_nombre" | "modelo_nombre" | "motor_nombre"
+  "trabajos_ids" | "repuestos_ids" | "marca_nombre" | "modelo_nombre" | "motor_nombre"
 > & {
   trabajos_ids: number[] | null;
+  repuestos_ids: number[] | null;
 };
 
 export async function listPedidos(filters: PedidoFilters = {}) {
@@ -146,16 +147,23 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
         END AS cliente_nombre,
         c.dni AS cliente_dni,
         c.cuit AS cliente_cuit,
+        c.telefono AS cliente_telefono,
         p.numero_serie_motor,
         p.observaciones,
         p.lista_precio,
-        array_agg(pt.trabajo_id ORDER BY pt.trabajo_id)
-          FILTER (WHERE pt.trabajo_id IS NOT NULL) AS trabajos_ids
+        (
+          SELECT array_agg(pt.trabajo_id ORDER BY pt.trabajo_id)
+          FROM pedido_trabajos pt
+          WHERE pt.pedido_id = p.id
+        ) AS trabajos_ids,
+        (
+          SELECT array_agg(pr.repuesto_id ORDER BY pr.repuesto_id)
+          FROM pedido_repuestos pr
+          WHERE pr.pedido_id = p.id
+        ) AS repuestos_ids
       FROM pedidos p
       LEFT JOIN clientes c ON c.id = p.cliente_id
-      LEFT JOIN pedido_trabajos pt ON pt.pedido_id = p.id
       WHERE p.id = $1
-      GROUP BY p.id, c.id
       LIMIT 1
     `,
     [id]
@@ -164,7 +172,13 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
   const row = rows[0];
   if (!row) return null;
 
-  const hydrated = await hydrateTechnicalLabels([{ ...row, trabajos_ids: row.trabajos_ids ?? [] }]);
+  const hydrated = await hydrateTechnicalLabels([
+    {
+      ...row,
+      trabajos_ids: row.trabajos_ids ?? [],
+      repuestos_ids: row.repuestos_ids ?? [],
+    },
+  ]);
   return hydrated[0] ?? null;
 }
 
@@ -197,6 +211,7 @@ export async function updatePedido(id: number, input: PedidoFormValues) {
   if (!updated[0]?.id) return false;
 
   await queryRows(`DELETE FROM pedido_trabajos WHERE pedido_id = $1`, [id]);
+  await queryRows(`DELETE FROM pedido_repuestos WHERE pedido_id = $1`, [id]);
 
   if (input.trabajosIds.length > 0) {
     const valuesSql = input.trabajosIds
@@ -205,6 +220,16 @@ export async function updatePedido(id: number, input: PedidoFormValues) {
 
     await queryRows(
       `INSERT INTO pedido_trabajos (pedido_id, trabajo_id) VALUES ${valuesSql} ON CONFLICT DO NOTHING`
+    );
+  }
+
+  if (input.repuestosIds.length > 0) {
+    const valuesSql = input.repuestosIds
+      .map((repuestoId) => `(${id}, ${Number(repuestoId)})`)
+      .join(", ");
+
+    await queryRows(
+      `INSERT INTO pedido_repuestos (pedido_id, repuesto_id) VALUES ${valuesSql} ON CONFLICT DO NOTHING`
     );
   }
 
@@ -265,6 +290,20 @@ export async function createPedido(input: PedidoFormValues) {
         INSERT INTO pedido_trabajos (pedido_id, trabajo_id)
         VALUES ${valuesSql}
         ON CONFLICT (pedido_id, trabajo_id) DO NOTHING
+      `
+    );
+  }
+
+  if (input.repuestosIds.length > 0) {
+    const valuesSql = input.repuestosIds
+      .map((repuestoId) => `(${pedidoId}, ${Number(repuestoId)})`)
+      .join(", ");
+
+    await queryRows(
+      `
+        INSERT INTO pedido_repuestos (pedido_id, repuesto_id)
+        VALUES ${valuesSql}
+        ON CONFLICT (pedido_id, repuesto_id) DO NOTHING
       `
     );
   }

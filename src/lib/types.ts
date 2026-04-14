@@ -75,9 +75,11 @@ export type PedidoListItem = {
 export type PedidoDetail = PedidoListItem & {
   observaciones: string | null;
   trabajos_ids: number[];
+  repuestos_ids: number[];
   lista_precio: 1 | 2 | 3;
   cliente_dni: string | null;
   cliente_cuit: string | null;
+  cliente_telefono: string | null;
 };
 
 export type ClientePedidoItem = PedidoListItem;
@@ -93,6 +95,7 @@ export type PedidoFormValues = {
   estado: PedidoEstado;
   observaciones: string;
   trabajosIds: string[];
+  repuestosIds: string[];
   listaPrecios: 1 | 2 | 3;
 };
 
@@ -154,5 +157,15 @@ export type TrabajoAgrupado = {
     precioLista1: number;
     precioLista2: number;
     precioLista3: number;
+  }>;
+};
+
+export type RepuestoAgrupado = {
+  categoriaId: number;
+  categoriaNombre: string;
+  repuestos: Array<{
+    id: number;
+    nombre: string;
+    precio: number;
   }>;
 };

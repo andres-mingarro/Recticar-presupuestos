@@ -5,9 +5,12 @@ import type {
   Modelo,
   ModeloMotorRelation,
   Motor,
+  RepuestoAgrupado,
   TrabajoAgrupado,
 } from "@/lib/types";
 import { PedidoForm, type PedidoFormState } from "@/components/forms/PedidoForm";
+import { TrabajosSeleccionProvider } from "@/components/forms/PedidoForm/TrabajosSeleccionContext";
+import { RepuestosSeleccionProvider } from "@/components/forms/PedidoForm/RepuestosSeleccionContext";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -25,6 +28,7 @@ type NuevoPedidoPageProps = {
   motores: Motor[];
   relations: ModeloMotorRelation[];
   trabajos: TrabajoAgrupado[];
+  repuestos: RepuestoAgrupado[];
 };
 
 export function NuevoPedidoPage({
@@ -36,6 +40,7 @@ export function NuevoPedidoPage({
   motores,
   relations,
   trabajos,
+  repuestos,
 }: NuevoPedidoPageProps) {
   return (
     <div className={cn("NuevoPedidoPage", styles.NuevoPedidoPage, "space-y-6")}>
@@ -56,16 +61,21 @@ export function NuevoPedidoPage({
           styles.NuevoPedidoPageContent
         )}
       >
-        <PedidoForm
-          action={action}
-          initialState={initialState}
-          initialClienteLabel={initialClienteLabel}
-          marcas={marcas}
-          modelos={modelos}
-          motores={motores}
-          relations={relations}
-          trabajos={trabajos}
-        />
+        <TrabajosSeleccionProvider initialIds={[]} initialListaPrecios={initialState.values.listaPrecios}>
+          <RepuestosSeleccionProvider initialIds={[]}>
+            <PedidoForm
+              action={action}
+              initialState={initialState}
+              initialClienteLabel={initialClienteLabel}
+              marcas={marcas}
+              modelos={modelos}
+              motores={motores}
+              relations={relations}
+              trabajos={trabajos}
+              repuestos={repuestos}
+            />
+          </RepuestosSeleccionProvider>
+        </TrabajosSeleccionProvider>
 
         <aside
           className={cn(

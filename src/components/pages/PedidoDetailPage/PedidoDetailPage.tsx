@@ -9,6 +9,7 @@ import type {
   ModeloMotorRelation,
   Motor,
   PedidoDetail,
+  RepuestoAgrupado,
   TrabajoAgrupado,
 } from "@/lib/types";
 import {
@@ -29,6 +30,7 @@ import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
 import { TrabajosResumen } from "@/components/ui/TrabajosResumen/TrabajosResumen";
 import { TrabajosSeleccionProvider } from "@/components/forms/PedidoForm/TrabajosSeleccionContext";
+import { RepuestosSeleccionProvider } from "@/components/forms/PedidoForm/RepuestosSeleccionContext";
 import { formatDate, getVehicleLabel } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
@@ -48,6 +50,7 @@ type PedidoDetailPageProps = {
   motores: Motor[];
   relations: ModeloMotorRelation[];
   trabajos: TrabajoAgrupado[];
+  repuestos: RepuestoAgrupado[];
   qrSvg: string;
 };
 
@@ -61,6 +64,7 @@ export function PedidoDetailPage({
   motores,
   relations,
   trabajos,
+  repuestos,
   qrSvg,
 }: PedidoDetailPageProps) {
   const formId = `pedido-form-${pedido.id}`;
@@ -79,6 +83,7 @@ export function PedidoDetailPage({
   return (
     <PrioridadProvider initialValue={pedido.prioridad}>
     <CobradoProvider initialValue={pedido.cobrado}>
+    <RepuestosSeleccionProvider initialIds={pedido.repuestos_ids}>
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
       {/* Top bar: back button + save */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -170,6 +175,7 @@ export function PedidoDetailPage({
             motores={motores}
             relations={relations}
             trabajos={trabajos}
+            repuestos={repuestos}
             allowFinalizado
             showClienteSection={false}
             showPrioridadSection={false}
@@ -299,10 +305,10 @@ export function PedidoDetailPage({
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
                     <Icon name="clipboard" className="h-4 w-4 shrink-0" />
-                    Trabajos
+                    Items
                   </dt>
                 </div>
-                <TrabajosResumen trabajos={trabajos} />
+                <TrabajosResumen trabajos={trabajos} repuestos={repuestos} />
               </div>
             </dl>
           </Card>
@@ -327,6 +333,7 @@ export function PedidoDetailPage({
       </div>
       </TrabajosSeleccionProvider>
     </div>
+    </RepuestosSeleccionProvider>
     </CobradoProvider>
     </PrioridadProvider>
   );

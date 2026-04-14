@@ -2,6 +2,7 @@ import React from "react";
 import {
   Document,
   Font,
+  Image,
   Page,
   StyleSheet,
   Text,
@@ -9,6 +10,7 @@ import {
 } from "@react-pdf/renderer";
 import type { PedidoDetail } from "@/lib/types";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
+import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -24,7 +26,7 @@ const palette = {
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11,
     color: palette.foreground,
     paddingTop: 40,
     paddingBottom: 48,
@@ -36,24 +38,27 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
     marginBottom: 28,
     paddingBottom: 18,
     borderBottomWidth: 1,
     borderBottomColor: palette.border,
   },
-  headerLeft: { flexDirection: "column", gap: 2 },
+  headerLeft: { flexDirection: "column", gap: 3, flex: 1, paddingRight: 16 },
   companyName: { fontSize: 18, fontFamily: "Helvetica-Bold", color: palette.accent },
-  companyTagline: { fontSize: 9, color: palette.muted },
-  headerRight: { flexDirection: "column", alignItems: "flex-end", gap: 3 },
-  presupuestoLabel: { fontSize: 9, color: palette.muted, textTransform: "uppercase" },
+  companyTagline: { fontSize: 10, color: palette.muted },
+  companyMeta: { fontSize: 9, color: palette.muted },
+  headerRight: { flexDirection: "row", alignItems: "center", gap: 16 },
+  headerInfo: { flexDirection: "column", alignItems: "flex-end", gap: 3 },
+  qr: { width: 72, height: 72 },
+  presupuestoLabel: { fontSize: 10, color: palette.muted, textTransform: "uppercase" },
   presupuestoNum: { fontSize: 20, fontFamily: "Helvetica-Bold", color: palette.foreground },
-  headerMeta: { fontSize: 8, color: palette.muted },
+  headerMeta: { fontSize: 9, color: palette.muted },
 
   // Section
   section: { marginBottom: 16 },
   sectionTitle: {
-    fontSize: 8,
+    fontSize: 9,
     fontFamily: "Helvetica-Bold",
     color: palette.accent,
     textTransform: "uppercase",
@@ -72,21 +77,9 @@ const styles = StyleSheet.create({
   infoGrid: { flexDirection: "row", gap: 16 },
   infoCol: { flex: 1, gap: 5 },
   infoRow: { flexDirection: "row", gap: 6, alignItems: "center" },
-  infoLabel: { fontSize: 8, color: palette.muted, width: 56 },
-  infoValue: { fontSize: 9, color: palette.foreground, flex: 1 },
-  infoValueBold: { fontSize: 9, fontFamily: "Helvetica-Bold", color: palette.foreground, flex: 1 },
-
-  // Priority badge
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 20,
-    alignSelf: "flex-start",
-  },
-  badgeText: { fontSize: 8, fontFamily: "Helvetica-Bold" },
-  badgeAlta: { backgroundColor: "#ffe4e6", color: "#be123c" },
-  badgeNormal: { backgroundColor: "#e0f2fe", color: "#0369a1" },
-  badgeBaja: { backgroundColor: "#f1f5f9", color: "#475569" },
+  infoLabel: { fontSize: 9, color: palette.muted, width: 64 },
+  infoValue: { fontSize: 10, color: palette.foreground, flex: 1 },
+  infoValueBold: { fontSize: 10, fontFamily: "Helvetica-Bold", color: palette.foreground, flex: 1 },
 
   // Trabajos table
   tableHeader: {
@@ -97,7 +90,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  tableHeaderText: { fontSize: 8, fontFamily: "Helvetica-Bold", color: palette.white },
+  tableHeaderText: { fontSize: 9, fontFamily: "Helvetica-Bold", color: palette.white },
   tableRow: {
     flexDirection: "row",
     paddingHorizontal: 10,
@@ -108,8 +101,8 @@ const styles = StyleSheet.create({
   tableRowAlt: { backgroundColor: palette.surface },
   colNombre: { flex: 1 },
   colPrecio: { width: 72, textAlign: "right" },
-  tableCell: { fontSize: 9, color: palette.foreground },
-  tableCellMuted: { fontSize: 9, color: palette.muted },
+  tableCell: { fontSize: 10, color: palette.foreground },
+  tableCellMuted: { fontSize: 10, color: palette.muted },
 
   // Category heading inside table
   categoryRow: {
@@ -120,7 +113,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#fed7aa",
   },
-  categoryLabel: { fontSize: 8, fontFamily: "Helvetica-Bold", color: palette.accent },
+  categoryLabel: { fontSize: 9, fontFamily: "Helvetica-Bold", color: palette.accent },
 
   // Total
   totalRow: {
@@ -130,8 +123,8 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 10,
   },
-  totalLabel: { fontSize: 10, color: palette.muted },
-  totalValue: { fontSize: 14, fontFamily: "Helvetica-Bold", color: palette.foreground },
+  totalLabel: { fontSize: 11, color: palette.muted },
+  totalValue: { fontSize: 15, fontFamily: "Helvetica-Bold", color: palette.foreground },
 
   // Footer
   footer: {
@@ -145,7 +138,7 @@ const styles = StyleSheet.create({
     borderTopColor: palette.border,
     paddingTop: 8,
   },
-  footerText: { fontSize: 8, color: palette.muted },
+  footerText: { fontSize: 9, color: palette.muted },
 });
 
 function formatPrecio(value: number) {
@@ -183,21 +176,37 @@ function groupByCategory(trabajos: TrabajoDetalleItem[]) {
   return Array.from(map.values());
 }
 
+function groupRepuestosByCategory(repuestos: RepuestoDetalleItem[]) {
+  const map = new Map<
+    number,
+    { nombre: string; items: RepuestoDetalleItem[] }
+  >();
+
+  for (const r of repuestos) {
+    const group = map.get(r.categoriaId);
+    if (group) {
+      group.items.push(r);
+    } else {
+      map.set(r.categoriaId, { nombre: r.categoriaNombre, items: [r] });
+    }
+  }
+
+  return Array.from(map.values());
+}
+
 type Props = {
   pedido: PedidoDetail;
   trabajos: TrabajoDetalleItem[];
+  repuestos: RepuestoDetalleItem[];
+  qrDataUrl: string;
 };
 
-export function PresupuestoPdf({ pedido, trabajos }: Props) {
+export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props) {
   const groups = groupByCategory(trabajos);
-  const total = trabajos.reduce((sum, t) => sum + t.precio, 0);
-
-  const prioridadStyle =
-    pedido.prioridad === "alta"
-      ? [styles.badge, styles.badgeAlta]
-      : pedido.prioridad === "baja"
-        ? [styles.badge, styles.badgeBaja]
-        : [styles.badge, styles.badgeNormal];
+  const repuestoGroups = groupRepuestosByCategory(repuestos);
+  const total =
+    trabajos.reduce((sum, t) => sum + t.precio, 0) +
+    repuestos.reduce((sum, r) => sum + r.precio, 0);
 
   const allRows: Array<
     | { type: "category"; nombre: string }
@@ -223,18 +232,25 @@ export function PresupuestoPdf({ pedido, trabajos }: Props) {
           <View style={styles.headerLeft}>
             <Text style={styles.companyName}>Recticar</Text>
             <Text style={styles.companyTagline}>Rectificación de motores</Text>
+            <Text style={styles.companyMeta}>Tel: 02800 443-6272</Text>
+            <Text style={styles.companyMeta}>
+              Cadfan Hughes 164, U9100 Trelew, Chubut
+            </Text>
           </View>
           <View style={styles.headerRight}>
-            <Text style={styles.presupuestoLabel}>Presupuesto</Text>
-            <Text style={styles.presupuestoNum}>#{pedido.numero_pedido}</Text>
-            <Text style={styles.headerMeta}>
-              Creado: {formatDate(pedido.fecha_creacion)}
-            </Text>
-            {pedido.fecha_aprobacion ? (
+            <View style={styles.headerInfo}>
+              <Text style={styles.presupuestoLabel}>Presupuesto</Text>
+              <Text style={styles.presupuestoNum}>#{pedido.numero_pedido}</Text>
               <Text style={styles.headerMeta}>
-                Aprobado: {formatDate(pedido.fecha_aprobacion)}
+                Creado: {formatDate(pedido.fecha_creacion)}
               </Text>
-            ) : null}
+              {pedido.fecha_aprobacion ? (
+                <Text style={styles.headerMeta}>
+                  Aprobado: {formatDate(pedido.fecha_aprobacion)}
+                </Text>
+              ) : null}
+            </View>
+            <Image src={qrDataUrl} style={styles.qr} alt="" />
           </View>
         </View>
 
@@ -261,12 +277,12 @@ export function PresupuestoPdf({ pedido, trabajos }: Props) {
                   <Text style={styles.infoValue}>{pedido.cliente_cuit}</Text>
                 </View>
               ) : null}
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Prioridad</Text>
-                <View style={prioridadStyle}>
-                  <Text style={styles.badgeText}>{pedido.prioridad}</Text>
+              {pedido.cliente_telefono ? (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Teléfono</Text>
+                  <Text style={styles.infoValue}>{pedido.cliente_telefono}</Text>
                 </View>
-              </View>
+              ) : null}
             </View>
             <View style={styles.infoCol}>
               <View style={styles.infoRow}>
@@ -358,17 +374,53 @@ export function PresupuestoPdf({ pedido, trabajos }: Props) {
           )}
         </View>
 
-        {/* OBSERVACIONES */}
-        {pedido.observaciones ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Observaciones</Text>
+        {/* REPUESTOS */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Repuestos incluidos</Text>
+
+          {repuestos.length === 0 ? (
             <View style={styles.card}>
-              <Text style={{ fontSize: 9, color: palette.foreground, lineHeight: 1.5 }}>
-                {pedido.observaciones}
-              </Text>
+              <Text style={styles.tableCellMuted}>Sin repuestos seleccionados.</Text>
             </View>
-          </View>
-        ) : null}
+          ) : (
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: palette.border,
+                borderRadius: 6,
+                overflow: "hidden",
+              }}
+            >
+              <View style={styles.tableHeader}>
+                <Text style={[styles.tableHeaderText, styles.colNombre]}>
+                  Repuesto
+                </Text>
+                <Text style={[styles.tableHeaderText, styles.colPrecio]}>
+                  Precio
+                </Text>
+              </View>
+
+              {repuestoGroups.flatMap((group, groupIndex) => [
+                <View key={`rep-cat-${groupIndex}`} style={styles.categoryRow}>
+                  <Text style={styles.categoryLabel}>{group.nombre}</Text>
+                </View>,
+                ...group.items.map((item, index) => (
+                  <View
+                    key={item.repuestoId}
+                    style={index % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}
+                  >
+                    <Text style={[styles.tableCell, styles.colNombre]}>
+                      {item.repuestoNombre}
+                    </Text>
+                    <Text style={[styles.tableCell, styles.colPrecio]}>
+                      {item.precio > 0 ? formatPrecio(item.precio) : "-"}
+                    </Text>
+                  </View>
+                )),
+              ])}
+            </View>
+          )}
+        </View>
 
         {/* FOOTER */}
         <View style={styles.footer} fixed>

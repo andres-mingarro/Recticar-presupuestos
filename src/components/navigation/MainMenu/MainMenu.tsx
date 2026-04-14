@@ -11,6 +11,7 @@ const baseItems = [
   { href: "/clientes", label: "Clientes", icon: "user" as const, exact: false },
   { href: "/pedidos", label: "Pedidos", icon: "clipboard" as const, exact: false },
   { href: "/precios", label: "Precios", icon: "tag" as const, exact: false },
+  { href: "/repuestos", label: "Repuestos", icon: "package" as const, exact: false },
 ];
 
 function isActive(pathname: string, href: string, exact: boolean) {

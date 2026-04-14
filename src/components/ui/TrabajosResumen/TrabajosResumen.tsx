@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import type { TrabajoAgrupado } from "@/lib/types";
+import type { RepuestoAgrupado, TrabajoAgrupado } from "@/lib/types";
 import { useTrabajosSeleccion } from "@/components/forms/PedidoForm/TrabajosSeleccionContext";
+import { useRepuestosSeleccion } from "@/components/forms/PedidoForm/RepuestosSeleccionContext";
 import { formatPrice } from "@/lib/format";
 
 type TrabajosResumenProps = {
   trabajos: TrabajoAgrupado[];
+  repuestos?: RepuestoAgrupado[];
 };
 
 function getPrecio(t: TrabajoAgrupado["trabajos"][number], lista: 1 | 2 | 3) {
@@ -21,20 +23,28 @@ const LISTA_COLORS: Record<1 | 2 | 3, string> = {
   3: "bg-emerald-100 text-emerald-700",
 };
 
-export function TrabajosResumen({ trabajos }: TrabajosResumenProps) {
+export function TrabajosResumen({ trabajos, repuestos = [] }: TrabajosResumenProps) {
   const { selectedIds, listaPrecios } = useTrabajosSeleccion();
+  const { selectedIds: selectedRepuestosIds } = useRepuestosSeleccion();
 
   const selectedTrabajos = useMemo(
     () => trabajos.flatMap((g) => g.trabajos).filter((t) => selectedIds.has(t.id)),
     [trabajos, selectedIds]
   );
 
-  const total = useMemo(
-    () => selectedTrabajos.reduce((sum, t) => sum + getPrecio(t, listaPrecios), 0),
-    [selectedTrabajos, listaPrecios]
+  const selectedRepuestos = useMemo(
+    () => repuestos.flatMap((g) => g.repuestos).filter((r) => selectedRepuestosIds.has(r.id)),
+    [repuestos, selectedRepuestosIds]
   );
 
-  if (selectedTrabajos.length === 0) return null;
+  const total = useMemo(
+    () =>
+      selectedTrabajos.reduce((sum, t) => sum + getPrecio(t, listaPrecios), 0) +
+      selectedRepuestos.reduce((sum, r) => sum + r.precio, 0),
+    [selectedTrabajos, selectedRepuestos, listaPrecios]
+  );
+
+  if (selectedTrabajos.length === 0 && selectedRepuestos.length === 0) return null;
 
   return (
     <div className="TrabajosResumen space-y-1 rounded-xl bg-[var(--color-surface)] p-3 text-xs">
@@ -44,14 +54,36 @@ export function TrabajosResumen({ trabajos }: TrabajosResumenProps) {
           Lista {listaPrecios}
         </span>
       </div>
-      {selectedTrabajos.map((t) => (
-        <div key={t.id} className="flex items-baseline justify-between gap-2">
-          <span className="text-[var(--color-foreground-muted)]">{t.nombre}</span>
-          <span className="shrink-0 font-medium text-[var(--color-foreground)]">
-            {formatPrice(getPrecio(t, listaPrecios))}
-          </span>
+      {selectedTrabajos.length > 0 ? (
+        <div className="space-y-1.5">
+          <div className="pt-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
+            Trabajos
+          </div>
+          {selectedTrabajos.map((t) => (
+            <div key={t.id} className="flex items-baseline justify-between gap-2">
+              <span className="text-[var(--color-foreground-muted)]">{t.nombre}</span>
+              <span className="shrink-0 font-medium text-[var(--color-foreground)]">
+                {formatPrice(getPrecio(t, listaPrecios))}
+              </span>
+            </div>
+          ))}
         </div>
-      ))}
+      ) : null}
+      {selectedRepuestos.length > 0 ? (
+        <div className="space-y-1.5">
+          <div className="pt-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
+            Repuestos
+          </div>
+          {selectedRepuestos.map((r) => (
+            <div key={`repuesto-${r.id}`} className="flex items-baseline justify-between gap-2">
+              <span className="text-[var(--color-foreground-muted)]">{r.nombre}</span>
+              <span className="shrink-0 font-medium text-[var(--color-foreground)]">
+                {formatPrice(r.precio)}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : null}
       <div className="mt-2 flex items-baseline justify-between gap-2 border-t border-[var(--color-border)] pt-2">
         <span className="font-semibold text-[var(--color-foreground)]">Total</span>
         <span className="shrink-0 font-semibold text-[var(--color-accent)]">

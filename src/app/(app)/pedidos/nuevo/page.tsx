@@ -8,6 +8,7 @@ import {
   listMotores,
   listTrabajosAgrupados,
 } from "@/lib/queries/catalogo";
+import { listRepuestosAgrupados } from "@/lib/queries/repuestos";
 import { createPedido } from "@/lib/queries/pedidos";
 import { getClienteById } from "@/lib/queries/clientes";
 import type { PedidoFormValues } from "@/lib/types";
@@ -27,6 +28,7 @@ const initialState: PedidoFormState = {
     estado: "pendiente",
     observaciones: "",
     trabajosIds: [],
+    repuestosIds: [],
     listaPrecios: 1,
   },
 };
@@ -46,13 +48,14 @@ export default async function Page({
   const selectedClienteId =
     Number.isFinite(clienteIdParam) && clienteIdParam > 0 ? String(clienteIdParam) : "";
 
-  const [marcas, modelos, motores, relations, trabajos, cliente] =
+  const [marcas, modelos, motores, relations, trabajos, repuestos, cliente] =
     await Promise.all([
       listMarcas(),
       listModelos(),
       listMotores(),
       listModeloMotorRelations(),
       listTrabajosAgrupados(),
+      listRepuestosAgrupados(),
       selectedClienteId ? getClienteById(Number(selectedClienteId)) : Promise.resolve(null),
     ]);
 
@@ -95,6 +98,9 @@ export default async function Page({
       trabajosIds: formData
         .getAll("trabajosIds")
         .filter((value): value is string => typeof value === "string"),
+      repuestosIds: formData
+        .getAll("repuestosIds")
+        .filter((value): value is string => typeof value === "string"),
       listaPrecios: (Number(normalizeString(formData.get("listaPrecios"))) || 1) as 1 | 2 | 3,
     };
 
@@ -127,6 +133,7 @@ export default async function Page({
       motores={motores}
       relations={relations}
       trabajos={trabajos}
+      repuestos={repuestos}
     />
   );
 }
