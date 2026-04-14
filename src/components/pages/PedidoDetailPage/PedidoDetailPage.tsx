@@ -18,22 +18,22 @@ import {
   type PedidoFormState,
 } from "@/components/forms/PedidoForm";
 import { buttonStyles } from "@/components/ui/Button";
-import { StatusBadge } from "@/components/ui/Badge";
-import { CobradoBadge, CobradoProvider, CobradoToggle } from "@/components/ui/CobradoToggle";
+import { CobradoProvider, CobradoToggle } from "@/components/ui/CobradoToggle";
 import { EstadoStepper } from "@/components/ui/EstadoStepper";
 import {
   PrioridadProvider,
-  PrioridadBadge,
   PrioridadToggle,
+  usePrioridad,
 } from "@/components/ui/PrioridadSelector";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
-import { TrabajosResumen } from "@/components/ui/TrabajosResumen/TrabajosResumen";
 import { TrabajosSeleccionProvider } from "@/components/forms/PedidoForm/TrabajosSeleccionContext";
 import { RepuestosSeleccionProvider } from "@/components/forms/PedidoForm/RepuestosSeleccionContext";
-import { formatDate, getVehicleLabel } from "@/lib/format";
+import { getVehicleLabel } from "@/lib/format";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { useCobrado } from "@/components/ui/CobradoToggle/CobradoContext";
+import { PedidoDatosCard } from "@/components/ui/PedidoDatosCard";
 import { PrintButton } from "./PrintButton";
 import styles from "./PedidoDetailPage.module.scss";
 
@@ -221,97 +221,12 @@ export function PedidoDetailPage({
             <PrintButton />
           </Card>
 
-          <Card as="section" className="space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-              Datos del pedido
-            </p>
-
-            <dl className="space-y-3 text-sm">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
-                  <Icon name="clipboard" className="h-4 w-4 shrink-0" />
-                  Estado
-                </dt>
-                <dd>
-                  <StatusBadge estado={selectedEstado} />
-                </dd>
-              </div>
-
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
-                  <Icon name="check" className="h-4 w-4 shrink-0" />
-                  Cobro
-                </dt>
-                <dd>
-                  <CobradoBadge />
-                </dd>
-              </div>
-
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
-                  <Icon name="gauge" className="h-4 w-4 shrink-0" />
-                  Prioridad
-                </dt>
-                <dd>
-                  <PrioridadBadge />
-                </dd>
-              </div>
-
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
-                  <Icon name="car" className="h-4 w-4 shrink-0" />
-                  Vehículo
-                </dt>
-                <dd className="font-medium text-[var(--color-foreground)] sm:text-right">
-                  {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre, pedido.motor_nombre])}
-                </dd>
-              </div>
-
-              {pedido.numero_serie_motor ? (
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
-                    <Icon name="hash" className="h-4 w-4 shrink-0" />
-                    Serie
-                  </dt>
-                  <dd className="font-medium text-[var(--color-foreground)]">
-                    {pedido.numero_serie_motor}
-                  </dd>
-                </div>
-              ) : null}
-
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
-                  <Icon name="calendar" className="h-4 w-4 shrink-0" />
-                  Creación
-                </dt>
-                <dd className="font-medium text-[var(--color-foreground)]">
-                  {formatDate(pedido.fecha_creacion)}
-                </dd>
-              </div>
-
-              {pedido.fecha_aprobacion ? (
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
-                    <Icon name="calendar" className="h-4 w-4 shrink-0" />
-                    Aprobación
-                  </dt>
-                  <dd className="font-medium text-[var(--color-foreground)]">
-                    {formatDate(pedido.fecha_aprobacion)}
-                  </dd>
-                </div>
-              ) : null}
-
-              <div className="space-y-2">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
-                    <Icon name="clipboard" className="h-4 w-4 shrink-0" />
-                    Items
-                  </dt>
-                </div>
-                <TrabajosResumen trabajos={trabajos} repuestos={repuestos} />
-              </div>
-            </dl>
-          </Card>
+          <PedidoDetailSummaryCard
+            estado={selectedEstado}
+            pedido={pedido}
+            trabajos={trabajos}
+            repuestos={repuestos}
+          />
 
           <PedidoClienteSection
             initialClienteId={initialState.values.clienteId}
@@ -336,5 +251,36 @@ export function PedidoDetailPage({
     </RepuestosSeleccionProvider>
     </CobradoProvider>
     </PrioridadProvider>
+  );
+}
+
+function PedidoDetailSummaryCard({
+  estado,
+  pedido,
+  trabajos,
+  repuestos,
+}: {
+  estado: PedidoDetail["estado"];
+  pedido: PedidoDetail;
+  trabajos: TrabajoAgrupado[];
+  repuestos: RepuestoAgrupado[];
+}) {
+  const { cobrado } = useCobrado();
+  const { prioridad } = usePrioridad();
+
+  return (
+    <PedidoDatosCard
+      estado={estado}
+      cobrado={cobrado}
+      prioridad={prioridad}
+      marcaNombre={pedido.marca_nombre}
+      modeloNombre={pedido.modelo_nombre}
+      motorNombre={pedido.motor_nombre}
+      numeroSerieMotor={pedido.numero_serie_motor}
+      fechaCreacion={pedido.fecha_creacion}
+      fechaAprobacion={pedido.fecha_aprobacion}
+      trabajos={trabajos}
+      repuestos={repuestos}
+    />
   );
 }

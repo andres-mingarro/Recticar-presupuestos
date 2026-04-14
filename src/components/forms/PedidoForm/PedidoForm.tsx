@@ -34,6 +34,16 @@ export type PedidoFormState = {
   values: PedidoFormValues;
 };
 
+export type PedidoFormSummary = {
+  clienteLabel: string;
+  marcaNombre: string | null;
+  modeloNombre: string | null;
+  motorNombre: string | null;
+  numeroSerieMotor: string;
+  prioridad: PedidoPrioridad;
+  estado: PedidoFormValues["estado"];
+};
+
 type PedidoFormProps = {
   action: (
     state: PedidoFormState,
@@ -55,6 +65,7 @@ type PedidoFormProps = {
   externalFormAction?: (payload: FormData) => void;
   externalState?: PedidoFormState;
   externalIsPending?: boolean;
+  onSummaryChange?: (summary: PedidoFormSummary) => void;
 };
 
 const prioridadCards: Array<{
@@ -97,6 +108,7 @@ export function PedidoForm({
   externalFormAction,
   externalState,
   externalIsPending,
+  onSummaryChange,
 }: PedidoFormProps) {
   const [internalState, internalFormAction, internalIsPending] = useActionState(action, initialState);
   const state = externalState ?? internalState;
@@ -116,12 +128,28 @@ export function PedidoForm({
   const { selectedIds: selectedRepuestoIds, toggle: toggleRepuesto } = useRepuestosSeleccion();
   const [selectedMarca, setSelectedMarca] = useState(initialState.values.marcaId);
   const [selectedModelo, setSelectedModelo] = useState(initialState.values.modeloId);
+  const [selectedMotor, setSelectedMotor] = useState(initialState.values.motorId);
+  const [selectedNumeroSerieMotor, setSelectedNumeroSerieMotor] = useState(initialState.values.numeroSerieMotor);
   const [selectedPrioridad, setSelectedPrioridad] = useState(initialState.values.prioridad);
+  const [selectedEstado, setSelectedEstado] = useState(initialState.values.estado);
+  const [selectedClienteLabel, setSelectedClienteLabel] = useState(initialClienteLabel);
   const [selectedItemsTab, setSelectedItemsTab] = useState<"trabajos" | "repuestos">("trabajos");
 
   useEffect(() => {
     setSelectedPrioridad(state.values.prioridad);
   }, [state.values.prioridad]);
+
+  useEffect(() => {
+    setSelectedEstado(state.values.estado);
+  }, [state.values.estado]);
+
+  useEffect(() => {
+    setSelectedNumeroSerieMotor(state.values.numeroSerieMotor);
+  }, [state.values.numeroSerieMotor]);
+
+  useEffect(() => {
+    setSelectedClienteLabel(initialClienteLabel);
+  }, [initialClienteLabel]);
 
   const modelosFiltrados = useMemo(
     () =>
@@ -146,6 +174,42 @@ export function PedidoForm({
     [motores, motoresIds]
   );
 
+  const selectedMarcaNombre = useMemo(
+    () => marcas.find((marca) => String(marca.id) === selectedMarca)?.nombre ?? null,
+    [marcas, selectedMarca]
+  );
+
+  const selectedModeloNombre = useMemo(
+    () => modelos.find((modelo) => String(modelo.id) === selectedModelo)?.nombre ?? null,
+    [modelos, selectedModelo]
+  );
+
+  const selectedMotorNombre = useMemo(
+    () => motores.find((motor) => String(motor.id) === selectedMotor)?.nombre ?? null,
+    [motores, selectedMotor]
+  );
+
+  useEffect(() => {
+    onSummaryChange?.({
+      clienteLabel: selectedClienteLabel,
+      marcaNombre: selectedMarcaNombre,
+      modeloNombre: selectedModeloNombre,
+      motorNombre: selectedMotorNombre,
+      numeroSerieMotor: selectedNumeroSerieMotor,
+      prioridad: selectedPrioridad,
+      estado: selectedEstado,
+    });
+  }, [
+    onSummaryChange,
+    selectedClienteLabel,
+    selectedMarcaNombre,
+    selectedModeloNombre,
+    selectedMotorNombre,
+    selectedNumeroSerieMotor,
+    selectedPrioridad,
+    selectedEstado,
+  ]);
+
   return (
     <form
       id={formId}
@@ -166,6 +230,7 @@ export function PedidoForm({
           initialClienteId={state.values.clienteId}
           initialClienteLabel={initialClienteLabel}
           formId={formId}
+          onClienteLabelChange={setSelectedClienteLabel}
         />
       ) : null}
 
@@ -196,6 +261,7 @@ export function PedidoForm({
               onChange={(event) => {
                 setSelectedMarca(event.target.value);
                 setSelectedModelo("");
+                setSelectedMotor("");
               }}
             >
               <option value="">Seleccionar marca</option>
@@ -214,7 +280,10 @@ export function PedidoForm({
             <Select
               name="modeloId"
               value={selectedModelo}
-              onChange={(event) => setSelectedModelo(event.target.value)}
+              onChange={(event) => {
+                setSelectedModelo(event.target.value);
+                setSelectedMotor("");
+              }}
               disabled={!selectedMarca}
             >
               <option value="">Seleccionar modelo</option>
@@ -230,7 +299,12 @@ export function PedidoForm({
             <span className="text-sm font-medium text-[var(--color-foreground)]">
               Motor
             </span>
-            <Select name="motorId" defaultValue={state.values.motorId} disabled={!selectedModelo}>
+            <Select
+              name="motorId"
+              value={selectedMotor}
+              onChange={(event) => setSelectedMotor(event.target.value)}
+              disabled={!selectedModelo}
+            >
               <option value="">Seleccionar motor</option>
               {motoresFiltrados.map((motor) => (
                 <option key={motor.id} value={motor.id}>
@@ -247,7 +321,8 @@ export function PedidoForm({
             <Input
               name="numeroSerieMotor"
               placeholder="Ej. ABC-1234"
-              defaultValue={state.values.numeroSerieMotor}
+              value={selectedNumeroSerieMotor}
+              onChange={(event) => setSelectedNumeroSerieMotor(event.target.value)}
             />
           </label>
         </div>
@@ -434,6 +509,8 @@ export function PedidoForm({
           <EstadoStepper
             name="estado"
             initialValue={state.values.estado}
+            value={selectedEstado}
+            onChange={setSelectedEstado}
             allowFinalizado={allowFinalizado}
           />
 
@@ -506,10 +583,12 @@ export function PedidoClienteSection({
   initialClienteId = "",
   initialClienteLabel = "",
   formId,
+  onClienteLabelChange,
 }: {
   initialClienteId?: string;
   initialClienteLabel?: string;
   formId?: string;
+  onClienteLabelChange?: (label: string) => void;
 }) {
   return (
     <Card
@@ -537,6 +616,7 @@ export function PedidoClienteSection({
           initialId={initialClienteId}
           initialLabel={initialClienteLabel}
           form={formId}
+          onSelectionChange={(_, label) => onClienteLabelChange?.(label)}
         />
       </div>
     </Card>

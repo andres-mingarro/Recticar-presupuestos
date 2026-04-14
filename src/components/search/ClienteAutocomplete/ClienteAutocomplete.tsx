@@ -11,6 +11,7 @@ type ClienteAutocompleteProps = {
   initialLabel?: string;
   placeholder?: string;
   form?: string;
+  onSelectionChange?: (id: string, label: string) => void;
 };
 
 export function ClienteAutocomplete({
@@ -19,6 +20,7 @@ export function ClienteAutocomplete({
   initialLabel = "",
   placeholder = "Buscar por nombre o apellido...",
   form,
+  onSelectionChange,
 }: ClienteAutocompleteProps) {
   const [selectedId, setSelectedId] = useState(initialId);
   const [selectedLabel, setSelectedLabel] = useState(initialLabel);
@@ -79,8 +81,11 @@ export function ClienteAutocomplete({
   }, []);
 
   function selectCliente(cliente: ClienteListItem) {
-    setSelectedId(String(cliente.id));
-    setSelectedLabel(`#${cliente.numero_cliente} · ${cliente.apellido}, ${cliente.nombre}`);
+    const nextId = String(cliente.id);
+    const nextLabel = `#${cliente.numero_cliente} · ${cliente.apellido}, ${cliente.nombre}`;
+    setSelectedId(nextId);
+    setSelectedLabel(nextLabel);
+    onSelectionChange?.(nextId, nextLabel);
     setQuery("");
     setResults([]);
     setIsOpen(false);
@@ -90,6 +95,7 @@ export function ClienteAutocomplete({
   function clearSelection() {
     setSelectedId("");
     setSelectedLabel("");
+    onSelectionChange?.("", "");
     setQuery("");
     setResults([]);
     setIsOpen(false);
