@@ -9,6 +9,7 @@ export function CobradoBadge() {
   return (
     <span
       className={cn(
+        "CobradoBadge",
         "inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold",
         cobrado
           ? "bg-emerald-100 text-emerald-700"

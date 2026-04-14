@@ -13,6 +13,7 @@ export function Divider({
     <div
       aria-hidden="true"
       className={cn(
+        "Divider",
         orientation === "horizontal"
           ? "h-px w-full bg-[var(--color-border)]"
           : "h-full w-px self-stretch bg-[var(--color-border)]",

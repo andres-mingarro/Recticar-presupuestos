@@ -6,6 +6,8 @@ import { useActionState } from "react";
 import { cn } from "@/lib/cn";
 import type { ClienteFormValues } from "@/lib/types";
 import { buttonStyles } from "@/components/ui/Button";
+import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { Spinner } from "@/components/ui/Spinner";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import styles from "./ClienteForm.module.scss";
@@ -52,6 +54,11 @@ export function ClienteForm({
   onCancel,
 }: ClienteFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    if (isPending) setDirty(false);
+  }, [isPending]);
   const [internalIsEditing, setInternalIsEditing] = useState(!startInReadOnly);
   const isEditing = controlledIsEditing ?? internalIsEditing;
   const [provincias, setProvincias] = useState<string[]>([]);
@@ -190,6 +197,7 @@ export function ClienteForm({
   return (
     <form
       action={formAction}
+      onInput={() => setDirty(true)}
       className={cn("ClienteForm", styles.ClienteForm, "space-y-6")}
     >
       {title || description || startInReadOnly ? (
@@ -419,9 +427,10 @@ export function ClienteForm({
             styles.ClienteFormActions
           )}
         >
-          <button type="submit" className={buttonStyles()} disabled={isPending}>
+          <PulsatingButton type="submit" pulsing={dirty && !isPending} disabled={isPending} className="gap-2">
+            {isPending ? <Spinner className="h-4 w-4" /> : null}
             {isPending ? pendingLabel : submitLabel}
-          </button>
+          </PulsatingButton>
           {cancelMode === "toggle" ? (
             <button
               type="button"

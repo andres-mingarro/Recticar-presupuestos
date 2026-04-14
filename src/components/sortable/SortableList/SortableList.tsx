@@ -67,7 +67,7 @@ export function SortableList<TItem extends SortableItem>({
         strategy={verticalListSortingStrategy}
       >
         {renderHeader}
-        <div className="divide-y divide-[var(--color-border)]">
+        <div className="SortableList divide-y divide-[var(--color-border)]">
           {optimisticItems.map((item, index) => renderItem(item, index))}
         </div>
       </SortableContext>

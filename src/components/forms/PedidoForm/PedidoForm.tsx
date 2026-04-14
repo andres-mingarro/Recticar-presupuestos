@@ -22,6 +22,9 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { ClienteAutocomplete } from "@/components/search/ClienteAutocomplete";
+import { ButtonGroup } from "@/components/ui/ButtonGroup";
+import { Spinner } from "@/components/ui/Spinner";
+import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import styles from "./PedidoForm.module.scss";
 
 export type PedidoFormState = {
@@ -46,6 +49,9 @@ type PedidoFormProps = {
   showClienteSection?: boolean;
   showPrioridadSection?: boolean;
   showActions?: boolean;
+  externalFormAction?: (payload: FormData) => void;
+  externalState?: PedidoFormState;
+  externalIsPending?: boolean;
 };
 
 const prioridadCards: Array<{
@@ -56,20 +62,17 @@ const prioridadCards: Array<{
   {
     value: "baja",
     label: "Baja",
-    activeTone:
-      "border-slate-600 bg-slate-700 text-white shadow-[0_10px_24px_rgba(51,65,85,0.28)]",
+    activeTone: "border-slate-600 bg-[linear-gradient(135deg,#475569,#1e293b)] text-white shadow-[0_10px_24px_rgba(51,65,85,0.28)]",
   },
   {
     value: "normal",
     label: "Normal",
-    activeTone:
-      "border-sky-600 bg-sky-600 text-white shadow-[0_10px_24px_rgba(2,132,199,0.3)]",
+    activeTone: "border-sky-600 bg-[linear-gradient(135deg,#0284c7,#38bdf8)] text-white shadow-[0_10px_24px_rgba(2,132,199,0.3)]",
   },
   {
     value: "alta",
     label: "Alta",
-    activeTone:
-      "border-rose-600 bg-rose-600 text-white shadow-[0_10px_24px_rgba(225,29,72,0.3)]",
+    activeTone: "border-rose-600 bg-[linear-gradient(135deg,#e11d48,#fb7185)] text-white shadow-[0_10px_24px_rgba(225,29,72,0.3)]",
   },
 ];
 
@@ -87,8 +90,19 @@ export function PedidoForm({
   showClienteSection = true,
   showPrioridadSection = true,
   showActions = true,
+  externalFormAction,
+  externalState,
+  externalIsPending,
 }: PedidoFormProps) {
-  const [state, formAction, isPending] = useActionState(action, initialState);
+  const [internalState, internalFormAction, internalIsPending] = useActionState(action, initialState);
+  const state = externalState ?? internalState;
+  const formAction = externalFormAction ?? internalFormAction;
+  const isPending = externalIsPending ?? internalIsPending;
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    if (isPending) setDirty(false);
+  }, [isPending]);
   const { toggle: toggleTrabajo, listaPrecios, setListaPrecios } = useTrabajosSeleccion();
   const [selectedMarca, setSelectedMarca] = useState(initialState.values.marcaId);
   const [selectedModelo, setSelectedModelo] = useState(initialState.values.modeloId);
@@ -125,6 +139,8 @@ export function PedidoForm({
     <form
       id={formId}
       action={formAction}
+      onInput={() => setDirty(true)}
+      onClickCapture={() => setDirty(true)}
       className={cn("PedidoForm", styles.PedidoForm, "mb-12 space-y-6")}
     >
       {showClienteSection ? (
@@ -238,30 +254,15 @@ export function PedidoForm({
         {/* Selector de lista de precios */}
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium text-[var(--color-foreground)]">Lista de precios</span>
-          <div className="grid grid-cols-3 gap-2">
-            {([1, 2, 3] as const).map((lista) => {
-              const colors = {
-                1: "border-[var(--color-info-border-strong)] bg-[var(--color-info-bg)] text-[var(--color-info-text-strong)] ring-[var(--color-info-border-strong)]",
-                2: "border-[var(--color-violet-border)] bg-[var(--color-violet-bg)] text-[var(--color-violet-text)] ring-[var(--color-violet-border)]",
-                3: "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success-text-strong)] ring-[var(--color-success-border)]",
-              };
-              const active = listaPrecios === lista;
-              return (
-                <button
-                  key={lista}
-                  type="button"
-                  onClick={() => setListaPrecios(lista)}
-                  className={cn(
-                    "rounded-xl border px-4 py-2 text-sm font-semibold transition",
-                    colors[lista],
-                    active ? "ring-2" : "opacity-50 hover:opacity-80"
-                  )}
-                >
-                  Lista {lista}
-                </button>
-              );
-            })}
-          </div>
+          <ButtonGroup
+            options={[
+              { value: 1, label: "Lista 1" },
+              { value: 2, label: "Lista 2" },
+              { value: 3, label: "Lista 3" },
+            ]}
+            value={listaPrecios}
+            onChange={setListaPrecios}
+          />
           <input type="hidden" name="listaPrecios" value={listaPrecios} />
         </div>
 
@@ -323,28 +324,14 @@ export function PedidoForm({
             </h2>
           </div>
 
-          <div className="inline-flex w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5">
-            {prioridadCards.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setSelectedPrioridad(item.value)}
-                aria-pressed={selectedPrioridad === item.value}
-                className={cn(
-                  "flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]",
-                  selectedPrioridad === item.value
-                    ? item.activeTone
-                    : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]"
-                )}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
+          <ButtonGroup
+            options={prioridadCards}
+            value={selectedPrioridad}
+            onChange={setSelectedPrioridad}
+          />
           <input type="hidden" name="prioridad" value={selectedPrioridad} />
 
           <EstadoStepper
-            mode="form"
             name="estado"
             initialValue={state.values.estado}
             allowFinalizado={allowFinalizado}
@@ -363,8 +350,6 @@ export function PedidoForm({
         </Card>
       ) : (
         <>
-          <input type="hidden" name="prioridad" value={state.values.prioridad} />
-          <input type="hidden" name="estado" value={state.values.estado} />
           <Card
             as="section"
             className={cn("PedidoFormSection", styles.PedidoFormSection)}
@@ -396,13 +381,15 @@ export function PedidoForm({
 
       {showActions ? (
         <div className={cn("PedidoFormActions", styles.PedidoFormActions)}>
-          <button
+          <PulsatingButton
             type="submit"
-            className={buttonStyles({ className: "w-full flex-1" })}
+            pulsing={dirty && !isPending}
             disabled={isPending}
+            className="w-full flex-1 gap-2"
           >
-            {isPending ? "Guardando pedido..." : "Guardar pedido"}
-          </button>
+            {isPending ? <Spinner className="h-4 w-4" /> : null}
+            {isPending ? "Guardando..." : "Guardar pedido"}
+          </PulsatingButton>
           <Link
             href="/pedidos"
             className={buttonStyles({ variant: "secondary", className: "w-full flex-1" })}

@@ -39,6 +39,8 @@ export function StatusBadge({ estado }: { estado: PedidoEstado }) {
   const statusStyles = {
     pendiente:
       "border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]",
+    entregado:
+      "border-orange-200 bg-orange-50 text-orange-700",
     aprobado:
       "border-[var(--color-success-border)] bg-[var(--color-success-fill)] text-[var(--color-success-text-strong)]",
     finalizado:

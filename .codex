@@ -6,6 +6,7 @@
 - Tailwind CSS
 - SCSS Modules por componente
 - Neon PostgreSQL con `@neondatabase/serverless`
+- `qrcode` para generar SVG de etiquetas
 - Sin ORM
 
 ## Bases de datos
@@ -25,10 +26,13 @@
 - Cada componente tiene su archivo `*.module.scss`
 - Cada componente debe incluir una `className` raiz con el nombre del componente
 - Reutilizar `Card`, `Button`, `Badge`, `Table` y `PageHeader` antes de crear estilos nuevos
+- Para toggles y segmentados, priorizar componentes reutilizables como `ButtonGroup`, `CobradoToggle`, `PrioridadToggle` y `EstadoStepper`
+- Los botones principales pueden usar `PulsatingButton` para indicar cambios sin guardar y `Spinner` durante estados pending
 
 ## Estructura actual
 - `src/app/(app)/clientes`: listado, alta y detalle de clientes
 - `src/app/(app)/pedidos`: listado, alta y detalle de pedidos
+- `src/app/(app)/pedidos/[id]/etiqueta`: vista imprimible de etiqueta con QR
 - `src/app/(app)/precios`: administracion de trabajos y listas de precios
 - `src/app/(app)/informacion-tecnica`: administracion del catalogo tecnico externo
 - `src/app/api/clientes/search`: autocomplete de clientes
@@ -45,15 +49,29 @@
 - La edicion del cliente se abre en un acordeon desde el boton `EDITAR`
 - Los pedidos del cliente se muestran en dos cards: vigentes y finalizados
 - `/pedidos/nuevo` usa la base tecnica externa para marca, modelo y motor
-- `/pedidos/[id]` resuelve los nombres tecnicos desde la base externa
+- `/pedidos/[id]` resuelve los nombres tecnicos desde la base externa y concentra la edicion en un unico formulario cliente
+- `/pedidos/[id]` maneja `cobrado`, `prioridad` y `estado` dentro de la misma experiencia de guardado
+- `/pedidos/[id]/etiqueta` genera una etiqueta imprimible con QR al detalle del pedido
 - El PDF y los listados de pedidos tambien hidratan marca/modelo/motor desde la base externa
 - `/informacion-tecnica` permite ver y editar `marcas`, `modelos`, `motores` y `vehiculos`
 - `/informacion-tecnica` carga por seccion activa, con busqueda y paginacion server-side para evitar timeouts por volumen
 - `admin` y `superuser` pueden editar informacion tecnica; `operador` queda en solo lectura
 
+## Pedidos
+- `PedidoDetailPage` es cliente y comparte una sola accion de guardado con `PedidoForm`
+- `PedidoForm` acepta `externalFormAction`, `externalState` y `externalIsPending` para reutilizar el mismo submit desde pantallas contenedoras
+- `Prioridad` y `Cobrado` tienen UI sincronizada por contexto para reflejar cambios antes del submit
+- `EstadoStepper` tiene version interactiva para formularios y `EstadoStepperDisplay` para solo lectura
+- El helper `src/lib/qr.ts` genera SVG embebible a partir de una URL
+- La URL base para QR usa `NEXT_PUBLIC_BASE_URL` y cae a `http://localhost:3000` si no existe
+
+## Estados y migraciones
+- Las migraciones SQL viven en `migrations/`
+- Existe la migracion `011_add_estado_entregado.sql` para agregar `entregado` al enum `pedido_estado`
+- Revisar consistencia entre estados persistidos, labels del stepper y filtros/listados cuando se agreguen estados nuevos
+
 ## Notas
 - `DATABASE_URL` y `TECHNICAL_DATABASE_URL` se leen desde `.env.local`
-- Las migraciones SQL viven en `migrations/`
 - Los scripts de desarrollo para seed/reset viven en `scripts/`
 - `npm run db:migrate` aplica migraciones sobre la base principal
 - `npm run db:reset:dev` borra solo clientes y pedidos fake marcados como `DEV-SEED`

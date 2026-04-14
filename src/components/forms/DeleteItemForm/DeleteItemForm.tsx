@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { Icon } from "@/components/ui/Icon";
+import { Spinner } from "@/components/ui/Spinner";
 
 type DeleteItemFormProps = {
   itemId: number;
@@ -20,7 +21,7 @@ export function DeleteItemForm({
   const [state, formAction, isPending] = useActionState(action, { error: null });
 
   return (
-    <div>
+    <div className="DeleteItemForm">
       <form action={formAction}>
         <input type="hidden" name={idFieldName} value={itemId} />
         <button
@@ -30,7 +31,7 @@ export function DeleteItemForm({
           title={title}
           className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] disabled:opacity-40"
         >
-          <Icon name="trash" className="h-4 w-4" />
+          {isPending ? <Spinner className="h-4 w-4" /> : <Icon name="trash" className="h-4 w-4" />}
         </button>
       </form>
       {state.error ? (

@@ -114,7 +114,7 @@ export function ClienteAutocomplete({
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="ClienteAutocomplete relative">
       {/* Hidden input for form submission */}
       <input type="hidden" name={name} value={selectedId} form={form} />
 

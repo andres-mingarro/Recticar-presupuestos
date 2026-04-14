@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useActionState, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import type {
   Marca,
@@ -16,19 +19,20 @@ import {
 import { buttonStyles } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
 import { CobradoBadge, CobradoProvider, CobradoToggle } from "@/components/ui/CobradoToggle";
+import { EstadoStepper } from "@/components/ui/EstadoStepper";
 import {
-  EstadoStepperAction,
-  type ChangeEstadoActionState,
-} from "@/components/ui/EstadoStepper";
-import {
-  PrioridadSelector,
-  type ChangePrioridadActionState,
+  PrioridadProvider,
+  PrioridadBadge,
+  PrioridadToggle,
 } from "@/components/ui/PrioridadSelector";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
 import { TrabajosResumen } from "@/components/ui/TrabajosResumen/TrabajosResumen";
 import { TrabajosSeleccionProvider } from "@/components/forms/PedidoForm/TrabajosSeleccionContext";
 import { formatDate, getVehicleLabel } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
+import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { PrintButton } from "./PrintButton";
 import styles from "./PedidoDetailPage.module.scss";
 
 type PedidoDetailPageProps = {
@@ -37,14 +41,6 @@ type PedidoDetailPageProps = {
     state: PedidoFormState,
     formData: FormData
   ) => Promise<PedidoFormState>;
-  changeEstadoAction: (
-    prevState: ChangeEstadoActionState,
-    formData: FormData
-  ) => Promise<ChangeEstadoActionState>;
-  changePrioridadAction: (
-    prevState: ChangePrioridadActionState,
-    formData: FormData
-  ) => Promise<ChangePrioridadActionState>;
   initialState: PedidoFormState;
   wasUpdated: boolean;
   marcas: Marca[];
@@ -52,13 +48,12 @@ type PedidoDetailPageProps = {
   motores: Motor[];
   relations: ModeloMotorRelation[];
   trabajos: TrabajoAgrupado[];
+  qrSvg: string;
 };
 
 export function PedidoDetailPage({
   pedido,
   action,
-  changeEstadoAction,
-  changePrioridadAction,
   initialState,
   wasUpdated,
   marcas,
@@ -66,101 +61,160 @@ export function PedidoDetailPage({
   motores,
   relations,
   trabajos,
+  qrSvg,
 }: PedidoDetailPageProps) {
   const formId = `pedido-form-${pedido.id}`;
+  const [formState, formAction, isPending] = useActionState(action, initialState);
+  const [dirty, setDirty] = useState(false);
+  const [selectedEstado, setSelectedEstado] = useState(pedido.estado);
+
+  useEffect(() => {
+    if (isPending) setDirty(false);
+  }, [isPending]);
+
+  useEffect(() => {
+    setSelectedEstado(formState.values.estado);
+  }, [formState.values.estado]);
 
   return (
+    <PrioridadProvider initialValue={pedido.prioridad}>
     <CobradoProvider initialValue={pedido.cobrado}>
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
-      {/* Top bar: back button + PDF download */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Link
-            href="/pedidos"
-            className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
-          >
-            <Icon name="chevronLeft" className="h-4 w-4" />
-            Volver al listado
-          </Link>
-
-          <button
-            type="submit"
-            form={formId}
-            className={buttonStyles({ className: "w-full sm:w-auto" })}
-          >
-            Guardar pedido
-          </button>
-        </div>
-
-        <a
-          href={`/api/pedidos/${pedido.id}/pdf`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonStyles({
-            className:
-              "w-full gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white sm:w-auto",
-          })}
+      {/* Top bar: back button + save */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <Link
+          href="/pedidos"
+          className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
         >
-          <Icon name="download" className="h-4 w-4" />
-          DESCARGAR PRESUPUESTO
-        </a>
+          <Icon name="chevronLeft" className="h-4 w-4" />
+          Volver al listado
+        </Link>
+
+        <PulsatingButton
+          type="submit"
+          form={formId}
+          disabled={isPending}
+          pulsing={dirty && !isPending}
+          className="w-full sm:w-auto gap-2"
+        >
+          {isPending ? <Spinner className="h-4 w-4" /> : null}
+          {isPending ? "Guardando..." : "Guardar pedido"}
+        </PulsatingButton>
       </div>
-
-      <Card as="section" className="space-y-5">
-        {/* Title row */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
-              Pedido #{pedido.numero_pedido}
-            </p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">
-              {pedido.cliente_nombre ?? "Sin cliente"}
-            </h1>
-          </div>
-          <div className="flex shrink-0 items-center gap-4">
-            <CobradoToggle form={formId} />
-            {pedido.cliente_id ? (
-              <Link
-                href={`/clientes/${pedido.cliente_id}`}
-                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--color-accent)] underline underline-offset-4 transition-opacity hover:opacity-70"
-              >
-                Ver ficha del cliente
-                <Icon name="arrowRight" className="h-3.5 w-3.5" />
-              </Link>
-            ) : (
-              <span className="text-sm text-[var(--color-foreground-muted)]">Sin cliente asignado</span>
-            )}
-          </div>
-        </div>
-
-        {/* Estado stepper */}
-        <EstadoStepperAction value={pedido.estado} action={changeEstadoAction} />
-      </Card>
-
-      {wasUpdated ? (
-        <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
-          Los cambios del pedido se guardaron correctamente.
-        </section>
-      ) : null}
 
       <TrabajosSeleccionProvider initialIds={pedido.trabajos_ids} initialListaPrecios={(pedido.lista_precio as 1 | 2 | 3) ?? 1}>
       <div className={cn("PedidoDetailPageContent", styles.PedidoDetailPageContent)}>
-        <PedidoForm
-          formId={formId}
-          action={action}
-          initialState={initialState}
-          initialClienteLabel={pedido.cliente_nombre ?? ""}
-          marcas={marcas}
-          modelos={modelos}
-          motores={motores}
-          relations={relations}
-          trabajos={trabajos}
-          allowFinalizado
-          showClienteSection={false}
-          showPrioridadSection={false}
-        />
+        <div className={cn("PedidoDetailPageMain", styles.PedidoDetailPageMain)}>
+          <Card as="section" className="space-y-5">
+            {/* Title row */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
+                  Pedido #{pedido.numero_pedido}
+                </p>
+                <div className="mt-1 flex items-center gap-2">
+                  <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                    {pedido.cliente_nombre ?? "Sin cliente"}
+                  </h1>
+                  {pedido.cliente_id ? (
+                    <Link
+                      href={`/clientes/${pedido.cliente_id}`}
+                      className={buttonStyles({ variant: "secondary", size: "sm", className: "gap-1.5 shrink-0" })}
+                    >
+                      <Icon name="idCard" className="h-3.5 w-3.5" />
+                      Ficha
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+              {!pedido.cliente_id ? (
+                <span className="text-sm text-[var(--color-foreground-muted)]">Sin cliente asignado</span>
+              ) : null}
+            </div>
+
+            {/* Cobrado + Prioridad */}
+            <div className="flex gap-3" onClickCapture={() => setDirty(true)}>
+              <CobradoToggle form={formId} />
+              <PrioridadToggle form={formId} />
+            </div>
+
+            {/* Estado stepper */}
+            <div onClickCapture={() => setDirty(true)}>
+              <EstadoStepper
+                name="estado"
+                initialValue={pedido.estado}
+                value={selectedEstado}
+                onChange={setSelectedEstado}
+                form={formId}
+              />
+            </div>
+          </Card>
+
+          {wasUpdated ? (
+            <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
+              Los cambios del pedido se guardaron correctamente.
+            </section>
+          ) : null}
+
+          <div onInput={() => setDirty(true)}>
+          <PedidoForm
+            formId={formId}
+            action={action}
+            initialState={initialState}
+            externalFormAction={formAction}
+            externalState={formState}
+            externalIsPending={isPending}
+            initialClienteLabel={pedido.cliente_nombre ?? ""}
+            marcas={marcas}
+            modelos={modelos}
+            motores={motores}
+            relations={relations}
+            trabajos={trabajos}
+            allowFinalizado
+            showClienteSection={false}
+            showPrioridadSection={false}
+          />
+          </div>
+        </div>
 
         <aside className={cn("PedidoDetailPageSidebar", styles.PedidoDetailPageSidebar)}>
+          <Card as="section" className="flex flex-col gap-3">
+            <a
+              href={`/api/pedidos/${pedido.id}/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonStyles({
+                className:
+                  "w-full gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white",
+              })}
+            >
+              <Icon name="download" className="h-4 w-4" />
+              DESCARGAR PRESUPUESTO
+            </a>
+
+            {/* Etiqueta QR */}
+            <div className={styles.etiquetaWrapper}>
+              <div className={styles.etiqueta}>
+                <div
+                  className={styles.etiquetaQr}
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG generado internamente
+                  dangerouslySetInnerHTML={{ __html: qrSvg }}
+                />
+                <div className={styles.etiquetaInfo}>
+                  <p className={styles.etiquetaNumero}>#{pedido.numero_pedido}</p>
+                  <p className={styles.etiquetaCliente}>{pedido.cliente_nombre ?? "Sin cliente"}</p>
+                  {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre, pedido.motor_nombre]) ? (
+                    <p className={styles.etiquetaVehiculo}>
+                      {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre, pedido.motor_nombre])}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            <PrintButton />
+          </Card>
+
           <Card as="section" className="space-y-4">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Datos del pedido
@@ -173,7 +227,7 @@ export function PedidoDetailPage({
                   Estado
                 </dt>
                 <dd>
-                  <StatusBadge estado={pedido.estado} />
+                  <StatusBadge estado={selectedEstado} />
                 </dd>
               </div>
 
@@ -193,7 +247,7 @@ export function PedidoDetailPage({
                   Prioridad
                 </dt>
                 <dd>
-                  <PrioridadSelector value={pedido.prioridad} action={changePrioridadAction} />
+                  <PrioridadBadge />
                 </dd>
               </div>
 
@@ -274,5 +328,6 @@ export function PedidoDetailPage({
       </TrabajosSeleccionProvider>
     </div>
     </CobradoProvider>
+    </PrioridadProvider>
   );
 }

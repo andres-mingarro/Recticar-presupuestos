@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 import { SearchBox, searchConfigs, type SearchEntity } from "@/components/search/SearchBox";
 import { buttonStyles } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
@@ -19,7 +20,7 @@ export function SearchForm({
   const config = searchConfigs[entity];
 
   return (
-    <form className={className}>
+    <form className={cn("SearchForm", className)}>
       <label className="grid gap-2">
         <span className="text-sm font-medium text-[var(--color-foreground)]">
           {config.label}
