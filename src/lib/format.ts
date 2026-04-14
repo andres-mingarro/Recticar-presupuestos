@@ -66,6 +66,14 @@ export function formatPrice(value: number) {
   }).format(value);
 }
 
+export function toIntegerPrice(value: number) {
+  if (!Number.isFinite(value) || value < 0) {
+    return 0;
+  }
+
+  return Math.round(value);
+}
+
 export function getVehicleLabel(parts: Array<string | null | undefined>) {
   const filtered = parts.map((part) => part?.trim()).filter(Boolean);
   return filtered.length > 0 ? filtered.join(" / ") : "Vehículo sin definir";

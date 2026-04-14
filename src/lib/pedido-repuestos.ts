@@ -1,3 +1,4 @@
+import { toIntegerPrice } from "@/lib/format";
 import type { PedidoRepuestoValue } from "@/lib/types";
 
 export function parsePedidoRepuestos(formData: FormData): PedidoRepuestoValue[] {
@@ -10,7 +11,7 @@ export function parsePedidoRepuestos(formData: FormData): PedidoRepuestoValue[] 
 
       return {
         repuestoId,
-        precioUnitario: Number.isFinite(precio) && precio >= 0 ? precio : 0,
+        precioUnitario: toIntegerPrice(precio),
         cantidad: Number.isFinite(cantidad) && cantidad >= 1 ? Math.trunc(cantidad) : 1,
       };
     });

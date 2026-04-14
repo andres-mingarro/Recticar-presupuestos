@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { toIntegerPrice } from "@/lib/format";
 import {
   createCategoria,
   createTrabajo,
@@ -38,7 +39,7 @@ export async function updateCategoriaTrabajos(
     if (key.startsWith("precio_lista_")) {
       const [, , lista, rawId] = key.split("_");
       const id = Number(rawId);
-      const precio = Number(value);
+      const precio = toIntegerPrice(Number(value));
 
       if (Number.isNaN(id) || Number.isNaN(precio) || precio < 0) {
         continue;

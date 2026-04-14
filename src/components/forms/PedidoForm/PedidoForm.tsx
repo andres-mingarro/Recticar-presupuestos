@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
+import { formatPrice } from "@/lib/format";
 import type {
   Marca,
   Modelo,
@@ -487,11 +488,11 @@ export function PedidoForm({
                                 +
                               </button>
                             </div>
-                            <span className="text-left font-semibold text-[var(--color-foreground)] md:text-right">
-                              ${(
+                            <span className="text-left text-base font-bold text-[var(--color-foreground)] md:text-right">
+                              {formatPrice(
                                 (selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0) *
-                                (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
-                              ).toLocaleString("es-AR")}
+                                  (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
+                              )}
                             </span>
                           </PedidoItemCard>
                         ))}

@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { TrabajoAgrupado } from "@/lib/types";
 import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { cn } from "@/lib/cn";
+import { formatPrice } from "@/lib/format";
 import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { buttonStyles } from "@/components/ui/Button";
@@ -27,8 +28,7 @@ const LISTA_COLORS = [
 ];
 
 function formatPrecio(value: number | null | undefined) {
-  if (!value) return "$0";
-  return `$${value.toLocaleString("es-AR")}`;
+  return formatPrice(value ?? 0);
 }
 
 function DragHandle(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
