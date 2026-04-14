@@ -205,7 +205,7 @@ export function PedidoDetailPage({
             </a>
 
             {/* Etiqueta QR */}
-            <div className={styles.etiquetaWrapper}>
+            <div id="etiqueta-qr-print" className={styles.etiquetaWrapper}>
               <div className={styles.etiqueta}>
                 <div
                   className={styles.etiquetaQr}

@@ -83,27 +83,8 @@
   white-space: nowrap;
 }
 
-/* ─── Print: solo la etiqueta ─── */
+/* ─── Print: solo la etiqueta (posicionamiento y sizing vía globals.css) ─── */
 @media print {
-  /* Ocultar todo el body, luego revelar solo la etiqueta */
-  :global(body *) {
-    visibility: hidden !important;
-  }
-
-  .etiquetaWrapper,
-  .etiquetaWrapper * {
-    visibility: visible !important;
-  }
-
-  .etiquetaWrapper {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    border: none !important;
-    overflow: visible !important;
-  }
-
   .etiqueta {
     width: 8cm;
     height: 6cm;
