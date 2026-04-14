@@ -123,8 +123,27 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 10,
   },
+  totalsCard: {
+    marginTop: 12,
+    marginLeft: "auto",
+    width: 220,
+    gap: 8,
+  },
+  totalsLine: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+  },
+  totalsLineStrong: {
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: palette.border,
+  },
   totalLabel: { fontSize: 11, color: palette.muted },
   totalValue: { fontSize: 15, fontFamily: "Helvetica-Bold", color: palette.foreground },
+  subtotalLabel: { fontSize: 9, color: palette.muted },
+  subtotalValue: { fontSize: 9, color: palette.foreground },
 
   // Footer
   footer: {
@@ -204,9 +223,9 @@ type Props = {
 export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props) {
   const groups = groupByCategory(trabajos);
   const repuestoGroups = groupRepuestosByCategory(repuestos);
-  const total =
-    trabajos.reduce((sum, t) => sum + t.precio, 0) +
-    repuestos.reduce((sum, r) => sum + r.precio, 0);
+  const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio, 0);
+  const totalRepuestos = repuestos.reduce((sum, r) => sum + r.precio, 0);
+  const totalGeneral = totalTrabajos + totalRepuestos;
 
   const allRows: Array<
     | { type: "category"; nombre: string }
@@ -365,11 +384,10 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
             </View>
           )}
 
-          {/* Total */}
           {trabajos.length > 0 && (
             <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Total estimado</Text>
-              <Text style={styles.totalValue}>{formatPrecio(total)}</Text>
+              <Text style={styles.subtotalLabel}>Total trabajos</Text>
+              <Text style={styles.subtotalValue}>{formatPrecio(totalTrabajos)}</Text>
             </View>
           )}
         </View>
@@ -420,6 +438,31 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
               ])}
             </View>
           )}
+
+          {repuestos.length > 0 && (
+            <View style={styles.totalRow}>
+              <Text style={styles.subtotalLabel}>Total repuestos</Text>
+              <Text style={styles.subtotalValue}>{formatPrecio(totalRepuestos)}</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Totales</Text>
+          <View style={[styles.card, styles.totalsCard]}>
+            <View style={styles.totalsLine}>
+              <Text style={styles.subtotalLabel}>Trabajos</Text>
+              <Text style={styles.subtotalValue}>{formatPrecio(totalTrabajos)}</Text>
+            </View>
+            <View style={styles.totalsLine}>
+              <Text style={styles.subtotalLabel}>Repuestos</Text>
+              <Text style={styles.subtotalValue}>{formatPrecio(totalRepuestos)}</Text>
+            </View>
+            <View style={[styles.totalsLine, styles.totalsLineStrong]}>
+              <Text style={styles.totalLabel}>Total general</Text>
+              <Text style={styles.totalValue}>{formatPrecio(totalGeneral)}</Text>
+            </View>
+          </View>
         </View>
 
         {/* FOOTER */}

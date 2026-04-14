@@ -154,6 +154,13 @@ export function PedidoForm({
       onClickCapture={() => setDirty(true)}
       className={cn("PedidoForm", styles.PedidoForm, "mb-12 space-y-6")}
     >
+      {Array.from(selectedTrabajoIds).map((id) => (
+        <input key={`trabajo-hidden-${id}`} type="hidden" name="trabajosIds" value={id} />
+      ))}
+      {Array.from(selectedRepuestoIds).map((id) => (
+        <input key={`repuesto-hidden-${id}`} type="hidden" name="repuestosIds" value={id} />
+      ))}
+
       {showClienteSection ? (
         <PedidoClienteSection
           initialClienteId={state.values.clienteId}
@@ -329,7 +336,6 @@ export function PedidoForm({
                           >
                             <input
                               type="checkbox"
-                              name="trabajosIds"
                               value={trabajo.id}
                               checked={selectedTrabajoIds.has(trabajo.id)}
                               onChange={(e) => toggleTrabajo(trabajo.id, e.target.checked)}
@@ -379,7 +385,6 @@ export function PedidoForm({
                             <div className="flex items-start gap-3">
                               <input
                                 type="checkbox"
-                                name="repuestosIds"
                                 value={repuesto.id}
                                 checked={selectedRepuestoIds.has(repuesto.id)}
                                 onChange={(e) => toggleRepuesto(repuesto.id, e.target.checked)}
