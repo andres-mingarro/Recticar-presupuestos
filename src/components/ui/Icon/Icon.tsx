@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import type { IconDefinition, SizeProp } from "@fortawesome/fontawesome-svg-core";
 import {
   faArrowRight,
   faBoxOpen,
@@ -10,6 +10,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faClipboard,
+  faClipboardList,
   faClock,
   faDownload,
   faEnvelope,
@@ -18,6 +19,7 @@ import {
   faHashtag,
   faIdCard,
   faKey,
+  faListCheck,
   faLocationDot,
   faMagnifyingGlass,
   faPenToSquare,
@@ -48,10 +50,12 @@ export type IconName =
   | "user"
   | "phone"
   | "clipboard"
+  | "clipboardList"
   | "car"
   | "gauge"
   | "calendar"
   | "clock"
+  | "listCheck"
   | "edit"
   | "mail"
   | "mapPin"
@@ -71,6 +75,7 @@ export type IconName =
 type IconProps = {
   name: IconName;
   className?: string;
+  size?: SizeProp;
 };
 
 const ICONS: Record<IconName, IconDefinition> = {
@@ -85,10 +90,12 @@ const ICONS: Record<IconName, IconDefinition> = {
   user: faUser,
   phone: faPhone,
   clipboard: faClipboard,
+  clipboardList: faClipboardList,
   car: faCarSide,
   gauge: faGaugeHigh,
   calendar: faCalendarDays,
   clock: faClock,
+  listCheck: faListCheck,
   edit: faPenToSquare,
   mail: faEnvelope,
   mapPin: faLocationDot,
@@ -106,11 +113,12 @@ const ICONS: Record<IconName, IconDefinition> = {
   settings: faGear,
 };
 
-export function Icon({ name, className }: IconProps) {
+export function Icon({ name, className, size }: IconProps) {
   return (
     <FontAwesomeIcon
       icon={ICONS[name]}
       aria-hidden
+      size={size}
       className={cn("Icon", styles.Icon, className)}
     />
   );

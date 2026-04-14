@@ -1,0 +1,180 @@
+.CheckboxBeauti {
+  --checkbox-size: 33px;
+  --checkbox-color-off: #94a3b8;
+  --checkbox-color-on: var(--color-accent);
+  --checkbox-color: var(--checkbox-color-off);
+  --checkbox-border: color-mix(in srgb, var(--checkbox-color) 28%, transparent);
+  --checkbox-surface: color-mix(in srgb, var(--checkbox-color) 12%, white);
+  --checkbox-ring: color-mix(in srgb, var(--checkbox-color-on) 20%, white);
+
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  transition: transform 0.14s ease;
+}
+
+.CheckboxBeauti:active {
+  transform: rotateX(30deg);
+}
+
+.CheckboxBeautiInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.CheckboxBeautiIndicator {
+  border: 3px solid var(--checkbox-border);
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 30%, white, var(--checkbox-surface));
+  position: relative;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 10px 20px color-mix(in srgb, var(--checkbox-color) 12%, transparent);
+}
+
+.CheckboxBeautiIcon {
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  display: block;
+  position: absolute;
+  inset: -3px;
+  z-index: 1;
+  fill: none;
+  stroke-width: 3.6;
+  stroke: var(--checkbox-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dashoffset: 124.6;
+  stroke-dasharray: 0 162.6 133 29.6;
+  transition: all 0.4s ease 0s;
+}
+
+.CheckboxBeautiIndicator::before,
+.CheckboxBeautiIndicator::after {
+  content: "";
+  width: 3px;
+  height: 16px;
+  background: var(--checkbox-color);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 5px;
+}
+
+.CheckboxBeautiIndicator::before {
+  opacity: 0;
+  transform: scale(0.3) translate(-50%, -50%) rotate(45deg);
+  animation: checkbox-beauti-in-before 0.3s linear forwards 0.3s;
+}
+
+.CheckboxBeautiIndicator::after {
+  opacity: 0;
+  transform: scale(0.3) translate(-50%, -50%) rotate(-45deg);
+  animation: checkbox-beauti-in-after 0.3s linear forwards 0.3s;
+}
+
+.CheckboxBeautiInput:checked + .CheckboxBeautiIndicator .CheckboxBeautiIcon {
+  stroke-dashoffset: 162.6;
+  stroke-dasharray: 0 162.6 28 134.6;
+  transition: all 0.4s ease 0.2s;
+}
+
+.CheckboxBeautiInput:checked + .CheckboxBeautiIndicator {
+  --checkbox-color: var(--checkbox-color-on);
+  --checkbox-border: color-mix(in srgb, var(--checkbox-color-on) 60%, white);
+  --checkbox-surface: color-mix(in srgb, var(--checkbox-color-on) 12%, white);
+}
+
+.CheckboxBeautiInput:checked + .CheckboxBeautiIndicator::before {
+  opacity: 0;
+  transform: scale(0.3) translate(-50%, -50%) rotate(45deg);
+  animation: checkbox-beauti-out-before 0.3s linear forwards 0s;
+}
+
+.CheckboxBeautiInput:checked + .CheckboxBeautiIndicator::after {
+  opacity: 0;
+  transform: scale(0.3) translate(-50%, -50%) rotate(-45deg);
+  animation: checkbox-beauti-out-after 0.3s linear forwards 0s;
+}
+
+.CheckboxBeautiInput:focus-visible + .CheckboxBeautiIndicator {
+  outline: 2px solid var(--checkbox-ring);
+  outline-offset: 4px;
+}
+
+.CheckboxBeautiInput:disabled + .CheckboxBeautiIndicator {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.CheckboxBeautiLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+@keyframes checkbox-beauti-in-before {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translate(-50%, -50%) rotate(45deg);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1) translate(-50%, -50%) rotate(45deg);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(0.89) translate(-50%, -50%) rotate(45deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%) rotate(45deg);
+  }
+}
+
+@keyframes checkbox-beauti-in-after {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translate(-50%, -50%) rotate(-45deg);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1) translate(-50%, -50%) rotate(-45deg);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(0.89) translate(-50%, -50%) rotate(-45deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%) rotate(-45deg);
+  }
+}
+
+@keyframes checkbox-beauti-out-before {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translate(-50%, -50%) rotate(45deg);
+  }
+}
+
+@keyframes checkbox-beauti-out-after {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%) rotate(-45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translate(-50%, -50%) rotate(-45deg);
+  }
+}

@@ -16,6 +16,7 @@ import type {
 } from "@/lib/types";
 import { useTrabajosSeleccion } from "./TrabajosSeleccionContext";
 import { useRepuestosSeleccion } from "./RepuestosSeleccionContext";
+import { PedidoItemCard } from "./PedidoItemCard";
 import { buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EstadoStepper } from "@/components/ui/EstadoStepper";
@@ -364,7 +365,8 @@ export function PedidoForm({
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                   Trabajos
                 </p>
-                <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                  <Icon name="listCheck" size="lg" className="text-current" />
                   Checklist por categoria
                 </h2>
               </div>
@@ -373,9 +375,9 @@ export function PedidoForm({
                 <span className="text-sm font-medium text-[var(--color-foreground)]">Lista de precios</span>
                 <ButtonGroup
                   options={[
-                    { value: 1, label: "Lista 1" },
-                    { value: 2, label: "Lista 2" },
-                    { value: 3, label: "Lista 3" },
+                    { value: 1, label: "Lista 1", icon: "clipboardList" },
+                    { value: 2, label: "Lista 2", icon: "clipboardList" },
+                    { value: 3, label: "Lista 3", icon: "clipboardList" },
                   ]}
                   value={listaPrecios}
                   onChange={setListaPrecios}
@@ -400,19 +402,14 @@ export function PedidoForm({
                       </summary>
                       <div className="mt-4 grid gap-3 md:grid-cols-2">
                         {grupo.trabajos.map((trabajo) => (
-                          <label
+                          <PedidoItemCard
                             key={trabajo.id}
-                            className="flex items-start gap-3 rounded-xl bg-white px-4 py-3 text-sm text-[var(--color-foreground)]"
+                            checked={selectedTrabajoIds.has(trabajo.id)}
+                            value={trabajo.id}
+                            onCheckedChange={(checked) => toggleTrabajo(trabajo.id, checked)}
+                            label={trabajo.nombre}
                           >
-                            <input
-                              type="checkbox"
-                              value={trabajo.id}
-                              checked={selectedTrabajoIds.has(trabajo.id)}
-                              onChange={(e) => toggleTrabajo(trabajo.id, e.target.checked)}
-                              className="mt-0.5 h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-accent)]"
-                            />
-                            <span>{trabajo.nombre}</span>
-                          </label>
+                          </PedidoItemCard>
                         ))}
                       </div>
                     </details>
@@ -426,7 +423,8 @@ export function PedidoForm({
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                   Repuestos
                 </p>
-                <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                  <Icon name="listCheck" size="lg" className="text-current" />
                   Checklist por categoria
                 </h2>
               </div>
@@ -448,20 +446,14 @@ export function PedidoForm({
                       </summary>
                       <div className="mt-4 grid gap-3">
                         {grupo.repuestos.map((repuesto) => (
-                          <label
+                          <PedidoItemCard
                             key={repuesto.id}
-                            className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-xl bg-white px-4 py-3 text-sm text-[var(--color-foreground)] md:grid-cols-[auto_minmax(0,1.3fr)_120px_132px_120px]"
+                            checked={selectedRepuestoIds.has(repuesto.id)}
+                            value={repuesto.id}
+                            onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked)}
+                            label={repuesto.nombre}
+                            contentClassName="grid grid-cols-[auto_minmax(0,1fr)] gap-3 md:grid-cols-[auto_minmax(0,1.3fr)_120px_132px_120px]"
                           >
-                            <div className="flex items-start gap-3">
-                              <input
-                                type="checkbox"
-                                value={repuesto.id}
-                                checked={selectedRepuestoIds.has(repuesto.id)}
-                                onChange={(e) => toggleRepuesto(repuesto.id, e.target.checked)}
-                                className="mt-0.5 h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-accent)]"
-                              />
-                            </div>
-                            <span className="min-w-0">{repuesto.nombre}</span>
                             <Input
                               type="number"
                               min="0"
@@ -501,7 +493,7 @@ export function PedidoForm({
                                 (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
                               ).toLocaleString("es-AR")}
                             </span>
-                          </label>
+                          </PedidoItemCard>
                         ))}
                       </div>
                     </details>

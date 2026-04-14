@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon, type IconName } from "@/components/ui/Icon";
 import { cn } from "@/lib/cn";
 
 const DEFAULT_ACTIVE_TONE =
@@ -9,6 +10,7 @@ export type ButtonGroupOption<T extends string | number> = {
   value: T;
   label: string;
   activeTone?: string;
+  icon?: IconName;
 };
 
 type ButtonGroupProps<T extends string | number> = {
@@ -33,13 +35,14 @@ export function ButtonGroup<T extends string | number>({
             onClick={() => onChange(option.value)}
             aria-pressed={active}
             className={cn(
-              "flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]",
+              "inline-flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]",
               active
                 ? (option.activeTone ?? DEFAULT_ACTIVE_TONE)
                 : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]"
             )}
           >
-            {option.label}
+            {option.icon ? <Icon name={option.icon} className="h-4 w-4 shrink-0" /> : null}
+            <span>{option.label}</span>
           </button>
         );
       })}
