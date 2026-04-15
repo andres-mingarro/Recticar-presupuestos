@@ -998,6 +998,8 @@ export function InformacionTecnicaPage({
             ]}
             value={marcasTab}
             onChange={setMarcasTab}
+            className="scale-[0.82] origin-right p-0.5"
+            buttonClassName="gap-1 px-2 py-1 text-[11px]"
           />
         }
       >
@@ -1123,6 +1125,8 @@ export function InformacionTecnicaPage({
             ]}
             value={vehiculosTab}
             onChange={setVehiculosTab}
+            className="scale-[0.82] origin-right p-0.5"
+            buttonClassName="gap-1 px-2 py-1 text-[11px]"
           />
         }
       >

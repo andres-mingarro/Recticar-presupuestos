@@ -18,6 +18,7 @@ type ButtonGroupProps<T extends string | number> = {
   value: T;
   onChange: (value: T) => void;
   className?: string;
+  buttonClassName?: string;
 };
 
 export function ButtonGroup<T extends string | number>({
@@ -25,6 +26,7 @@ export function ButtonGroup<T extends string | number>({
   value,
   onChange,
   className,
+  buttonClassName,
 }: ButtonGroupProps<T>) {
   return (
     <div className={cn("ButtonGroup inline-flex rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5", className)}>
@@ -38,13 +40,14 @@ export function ButtonGroup<T extends string | number>({
             aria-pressed={active}
             className={cn(
               "inline-flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]",
+              buttonClassName,
               active
                 ? (option.activeTone ?? DEFAULT_ACTIVE_TONE)
                 : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]"
             )}
           >
             {option.icon ? <Icon name={option.icon} className="h-4 w-4 shrink-0" /> : null}
-            <span>{option.label}</span>
+            <span className="whitespace-nowrap">{option.label}</span>
           </button>
         );
       })}
