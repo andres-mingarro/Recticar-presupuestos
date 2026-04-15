@@ -10,14 +10,14 @@ type ContactBadgeVariant =
   | "province"
   | "postalCode";
 
-export function PriorityBadge({ prioridad }: { prioridad: PedidoPrioridad }) {
+export function PriorityBadge({ prioridad, className }: { prioridad: PedidoPrioridad; className?: string }) {
   const priorityStyles = {
     baja:
-      "border-[var(--color-priority-low-border)] bg-[var(--color-priority-low-bg)] text-[var(--color-priority-low-text)]",
+      "border-slate-600 bg-[linear-gradient(135deg,#475569,#1e293b)] text-white shadow-[0_10px_24px_rgba(51,65,85,0.18)]",
     normal:
-      "border-[var(--color-priority-normal-border)] bg-[var(--color-priority-normal-bg)] text-[var(--color-priority-normal-text)]",
+      "border-sky-600 bg-[linear-gradient(135deg,#0284c7,#38bdf8)] text-white shadow-[0_10px_24px_rgba(2,132,199,0.18)]",
     alta:
-      "border-[var(--color-priority-high-border)] bg-[var(--color-priority-high-bg)] text-[var(--color-priority-high-text)]",
+      "border-rose-600 bg-[linear-gradient(135deg,#e11d48,#fb7185)] text-white shadow-[0_10px_24px_rgba(225,29,72,0.18)]",
   };
 
   return (
@@ -27,7 +27,8 @@ export function PriorityBadge({ prioridad }: { prioridad: PedidoPrioridad }) {
         "Badge",
         styles.Badge,
         "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold capitalize",
-        priorityStyles[prioridad]
+        priorityStyles[prioridad],
+        className
       )}
     >
       {prioridad}
@@ -38,13 +39,13 @@ export function PriorityBadge({ prioridad }: { prioridad: PedidoPrioridad }) {
 export function StatusBadge({ estado }: { estado: PedidoEstado }) {
   const statusStyles = {
     pendiente:
-      "border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]",
+      "border-orange-200 bg-[linear-gradient(135deg,#fff7ed,#fed7aa)] text-orange-700 shadow-[0_10px_24px_rgba(251,146,60,0.16)]",
     entregado:
       "border-orange-200 bg-orange-50 text-orange-700",
     aprobado:
-      "border-[var(--color-success-border)] bg-[var(--color-success-fill)] text-[var(--color-success-text-strong)]",
+      "border-orange-600 bg-[linear-gradient(135deg,#ea580c,#fb923c)] text-white shadow-[0_10px_24px_rgba(234,88,12,0.18)]",
     finalizado:
-      "border-[var(--color-neutral-border)] bg-[var(--color-neutral-bg)] text-[var(--color-neutral-text)]",
+      "border-emerald-600 bg-[linear-gradient(135deg,#059669,#34d399)] text-white shadow-[0_10px_24px_rgba(5,150,105,0.18)]",
   };
 
   return (
@@ -268,13 +269,7 @@ export function ContactBadge({
   );
 }
 
-export function BusinessDaysBadge({
-  days,
-  prefix,
-}: {
-  days: number;
-  prefix?: string;
-}) {
+export function BusinessDaysBadge({ days }: { days: number }) {
   return (
     <span
       className={cn(
@@ -285,8 +280,7 @@ export function BusinessDaysBadge({
         "inline-flex items-center rounded-full border border-[var(--color-border)] px-2.5 py-1 text-xs font-medium text-[var(--color-foreground-muted)]"
       )}
     >
-      {prefix ? `${prefix} ` : null}
-      {days} {days === 1 ? "dia habil" : "dias habiles"}
+      {days}
     </span>
   );
 }

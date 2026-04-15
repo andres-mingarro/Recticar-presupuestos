@@ -102,7 +102,7 @@ function PedidoTable({
                     {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre, pedido.motor_nombre])}
                   </td>
                   <td className="px-4 py-4">{pedido.numero_serie_motor || "Sin serie"}</td>
-                  <td className="px-4 py-4"><PriorityBadge prioridad={pedido.prioridad} /></td>
+                  <td className="px-4 py-4"><PriorityBadge prioridad={pedido.prioridad} className="w-full justify-center" /></td>
                   <td className="px-4 py-4"><PaymentBadge cobrado={pedido.cobrado} /></td>
                   <td className="px-4 py-4"><StatusBadge estado={pedido.estado} /></td>
                   <td className="px-4 py-4">{formatDate(pedido.fecha_creacion)}</td>

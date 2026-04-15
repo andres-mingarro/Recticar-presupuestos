@@ -31,6 +31,8 @@ import {
   faPrint,
   faQrcode,
   faShieldHalved,
+  faSackDollar,
+  faSackXmark,
   faTag,
   faTrash,
   faUser,
@@ -73,6 +75,8 @@ export type IconName =
   | "printer"
   | "package"
   | "settings"
+  | "sackDollar"
+  | "sackXmark"
   | "eye"
   | "eyeSlash";
 
@@ -115,6 +119,8 @@ const ICONS: Record<IconName, IconDefinition> = {
   printer: faPrint,
   package: faBoxOpen,
   settings: faGear,
+  sackDollar: faSackDollar,
+  sackXmark: faSackXmark,
   eye: faEye,
   eyeSlash: faEyeSlash,
 };

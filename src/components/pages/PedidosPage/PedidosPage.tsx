@@ -13,7 +13,6 @@ import {
 import { PageHeader } from "@/components/ui/PageHeader";
 import {
   BusinessDaysBadge,
-  PaymentBadge,
   PriorityBadge,
   StatusBadge,
 } from "@/components/ui/Badge";
@@ -27,7 +26,6 @@ import {
   formatDate,
   getBusinessDaysBetween,
   getBusinessDaysSince,
-  getVehicleLabel,
 } from "@/lib/format";
 import styles from "./PedidosPage.module.scss";
 
@@ -38,6 +36,24 @@ type PedidosPageProps = {
   errorMessage: string | null;
   canEdit: boolean;
 };
+
+function CobroIcon({ cobrado }: { cobrado: boolean }) {
+  return (
+    <span
+      className={cn(
+        "CobroIcon",
+        "inline-flex items-center justify-center text-xl",
+        cobrado
+          ? "text-emerald-600"
+          : "text-[var(--color-foreground-subtle)]"
+      )}
+      aria-label={cobrado ? "Cobrado" : "No cobrado"}
+      title={cobrado ? "Cobrado" : "No cobrado"}
+    >
+      <Icon name={cobrado ? "sackDollar" : "sackXmark"} size="lg" />
+    </span>
+  );
+}
 
 function PedidoTable({
   title,
@@ -67,19 +83,38 @@ function PedidoTable({
       </div>
 
       <Table>
-        <table className="min-w-[760px] w-full text-left text-sm">
+        <table className="w-full table-auto text-left text-sm">
           <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
             <tr>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="hash" className="h-4 w-4" />N° Pedido</span></th>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="user" className="h-4 w-4" />Cliente</span></th>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Vehículo / Motor</span></th>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="gauge" className="h-4 w-4" />Prioridad</span></th>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="check" className="h-4 w-4" />Cobro</span></th>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Estado</span></th>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación</span></th>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Aprobación</span></th>
+              <th className="w-[56px] px-2 py-3 text-center font-semibold">
+                <span className="inline-flex items-center" aria-label="Número de pedido" title="Número de pedido">
+                  #
+                </span>
+              </th>
+              <th className="min-w-[110px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="user" className="h-4 w-4" />Cliente</span></th>
+              <th className="min-w-[130px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Detalle</span></th>
+              <th className="w-[96px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="gauge" className="h-4 w-4" />Prioridad</span></th>
+              <th className="w-[64px] px-3 py-3 font-semibold">
+                <span
+                  className="group relative inline-flex items-center"
+                  aria-label="Cobro"
+                  tabIndex={0}
+                >
+                  <Icon name="sackDollar" size="xl" />
+                  <span
+                    className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 rounded-md bg-[var(--color-foreground)] px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-[0_10px_24px_rgba(15,23,42,0.18)] transition group-hover:opacity-100 group-focus-visible:opacity-100"
+                    role="tooltip"
+                  >
+                    Cobro
+                  </span>
+                </span>
+              </th>
+              <th className="w-[96px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Estado</span></th>
+              <th className="w-[146px] px-3 py-3 font-semibold">
+                <span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación / aprobación</span>
+              </th>
               {showBusinessDays ? (
-                <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clock" className="h-4 w-4" />Días hábiles</span></th>
+                <th className="w-[96px] px-3 py-3 font-semibold whitespace-nowrap"><span className="inline-flex items-center gap-2"><Icon name="clock" className="h-4 w-4" />Días hábiles</span></th>
               ) : null}
             </tr>
           </thead>
@@ -87,7 +122,7 @@ function PedidoTable({
             {pedidos.length === 0 ? (
               <tr>
                 <td
-                  colSpan={showBusinessDays ? 9 : 8}
+                  colSpan={showBusinessDays ? 8 : 7}
                   className="px-4 py-10 text-center text-[var(--color-foreground-muted)]"
                 >
                   {emptyMessage}
@@ -108,10 +143,10 @@ function PedidoTable({
                     }
                   }}
                 >
-                  <td className="px-4 py-4 font-semibold">
+                  <td className="w-[56px] px-2 py-4 text-center font-semibold">
                     #{pedido.numero_pedido}
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="min-w-[110px] px-3 py-4">
                     {pedido.cliente_id ? (
                       <Link
                         href={`/clientes/${pedido.cliente_id}`}
@@ -124,37 +159,37 @@ function PedidoTable({
                       "Sin cliente asignado"
                     )}
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="min-w-[130px] px-3 py-4">
                     <div className="space-y-1">
-                      <p>
-                        {getVehicleLabel([
-                          pedido.marca_nombre,
-                          pedido.modelo_nombre,
-                          pedido.motor_nombre,
-                        ])}
+                      <p className="text-[0.68rem] font-semibold uppercase leading-none text-[var(--color-foreground-subtle)]">
+                        {pedido.marca_nombre ?? "Marca sin definir"}
+                      </p>
+                      <p className="font-medium">
+                        {pedido.modelo_nombre ?? "Modelo sin definir"}
                       </p>
                       <p className="text-xs text-[var(--color-foreground-muted)]">
-                        Serie: {pedido.numero_serie_motor || "Sin serie"}
+                        {pedido.motor_nombre ?? "Motor sin definir"}
                       </p>
                     </div>
                   </td>
-                  <td className="px-4 py-4">
-                    <PriorityBadge prioridad={pedido.prioridad} />
+                  <td className="w-[96px] px-3 py-4">
+                    <PriorityBadge prioridad={pedido.prioridad} className="w-full justify-center" />
                   </td>
-                  <td className="px-4 py-4">
-                    <PaymentBadge cobrado={pedido.cobrado} />
+                  <td className="w-[64px] px-3 py-4">
+                    <CobroIcon cobrado={pedido.cobrado} />
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="w-[96px] px-3 py-4">
                     <StatusBadge estado={pedido.estado} />
                   </td>
-                  <td className="px-4 py-4">
-                    {formatDate(pedido.fecha_creacion)}
-                  </td>
-                  <td className="px-4 py-4">
-                    {formatDate(pedido.fecha_aprobacion)}
+                  <td className="w-[146px] px-3 py-4">
+                    <div className="inline-flex items-center gap-2 text-[var(--color-foreground-muted)]">
+                      <span>{formatDate(pedido.fecha_creacion)}</span>
+                      <Icon name="arrowRight" className="h-4 w-4" />
+                      <span>{pedido.estado === "pendiente" ? "-" : formatDate(pedido.fecha_aprobacion)}</span>
+                    </div>
                   </td>
                   {showBusinessDays ? (
-                    <td className="px-4 py-4">
+                    <td className="w-[96px] px-3 py-4 text-right">
                       <BusinessDaysBadge
                         days={
                           pedido.estado === "finalizado"
@@ -163,9 +198,6 @@ function PedidoTable({
                                 pedido.fecha_aprobacion ?? pedido.fecha_creacion
                               )
                             : getBusinessDaysSince(pedido.fecha_creacion)
-                        }
-                        prefix={
-                          pedido.estado === "finalizado" ? "Entregado en" : undefined
                         }
                       />
                     </td>

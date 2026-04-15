@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { Icon } from "@/components/ui/Icon";
 import { useCobrado } from "./CobradoContext";
 
 type CobradoToggleProps = {
@@ -19,24 +20,26 @@ export function CobradoToggle({ form }: CobradoToggleProps) {
           type="button"
           onClick={() => setCobrado(false)}
           className={cn(
-            "flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
+            "inline-flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
             !cobrado
-              ? "border-red-600 bg-[linear-gradient(135deg,#dc2626,#f87171)] text-white shadow-[0_10px_24px_rgba(220,38,38,0.28)]"
+              ? "border-slate-600 bg-[linear-gradient(135deg,#64748b,#475569)] text-white shadow-[0_10px_24px_rgba(100,116,139,0.28)]"
               : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]"
           )}
         >
+          <Icon name="sackXmark" size="lg" />
           No cobrado
         </button>
         <button
           type="button"
           onClick={() => setCobrado(true)}
           className={cn(
-            "flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
+            "inline-flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
             cobrado
               ? "border-emerald-600 bg-[linear-gradient(135deg,#059669,#34d399)] text-white shadow-[0_10px_24px_rgba(5,150,105,0.28)]"
               : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]"
           )}
         >
+          <Icon name="sackDollar" size="lg" />
           Cobrado
         </button>
       </div>
