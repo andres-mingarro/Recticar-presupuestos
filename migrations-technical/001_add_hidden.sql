@@ -1,0 +1,2 @@
+ALTER TABLE marcas ADD COLUMN IF NOT EXISTS hidden boolean NOT NULL DEFAULT false;
+ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS hidden boolean NOT NULL DEFAULT false;

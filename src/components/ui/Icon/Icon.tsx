@@ -14,6 +14,8 @@ import {
   faClock,
   faDownload,
   faEnvelope,
+  faEye,
+  faEyeSlash,
   faGaugeHigh,
   faGear,
   faHashtag,
@@ -70,7 +72,9 @@ export type IconName =
   | "qrCode"
   | "printer"
   | "package"
-  | "settings";
+  | "settings"
+  | "eye"
+  | "eyeSlash";
 
 type IconProps = {
   name: IconName;
@@ -111,6 +115,8 @@ const ICONS: Record<IconName, IconDefinition> = {
   printer: faPrint,
   package: faBoxOpen,
   settings: faGear,
+  eye: faEye,
+  eyeSlash: faEyeSlash,
 };
 
 export function Icon({ name, className, size }: IconProps) {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import type { TechnicalActionState } from "@/app/(app)/informacion-tecnica/actions";
 import { cn } from "@/lib/cn";
 import type {
@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
 import { buttonStyles } from "@/components/ui/Button";
+import { ButtonGroup } from "@/components/ui/ButtonGroup";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import styles from "./InformacionTecnicaPage.module.scss";
@@ -123,6 +124,7 @@ function ContentCard({
   createForm,
   emptyLabel,
   children,
+  tabsSlot,
 }: {
   section: TechnicalSection;
   count: number;
@@ -138,6 +140,7 @@ function ContentCard({
   createForm?: React.ReactNode;
   emptyLabel: string;
   children: React.ReactNode;
+  tabsSlot?: React.ReactNode;
 }) {
   return (
     <Card as="section" className="overflow-hidden p-0">
@@ -150,6 +153,13 @@ function ContentCard({
         <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--color-foreground-muted)]">
           {count}
         </span>
+
+        {tabsSlot && (
+          <>
+            <Divider orientation="vertical" className="h-5" />
+            {tabsSlot}
+          </>
+        )}
 
         <Divider orientation="vertical" className="h-5" />
 
@@ -267,16 +277,34 @@ function MarcaRow({
   updateAction,
   deleteAction,
   canEdit,
+  hiddenMarcas,
+  confirmMarcaHiddenChange,
 }: {
   marca: TechnicalMarca;
   index: number;
   updateAction: ActionFn;
   deleteAction: ActionFn;
   canEdit: boolean;
+  hiddenMarcas: Set<number>;
+  confirmMarcaHiddenChange: (marcaId: number, hidden: boolean) => void;
 }) {
   const deleteFormId = `delete-marca-${marca.id}`;
   const [state, formAction, isPending] = useActionState(updateAction, { error: null });
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteAction, { error: null });
+  const isHidden = hiddenMarcas.has(marca.id);
+  const [pendingHidden, setPendingHidden] = useState(isHidden);
+  const prevPending = useRef(isPending);
+
+  useEffect(() => {
+    setPendingHidden(isHidden);
+  }, [isHidden]);
+
+  useEffect(() => {
+    if (prevPending.current && !isPending && !state.error && pendingHidden !== isHidden) {
+      confirmMarcaHiddenChange(marca.id, pendingHidden);
+    }
+    prevPending.current = isPending;
+  }, [isPending, state.error, pendingHidden, isHidden, confirmMarcaHiddenChange, marca.id]);
 
   return (
     <div className={cn(index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
@@ -285,6 +313,19 @@ function MarcaRow({
         className="flex items-center gap-2 px-4 py-2.5"
       >
         <input type="hidden" name="marcaId" value={marca.id} />
+        <input type="hidden" name="hidden" value={pendingHidden ? "1" : "0"} />
+        <button
+          type="button"
+          onClick={() => setPendingHidden((prev) => !prev)}
+          disabled={!canEdit}
+          className={cn(
+            "shrink-0 rounded-full border border-[var(--color-border)] p-1.5 text-[var(--color-foreground-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]",
+            !canEdit && "opacity-40"
+          )}
+          title={canEdit ? (pendingHidden ? "Ocultar marca (guardar para confirmar)" : "Mostrar marca (guardar para confirmar)") : "Necesitás permisos para guardar"}
+        >
+          <Icon name={pendingHidden ? "eyeSlash" : "eye"} className="h-4 w-4" />
+        </button>
         <input
           type="text"
           name="nombre"
@@ -450,6 +491,9 @@ function VehiculoRow({
   updateAction,
   deleteAction,
   canEdit,
+  hiddenVehiculos,
+  confirmVehiculoHiddenChange,
+  toggleHiddenAction,
 }: {
   vehiculo: TechnicalVehiculo;
   index: number;
@@ -458,89 +502,137 @@ function VehiculoRow({
   updateAction: ActionFn;
   deleteAction: ActionFn;
   canEdit: boolean;
+  hiddenVehiculos: Set<number>;
+  confirmVehiculoHiddenChange: (vehiculoId: number, hidden: boolean) => void;
+  toggleHiddenAction: ActionFn;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const deleteFormId = `delete-vehiculo-${vehiculo.id}`;
+  const toggleHiddenFormId = `toggle-hidden-vehiculo-${vehiculo.id}`;
   const [state, formAction, isPending] = useActionState(updateAction, { error: null });
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteAction, { error: null });
+  const [toggleState, toggleHiddenFormAction, togglePending] = useActionState(toggleHiddenAction, { error: null });
+  const isHidden = hiddenVehiculos.has(vehiculo.id);
+  const [pendingHidden, setPendingHidden] = useState(isHidden);
+
+  useEffect(() => {
+    setPendingHidden(isHidden);
+  }, [isHidden]);
+
+  const prevTogglePending = useRef(togglePending);
+  useEffect(() => {
+    if (prevTogglePending.current && !togglePending && !toggleState.error) {
+      confirmVehiculoHiddenChange(vehiculo.id, pendingHidden);
+    }
+    prevTogglePending.current = togglePending;
+  }, [togglePending, toggleState.error, pendingHidden, confirmVehiculoHiddenChange, vehiculo.id]);
 
   return (
     <div className={cn(index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
-      {isEditing && canEdit ? (
-        <form
-          action={formAction}
-          className="grid items-center gap-2 px-4 py-2.5 md:grid-cols-[1fr_1fr_auto_auto_auto]"
-        >
-          <input type="hidden" name="vehiculoId" value={vehiculo.id} />
-          <select
-            name="modeloId"
-            defaultValue={vehiculo.modeloId}
-            disabled={isPending}
-            className={fieldCls}
-          >
-            {modelos.map((m) => (
-              <option key={m.id} value={m.id}>
-                {(m.marcaNombre ? `${m.marcaNombre} / ` : "") + m.nombre}
-              </option>
-            ))}
-          </select>
-          <select
-            name="motorId"
-            defaultValue={vehiculo.motorId}
-            disabled={isPending}
-            className={fieldCls}
-          >
-            {motores.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.nombre}{m.cilindrada ? ` (${m.cilindrada})` : ""}
-              </option>
-            ))}
-          </select>
-          <PulsatingButton type="submit" pulsing={!isPending} disabled={isPending} className={saveRowBtnCls}>
-            Guardar
-          </PulsatingButton>
-          <button
-            type="button"
-            onClick={() => setIsEditing(false)}
-            disabled={isPending}
-            className={saveRowBtnCls}
-          >
-            Cancelar
-          </button>
-          <DeleteButton form={deleteFormId} disabled={deletePending} />
-        </form>
-      ) : (
-        <div className="flex items-center gap-2 px-4 py-2.5">
-          <span className={cn("flex-1", readCls)}>
-            {vehiculo.marcaNombre ? `${vehiculo.marcaNombre} / ` : ""}
-            {vehiculo.modeloNombre}
-          </span>
-          <span className={cn("flex-1", readCls, "text-[var(--color-foreground-muted)]")}>
-            {vehiculo.motorNombre}
-          </span>
-          {canEdit && (
-            <>
-              <button
-                type="button"
-                onClick={() => setIsEditing(true)}
-                className={saveRowBtnCls}
-              >
-                Editar
-              </button>
-              <DeleteButton form={deleteFormId} disabled={deletePending} />
-            </>
-          )}
-        </div>
-      )}
+      <form
+        action={canEdit ? formAction : undefined}
+        className={cn("grid items-center gap-2 px-4 py-2.5", isEditing && canEdit ? "md:grid-cols-[1fr_1fr_auto_auto_auto]" : "")}
+      >
+        <input type="hidden" name="vehiculoId" value={vehiculo.id} />
+        {isEditing && canEdit ? (
+          <>
+            <select
+              name="modeloId"
+              defaultValue={vehiculo.modeloId}
+              disabled={isPending}
+              className={fieldCls}
+            >
+              {modelos.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {(m.marcaNombre ? `${m.marcaNombre} / ` : "") + m.nombre}
+                </option>
+              ))}
+            </select>
+            <select
+              name="motorId"
+              defaultValue={vehiculo.motorId}
+              disabled={isPending}
+              className={fieldCls}
+            >
+              {motores.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.nombre}{m.cilindrada ? ` (${m.cilindrada})` : ""}
+                </option>
+              ))}
+            </select>
+            <PulsatingButton type="submit" pulsing={!isPending} disabled={isPending} className={saveRowBtnCls}>
+              Guardar
+            </PulsatingButton>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              disabled={isPending}
+              className={saveRowBtnCls}
+            >
+              Cancelar
+            </button>
+            <DeleteButton form={deleteFormId} disabled={deletePending} />
+          </>
+        ) : (
+          <div className="flex items-center gap-2 px-4 py-2.5">
+            <span className={cn("flex-1", readCls)}>
+              {vehiculo.marcaNombre ? `${vehiculo.marcaNombre} / ` : ""}
+              {vehiculo.modeloNombre}
+            </span>
+            <span className={cn("flex-1", readCls, "text-[var(--color-foreground-muted)]")}>
+              {vehiculo.motorNombre}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPendingHidden((prev) => !prev)}
+              disabled={!canEdit}
+              className={cn(
+                "shrink-0 rounded-full border border-[var(--color-border)] p-1.5 transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]",
+                pendingHidden && "border-[var(--color-foreground-muted)] text-[var(--color-foreground-muted)]",
+                !canEdit && "opacity-40"
+              )}
+              title={canEdit ? (pendingHidden ? "Mostrar vehículo" : "Ocultar vehículo") : "Necesitás permisos para editar"}
+            >
+              <Icon name={pendingHidden ? "eyeSlash" : "eye"} className="h-4 w-4" />
+            </button>
+            {canEdit && (
+              <>
+                {pendingHidden !== isHidden && (
+                  <PulsatingButton
+                    type="submit"
+                    form={toggleHiddenFormId}
+                    pulsing={!togglePending}
+                    disabled={togglePending}
+                    className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}
+                  >
+                    {togglePending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                    {togglePending ? "Guardando…" : "Guardar"}
+                  </PulsatingButton>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className={saveRowBtnCls}
+                >
+                  Editar
+                </button>
+                <DeleteButton form={deleteFormId} disabled={deletePending} />
+              </>
+            )}
+          </div>
+        )}
+      </form>
       <form id={deleteFormId} action={deleteFormAction} className="hidden">
         <input type="hidden" name="vehiculoId" value={vehiculo.id} />
       </form>
-      <RowError error={state.error ?? deleteState.error} />
+      <form id={toggleHiddenFormId} action={toggleHiddenFormAction} className="hidden">
+        <input type="hidden" name="vehiculoId" value={vehiculo.id} />
+        <input type="hidden" name="hidden" value={pendingHidden ? "1" : "0"} />
+      </form>
+      <RowError error={state.error ?? deleteState.error ?? toggleState.error} />
     </div>
   );
 }
-
-// ─── Add forms (footer style) ─────────────────────────────────────────────────
 
 function AddFooter({ children }: { children: React.ReactNode }) {
   return (
@@ -789,6 +881,7 @@ type Props = {
   createVehiculoAction: ActionFn;
   updateVehiculoAction: ActionFn;
   deleteVehiculoAction: ActionFn;
+  toggleVehiculoHiddenAction: ActionFn;
 };
 
 export function InformacionTecnicaPage({
@@ -815,7 +908,54 @@ export function InformacionTecnicaPage({
   createVehiculoAction,
   updateVehiculoAction,
   deleteVehiculoAction,
+  toggleVehiculoHiddenAction,
 }: Props) {
+  const [hiddenMarcas, setHiddenMarcas] = useState<Set<number>>(
+    () => new Set(marcas.filter((m) => m.hidden).map((m) => m.id))
+  );
+  const [hiddenVehiculos, setHiddenVehiculos] = useState<Set<number>>(
+    () => new Set(vehiculos.filter((v) => v.hidden).map((v) => v.id))
+  );
+  const [marcasTab, setMarcasTab] = useState<"visible" | "ocultas">("visible");
+  const [vehiculosTab, setVehiculosTab] = useState<"visible" | "ocultos">("visible");
+
+  const confirmMarcaHiddenChange = (marcaId: number, hidden: boolean) => {
+    setHiddenMarcas(prev => {
+      const newSet = new Set(prev);
+      if (hidden) {
+        newSet.add(marcaId);
+      } else {
+        newSet.delete(marcaId);
+      }
+      return newSet;
+    });
+
+    const modelosDeMarca = modelos.filter(m => m.marcaId === marcaId);
+    const vehiculosDeMarca = vehiculos.filter(v => modelosDeMarca.some(m => m.id === v.modeloId));
+    setHiddenVehiculos(prev => {
+      const newSet = new Set(prev);
+      if (hidden) {
+        vehiculosDeMarca.forEach((v) => newSet.add(v.id));
+      } else {
+        vehiculosDeMarca.forEach((v) => newSet.delete(v.id));
+      }
+      return newSet;
+    });
+  };
+
+  const confirmVehiculoHiddenChange = (vehiculoId: number, hidden: boolean) => {
+    setHiddenVehiculos(prev => {
+      const newSet = new Set(prev);
+      if (hidden) {
+        newSet.add(vehiculoId);
+      } else {
+        newSet.delete(vehiculoId);
+      }
+      return newSet;
+    });
+  };
+
+  const filteredModelos = modelos.filter(m => !hiddenMarcas.has(m.marcaId));
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const hasPreviousPage = currentPage > 1;
   const hasNextPage = currentPage < totalPages;
@@ -838,13 +978,30 @@ export function InformacionTecnicaPage({
   let sectionContent: React.ReactNode = null;
 
   if (activeSection === "marcas") {
+    const marcasVisibles = marcas.filter(m => !hiddenMarcas.has(m.id));
+    const marcasOcultas = marcas.filter(m => hiddenMarcas.has(m.id));
+    const marcasActivas = marcasTab === "visible" ? marcasVisibles : marcasOcultas;
     sectionContent = (
       <ContentCard
         {...cardCommon}
-        emptyLabel={q ? "Sin resultados para la búsqueda." : "No hay marcas aún."}
-        createForm={canEdit ? <AddMarcaForm action={createMarcaAction} /> : undefined}
+        emptyLabel={
+          marcasTab === "ocultas"
+            ? "No hay marcas ocultas."
+            : q ? "Sin resultados para la búsqueda." : "No hay marcas aún."
+        }
+        createForm={canEdit && marcasTab === "visible" ? <AddMarcaForm action={createMarcaAction} /> : undefined}
+        tabsSlot={
+          <ButtonGroup
+            options={[
+              { value: "visible", label: "Visibles", icon: "eye" },
+              { value: "ocultas", label: `Ocultas${marcasOcultas.length > 0 ? ` (${marcasOcultas.length})` : ""}`, icon: "eyeSlash" },
+            ]}
+            value={marcasTab}
+            onChange={setMarcasTab}
+          />
+        }
       >
-        {marcas.map((marca, i) => (
+        {marcasActivas.map((marca, i) => (
           <MarcaRow
             key={marca.id}
             marca={marca}
@@ -852,6 +1009,8 @@ export function InformacionTecnicaPage({
             updateAction={updateMarcaAction}
             deleteAction={deleteMarcaAction}
             canEdit={canEdit}
+            hiddenMarcas={hiddenMarcas}
+            confirmMarcaHiddenChange={confirmMarcaHiddenChange}
           />
         ))}
       </ContentCard>
@@ -879,7 +1038,7 @@ export function InformacionTecnicaPage({
           ) : undefined
         }
       >
-        {modelos.map((modelo, i) => (
+        {filteredModelos.map((modelo, i) => (
           <ModeloRow
             key={modelo.id}
             modelo={modelo}
@@ -926,10 +1085,17 @@ export function InformacionTecnicaPage({
   }
 
   if (activeSection === "vehiculos") {
+    const vehiculosVisibles = vehiculos.filter(v => !hiddenVehiculos.has(v.id));
+    const vehiculosOcultos = vehiculos.filter(v => hiddenVehiculos.has(v.id));
+    const vehiculosActivos = vehiculosTab === "visible" ? vehiculosVisibles : vehiculosOcultos;
     sectionContent = (
       <ContentCard
         {...cardCommon}
-        emptyLabel={q ? "Sin resultados para la búsqueda." : "No hay relaciones aún."}
+        emptyLabel={
+          vehiculosTab === "ocultos"
+            ? "No hay vehículos ocultos."
+            : q ? "Sin resultados para la búsqueda." : "No hay relaciones aún."
+        }
         columnHeaders={
           canEdit ? (
             <ColHeaders
@@ -941,7 +1107,7 @@ export function InformacionTecnicaPage({
           ) : undefined
         }
         createForm={
-          canEdit ? (
+          canEdit && vehiculosTab === "visible" ? (
             <AddVehiculoForm
               modelos={modelos}
               motores={motores}
@@ -949,8 +1115,18 @@ export function InformacionTecnicaPage({
             />
           ) : undefined
         }
+        tabsSlot={
+          <ButtonGroup
+            options={[
+              { value: "visible", label: "Visibles", icon: "eye" },
+              { value: "ocultos", label: `Ocultos${vehiculosOcultos.length > 0 ? ` (${vehiculosOcultos.length})` : ""}`, icon: "eyeSlash" },
+            ]}
+            value={vehiculosTab}
+            onChange={setVehiculosTab}
+          />
+        }
       >
-        {vehiculos.map((vehiculo, i) => (
+        {vehiculosActivos.map((vehiculo, i) => (
           <VehiculoRow
             key={vehiculo.id}
             vehiculo={vehiculo}
@@ -960,6 +1136,9 @@ export function InformacionTecnicaPage({
             updateAction={updateVehiculoAction}
             deleteAction={deleteVehiculoAction}
             canEdit={canEdit}
+            hiddenVehiculos={hiddenVehiculos}
+            confirmVehiculoHiddenChange={confirmVehiculoHiddenChange}
+            toggleHiddenAction={toggleVehiculoHiddenAction}
           />
         ))}
       </ContentCard>

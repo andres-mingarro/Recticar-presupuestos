@@ -26,7 +26,7 @@ export async function listTechnicalMarcas({ search, limit, offset }: {
 
   if (normalizedSearch) {
     return templateRowsFromTechnical<TechnicalMarca>`
-      SELECT id, nombre
+      SELECT id, nombre, hidden
       FROM marcas
       WHERE nombre ILIKE ${normalizedSearch}
       ORDER BY nombre ASC
@@ -36,7 +36,7 @@ export async function listTechnicalMarcas({ search, limit, offset }: {
   }
 
   return templateRowsFromTechnical<TechnicalMarca>`
-    SELECT id, nombre
+    SELECT id, nombre, hidden
     FROM marcas
     ORDER BY nombre ASC
     LIMIT ${normalizedLimit}
@@ -134,6 +134,7 @@ export async function listTechnicalVehiculos({ search, limit, offset }: {
     marca_nombre: string | null;
     motor_id: number;
     motor_nombre: string;
+    hidden: boolean;
   }>(
     `
       SELECT
@@ -142,7 +143,8 @@ export async function listTechnicalVehiculos({ search, limit, offset }: {
         mo.nombre AS modelo_nombre,
         ma.nombre AS marca_nombre,
         v.motor_id,
-        mt.nombre AS motor_nombre
+        mt.nombre AS motor_nombre,
+        v.hidden
       FROM vehiculos v
       INNER JOIN modelos mo ON mo.id = v.modelo_id
       LEFT JOIN marcas ma ON ma.id = mo.marca_id
@@ -171,6 +173,7 @@ export async function listTechnicalVehiculos({ search, limit, offset }: {
     marcaNombre: row.marca_nombre,
     motorId: row.motor_id,
     motorNombre: row.motor_nombre,
+    hidden: row.hidden,
   })) as TechnicalVehiculo[];
 }
 
@@ -258,12 +261,20 @@ export async function createTechnicalMarca(nombre: string) {
   `;
 }
 
-export async function updateTechnicalMarca(id: number, nombre: string) {
-  await templateRowsFromTechnical`
-    UPDATE marcas
-    SET nombre = ${nombre}
-    WHERE id = ${id}
-  `;
+export async function updateTechnicalMarca(id: number, nombre: string, hidden?: boolean) {
+  if (hidden !== undefined) {
+    await templateRowsFromTechnical`
+      UPDATE marcas
+      SET nombre = ${nombre}, hidden = ${hidden}
+      WHERE id = ${id}
+    `;
+  } else {
+    await templateRowsFromTechnical`
+      UPDATE marcas
+      SET nombre = ${nombre}
+      WHERE id = ${id}
+    `;
+  }
 }
 
 export async function deleteTechnicalMarca(id: number) {
@@ -325,6 +336,14 @@ export async function createTechnicalVehiculo(modeloId: number, motorId: number)
   await templateRowsFromTechnical`
     INSERT INTO vehiculos (modelo_id, motor_id)
     VALUES (${modeloId}, ${motorId})
+  `;
+}
+
+export async function toggleTechnicalVehiculoHidden(id: number, hidden: boolean) {
+  await templateRowsFromTechnical`
+    UPDATE vehiculos
+    SET hidden = ${hidden}
+    WHERE id = ${id}
   `;
 }
 

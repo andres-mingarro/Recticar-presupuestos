@@ -26,6 +26,7 @@ import {
   updateModeloAction,
   updateMotorAction,
   updateVehiculoAction,
+  toggleVehiculoHiddenAction,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -106,6 +107,7 @@ export default async function Page({
       createVehiculoAction={createVehiculoAction}
       updateVehiculoAction={updateVehiculoAction}
       deleteVehiculoAction={deleteVehiculoAction}
+      toggleVehiculoHiddenAction={toggleVehiculoHiddenAction}
     />
   );
 }

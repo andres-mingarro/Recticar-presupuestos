@@ -14,6 +14,7 @@ import {
   updateTechnicalModelo,
   updateTechnicalMotor,
   updateTechnicalVehiculo,
+  toggleTechnicalVehiculoHidden,
 } from "@/lib/queries/informacion-tecnica";
 
 export type TechnicalActionState = {
@@ -61,8 +62,11 @@ export async function updateMarcaAction(
   if (Number.isNaN(id)) return { error: "Marca inválida." };
   if (!nombre) return { error: "El nombre es obligatorio." };
 
+  const hiddenRaw = formData.get("hidden");
+  const hidden = hiddenRaw === "1" ? true : hiddenRaw === "0" ? false : undefined;
+
   try {
-    await updateTechnicalMarca(id, nombre);
+    await updateTechnicalMarca(id, nombre, hidden);
   } catch {
     return { error: "No se pudo actualizar la marca." };
   }
@@ -202,6 +206,25 @@ export async function deleteMotorAction(
 
   revalidateTechnicalPages();
   return { error: null };
+}
+
+export async function toggleVehiculoHiddenAction(
+  _prev: TechnicalActionState,
+  formData: FormData
+): Promise<TechnicalActionState> {
+  const id = Number(normalize(formData, "vehiculoId"));
+  const hidden = formData.get("hidden") === "1";
+
+  if (Number.isNaN(id)) return { error: "Vehículo inválido." };
+
+  try {
+    await toggleTechnicalVehiculoHidden(id, hidden);
+  } catch {
+    return { error: "No se pudo actualizar la visibilidad del vehículo." };
+  }
+
+  revalidateTechnicalPages();
+  return { error: null, success: true };
 }
 
 export async function createVehiculoAction(

@@ -131,6 +131,7 @@ export type ModeloMotorRelation = {
 export type TechnicalMarca = {
   id: number;
   nombre: string;
+  hidden: boolean;
 };
 
 export type TechnicalModelo = {
@@ -153,6 +154,7 @@ export type TechnicalVehiculo = {
   marcaNombre: string | null;
   motorId: number;
   motorNombre: string;
+  hidden: boolean;
 };
 
 export type TrabajoAgrupado = {

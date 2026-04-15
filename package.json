@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "db:migrate": "node scripts/run-migrations.mjs",
+    "db:migrate:technical": "node scripts/run-technical-migrations.mjs",
     "db:seed:dev": "node scripts/seed-dev-data.mjs",
     "db:reset:dev": "node scripts/reset-dev-data.mjs"
   },

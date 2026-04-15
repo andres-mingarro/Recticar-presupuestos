@@ -17,15 +17,17 @@ type ButtonGroupProps<T extends string | number> = {
   options: ButtonGroupOption<T>[];
   value: T;
   onChange: (value: T) => void;
+  className?: string;
 };
 
 export function ButtonGroup<T extends string | number>({
   options,
   value,
   onChange,
+  className,
 }: ButtonGroupProps<T>) {
   return (
-    <div className="ButtonGroup inline-flex w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5">
+    <div className={cn("ButtonGroup inline-flex rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5", className)}>
       {options.map((option) => {
         const active = option.value === value;
         return (
