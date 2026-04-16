@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
 import type { PedidoEstado, PedidoPrioridad } from "@/lib/types";
+import { Icon } from "@/components/ui/Icon";
 import styles from "./Badge.module.scss";
 
 type ContactBadgeVariant =
@@ -36,7 +37,7 @@ export function PriorityBadge({ prioridad, className }: { prioridad: PedidoPrior
   );
 }
 
-export function StatusBadge({ estado }: { estado: PedidoEstado }) {
+export function StatusBadge({ estado, className }: { estado: PedidoEstado; className?: string }) {
   const statusStyles = {
     pendiente:
       "border-orange-200 bg-[linear-gradient(135deg,#fff7ed,#fed7aa)] text-orange-700 shadow-[0_10px_24px_rgba(251,146,60,0.16)]",
@@ -55,7 +56,8 @@ export function StatusBadge({ estado }: { estado: PedidoEstado }) {
         "Badge",
         styles.Badge,
         "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold capitalize",
-        statusStyles[estado]
+        statusStyles[estado],
+        className
       )}
     >
       {estado}
@@ -63,19 +65,21 @@ export function StatusBadge({ estado }: { estado: PedidoEstado }) {
   );
 }
 
-export function PaymentBadge({ cobrado }: { cobrado: boolean }) {
+export function PaymentBadge({ cobrado, className }: { cobrado: boolean; className?: string }) {
   return (
     <span
       className={cn(
         "PaymentBadge",
         "Badge",
         styles.Badge,
-        "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold",
+        "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold",
         cobrado
-          ? "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success-text-strong)]"
-          : "border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]"
+          ? "border-emerald-600 bg-[linear-gradient(135deg,#059669,#34d399)] text-white shadow-[0_10px_24px_rgba(5,150,105,0.28)]"
+          : "border-slate-600 bg-[linear-gradient(135deg,#64748b,#475569)] text-white shadow-[0_10px_24px_rgba(100,116,139,0.28)]",
+        className
       )}
     >
+      <Icon name={cobrado ? "sackDollar" : "sackXmark"} size="lg" />
       {cobrado ? "Cobrado" : "No cobrado"}
     </span>
   );

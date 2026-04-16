@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import "./globals.css";
+import "../scss/globals.css";
 
 export const metadata: Metadata = {
   title: "Recticar Presupuestos",

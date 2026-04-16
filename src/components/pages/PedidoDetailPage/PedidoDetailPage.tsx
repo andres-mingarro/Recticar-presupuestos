@@ -92,10 +92,10 @@ export function PedidoDetailPage({
     >
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
       {/* Top bar: back button + save */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-wrap  lg:flex-nowrap flex-col gap-3 flex-row sm:items-center">
         <Link
           href="/pedidos"
-          className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
+          className={buttonStyles({ variant: "secondary", className: "flex-1 lg:flex-none sm:w-auto" })}
         >
           <Icon name="chevronLeft" className="h-4 w-4" />
           Volver al listado
@@ -106,12 +106,23 @@ export function PedidoDetailPage({
           form={formId}
           disabled={isPending}
           pulsing={dirty && !isPending}
-          className="w-full sm:w-auto gap-2"
+          className="flex-1 lg:flex-none  sm:w-auto gap-2"
         >
           {isPending ? <Spinner className="h-4 w-4" /> : null}
           {isPending ? "Guardando..." : "Guardar pedido"}
         </PulsatingButton>
+        <div className="block w-full lg:hidden flex flex-col gap-3 flex-row sm:items-center">
+          <a
+            href={`/api/pedidos/${pedido.id}/pdf`} target="_blank" rel="noopener noreferrer" className={buttonStyles({
+              className: "w-full gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white",
+            })}>
+            <Icon name="download" className="h-4 w-4" />
+            DESCARGAR PRESUPUESTO
+          </a>
+        </div>
       </div>
+
+
 
       <TrabajosSeleccionProvider initialIds={pedido.trabajos_ids} initialListaPrecios={(pedido.lista_precio as 1 | 2 | 3) ?? 1}>
       <div className={cn("PedidoDetailPageContent", styles.PedidoDetailPageContent)}>
@@ -144,7 +155,7 @@ export function PedidoDetailPage({
             </div>
 
             {/* Cobrado + Prioridad */}
-            <div className="flex gap-3" onClickCapture={() => setDirty(true)}>
+            <div className="flex gap-3 flex-col md:flex-row" onClickCapture={() => setDirty(true)}>
               <CobradoToggle form={formId} />
               <PrioridadToggle form={formId} />
             </div>

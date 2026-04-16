@@ -7,19 +7,15 @@ import styles from "./ButtonAdd.module.scss";
 type ButtonAddProps = {
   children: string;
   className?: string;
+  classNameInner?: string;
 } & (
   | { href: string; onClick?: never }
   | { onClick: () => void; href?: never }
 );
 
-export function ButtonAdd({ href, onClick, children, className }: ButtonAddProps) {
+export function ButtonAdd({ href, onClick, children, className, classNameInner }: ButtonAddProps) {
   const cls = buttonStyles({
-    className: cn(
-      "ButtonAdd",
-      styles.ButtonAdd,
-      "gap-2 !text-white bg-sky-600 uppercase hover:bg-sky-700 focus-visible:ring-sky-600",
-      className
-    ),
+    className: cn( "ButtonAdd", styles.ButtonAdd, "gap-2 !text-white bg-sky-600 uppercase hover:bg-sky-700 focus-visible:ring-sky-600", className),
   });
 
   if (onClick) {
@@ -32,7 +28,7 @@ export function ButtonAdd({ href, onClick, children, className }: ButtonAddProps
   }
 
   return (
-    <Link href={href!} className={cls}>
+    <Link href={href!} className={cn(classNameInner, cls)}>
       <Icon name="plus" className="h-4 w-4" />
       {children}
     </Link>

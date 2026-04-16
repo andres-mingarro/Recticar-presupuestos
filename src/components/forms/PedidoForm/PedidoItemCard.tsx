@@ -31,14 +31,15 @@ export function PedidoItemCard({
     <label
       htmlFor={inputId}
       className={cn(
-        "PedidoItemCard rounded-xl px-4 py-3 text-sm",
+        "PedidoItemCard rounded-xl px-4 py-3 text-sm ",
         checked ? "text-white" : "text-[var(--color-foreground)]",
         styles.PedidoItemCard,
         checked ? styles.PedidoItemCardChecked : styles.PedidoItemCardUnchecked,
         className
       )}
     >
-      <div className={cn("flex items-start gap-3", styles.PedidoItemCardContent, contentClassName)}>
+      <div className={cn("flex items-start  flex-col lg:flex-row lg:items-center justify-between gap-3", styles.PedidoItemCardContent, contentClassName)}>
+        <div className="content-pedido-item-header flex items-center gap-3">
         <CheckboxBeauti
           {...inputProps}
           id={inputId}
@@ -47,7 +48,8 @@ export function PedidoItemCard({
           onChange={(event) => onCheckedChange(event.target.checked)}
           className="gap-0"
         />
-        <span className="min-w-0">{label}</span>
+        <span className="min-w-0 text-lg">{label}</span>
+        </div>
         {children}
       </div>
     </label>

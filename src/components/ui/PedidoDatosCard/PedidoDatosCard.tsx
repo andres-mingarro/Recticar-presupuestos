@@ -48,37 +48,37 @@ export function PedidoDatosCard({
       </p>
 
       <dl className="space-y-3 text-sm">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-2 flex-row sm:items-center justify-between">
           <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
             <Icon name="clipboard" className="h-4 w-4 shrink-0" />
             Estado
           </dt>
           <dd>
-            <StatusBadge estado={estado} />
+            <StatusBadge estado={estado} className="inline-flex w-[130px] justify-center" />
           </dd>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-2 flex-row sm:items-center justify-between">
           <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
             <Icon name="check" className="h-4 w-4 shrink-0" />
             Cobro
           </dt>
           <dd>
-            <PaymentBadge cobrado={cobrado} />
+            <PaymentBadge cobrado={cobrado} className="inline-flex w-[130px] justify-center" />
           </dd>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-2 flex-row sm:items-center justify-between">
           <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
             <Icon name="gauge" className="h-4 w-4 shrink-0" />
             Prioridad
           </dt>
           <dd>
-            <PriorityBadge prioridad={prioridad} />
+            <PriorityBadge prioridad={prioridad} className="inline-flex w-[130px] justify-center" />
           </dd>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-2 flex-row sm:items-center justify-between">
           <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
             <Icon name="car" className="h-4 w-4 shrink-0" />
             Vehículo
@@ -89,7 +89,7 @@ export function PedidoDatosCard({
         </div>
 
         {numeroSerieMotor ? (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-2 flex-row sm:items-center justify-between">
             <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
               <Icon name="hash" className="h-4 w-4 shrink-0" />
               Serie
@@ -100,7 +100,7 @@ export function PedidoDatosCard({
           </div>
         ) : null}
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-2 flex-row sm:items-center justify-between">
           <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
             <Icon name="calendar" className="h-4 w-4 shrink-0" />
             Creación
@@ -111,7 +111,7 @@ export function PedidoDatosCard({
         </div>
 
         {fechaAprobacion ? (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-2 flex-row sm:items-center justify-between">
             <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
               <Icon name="calendar" className="h-4 w-4 shrink-0" />
               Aprobación
@@ -123,7 +123,7 @@ export function PedidoDatosCard({
         ) : null}
 
         <div className="space-y-2">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-2 flex-row sm:items-center justify-between">
             <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
               <Icon name="clipboard" className="h-4 w-4 shrink-0" />
               Items

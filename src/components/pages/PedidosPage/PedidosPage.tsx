@@ -86,13 +86,13 @@ function PedidoTable({
         <table className="w-full table-auto text-left text-sm">
           <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
             <tr>
-              <th className="w-[56px] px-2 py-3 text-center font-semibold">
+              <th className="w-[56px] px-2 py-3 font-semibold">
                 <span className="inline-flex items-center" aria-label="Número de pedido" title="Número de pedido">
                   #
                 </span>
               </th>
-              <th className="min-w-[110px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="user" className="h-4 w-4" />Cliente</span></th>
-              <th className="min-w-[130px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Detalle</span></th>
+              <th className="min-w-[80px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="user" className="h-4 w-4" />Cliente</span></th>
+              <th className="min-w-[90px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Detalle</span></th>
               <th className="w-[96px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="gauge" className="h-4 w-4" />Prioridad</span></th>
               <th className="w-[64px] px-3 py-3 font-semibold">
                 <span
@@ -115,14 +115,16 @@ function PedidoTable({
               </th>
               {showBusinessDays ? (
                 <th className="w-[96px] px-3 py-3 font-semibold whitespace-nowrap"><span className="inline-flex items-center gap-2"><Icon name="clock" className="h-4 w-4" />Días hábiles</span></th>
-              ) : null}
+              ) : (
+                <th className="w-[96px] px-3 py-3 font-semibold"></th>
+              )}
             </tr>
           </thead>
           <tbody>
             {pedidos.length === 0 ? (
               <tr>
                 <td
-                  colSpan={showBusinessDays ? 8 : 7}
+                  colSpan={8}
                   className="px-4 py-10 text-center text-[var(--color-foreground-muted)]"
                 >
                   {emptyMessage}
@@ -143,10 +145,10 @@ function PedidoTable({
                     }
                   }}
                 >
-                  <td className="w-[56px] px-2 py-4 text-center font-semibold">
+                  <td className="w-[56px] px-2 py-4 font-semibold">
                     #{pedido.numero_pedido}
                   </td>
-                  <td className="min-w-[110px] px-3 py-4">
+                  <td className="min-w-[80px] px-3 py-4">
                     {pedido.cliente_id ? (
                       <Link
                         href={`/clientes/${pedido.cliente_id}`}
@@ -159,7 +161,7 @@ function PedidoTable({
                       "Sin cliente asignado"
                     )}
                   </td>
-                  <td className="min-w-[130px] px-3 py-4">
+                  <td className="min-w-[90px] px-3 py-4">
                     <div className="space-y-1">
                       <p className="text-[0.68rem] font-semibold uppercase leading-none text-[var(--color-foreground-subtle)]">
                         {pedido.marca_nombre ?? "Marca sin definir"}
@@ -189,7 +191,7 @@ function PedidoTable({
                     </div>
                   </td>
                   {showBusinessDays ? (
-                    <td className="w-[96px] px-3 py-4 text-right">
+                    <td className="w-[96px] px-3 py-4">
                       <BusinessDaysBadge
                         days={
                           pedido.estado === "finalizado"
@@ -201,7 +203,9 @@ function PedidoTable({
                         }
                       />
                     </td>
-                  ) : null}
+                  ) : (
+                    <td className="w-[96px] px-3 py-4"></td>
+                  )}
                 </tr>
               ))
             )}
@@ -229,7 +233,11 @@ export function PedidosPage({
         title="Listado de pedidos"
         description="Filtrá presupuestos por estado y prioridad. La base ya queda lista para seguir con alta, edición, aprobación y PDF."
         actions={
-          canEdit ? <ButtonAdd href="/pedidos/nuevo">Nuevo pedido</ButtonAdd> : undefined
+          canEdit ? (
+            <ButtonAdd classNameInner="w-full md:w-auto" href="/pedidos/nuevo">
+              Nuevo pedido
+            </ButtonAdd>
+          ) : undefined
         }
       />
 
@@ -258,18 +266,19 @@ export function PedidosPage({
               </option>
             ))}
           </Select>
-
-          <button type="submit" className={buttonStyles({ className: "w-full md:w-auto" })}>
-            <Icon name="search" className="h-4 w-4" />
-            Filtrar
-          </button>
-          <Link
-            href="/pedidos"
-            className={buttonStyles({ variant: "secondary", className: "w-full md:w-auto" })}
-          >
-            <Icon name="x" className="h-4 w-4" />
-            Limpiar
-          </Link>
+            <div className="flex gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto]">
+              <button type="submit" className={buttonStyles({ className: "w-full md:w-auto" })}>
+                <Icon name="search" className="h-4 w-4" />
+                Filtrar
+              </button>
+              <Link
+                href="/pedidos"
+                className={buttonStyles({ variant: "secondary", className: "w-full md:w-auto" })}
+              >
+                <Icon name="x" className="h-4 w-4" />
+                Limpiar
+              </Link>
+            </div>
         </form>
 
         <PedidoTable

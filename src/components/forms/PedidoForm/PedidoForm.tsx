@@ -448,39 +448,41 @@ export function PedidoForm({
                       </summary>
                       <div className="mt-4 grid gap-3">
                         {grupo.repuestos.map((repuesto) => (
-                          <PedidoItemCard
-                            key={repuesto.id}
-                            checked={selectedRepuestoIds.has(repuesto.id)}
-                            value={repuesto.id}
-                            onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked)}
-                            label={repuesto.nombre}
-                            contentClassName="grid grid-cols-[auto_minmax(0,1fr)] gap-3 md:grid-cols-[auto_minmax(0,1.3fr)_120px_132px_120px]"
-                          >
-                            <Input
-                              type="number"
-                              min="0"
-                              step="1"
-                              inputMode="numeric"
-                              value={selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0}
-                              disabled={!selectedRepuestoIds.has(repuesto.id)}
-                              onChange={(event) =>
-                                setPrecioUnitario(repuesto.id, Number(event.target.value))
-                              }
-                              className="text-right"
-                            />
-                            <Incrementor
-                              value={selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
-                              onDecrement={() => decrementCantidad(repuesto.id)}
-                              onIncrement={() => incrementCantidad(repuesto.id)}
-                              disabled={!selectedRepuestoIds.has(repuesto.id)}
-                              className="justify-start md:justify-center"
-                            />
-                            <span className="text-left text-base font-bold text-[var(--color-foreground)] md:text-right">
-                              {formatPrice(
-                                (selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0) *
-                                  (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
-                              )}
-                            </span>
+                            <PedidoItemCard
+                              key={repuesto.id}
+                              checked={selectedRepuestoIds.has(repuesto.id)}
+                              value={repuesto.id}
+                              onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked)}
+                              label={repuesto.nombre}
+                              contentClassName="flex gap-3"
+                              >
+                            <div className="content-pedido-item-card w-full lg:w-auto items-center gap-2 grid grid-cols-[120px_132px_1fr] lg:grid-cols-[120px_132px_120px]">
+                              <Input
+                                type="number"
+                                min="0"
+                                step="1"
+                                inputMode="numeric"
+                                value={selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0}
+                                disabled={!selectedRepuestoIds.has(repuesto.id)}
+                                onChange={(event) =>
+                                  setPrecioUnitario(repuesto.id, Number(event.target.value))
+                                }
+                                className="text-right"
+                              />
+                              <Incrementor
+                                value={selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
+                                onDecrement={() => decrementCantidad(repuesto.id)}
+                                onIncrement={() => incrementCantidad(repuesto.id)}
+                                disabled={!selectedRepuestoIds.has(repuesto.id)}
+                                className="justify-start md:justify-center"
+                              />
+                              <span className="text-right text-base font-bold text-[var(--color-foreground)]">
+                                {formatPrice(
+                                  (selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0) *
+                                    (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
+                                )}
+                              </span>
+                            </div>
                           </PedidoItemCard>
                         ))}
                       </div>

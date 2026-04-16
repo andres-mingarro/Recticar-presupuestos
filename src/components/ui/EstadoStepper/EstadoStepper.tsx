@@ -15,7 +15,7 @@ const STEPS: Array<{
   {
     value: "pendiente",
     label: "Presupuesto entregado",
-    num: "01",
+    num: "1",
     activeBg: "bg-[linear-gradient(135deg,#fff7ed,#fed7aa)]",
     activeText: "text-orange-700",
     isLight: true,
@@ -23,7 +23,7 @@ const STEPS: Array<{
   {
     value: "aprobado",
     label: "Presupuesto aceptado",
-    num: "02",
+    num: "2",
     activeBg: "bg-[linear-gradient(135deg,#ea580c,#fb923c)]",
     activeText: "text-white",
     isLight: false,
@@ -31,7 +31,7 @@ const STEPS: Array<{
   {
     value: "finalizado",
     label: "Pedido finalizado",
-    num: "03",
+    num: "3",
     activeBg: "bg-[linear-gradient(135deg,#059669,#34d399)]",
     activeText: "text-white",
     isLight: false,
