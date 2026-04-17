@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
 import type { ClienteFormValues } from "@/lib/types";
@@ -11,6 +12,65 @@ import { Spinner } from "@/components/ui/Spinner";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import styles from "./ClienteForm.module.scss";
+
+const PROVINCIAS = [
+  "Buenos Aires",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Ciudad Autónoma de Buenos Aires",
+  "Córdoba",
+  "Corrientes",
+  "Entre Ríos",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquén",
+  "Río Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego",
+  "Tucumán",
+];
+
+const CIUDADES_CHUBUT = [
+  "Trelew",
+  "Comodoro Rivadavia",
+  "Puerto Madryn",
+  "Rawson",
+  "Esquel",
+  "Rada Tilly",
+  "Gaiman",
+  "Dolavon",
+  "28 de Julio",
+  "Lago Puelo",
+  "El Hoyo",
+  "Epuyén",
+  "Cholila",
+  "Tecka",
+  "Gobernador Costa",
+  "Alto Río Senguer",
+  "Río Mayo",
+  "Sarmiento",
+  "Camarones",
+  "Playa Unión",
+  "José de San Martín",
+  "Las Plumas",
+  "Paso de Indios",
+  "Los Altares",
+  "Gan Gan",
+  "Gastre",
+  "Telsen",
+  "Puerto Pirámides",
+  "Río Pico",
+];
 
 export type ClienteFormState = {
   error: string | null;
@@ -61,17 +121,16 @@ export function ClienteForm({
   }, [isPending]);
   const [internalIsEditing, setInternalIsEditing] = useState(!startInReadOnly);
   const isEditing = controlledIsEditing ?? internalIsEditing;
-  const [provincias, setProvincias] = useState<string[]>([]);
-  const [ciudades, setCiudades] = useState<string[]>([]);
   const [selectedProvincia, setSelectedProvincia] = useState(
     initialState.values.provincia || "Chubut"
   );
   const [selectedCiudad, setSelectedCiudad] = useState(
     initialState.values.ciudad || "Trelew"
   );
-  const [locationError, setLocationError] = useState<string | null>(null);
   const [dniValue, setDniValue] = useState(initialState.values.dni ?? "");
   const [cuitValue, setCuitValue] = useState(initialState.values.cuit ?? "");
+
+  const esChubut = selectedProvincia === "Chubut";
 
   useEffect(() => {
     const nextProvincia = state.values.provincia || "Chubut";
@@ -80,95 +139,14 @@ export function ClienteForm({
     setSelectedCiudad(nextCiudad);
   }, [state.values.provincia, state.values.ciudad]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadProvincias() {
-      try {
-        const response = await fetch("/api/georef/provincias");
-        const data = (await response.json()) as {
-          provincias?: string[];
-          error?: string;
-        };
-
-        if (!response.ok) {
-          throw new Error(data.error || "No se pudieron cargar las provincias.");
-        }
-
-        if (!cancelled) {
-          setProvincias(data.provincias ?? []);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setLocationError(
-            error instanceof Error
-              ? error.message
-              : "No se pudieron cargar las provincias."
-          );
-        }
-      }
+  function handleProvinciaChange(provincia: string) {
+    setSelectedProvincia(provincia);
+    if (provincia === "Chubut") {
+      setSelectedCiudad("Trelew");
+    } else {
+      setSelectedCiudad("");
     }
-
-    loadProvincias();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadCiudades() {
-      if (!selectedProvincia) {
-        setCiudades([]);
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `/api/georef/localidades?provincia=${encodeURIComponent(selectedProvincia)}`
-        );
-        const data = (await response.json()) as {
-          localidades?: string[];
-          error?: string;
-        };
-
-        if (!response.ok) {
-          throw new Error(data.error || "No se pudieron cargar las ciudades.");
-        }
-
-        if (cancelled) {
-          return;
-        }
-
-        const nextCiudades = data.localidades ?? [];
-        setCiudades(nextCiudades);
-
-        if (!nextCiudades.includes(selectedCiudad)) {
-          if (nextCiudades.includes("Trelew")) {
-            setSelectedCiudad("Trelew");
-          } else {
-            setSelectedCiudad(nextCiudades[0] ?? "");
-          }
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setLocationError(
-            error instanceof Error
-              ? error.message
-              : "No se pudieron cargar las ciudades."
-          );
-        }
-      }
-    }
-
-    loadCiudades();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedProvincia, selectedCiudad]);
+  }
 
   function formatDNI(raw: string): string {
     const digits = raw.replace(/\D/g, "").slice(0, 8);
@@ -309,26 +287,48 @@ export function ClienteForm({
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
           <span className="text-sm font-medium text-[var(--color-foreground)]">
-            Ciudad
+            Provincia
           </span>
           <Select
-            name="ciudad"
-            value={selectedCiudad}
-            onChange={(event) => setSelectedCiudad(event.target.value)}
+            name="provincia"
+            value={selectedProvincia}
+            onChange={(event) => handleProvinciaChange(event.target.value)}
             disabled={!isEditing}
           >
-            {ciudades.length === 0 ? (
-              <option value={selectedCiudad || ""}>
-                {selectedCiudad || "Sin ciudades"}
+            {PROVINCIAS.map((provincia) => (
+              <option key={provincia} value={provincia}>
+                {provincia}
               </option>
-            ) : (
-              ciudades.map((ciudad) => (
+            ))}
+          </Select>
+        </label>
+
+        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
+          <span className="text-sm font-medium text-[var(--color-foreground)]">
+            Ciudad
+          </span>
+          {esChubut ? (
+            <Select
+              name="ciudad"
+              value={selectedCiudad}
+              onChange={(event) => setSelectedCiudad(event.target.value)}
+              disabled={!isEditing}
+            >
+              {CIUDADES_CHUBUT.map((ciudad) => (
                 <option key={ciudad} value={ciudad}>
                   {ciudad}
                 </option>
-              ))
-            )}
-          </Select>
+              ))}
+            </Select>
+          ) : (
+            <Input
+              name="ciudad"
+              placeholder="Ej. Mendoza"
+              value={selectedCiudad}
+              onChange={(e) => setSelectedCiudad(e.target.value)}
+              disabled={!isEditing}
+            />
+          )}
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
@@ -341,30 +341,6 @@ export function ClienteForm({
             defaultValue={state.values.direccion}
             disabled={!isEditing}
           />
-        </label>
-
-        <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
-            Provincia
-          </span>
-          <Select
-            name="provincia"
-            value={selectedProvincia}
-            onChange={(event) => setSelectedProvincia(event.target.value)}
-            disabled={!isEditing}
-          >
-            {provincias.length === 0 ? (
-              <option value={selectedProvincia || ""}>
-                {selectedProvincia || "Sin provincias"}
-              </option>
-            ) : (
-              provincias.map((provincia) => (
-                <option key={provincia} value={provincia}>
-                  {provincia}
-                </option>
-              ))
-            )}
-          </Select>
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
@@ -411,12 +387,6 @@ export function ClienteForm({
       {state.error ? (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {state.error}
-        </div>
-      ) : null}
-
-      {locationError ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          {locationError}
         </div>
       ) : null}
 
