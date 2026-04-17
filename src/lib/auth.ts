@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import type { UserRole } from "@/lib/queries/usuarios";
 
 const COOKIE_NAME = "recticar_token";
-const EXPIRES_IN = 60 * 60 * 8; // 8 horas
+const EXPIRES_IN = 60 * 60 * 24 * 30; // 30 días
 
 export interface SessionPayload {
   email: string;
