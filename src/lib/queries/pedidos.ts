@@ -12,6 +12,7 @@ import type {
 type PedidoFilters = {
   estado?: PedidoEstado;
   prioridad?: PedidoPrioridad;
+  numeroPedido?: number;
 };
 
 type PedidoListRow = Omit<
@@ -39,6 +40,11 @@ export async function listPedidos(filters: PedidoFilters = {}) {
   if (filters.prioridad) {
     params.push(filters.prioridad);
     conditions.push(`p.prioridad = $${params.length}`);
+  }
+
+  if (filters.numeroPedido) {
+    params.push(String(filters.numeroPedido));
+    conditions.push(`p.numero_pedido = $${params.length}`);
   }
 
   const whereClause =

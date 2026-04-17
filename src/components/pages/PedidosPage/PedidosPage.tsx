@@ -34,6 +34,7 @@ import styles from "./PedidosPage.module.scss";
 type PedidosPageProps = {
   estado?: PedidoEstado;
   prioridad?: PedidoPrioridad;
+  numeroPedido?: number;
   pedidos: PedidoListItem[];
   errorMessage: string | null;
   canEdit: boolean;
@@ -189,7 +190,7 @@ function PedidoTable({
                     <div className="inline-flex items-center gap-2 text-[var(--color-foreground-muted)]">
                       <span>{formatDate(pedido.fecha_creacion)}</span>
                       <Icon name="arrowRight" className="h-4 w-4" />
-                      <span>{pedido.estado === "pendiente" ? "--/--/----" : formatDate(pedido.fecha_aprobacion)}</span>
+                      <span className="whitespace-nowrap">{pedido.estado === "pendiente" ? "--/--/----" : formatDate(pedido.fecha_aprobacion)}</span>
                     </div>
                   </td>
                   {showBusinessDays ? (
@@ -223,6 +224,7 @@ const PAGE_SIZE = 5;
 export function PedidosPage({
   estado,
   prioridad,
+  numeroPedido,
   pedidos,
   errorMessage,
   canEdit,
@@ -255,7 +257,7 @@ export function PedidosPage({
       ) : null}
 
       <Card as="section" className="space-y-5">
-        <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto]">
+        <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,140px)_auto_auto]">
           <Select name="estado" defaultValue={estado ?? ""}>
             <option value="">Todos los estados</option>
             {PEDIDO_ESTADOS.map((item) => (
@@ -273,7 +275,17 @@ export function PedidosPage({
               </option>
             ))}
           </Select>
-            <div className="flex gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto]">
+
+          <input
+            type="number"
+            name="numero"
+            min="1"
+            placeholder="Nº pedido"
+            defaultValue={numeroPedido ?? ""}
+            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-foreground-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          />
+
+            <div className="flex gap-3">
               <button type="submit" className={buttonStyles({ className: "w-full md:w-auto" })}>
                 <Icon name="search" className="h-4 w-4" />
                 Filtrar

@@ -23,7 +23,7 @@ function isPedidoPrioridad(value: string): value is PedidoPrioridad {
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: Promise<{ estado?: string; prioridad?: string }>;
+  searchParams?: Promise<{ estado?: string; prioridad?: string; numero?: string }>;
 }) {
   const params = await resolveSearchParams(searchParams);
   const estado =
@@ -34,6 +34,10 @@ export default async function Page({
     typeof params.prioridad === "string" && isPedidoPrioridad(params.prioridad)
       ? params.prioridad
       : undefined;
+  const numeroPedido =
+    typeof params.numero === "string" && /^\d+$/.test(params.numero)
+      ? Number(params.numero)
+      : undefined;
 
   const session = await getSession();
   const canEdit = session?.role !== "operador";
@@ -42,7 +46,7 @@ export default async function Page({
   let pedidos: PedidoListItem[] = [];
 
   try {
-    pedidos = await listPedidos({ estado, prioridad });
+    pedidos = await listPedidos({ estado, prioridad, numeroPedido });
   } catch (error) {
     errorMessage =
       error instanceof Error ? error.message : "No se pudo cargar pedidos.";
@@ -52,6 +56,7 @@ export default async function Page({
     <PedidosPage
       estado={estado}
       prioridad={prioridad}
+      numeroPedido={numeroPedido}
       pedidos={pedidos}
       errorMessage={errorMessage}
       canEdit={canEdit}
