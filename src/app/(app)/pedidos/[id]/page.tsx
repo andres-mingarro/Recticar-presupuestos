@@ -62,7 +62,7 @@ export default async function Page({
   const initialState: PedidoFormState = {
     error: null,
     values: {
-      updatedAt: pedido.updated_at,
+      updatedAt: new Date(pedido.updated_at).toISOString(),
       clienteId: pedido.cliente_id ? String(pedido.cliente_id) : "",
       marcaId: pedido.marca_id ? String(pedido.marca_id) : "",
       modeloId: pedido.modelo_id ? String(pedido.modelo_id) : "",
