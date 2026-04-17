@@ -73,6 +73,7 @@ export type PedidoListItem = {
 };
 
 export type PedidoDetail = PedidoListItem & {
+  updated_at: string;
   observaciones: string | null;
   trabajos_ids: number[];
   repuestos_ids: number[];
@@ -92,6 +93,7 @@ export type PedidoRepuestoValue = {
 };
 
 export type PedidoFormValues = {
+  updatedAt?: string;
   clienteId: string;
   marcaId: string;
   modeloId: string;
