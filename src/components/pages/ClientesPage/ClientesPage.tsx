@@ -18,6 +18,7 @@ import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
 import { Table } from "@/components/ui/Table";
 import { getVehicleLabel } from "@/lib/format";
+import { ClienteMobileCard } from "@/components/ui/ClienteMobileCard";
 import styles from "./ClientesPage.module.scss";
 
 type ClientesPageProps = {
@@ -147,11 +148,29 @@ export function ClientesPage({
           className={cn("ClientesPagePager", styles.ClientesPagePager)}
         />
 
-        <Table>
-          <table className="min-w-[840px] w-full text-left text-sm">
+        {/* Cards mobile */}
+        <div className="md:hidden space-y-2">
+          {clientes.length === 0 ? (
+            <p className="px-2 py-8 text-center text-sm text-[var(--color-foreground-muted)]">
+              No hay clientes para mostrar.
+            </p>
+          ) : (
+            clientes.map((cliente) => (
+              <ClienteMobileCard
+                key={cliente.id}
+                cliente={cliente}
+                pendientes={(pendingPedidosByCliente[cliente.id] ?? []).length}
+                onPendientesClick={() => openPanel(cliente.id)}
+              />
+            ))
+          )}
+        </div>
+
+        <div className="hidden md:block"><Table>
+          <table className="w-full text-left text-sm">
             <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
               <tr>
-                <th className="px-4 py-3 font-semibold">
+                <th className="px-4 py-3 font-semibold w-[140px]">
                   <span className="inline-flex items-center gap-2">
                     <Icon name="hash" className="h-4 w-4" />
                     N° Cliente
@@ -163,13 +182,13 @@ export function ClientesPage({
                     Nombre completo
                   </span>
                 </th>
-                <th className="px-4 py-3 font-semibold">
+                <th className="px-4 py-3 font-semibold w-[150px]">
                   <span className="inline-flex items-center gap-2">
                     <Icon name="phone" className="h-4 w-4" />
                     Teléfono
                   </span>
                 </th>
-                <th className="px-4 py-3 font-semibold">
+                <th className="px-4 py-3 font-semibold w-[150px]">
                   <span className="inline-flex items-center gap-2">
                     <Icon name="clipboard" className="h-4 w-4" />
                     Pendientes
@@ -257,7 +276,7 @@ export function ClientesPage({
               )}
             </tbody>
           </table>
-        </Table>
+        </Table></div>
 
         <Pager
           currentPage={currentPage}

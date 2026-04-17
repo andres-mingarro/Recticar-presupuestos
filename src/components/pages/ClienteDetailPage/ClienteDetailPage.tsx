@@ -8,6 +8,7 @@ import { formatDate, getVehicleLabel } from "@/lib/format";
 import { ClienteForm, type ClienteFormState } from "@/components/forms/ClienteForm";
 import { buttonStyles } from "@/components/ui/Button";
 import { PaymentBadge, PriorityBadge, StatusBadge } from "@/components/ui/Badge";
+import { PedidoMobileCard } from "@/components/ui/PedidoMobileCard";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
@@ -52,11 +53,13 @@ function PedidoTable({
   eyebrow,
   emptyMessage,
   pedidos,
+  footer,
 }: {
   title: string;
   eyebrow: string;
   emptyMessage: string;
   pedidos: ClientePedidoItem[];
+  footer?: React.ReactNode;
 }) {
   return (
     <Card as="section" className="space-y-4">
@@ -70,7 +73,18 @@ function PedidoTable({
         </h2>
       </div>
 
-      <Table>
+      {/* Cards mobile */}
+      <div className="md:hidden space-y-2">
+        {pedidos.length === 0 ? (
+          <p className="py-6 text-center text-sm text-[var(--color-foreground-muted)]">{emptyMessage}</p>
+        ) : (
+          pedidos.map((pedido) => (
+            <PedidoMobileCard key={pedido.id} pedido={pedido} showBusinessDays={false} />
+          ))
+        )}
+      </div>
+
+      <div className="hidden md:block"><Table>
         <table className="min-w-[720px] w-full text-left text-sm">
           <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
             <tr>
@@ -120,7 +134,8 @@ function PedidoTable({
             )}
           </tbody>
         </table>
-      </Table>
+      </Table></div>
+      {footer}
     </Card>
   );
 }
@@ -135,6 +150,9 @@ export function ClienteDetailPage({
   canEdit,
 }: ClienteDetailPageProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [visibleFinalizados, setVisibleFinalizados] = useState(5);
+  const finalizadosVisible = pedidosFinalizados.slice(0, visibleFinalizados);
+  const hayMasFinalizados = visibleFinalizados < pedidosFinalizados.length;
 
   const rawPhone = (cliente.telefono ?? "").replace(/\D/g, "");
   const waNumber = rawPhone.startsWith("54") ? rawPhone : `54${rawPhone}`;
@@ -144,7 +162,7 @@ export function ClienteDetailPage({
       <div>
         <Link
           href="/clientes"
-          className={buttonStyles({ variant: "secondary", className: "w-full sm:w-auto" })}
+          className={buttonStyles({ variant: "secondary", className: "" })}
         >
           <Icon name="chevronLeft" className="h-4 w-4" />
           Volver al listado
@@ -164,11 +182,11 @@ export function ClienteDetailPage({
           </div>
 
           <div className={styles.headerActions}>
-            <ButtonAdd href={`/pedidos/nuevo?clienteId=${cliente.id}`}>
+            <ButtonAdd className="w-full lg:w-auto" href={`/pedidos/nuevo?clienteId=${cliente.id}`}>
               Nuevo pedido
             </ButtonAdd>
             {/* Stats */}
-            <div className={styles.stats}>
+            <div className={`${styles.stats} hidden lg:flex`}>
               <div className={styles.stat}>
                 <span className={styles.statValue}>{pedidosVigentes.length}</span>
                 <span className={styles.statLabel}>Vigentes</span>
@@ -185,7 +203,7 @@ export function ClienteDetailPage({
         </div>
 
         {/* Info de contacto */}
-        <div className={styles.infoGrid}>
+        <div className={`infoGrid ${styles.infoGrid}`}>
           <div className={styles.infoGridRow}>
             <InfoRow label="Teléfono" icon={<Icon name="phone" className="h-3.5 w-3.5" />}>
               {cliente.telefono ? (
@@ -216,7 +234,7 @@ export function ClienteDetailPage({
           <div className={styles.infoGridRow}>
             <InfoRow label="Email" icon={<Icon name="mail" className="h-3.5 w-3.5" />}>
               {cliente.mail ? (
-                <a href={`mailto:${cliente.mail}`} className={styles.infoLink}>{cliente.mail}</a>
+                <a href={`mailto:${cliente.mail}`} className={styles.infoLinkTruncate}>{cliente.mail}</a>
               ) : (
                 <span className={styles.infoEmpty}>Sin email</span>
               )}
@@ -256,11 +274,11 @@ export function ClienteDetailPage({
           </div>
         </div>
 
-        <div>
+        <div className="grid">
           {canEdit && (
             <button
               type="button"
-              className={buttonStyles({ variant: "primary", size: "sm", className: "gap-2" })}
+              className={buttonStyles({ variant: "primary", size: "sm", className: "editBtn gap-2 max-w-[170px] w-full m-auto lg:ml-auto lg:mr-0" })}
               aria-expanded={isEditOpen}
               aria-controls="cliente-edit-panel"
               onClick={() => setIsEditOpen((v) => !v)}
@@ -317,8 +335,18 @@ export function ClienteDetailPage({
       <PedidoTable
         eyebrow="Historial"
         title="Pedidos finalizados"
-        pedidos={pedidosFinalizados}
+        pedidos={finalizadosVisible}
         emptyMessage="Todavía no hay pedidos finalizados para este cliente."
+        footer={hayMasFinalizados ? (
+          <button
+            type="button"
+            className={buttonStyles({ variant: "secondary", className: "w-full" })}
+            onClick={() => setVisibleFinalizados((v) => v + 5)}
+          >
+            <Icon name="chevronDown" className="h-4 w-4" />
+            Cargar más finalizados
+          </button>
+        ) : undefined}
       />
     </div>
   );

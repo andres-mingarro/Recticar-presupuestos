@@ -27,7 +27,6 @@
 
 /* ─── Stats ─── */
 .stats {
-  display: inline-flex;
   align-items: center;
   gap: 1rem;
   border: 1px solid var(--color-border);
@@ -85,15 +84,19 @@
 .infoRow {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 1.25rem;
+
+  & + .infoRow {
+    border-top: 1px solid var(--color-border);
+  }
 }
 
 .infoLabel {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  min-width: 9rem;
   flex-shrink: 0;
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
@@ -108,6 +111,12 @@
   color: var(--color-foreground);
   flex: 1;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .infoEmpty {
@@ -120,6 +129,7 @@
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .infoLink {
@@ -130,6 +140,27 @@
   &:hover {
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+}
+
+.infoLinkTruncate {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 767px) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    max-width: 130px;
+    display: block;
+    text-align: right;
   }
 }
 
@@ -193,5 +224,9 @@
 
   .infoRow:first-child {
     border-right: 1px solid var(--color-border);
+  }
+
+  .infoRow + .infoRow {
+    border-top: none;
   }
 }

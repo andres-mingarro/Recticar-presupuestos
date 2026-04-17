@@ -227,9 +227,14 @@ export function PedidoDetailPage({
                   <p className={styles.etiquetaNumero}>#{pedido.numero_pedido}</p>
                   <p className={styles.etiquetaCliente}>{pedido.cliente_nombre ?? "Sin cliente"}</p>
                   {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre, pedido.motor_nombre]) ? (
+                    <>
                     <p className={styles.etiquetaVehiculo}>
-                      {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre, pedido.motor_nombre])}
+                      {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre])}
                     </p>
+                    <p className={styles.etiquetaVehiculo}>
+                      {getVehicleLabel([pedido.motor_nombre])}
+                    </p>
+                    </>
                   ) : null}
                 </div>
               </div>

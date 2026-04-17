@@ -41,7 +41,7 @@ export function AppShell({ children, role }: Props) {
             priority
           />
         </Link>
-        <Date />
+        <Date className="hidden md:flex" />
         <button
           type="button"
           className={styles.hamburger}

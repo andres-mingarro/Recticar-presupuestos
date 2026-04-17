@@ -28,7 +28,7 @@ export function Pager({
     <div className={cn("Pager", className)}>
       <p className="text-sm text-[var(--color-foreground-muted)]">{summary}</p>
 
-      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+      <div className="flex w-full flex-wrap justify-between items-center gap-2 sm:w-auto sm:justify-end">
         <Link
           href={previousHref}
           aria-disabled={!hasPreviousPage}
@@ -36,7 +36,7 @@ export function Pager({
             variant: "secondary",
             size: "sm",
             className: cn(
-              "w-full sm:w-auto",
+              "sm:w-auto",
               !hasPreviousPage ? "pointer-events-none opacity-50" : undefined
             ),
           })}
@@ -44,8 +44,8 @@ export function Pager({
           <Icon name="chevronLeft" className="h-4 w-4" />
           Anterior
         </Link>
-        <span className="px-2 text-sm text-[var(--color-foreground-muted)]">
-          Página {currentPage} de {totalPages}
+        <span className="flex px-2 text-sm text-[var(--color-foreground-muted)]">
+          <span className="hidden lg:block">Página</span> {currentPage} de {totalPages}
         </span>
         <Link
           href={nextHref}
@@ -54,13 +54,13 @@ export function Pager({
             variant: "secondary",
             size: "sm",
             className: cn(
-              "w-full sm:w-auto",
+              "sm:w-auto",
               !hasNextPage ? "pointer-events-none opacity-50" : undefined
             ),
           })}
         >
-          <Icon name="chevronRight" className="h-4 w-4" />
           Siguiente
+          <Icon name="chevronRight" className="h-4 w-4" />
         </Link>
       </div>
     </div>

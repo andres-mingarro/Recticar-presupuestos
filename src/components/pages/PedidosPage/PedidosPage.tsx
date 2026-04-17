@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 import {
@@ -27,6 +28,7 @@ import {
   getBusinessDaysBetween,
   getBusinessDaysSince,
 } from "@/lib/format";
+import { PedidoMobileCard } from "@/components/ui/PedidoMobileCard";
 import styles from "./PedidosPage.module.scss";
 
 type PedidosPageProps = {
@@ -187,11 +189,11 @@ function PedidoTable({
                     <div className="inline-flex items-center gap-2 text-[var(--color-foreground-muted)]">
                       <span>{formatDate(pedido.fecha_creacion)}</span>
                       <Icon name="arrowRight" className="h-4 w-4" />
-                      <span>{pedido.estado === "pendiente" ? "-" : formatDate(pedido.fecha_aprobacion)}</span>
+                      <span>{pedido.estado === "pendiente" ? "--/--/----" : formatDate(pedido.fecha_aprobacion)}</span>
                     </div>
                   </td>
                   {showBusinessDays ? (
-                    <td className="w-[96px] px-3 py-4">
+                    <td className="w-[96px] px-3 py-4 text-center">
                       <BusinessDaysBadge
                         days={
                           pedido.estado === "finalizado"
@@ -216,6 +218,8 @@ function PedidoTable({
   );
 }
 
+const PAGE_SIZE = 5;
+
 export function PedidosPage({
   estado,
   prioridad,
@@ -225,6 +229,9 @@ export function PedidosPage({
 }: PedidosPageProps) {
   const pedidosActivos = pedidos.filter((pedido) => pedido.estado !== "finalizado");
   const pedidosFinalizados = pedidos.filter((pedido) => pedido.estado === "finalizado");
+  const [visibleFinalizados, setVisibleFinalizados] = useState(PAGE_SIZE);
+  const finalizadosVisible = pedidosFinalizados.slice(0, visibleFinalizados);
+  const hayMas = visibleFinalizados < pedidosFinalizados.length;
 
   return (
     <div className={cn("PedidosPage", styles.PedidosPage, "space-y-6")}>
@@ -281,21 +288,69 @@ export function PedidosPage({
             </div>
         </form>
 
-        <PedidoTable
-          eyebrow="Activos"
-          title="Pedidos activos"
-          pedidos={pedidosActivos}
-          emptyMessage="No hay pedidos pendientes ni aprobados para mostrar."
-        />
+        <div className="hidden md:block">
+          <PedidoTable
+            eyebrow="Activos"
+            title="Pedidos activos"
+            pedidos={pedidosActivos}
+            emptyMessage="No hay pedidos pendientes ni aprobados para mostrar."
+          />
+        </div>
 
-        <PedidoTable
-          eyebrow="Finalizados"
-          title="Pedidos finalizados"
-          pedidos={pedidosFinalizados}
-          emptyMessage="No hay pedidos finalizados para mostrar."
-          showBusinessDays={false}
-        />
+        <div className="md:hidden space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">Activos</p>
+          {pedidosActivos.length === 0 ? (
+            <p className="py-6 text-center text-sm text-[var(--color-foreground-muted)]">No hay pedidos pendientes ni aprobados para mostrar.</p>
+          ) : (
+            pedidosActivos.map((pedido) => (
+              <PedidoMobileCard key={pedido.id} pedido={pedido} />
+            ))
+          )}
+        </div>
       </Card>
+
+      <div style={{ filter: "brightness(0.9) grayscale(0.6)" }}><Card as="section" className="space-y-5">
+        <div className="hidden md:block space-y-4">
+          <PedidoTable
+            eyebrow="Finalizados"
+            title="Pedidos finalizados"
+            pedidos={finalizadosVisible}
+            emptyMessage="No hay pedidos finalizados para mostrar."
+            showBusinessDays={false}
+          />
+          {hayMas && (
+            <button
+              type="button"
+              className={buttonStyles({ variant: "secondary", className: "w-full" })}
+              onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
+            >
+              <Icon name="chevronDown" className="h-4 w-4" />
+              Cargar más finalizados
+            </button>
+          )}
+        </div>
+
+        <div className="md:hidden space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">Finalizados</p>
+          {finalizadosVisible.length === 0 ? (
+            <p className="py-6 text-center text-sm text-[var(--color-foreground-muted)]">No hay pedidos finalizados para mostrar.</p>
+          ) : (
+            finalizadosVisible.map((pedido) => (
+              <PedidoMobileCard key={pedido.id} pedido={pedido} showBusinessDays={false} />
+            ))
+          )}
+          {hayMas && (
+            <button
+              type="button"
+              className={buttonStyles({ variant: "secondary", className: "w-full" })}
+              onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
+            >
+              <Icon name="chevronDown" className="h-4 w-4" />
+              Cargar más finalizados
+            </button>
+          )}
+        </div>
+      </Card></div>
     </div>
   );
 }
