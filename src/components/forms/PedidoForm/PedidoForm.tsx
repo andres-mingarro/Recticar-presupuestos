@@ -229,6 +229,7 @@ export function PedidoForm({
       onClickCapture={() => setDirty(true)}
       className={cn("PedidoForm", styles.PedidoForm, "mb-12 space-y-6")}
     >
+      <input type="hidden" name="updatedAt" value={state.values.updatedAt ?? ""} />
       {Array.from(selectedTrabajoIds).map((id) => (
         <input key={`trabajo-hidden-${id}`} type="hidden" name="trabajosIds" value={id} />
       ))}

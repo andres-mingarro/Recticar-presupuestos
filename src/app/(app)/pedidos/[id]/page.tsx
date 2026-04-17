@@ -62,6 +62,7 @@ export default async function Page({
   const initialState: PedidoFormState = {
     error: null,
     values: {
+      updatedAt: pedido.updated_at,
       clienteId: pedido.cliente_id ? String(pedido.cliente_id) : "",
       marcaId: pedido.marca_id ? String(pedido.marca_id) : "",
       modeloId: pedido.modelo_id ? String(pedido.modelo_id) : "",
@@ -93,6 +94,7 @@ export default async function Page({
           : "pendiente";
 
     const values: PedidoFormValues = {
+      updatedAt: normalizeString(formData.get("updatedAt")),
       clienteId: normalizeString(formData.get("clienteId")),
       marcaId: normalizeString(formData.get("marcaId")),
       modeloId: normalizeString(formData.get("modeloId")),
@@ -124,11 +126,11 @@ export default async function Page({
       };
     }
 
-    const ok = await updatePedido(pedidoId, values);
+    const result = await updatePedido(pedidoId, values);
 
-    if (!ok) {
+    if (result === "conflict") {
       return {
-        error: "No se pudieron guardar los cambios. Probá nuevamente.",
+        error: "Otro usuario modificó este pedido. Recargá la página para ver los últimos cambios antes de guardar.",
         values,
       };
     }
