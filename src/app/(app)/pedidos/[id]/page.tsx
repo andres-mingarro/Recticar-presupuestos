@@ -62,7 +62,7 @@ export default async function Page({
   const initialState: PedidoFormState = {
     error: null,
     values: {
-      updatedAt: new Date(pedido.updated_at).toISOString(),
+      updatedAt: pedido.updated_at,
       clienteId: pedido.cliente_id ? String(pedido.cliente_id) : "",
       marcaId: pedido.marca_id ? String(pedido.marca_id) : "",
       modeloId: pedido.modelo_id ? String(pedido.modelo_id) : "",
@@ -135,7 +135,10 @@ export default async function Page({
       };
     }
 
-    redirect(`/pedidos/${pedidoId}?updated=1`);
+    return {
+      error: null,
+      values: { ...values, updatedAt: result.updatedAt },
+    };
   }
 
   async function changeEstadoAction(

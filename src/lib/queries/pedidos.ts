@@ -138,7 +138,7 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
         p.prioridad,
         p.fecha_creacion,
         p.fecha_aprobacion,
-        p.updated_at,
+        p.updated_at::text AS updated_at,
         p.cliente_id,
         p.marca_id,
         p.modelo_id,
@@ -209,7 +209,7 @@ export async function getPedidoDetailById(id: number): Promise<PedidoDetail | nu
 export async function updatePedido(
   id: number,
   input: PedidoFormValues
-): Promise<"ok" | "conflict"> {
+): Promise<{ updatedAt: string } | "conflict"> {
   if (!input.updatedAt) return "conflict";
 
   const clienteId = input.clienteId ? Number(input.clienteId) : null;
@@ -221,13 +221,7 @@ export async function updatePedido(
   const precios = input.repuestos.map((r) => r.precioUnitario);
   const cantidades = input.repuestos.map((r) => r.cantidad);
 
-  // Single atomic CTE:
-  // - UPDATE with optimistic lock (updated_at check)
-  // - DELETE trabajos/repuestos not in the new sets
-  // - INSERT/UPSERT new trabajos/repuestos
-  // If updated_at doesn't match, upd returns 0 rows → all deletes/inserts
-  // reference NULL pedido_id → touch nothing → return 0 rows → conflict
-  const rows = await queryRows<{ id: number }>(
+  const rows = await queryRows<{ id: number; updated_at: string }>(
     `
       WITH
         upd AS (
@@ -248,7 +242,7 @@ export async function updatePedido(
             observaciones      = $12,
             updated_at         = now()
           WHERE id = $1 AND updated_at = $2::timestamptz
-          RETURNING id
+          RETURNING id, updated_at::text AS updated_at
         ),
         del_trabajos AS (
           DELETE FROM pedido_trabajos
@@ -277,7 +271,7 @@ export async function updatePedido(
           ON CONFLICT (pedido_id, repuesto_id) DO UPDATE
             SET precio = EXCLUDED.precio, cantidad = EXCLUDED.cantidad
         )
-      SELECT id FROM upd
+      SELECT id, updated_at FROM upd
     `,
     [
       id,
@@ -299,7 +293,9 @@ export async function updatePedido(
     ]
   );
 
-  return rows[0]?.id ? "ok" : "conflict";
+  return rows[0]?.id
+    ? { updatedAt: rows[0].updated_at }
+    : "conflict";
 }
 
 export async function createPedido(input: PedidoFormValues) {
