@@ -1,0 +1,18 @@
+.carousel {
+  overflow: hidden;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.carouselContent {
+  display: flex;
+  height: 100%;
+}
+
+.carouselItem {
+  flex: 0 0 100%;
+  min-width: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}

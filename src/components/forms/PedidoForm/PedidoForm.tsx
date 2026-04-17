@@ -31,6 +31,9 @@ import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Tabs } from "@/components/ui/Tabs";
 import { Incrementor } from "@/components/ui/Incrementor";
+import { SeleccionTecnicaWizard } from "@/components/forms/SeleccionTecnicaWizard";
+import { getBrandLogoUrl } from "@/lib/vehicle-logo";
+import Image from "next/image";
 import styles from "./PedidoForm.module.scss";
 
 export type PedidoFormState = {
@@ -145,6 +148,13 @@ export function PedidoForm({
   const [selectedEstado, setSelectedEstado] = useState(initialState.values.estado);
   const [selectedClienteLabel, setSelectedClienteLabel] = useState(initialClienteLabel);
   const [selectedItemsTab, setSelectedItemsTab] = useState<"trabajos" | "repuestos">("trabajos");
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardInitialStep, setWizardInitialStep] = useState(0);
+
+  const openWizard = (step: number) => {
+    setWizardInitialStep(step);
+    setWizardOpen(true);
+  };
 
   useEffect(() => {
     setSelectedPrioridad(state.values.prioridad);
@@ -266,13 +276,102 @@ export function PedidoForm({
           </h2>
         </div>
 
-        <div className={cn("PedidoFormGrid", styles.PedidoFormGrid)}>
+        {/* Mobile: wizard */}
+        <div className="md:hidden">
+          {selectedMarca ? (
+            <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+              {(() => {
+                const logoUrl = getBrandLogoUrl(selectedMarcaNombre ?? "");
+                return logoUrl ? (
+                  <button type="button" onClick={() => openWizard(0)} className="cursor-pointer">
+                    <Image src={logoUrl} alt={selectedMarcaNombre ?? ""} width={150} height={150} className="object-contain" unoptimized />
+                  </button>
+                ) : (
+                  <button type="button" onClick={() => openWizard(0)} className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-3xl font-bold text-[var(--color-accent)]">
+                    {(selectedMarcaNombre ?? "?")[0].toUpperCase()}
+                  </button>
+                );
+              })()}
+              <div className="w-full divide-y divide-[var(--color-border)]">
+                <button
+                  type="button"
+                  onClick={() => openWizard(0)}
+                  className="flex w-full items-center justify-between py-3 text-left"
+                >
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-foreground-subtle)]">Marca</span>
+                  <span className="text-lg font-bold text-[var(--color-foreground)]">{selectedMarcaNombre}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openWizard(1)}
+                  className="flex w-full items-center justify-between py-3 text-left"
+                >
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-foreground-subtle)]">Modelo</span>
+                  <span className="text-base font-semibold text-[var(--color-foreground-muted)]">{selectedModeloNombre ?? "—"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openWizard(2)}
+                  className="flex w-full items-center justify-between py-3 text-left"
+                >
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-foreground-subtle)]">Motor</span>
+                  <span className="text-base font-semibold text-[var(--color-foreground-muted)]">{selectedMotorNombre ?? "—"}</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => openWizard(0)}
+              className={buttonStyles({ variant: "secondary", className: "w-full gap-2" })}
+            >
+              <Icon name="car" className="h-4 w-4" />
+              Seleccionar vehículo
+            </button>
+          )}
+          <SeleccionTecnicaWizard
+            marcas={marcas}
+            modelos={modelos}
+            motores={motores}
+            relations={relations}
+            open={wizardOpen}
+            onOpenChange={setWizardOpen}
+            initialStep={wizardInitialStep}
+            initialMarcaId={selectedMarca}
+            initialModeloId={selectedModelo}
+            initialMotorId={selectedMotor}
+            onSelect={(mId, moId, mtId) => {
+              setSelectedMarca(mId);
+              setSelectedModelo(moId);
+              setSelectedMotor(mtId);
+            }}
+          />
+        </div>
+
+        <label className={cn("PedidoFormField md:hidden", styles.PedidoFormField)}>
+          <span className="text-sm font-medium text-[var(--color-foreground)]">
+            Número de serie del motor
+          </span>
+          <Input
+            placeholder="Ej. ABC-1234"
+            value={selectedNumeroSerieMotor}
+            onChange={(event) => setSelectedNumeroSerieMotor(event.target.value)}
+          />
+        </label>
+
+        {/* Hidden inputs para mobile — envían los valores del wizard al form */}
+        <input type="hidden" name="marcaId" value={selectedMarca} className="md:hidden" />
+        <input type="hidden" name="modeloId" value={selectedModelo} className="md:hidden" />
+        <input type="hidden" name="motorId" value={selectedMotor} className="md:hidden" />
+
+        {/* Campo serie — visible en ambos modos */}
+
+        <div className={cn("PedidoFormGrid", styles.PedidoFormGrid, "hidden md:grid")}>
           <label className={cn("PedidoFormField", styles.PedidoFormField)}>
             <span className="text-sm font-medium text-[var(--color-foreground)]">
               Marca
             </span>
             <Select
-              name="marcaId"
               value={selectedMarca}
               onChange={(event) => {
                 setSelectedMarca(event.target.value);
@@ -294,7 +393,6 @@ export function PedidoForm({
               Modelo
             </span>
             <Select
-              name="modeloId"
               value={selectedModelo}
               onChange={(event) => {
                 setSelectedModelo(event.target.value);
@@ -316,7 +414,6 @@ export function PedidoForm({
               Motor
             </span>
             <Select
-              name="motorId"
               value={selectedMotor}
               onChange={(event) => setSelectedMotor(event.target.value)}
               disabled={!selectedModelo}
@@ -332,16 +429,18 @@ export function PedidoForm({
 
           <label className={cn("PedidoFormField", styles.PedidoFormField)}>
             <span className="text-sm font-medium text-[var(--color-foreground)]">
-              Numero de serie del motor
+              Número de serie del motor
             </span>
             <Input
-              name="numeroSerieMotor"
               placeholder="Ej. ABC-1234"
               value={selectedNumeroSerieMotor}
               onChange={(event) => setSelectedNumeroSerieMotor(event.target.value)}
             />
           </label>
         </div>
+
+        {/* Hidden input serie — fuente de verdad para el form en ambos modos */}
+        <input type="hidden" name="numeroSerieMotor" value={selectedNumeroSerieMotor} />
       </Card>
 
       <div className="space-y-0">
