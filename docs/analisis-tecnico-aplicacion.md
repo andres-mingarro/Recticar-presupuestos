@@ -2,10 +2,10 @@
 
 ## 1. Propósito del sistema
 
-Recticar Presupuestos es una aplicación web para administrar clientes, pedidos y presupuestos de una rectificadora. El sistema cubre tres necesidades principales:
+Recticar Presupuestos es una aplicación web para administrar clientes, trabajos y presupuestos de una rectificadora. El sistema cubre tres necesidades principales:
 
 1. Registrar y consultar clientes.
-2. Crear, editar y seguir pedidos de trabajo.
+2. Crear, editar y seguir trabajos de trabajo.
 3. Construir presupuestos combinando trabajos y repuestos, con salida en PDF y etiqueta QR.
 
 La aplicación está pensada para operación interna. No es un portal público ni un sistema orientado a autoservicio del cliente final.
@@ -38,8 +38,8 @@ La organización del código sigue una separación bastante clara entre rutas, p
 
 - `src/app/(auth)/login`: login.
 - `src/app/(app)/clientes`: listado, alta y detalle de clientes.
-- `src/app/(app)/pedidos`: listado, alta y detalle de pedidos.
-- `src/app/(app)/pedidos/[id]/etiqueta`: etiqueta imprimible con QR.
+- `src/app/(app)/trabajos`: listado, alta y detalle de trabajos.
+- `src/app/(app)/trabajos/[id]/etiqueta`: etiqueta imprimible con QR.
 - `src/app/(app)/precios`: administración de trabajos y listas de precios.
 - `src/app/(app)/repuestos`: catálogo de repuestos.
 - `src/app/(app)/informacion-tecnica`: mantenimiento del catálogo técnico.
@@ -70,11 +70,11 @@ Un patrón importante del proyecto es el siguiente:
 4. El componente cliente maneja interacción local, selección, dirty state y UX.
 5. Al enviar el formulario, la server action parsea el `FormData`, valida y persiste.
 
-Este patrón se ve con claridad en el detalle de pedido:
+Este patrón se ve con claridad en el detalle de trabajo:
 
-- La página servidor vive en `src/app/(app)/pedidos/[id]/page.tsx`.
-- La pantalla cliente vive en `src/components/pages/PedidoDetailPage/PedidoDetailPage.tsx`.
-- El formulario reusable vive en `src/components/forms/PedidoForm/PedidoForm.tsx`.
+- La página servidor vive en `src/app/(app)/trabajos/[id]/page.tsx`.
+- La pantalla cliente vive en `src/components/pages/TrabajoDetailPage/TrabajoDetailPage.tsx`.
+- El formulario reusable vive en `src/components/forms/TrabajoForm/TrabajoForm.tsx`.
 
 ## 5. Autenticación y autorización
 
@@ -119,11 +119,11 @@ Reglas actuales:
 - el resto requiere cookie válida,
 - el rol `operador` queda bloqueado para:
   - `/clientes/nuevo`
-  - `/pedidos/nuevo`
+  - `/trabajos/nuevo`
   - `/precios`
   - `/admin`
 
-En la práctica, el middleware implementa un modelo simple de acceso por rol y redirige al listado de pedidos si el usuario no puede entrar.
+En la práctica, el middleware implementa un modelo simple de acceso por rol y redirige al listado de trabajos si el usuario no puede entrar.
 
 ## 6. Persistencia y bases de datos
 
@@ -151,9 +151,9 @@ Esto permite decidir explícitamente si una query pega a la base operativa o a l
 
 ### Implicancias arquitectónicas
 
-- Clientes, pedidos, trabajos, repuestos, usuarios y relaciones comerciales viven en la base principal.
+- Clientes, trabajos, trabajos, repuestos, usuarios y relaciones comerciales viven en la base principal.
 - Marcas, modelos, motores y combinaciones técnicas se leen desde la base técnica.
-- Los pedidos guardan IDs técnicos (`marca_id`, `modelo_id`, `motor_id`) pero ya no dependen de foreign keys locales al catálogo técnico.
+- Los trabajos guardan IDs técnicos (`marca_id`, `modelo_id`, `motor_id`) pero ya no dependen de foreign keys locales al catálogo técnico.
 
 Esa desacoplación fue formalizada por la migración `010_drop_technical_foreign_keys.sql`.
 
@@ -161,7 +161,7 @@ Esa desacoplación fue formalizada por la migración `010_drop_technical_foreign
 
 ### 7.1 Clientes
 
-El dominio clientes cubre alta, búsqueda, detalle y relación con pedidos.
+El dominio clientes cubre alta, búsqueda, detalle y relación con trabajos.
 
 Tipos principales:
 
@@ -185,19 +185,19 @@ Además existe un endpoint de soporte para autocomplete:
 
 - `src/app/api/clientes/search/route.ts`
 
-Ese endpoint devuelve coincidencias por nombre y alimenta el selector de cliente en pedidos.
+Ese endpoint devuelve coincidencias por nombre y alimenta el selector de cliente en trabajos.
 
-### 7.2 Pedidos
+### 7.2 Trabajos
 
 Es el dominio central del sistema.
 
 Tipos principales en `src/lib/types.ts`:
 
-- `PedidoListItem`
-- `PedidoDetail`
-- `PedidoFormValues`
+- `TrabajoListItem`
+- `TrabajoDetail`
+- `TrabajoFormValues`
 
-Un pedido combina:
+Un trabajo combina:
 
 - cliente,
 - selección técnica,
@@ -244,18 +244,18 @@ Los repuestos también se organizan por categorías, pero el modelo cambió resp
 Hoy hay que distinguir dos niveles:
 
 1. Catálogo de repuestos.
-2. Repuesto dentro de un pedido.
+2. Repuesto dentro de un trabajo.
 
 El catálogo (`/repuestos`) hoy funciona esencialmente como una base de nombres y categorías. El precio útil para presupuestar ya no debe salir de ahí.
 
-El precio real se decide dentro de cada pedido.
+El precio real se decide dentro de cada trabajo.
 
 En consecuencia:
 
-- `pedido_repuestos` guarda `repuesto_id`, `precio` y `cantidad`,
-- el total de un repuesto en un pedido es `precio_unitario x cantidad`.
+- `trabajo_repuestos` guarda `repuesto_id`, `precio` y `cantidad`,
+- el total de un repuesto en un trabajo es `precio_unitario x cantidad`.
 
-Este cambio quedó formalizado por la migración `014_add_precio_cantidad_to_pedido_repuestos.sql`.
+Este cambio quedó formalizado por la migración `014_add_precio_cantidad_to_trabajo_repuestos.sql`.
 
 ### 7.5 Información técnica
 
@@ -283,27 +283,27 @@ Los usuarios internos viven en la base principal y participan del login cuando n
 
 Hay una pantalla administrativa en `/admin/usuarios`.
 
-## 8. Flujo de información del pedido
+## 8. Flujo de información del trabajo
 
-El pedido es donde más se cruzan servidor, cliente, estado local y persistencia.
+El trabajo es donde más se cruzan servidor, cliente, estado local y persistencia.
 
 ### 8.1 Carga inicial del detalle
 
-Cuando se entra a `/pedidos/[id]`, la página servidor:
+Cuando se entra a `/trabajos/[id]`, la página servidor:
 
 1. valida el `id`,
-2. carga el pedido,
+2. carga el trabajo,
 3. carga marcas, modelos, motores y relaciones,
 4. carga trabajos agrupados,
 5. carga repuestos agrupados,
 6. genera el SVG del QR,
 7. arma un `initialState` para el formulario.
 
-Esto ocurre en `src/app/(app)/pedidos/[id]/page.tsx`.
+Esto ocurre en `src/app/(app)/trabajos/[id]/page.tsx`.
 
 ### 8.2 Hidratación de nombres técnicos
 
-Los pedidos guardan IDs técnicos, no los nombres.
+Los trabajos guardan IDs técnicos, no los nombres.
 
 Para mostrar marca, modelo y motor, la app usa `hydrateTechnicalLabels()` en `src/lib/queries/catalogo.ts`, que:
 
@@ -311,11 +311,11 @@ Para mostrar marca, modelo y motor, la app usa `hydrateTechnicalLabels()` en `sr
 2. arma mapas por ID,
 3. agrega `marca_nombre`, `modelo_nombre` y `motor_nombre` a los objetos.
 
-Esto permite mantener persistencia mínima en pedidos y resolver etiquetas al vuelo.
+Esto permite mantener persistencia mínima en trabajos y resolver etiquetas al vuelo.
 
-### 8.3 Pantalla cliente del pedido
+### 8.3 Pantalla cliente del trabajo
 
-`PedidoDetailPage` actúa como orquestador visual.
+`TrabajoDetailPage` actúa como orquestador visual.
 
 Encapsula varios providers:
 
@@ -326,9 +326,9 @@ Encapsula varios providers:
 
 La idea es que la UI pueda reaccionar inmediatamente a cambios sin depender de roundtrip al servidor.
 
-### 8.4 Formulario de pedido
+### 8.4 Formulario de trabajo
 
-`PedidoForm` concentra la mayor parte de la edición.
+`TrabajoForm` concentra la mayor parte de la edición.
 
 Responsabilidades principales:
 
@@ -375,17 +375,17 @@ Esto es relevante porque el catálogo no define el precio final presupuestado.
 
 Cuando el usuario envía el formulario:
 
-1. la server action `updatePedidoAction` recibe el `FormData`,
+1. la server action `updateTrabajoAction` recibe el `FormData`,
 2. normaliza strings y valores simples,
-3. reconstruye los repuestos con `parsePedidoRepuestos()` desde `src/lib/pedido-repuestos.ts`,
+3. reconstruye los repuestos con `parseTrabajoRepuestos()` desde `src/lib/trabajo-repuestos.ts`,
 4. valida reglas de negocio,
-5. llama a `updatePedido()`.
+5. llama a `updateTrabajo()`.
 
-La función `updatePedido()` en `src/lib/queries/pedidos.ts` hace una estrategia simple y robusta:
+La función `updateTrabajo()` en `src/lib/queries/trabajos.ts` hace una estrategia simple y robusta:
 
-1. actualiza la fila principal del pedido,
-2. borra `pedido_trabajos`,
-3. borra `pedido_repuestos`,
+1. actualiza la fila principal del trabajo,
+2. borra `trabajo_trabajos`,
+3. borra `trabajo_repuestos`,
 4. reinserta relaciones actuales.
 
 No hay diff fino entre estado viejo y nuevo. El diseño favorece simplicidad y previsibilidad por encima de optimización micro.
@@ -394,39 +394,39 @@ No hay diff fino entre estado viejo y nuevo. El diseño favorece simplicidad y p
 
 Hoy existen al menos estas reglas:
 
-- un pedido no puede aprobarse sin cliente asignado,
+- un trabajo no puede aprobarse sin cliente asignado,
 - la fecha de aprobación se guarda la primera vez que pasa a `aprobado`,
-- `finalizado` mueve el pedido a historial a nivel de UX y listados,
+- `finalizado` mueve el trabajo a historial a nivel de UX y listados,
 - prioridad y cobrado forman parte del mismo flujo de edición.
 
 ## 9. Generación de presupuesto PDF
 
-El PDF sale por `src/app/api/pedidos/[id]/pdf/route.ts`.
+El PDF sale por `src/app/api/trabajos/[id]/pdf/route.ts`.
 
 El flujo es:
 
 1. recibe `id`,
-2. carga `PedidoDetail`,
+2. carga `TrabajoDetail`,
 3. carga trabajos ya resueltos para la lista de precios activa,
-4. carga repuestos del pedido con precio y cantidad,
+4. carga repuestos del trabajo con precio y cantidad,
 5. genera un QR como data URL,
 6. renderiza `PresupuestoPdf`,
 7. devuelve un PDF inline.
 
 Puntos a notar:
 
-- el nombre del archivo se arma dinámicamente con número de pedido y cliente,
+- el nombre del archivo se arma dinámicamente con número de trabajo y cliente,
 - el PDF usa datos ya cocinados por la capa de queries,
 - observaciones ya forman parte del documento,
 - los importes hoy se muestran como enteros, sin decimales.
 
 ## 10. Etiqueta QR e impresión
 
-La etiqueta QR se ve en `/pedidos/[id]/etiqueta`.
+La etiqueta QR se ve en `/trabajos/[id]/etiqueta`.
 
 La página se renderiza dentro del `AppShell`, por lo que la impresión requiere ocultar layout global. Ese ajuste está actualmente en:
 
-- `src/app/(app)/pedidos/[id]/etiqueta/EtiquetaPage.module.scss`
+- `src/app/(app)/trabajos/[id]/etiqueta/EtiquetaPage.module.scss`
 
 Esto es un punto delicado de mantenimiento: si cambia la estructura del shell, la hoja de impresión puede volver a mostrar header o menú lateral.
 
@@ -446,7 +446,7 @@ Piezas relevantes:
 - `ButtonGroup`
 - `Incrementor`
 - `CheckboxBeauti`
-- `PedidoItemCard`
+- `TrabajoItemCard`
 - `EstadoStepper`
 - `PrioridadToggle`
 - `CobradoToggle`
@@ -457,7 +457,7 @@ Convenciones actuales importantes:
 - cada componente debe tener una clase raíz identificable,
 - se prefiere usar componentes base antes que recrear estilos ad hoc,
 - los íconos deben pasar por `src/components/ui/Icon`,
-- el detalle del pedido usa un único botón de guardado,
+- el detalle del trabajo usa un único botón de guardado,
 - cuando un widget vive fuera del `<form>`, sus datos se envían mediante hidden inputs asociados por `form={formId}`.
 
 ## 12. Formato de dinero y reglas de importes
@@ -470,7 +470,7 @@ Esto afecta:
 - resúmenes,
 - PDF,
 - precios de trabajos,
-- precio unitario de repuestos por pedido.
+- precio unitario de repuestos por trabajo.
 
 La normalización de formato está centralizada en `src/lib/format.ts`.
 
@@ -495,14 +495,14 @@ npm run db:migrate
 
 El proyecto muestra una evolución bastante clara:
 
-- esquema base de clientes y pedidos,
+- esquema base de clientes y trabajos,
 - ampliaciones de datos de cliente,
 - incorporación de precios por trabajo,
 - incorporación de usuarios,
 - listas de precios,
 - desacople del catálogo técnico,
 - incorporación de repuestos,
-- precio y cantidad por repuesto dentro del pedido.
+- precio y cantidad por repuesto dentro del trabajo.
 
 Una observación útil: hay versiones repetidas en nombres de migración como `008_*` y `009_*`. Eso no necesariamente rompe el runner, pero sí exige disciplina al revisar historial y orden de aplicación.
 
@@ -511,9 +511,9 @@ Una observación útil: hay versiones repetidas en nombres de migración como `0
 - Separación razonable entre rutas, pantallas, componentes y queries.
 - SQL explícito y fácil de rastrear.
 - Buen uso del modelo híbrido servidor/cliente de App Router.
-- Formulario de pedido suficientemente flexible para una UI rica.
+- Formulario de trabajo suficientemente flexible para una UI rica.
 - Desacople correcto entre catálogo técnico y operación comercial.
-- Evolución acertada de repuestos hacia un precio por pedido, que refleja mejor la realidad del negocio.
+- Evolución acertada de repuestos hacia un precio por trabajo, que refleja mejor la realidad del negocio.
 
 ## 16. Riesgos técnicos y puntos a vigilar
 
@@ -521,9 +521,9 @@ Una observación útil: hay versiones repetidas en nombres de migración como `0
 
 `src/lib/queries/catalogo.ts` concentra catálogo técnico y trabajos comerciales. Funciona, pero complica la lectura y hace más difícil separar contextos de negocio.
 
-### Estrategia de reescritura total en relaciones del pedido
+### Estrategia de reescritura total en relaciones del trabajo
 
-Borrar y reinsertar `pedido_trabajos` y `pedido_repuestos` es simple, pero puede volverse costoso o incómodo si mañana se agregan auditorías, trazabilidad fina o edición concurrente.
+Borrar y reinsertar `trabajo_trabajos` y `trabajo_repuestos` es simple, pero puede volverse costoso o incómodo si mañana se agregan auditorías, trazabilidad fina o edición concurrente.
 
 ### Dependencia estructural del AppShell para impresión
 
@@ -535,7 +535,7 @@ El cambio de repuestos fue correcto, pero todavía conviene vigilar que ninguna 
 
 ### Base técnica externa
 
-La disponibilidad y forma del catálogo técnico son críticas. Si cambia el esquema externo o la conectividad, se impactan formularios de pedido, PDFs y listados que hidratan etiquetas técnicas.
+La disponibilidad y forma del catálogo técnico son críticas. Si cambia el esquema externo o la conectividad, se impactan formularios de trabajo, PDFs y listados que hidratan etiquetas técnicas.
 
 ## 17. Archivos clave para mantenimiento
 
@@ -546,24 +546,24 @@ Si alguien nuevo entra al proyecto, estos archivos son los mejores puntos de arr
 - `src/middleware.ts`: seguridad y autorización.
 - `src/lib/auth.ts`: sesión y JWT.
 - `src/lib/types.ts`: modelo tipado compartido.
-- `src/lib/queries/pedidos.ts`: núcleo del negocio de pedidos.
+- `src/lib/queries/trabajos.ts`: núcleo del negocio de trabajos.
 - `src/lib/queries/catalogo.ts`: trabajos y catálogo técnico.
-- `src/lib/queries/repuestos.ts`: catálogo y detalle de repuestos por pedido.
-- `src/app/(app)/pedidos/[id]/page.tsx`: ensamblado servidor del detalle.
-- `src/components/pages/PedidoDetailPage/PedidoDetailPage.tsx`: orquestación cliente del detalle.
-- `src/components/forms/PedidoForm/PedidoForm.tsx`: formulario principal.
-- `src/app/api/pedidos/[id]/pdf/route.ts`: salida PDF.
+- `src/lib/queries/repuestos.ts`: catálogo y detalle de repuestos por trabajo.
+- `src/app/(app)/trabajos/[id]/page.tsx`: ensamblado servidor del detalle.
+- `src/components/pages/TrabajoDetailPage/TrabajoDetailPage.tsx`: orquestación cliente del detalle.
+- `src/components/forms/TrabajoForm/TrabajoForm.tsx`: formulario principal.
+- `src/app/api/trabajos/[id]/pdf/route.ts`: salida PDF.
 
 ## 18. Conclusión
 
 La aplicación tiene una arquitectura pragmática y bastante alineada con su problema de negocio. No intenta abstraer de más: usa SQL directo, formularios claros, server actions y componentes cliente donde realmente hacen falta.
 
-El centro del sistema es el pedido. Todo lo demás orbita alrededor de esa entidad:
+El centro del sistema es el trabajo. Todo lo demás orbita alrededor de esa entidad:
 
 - clientes para identificar al dueño del trabajo,
 - catálogo técnico para describir el vehículo o motor,
 - trabajos para presupuestar mano de obra,
 - repuestos para presupuestar materiales con precio variable por caso,
-- PDF y QR para materializar el pedido fuera de la pantalla.
+- PDF y QR para materializar el trabajo fuera de la pantalla.
 
-Desde el punto de vista técnico, la base es sólida para seguir creciendo. Los próximos cuidados deberían enfocarse en mantener clara la separación de responsabilidades, proteger el flujo del pedido y evitar que el crecimiento de la UI termine duplicando reglas de negocio en demasiados lugares.
+Desde el punto de vista técnico, la base es sólida para seguir creciendo. Los próximos cuidados deberían enfocarse en mantener clara la separación de responsabilidades, proteger el flujo del trabajo y evitar que el crecimiento de la UI termine duplicando reglas de negocio en demasiados lugares.

@@ -1,8 +1,8 @@
-export const PEDIDO_ESTADOS = ["pendiente", "aprobado", "finalizado"] as const;
-export const PEDIDO_PRIORIDADES = ["baja", "normal", "alta"] as const;
+export const TRABAJO_ESTADOS = ["pendiente", "aprobado", "finalizado"] as const;
+export const TRABAJO_PRIORIDADES = ["baja", "normal", "alta"] as const;
 
-export type PedidoEstado = (typeof PEDIDO_ESTADOS)[number];
-export type PedidoPrioridad = (typeof PEDIDO_PRIORIDADES)[number];
+export type TrabajoEstado = (typeof TRABAJO_ESTADOS)[number];
+export type TrabajoPrioridad = (typeof TRABAJO_PRIORIDADES)[number];
 
 export type ClienteListItem = {
   id: number;
@@ -23,13 +23,13 @@ export type ClienteDetail = ClienteListItem & {
   cuit: string | null;
 };
 
-export type ClientePendingPedidoItem = {
+export type ClientePendingTrabajoItem = {
   cliente_id: number;
   id: number;
-  numero_pedido: number;
+  numero_trabajo: number;
   cobrado: boolean;
-  estado: PedidoEstado;
-  prioridad: PedidoPrioridad;
+  estado: TrabajoEstado;
+  prioridad: TrabajoPrioridad;
   fecha_creacion: string;
   marca_id: number | null;
   modelo_id: number | null;
@@ -53,12 +53,12 @@ export type ClienteFormValues = {
   cuit: string;
 };
 
-export type PedidoListItem = {
+export type TrabajoListItem = {
   id: number;
-  numero_pedido: number;
+  numero_trabajo: number;
   cobrado: boolean;
-  estado: PedidoEstado;
-  prioridad: PedidoPrioridad;
+  estado: TrabajoEstado;
+  prioridad: TrabajoPrioridad;
   fecha_creacion: string;
   fecha_aprobacion: string | null;
   cliente_id: number | null;
@@ -72,27 +72,27 @@ export type PedidoListItem = {
   numero_serie_motor: string;
 };
 
-export type PedidoDetail = PedidoListItem & {
+export type TrabajoDetail = TrabajoListItem & {
   updated_at: string;
   observaciones: string | null;
   trabajos_ids: number[];
   repuestos_ids: number[];
-  repuestos: PedidoRepuestoValue[];
+  repuestos: TrabajoRepuestoValue[];
   lista_precio: 1 | 2 | 3;
   cliente_dni: string | null;
   cliente_cuit: string | null;
   cliente_telefono: string | null;
 };
 
-export type ClientePedidoItem = PedidoListItem;
+export type ClienteTrabajoItem = TrabajoListItem;
 
-export type PedidoRepuestoValue = {
+export type TrabajoRepuestoValue = {
   repuestoId: string;
   precioUnitario: number;
   cantidad: number;
 };
 
-export type PedidoFormValues = {
+export type TrabajoFormValues = {
   updatedAt?: string;
   clienteId: string;
   marcaId: string;
@@ -100,12 +100,12 @@ export type PedidoFormValues = {
   motorId: string;
   numeroSerieMotor: string;
   cobrado: boolean;
-  prioridad: PedidoPrioridad;
-  estado: PedidoEstado;
+  prioridad: TrabajoPrioridad;
+  estado: TrabajoEstado;
   observaciones: string;
   trabajosIds: string[];
   repuestosIds: string[];
-  repuestos: PedidoRepuestoValue[];
+  repuestos: TrabajoRepuestoValue[];
   listaPrecios: 1 | 2 | 3;
 };
 

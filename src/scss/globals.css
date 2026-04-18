@@ -183,7 +183,7 @@ body {
   background: var(--color-selection);
 }
 
-/* ─── Print: etiqueta QR pedido ─── */
+/* ─── Print: etiqueta QR trabajo ─── */
 @media print {
   .print-etiqueta * {
     visibility: hidden !important;

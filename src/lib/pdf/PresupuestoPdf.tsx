@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import type { PedidoDetail } from "@/lib/types";
+import type { TrabajoDetail } from "@/lib/types";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 
@@ -235,13 +235,13 @@ function groupRepuestosByCategory(repuestos: RepuestoDetalleItem[]) {
 }
 
 type Props = {
-  pedido: PedidoDetail;
+  trabajo: TrabajoDetail;
   trabajos: TrabajoDetalleItem[];
   repuestos: RepuestoDetalleItem[];
   qrDataUrl: string;
 };
 
-export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props) {
+export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl }: Props) {
   const groups = groupByCategory(trabajos);
   const repuestoGroups = groupRepuestosByCategory(repuestos);
   const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio, 0);
@@ -263,7 +263,7 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
 
   return (
     <Document
-      title={`Presupuesto #${pedido.numero_pedido} - Recticar`}
+      title={`Presupuesto #${trabajo.numero_trabajo} - Recticar`}
       author="Recticar"
     >
       <Page size="A4" style={styles.page}>
@@ -280,13 +280,13 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
           <View style={styles.headerRight}>
             <View style={styles.headerInfo}>
               <Text style={styles.presupuestoLabel}>Presupuesto</Text>
-              <Text style={styles.presupuestoNum}>#{pedido.numero_pedido}</Text>
+              <Text style={styles.presupuestoNum}>#{trabajo.numero_trabajo}</Text>
               <Text style={styles.headerMeta}>
-                Creado: {formatDate(pedido.fecha_creacion)}
+                Creado: {formatDate(trabajo.fecha_creacion)}
               </Text>
-              {pedido.fecha_aprobacion ? (
+              {trabajo.fecha_aprobacion ? (
                 <Text style={styles.headerMeta}>
-                  Aprobado: {formatDate(pedido.fecha_aprobacion)}
+                  Aprobado: {formatDate(trabajo.fecha_aprobacion)}
                 </Text>
               ) : null}
             </View>
@@ -303,25 +303,25 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Cliente</Text>
                 <Text style={styles.infoValueBold}>
-                  {pedido.cliente_nombre ?? "Sin asignar"}
+                  {trabajo.cliente_nombre ?? "Sin asignar"}
                 </Text>
               </View>
-              {pedido.cliente_dni ? (
+              {trabajo.cliente_dni ? (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>DNI</Text>
-                  <Text style={styles.infoValue}>{pedido.cliente_dni}</Text>
+                  <Text style={styles.infoValue}>{trabajo.cliente_dni}</Text>
                 </View>
               ) : null}
-              {pedido.cliente_cuit ? (
+              {trabajo.cliente_cuit ? (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>CUIT</Text>
-                  <Text style={styles.infoValue}>{pedido.cliente_cuit}</Text>
+                  <Text style={styles.infoValue}>{trabajo.cliente_cuit}</Text>
                 </View>
               ) : null}
-              {pedido.cliente_telefono ? (
+              {trabajo.cliente_telefono ? (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Teléfono</Text>
-                  <Text style={styles.infoValue}>{pedido.cliente_telefono}</Text>
+                  <Text style={styles.infoValue}>{trabajo.cliente_telefono}</Text>
                 </View>
               ) : null}
             </View>
@@ -329,7 +329,7 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Vehículo</Text>
                 <Text style={styles.infoValue}>
-                  {[pedido.marca_nombre, pedido.modelo_nombre]
+                  {[trabajo.marca_nombre, trabajo.modelo_nombre]
                     .filter(Boolean)
                     .join(" / ") || "Sin definir"}
                 </Text>
@@ -337,13 +337,13 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Motor</Text>
                 <Text style={styles.infoValue}>
-                  {pedido.motor_nombre ?? "Sin definir"}
+                  {trabajo.motor_nombre ?? "Sin definir"}
                 </Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>N° de serie</Text>
                 <Text style={styles.infoValue}>
-                  {pedido.numero_serie_motor || "Sin serie"}
+                  {trabajo.numero_serie_motor || "Sin serie"}
                 </Text>
               </View>
             </View>
@@ -487,7 +487,7 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
             <View style={[styles.card, styles.observationsCard]}>
               <Text style={styles.observationsLabel}>Observaciones</Text>
               <Text style={styles.observationsValue}>
-                {pedido.observaciones?.trim() || "Sin observaciones."}
+                {trabajo.observaciones?.trim() || "Sin observaciones."}
               </Text>
             </View>
             <View style={[styles.card, styles.totalsCard]}>
@@ -511,7 +511,7 @@ export function PresupuestoPdf({ pedido, trabajos, repuestos, qrDataUrl }: Props
         <View style={styles.footer} fixed>
           <Text style={styles.footerText}>Recticar — Rectificación de motores</Text>
           <Text style={styles.footerText}>
-            Presupuesto #{pedido.numero_pedido} · {formatDate(pedido.fecha_creacion)}
+            Presupuesto #{trabajo.numero_trabajo} · {formatDate(trabajo.fecha_creacion)}
           </Text>
         </View>
       </Page>

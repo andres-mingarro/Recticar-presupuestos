@@ -10,7 +10,7 @@ originSessionId: 42d9cf24-083b-4a64-ba85-405a3966e213
 |-----|--------|
 | `admin` | Todo. Usuario/contraseña fijo, NO usa Google, roles intocables, nadie puede modificarlo ni borrarlo |
 | `superuser` | Igual que admin EXCEPTO que no puede tocar al `admin`. Un superuser puede modificar/borrar a otro superuser |
-| `operador` | Solo ve listado de pedidos, puede entrar a un cliente y ver sus pedidos. Solo lectura |
+| `operador` | Solo ve listado de trabajos, puede entrar a un cliente y ver sus trabajos. Solo lectura |
 
 ## Reglas clave
 - Admin: credenciales fijas hardcodeadas (o en .env), nunca en tabla usuarios, sin posibilidad de cambiar rol ni borrar
@@ -57,7 +57,7 @@ originSessionId: 42d9cf24-083b-4a64-ba85-405a3966e213
 ### 6. Protección por rol en la app
 - Ocultar botones de crear/editar/borrar para `operador`
 - Server Actions verifican rol antes de ejecutar (no solo UI)
-- Operador: acceso a `/pedidos` (listado) y `/clientes/[id]` (solo lectura)
+- Operador: acceso a `/trabajos` (listado) y `/clientes/[id]` (solo lectura)
 
 ## Variables de entorno necesarias
 ```

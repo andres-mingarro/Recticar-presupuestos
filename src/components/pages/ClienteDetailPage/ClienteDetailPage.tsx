@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
-import type { ClienteDetail, ClientePedidoItem } from "@/lib/types";
+import type { ClienteDetail, ClienteTrabajoItem } from "@/lib/types";
 import { formatDate, getVehicleLabel } from "@/lib/format";
 import { ClienteForm, type ClienteFormState } from "@/components/forms/ClienteForm";
 import { Button } from "@/components/ui/Button";
 import { PaymentBadge, PriorityBadge, StatusBadge } from "@/components/ui/Badge";
-import { PedidoMobileCard } from "@/components/ui/PedidoMobileCard";
+import { TrabajoMobileCard } from "@/components/ui/TrabajoMobileCard";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
@@ -22,8 +22,8 @@ type ClienteDetailPageProps = {
   ) => Promise<ClienteFormState>;
   initialState: ClienteFormState;
   wasUpdated: boolean;
-  pedidosVigentes: ClientePedidoItem[];
-  pedidosFinalizados: ClientePedidoItem[];
+  trabajosVigentes: ClienteTrabajoItem[];
+  trabajosFinalizados: ClienteTrabajoItem[];
   canEdit: boolean;
 };
 
@@ -47,17 +47,17 @@ function InfoRow({
   );
 }
 
-function PedidoTable({
+function TrabajoTable({
   title,
   eyebrow,
   emptyMessage,
-  pedidos,
+  trabajos,
   footer,
 }: {
   title: string;
   eyebrow: string;
   emptyMessage: string;
-  pedidos: ClientePedidoItem[];
+  trabajos: ClienteTrabajoItem[];
   footer?: React.ReactNode;
 }) {
   return (
@@ -74,11 +74,11 @@ function PedidoTable({
 
       {/* Cards mobile */}
       <div className="md:hidden space-y-2">
-        {pedidos.length === 0 ? (
+        {trabajos.length === 0 ? (
           <p className="py-6 text-center text-sm text-[var(--color-foreground-muted)]">{emptyMessage}</p>
         ) : (
-          pedidos.map((pedido) => (
-            <PedidoMobileCard key={pedido.id} pedido={pedido} showBusinessDays={false} />
+          trabajos.map((trabajo) => (
+            <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} showBusinessDays={false} />
           ))
         )}
       </div>
@@ -87,7 +87,7 @@ function PedidoTable({
         <table className="min-w-[720px] w-full text-left text-sm">
           <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
             <tr>
-              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="hash" className="h-4 w-4" />N° Pedido</span></th>
+              <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="hash" className="h-4 w-4" />N° Trabajo</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Vehículo / Motor</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="gauge" className="h-4 w-4" />Prioridad</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="check" className="h-4 w-4" />Cobro</span></th>
@@ -97,29 +97,29 @@ function PedidoTable({
             </tr>
           </thead>
           <tbody>
-            {pedidos.length === 0 ? (
+            {trabajos.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-12 text-center text-[var(--color-foreground-muted)]">
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
-              pedidos.map((pedido) => (
+              trabajos.map((trabajo) => (
                 <tr
-                  key={pedido.id}
+                  key={trabajo.id}
                   className="border-t border-[var(--color-border)] text-[var(--color-foreground)]"
                 >
-                  <td className="px-4 py-4 font-semibold">#{pedido.numero_pedido}</td>
+                  <td className="px-4 py-4 font-semibold">#{trabajo.numero_trabajo}</td>
                   <td className="px-4 py-4">
-                    {getVehicleLabel([pedido.marca_nombre, pedido.modelo_nombre, pedido.motor_nombre])}
+                    {getVehicleLabel([trabajo.marca_nombre, trabajo.modelo_nombre, trabajo.motor_nombre])}
                   </td>
-                  <td className="px-4 py-4"><PriorityBadge prioridad={pedido.prioridad} className="w-full justify-center" /></td>
-                  <td className="px-4 py-4"><PaymentBadge cobrado={pedido.cobrado} /></td>
-                  <td className="px-4 py-4"><StatusBadge estado={pedido.estado} /></td>
-                  <td className="px-4 py-4">{formatDate(pedido.fecha_creacion)}</td>
+                  <td className="px-4 py-4"><PriorityBadge prioridad={trabajo.prioridad} className="w-full justify-center" /></td>
+                  <td className="px-4 py-4"><PaymentBadge cobrado={trabajo.cobrado} /></td>
+                  <td className="px-4 py-4"><StatusBadge estado={trabajo.estado} /></td>
+                  <td className="px-4 py-4">{formatDate(trabajo.fecha_creacion)}</td>
                   <td className="px-4 py-4 text-right">
-                    <Button as="a" href={`/pedidos/${pedido.id}`} variant="secondary" size="sm"  iconRight={<Icon name="arrowRight" className="h-4 w-4" />}>
-                      Ver pedido
+                    <Button as="a" href={`/trabajos/${trabajo.id}`} variant="secondary" size="sm"  iconRight={<Icon name="arrowRight" className="h-4 w-4" />}>
+                      Ver trabajo
                     </Button>
                   </td>
                 </tr>
@@ -138,14 +138,14 @@ export function ClienteDetailPage({
   action,
   initialState,
   wasUpdated,
-  pedidosVigentes,
-  pedidosFinalizados,
+  trabajosVigentes,
+  trabajosFinalizados,
   canEdit,
 }: ClienteDetailPageProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [visibleFinalizados, setVisibleFinalizados] = useState(5);
-  const finalizadosVisible = pedidosFinalizados.slice(0, visibleFinalizados);
-  const hayMasFinalizados = visibleFinalizados < pedidosFinalizados.length;
+  const finalizadosVisible = trabajosFinalizados.slice(0, visibleFinalizados);
+  const hayMasFinalizados = visibleFinalizados < trabajosFinalizados.length;
 
   const rawPhone = (cliente.telefono ?? "").replace(/\D/g, "");
   const waNumber = rawPhone.startsWith("54") ? rawPhone : `54${rawPhone}`;
@@ -171,18 +171,18 @@ export function ClienteDetailPage({
           </div>
 
           <div className={styles.headerActions}>
-            <ButtonAdd className="w-full lg:w-auto" href={`/pedidos/nuevo?clienteId=${cliente.id}`}>
-              Nuevo pedido
+            <ButtonAdd className="w-full lg:w-auto" href={`/trabajos/nuevo?clienteId=${cliente.id}`}>
+              Nuevo trabajo
             </ButtonAdd>
             {/* Stats */}
             <div className={`${styles.stats} hidden lg:flex`}>
               <div className={styles.stat}>
-                <span className={styles.statValue}>{pedidosVigentes.length}</span>
+                <span className={styles.statValue}>{trabajosVigentes.length}</span>
                 <span className={styles.statLabel}>Vigentes</span>
               </div>
               <div className={styles.statDivider} />
               <div className={styles.stat}>
-                <span className={styles.statValue}>{pedidosFinalizados.length}</span>
+                <span className={styles.statValue}>{trabajosFinalizados.length}</span>
                 <span className={styles.statLabel}>Finalizados</span>
               </div>
             </div>
@@ -316,18 +316,18 @@ export function ClienteDetailPage({
         </div>
       </Card>
 
-      <PedidoTable
+      <TrabajoTable
         eyebrow="Trabajos vigentes"
-        title="Pedidos vigentes"
-        pedidos={pedidosVigentes}
-        emptyMessage="Este cliente no tiene pedidos pendientes ni aprobados."
+        title="Trabajos vigentes"
+        trabajos={trabajosVigentes}
+        emptyMessage="Este cliente no tiene trabajos pendientes ni aprobados."
       />
 
-      <PedidoTable
+      <TrabajoTable
         eyebrow="Historial"
-        title="Pedidos finalizados"
-        pedidos={finalizadosVisible}
-        emptyMessage="Todavía no hay pedidos finalizados para este cliente."
+        title="Trabajos finalizados"
+        trabajos={finalizadosVisible}
+        emptyMessage="Todavía no hay trabajos finalizados para este cliente."
         footer={hayMasFinalizados ? (
           <Button
             variant="secondary"

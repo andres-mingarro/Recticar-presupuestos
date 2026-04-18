@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
-import type { ClienteListItem, PedidoListItem } from "@/lib/types";
+import type { ClienteListItem, TrabajoListItem } from "@/lib/types";
 import { Input } from "@/components/ui/Input";
 import styles from "./SearchBox.module.scss";
 
-export type SearchEntity = "clientes" | "pedidos";
+export type SearchEntity = "clientes" | "trabajos";
 
-type SearchItem = ClienteListItem | PedidoListItem;
+type SearchItem = ClienteListItem | TrabajoListItem;
 
 type SearchConfig<TItem extends SearchItem> = {
   emptyMessage: string;
@@ -25,7 +25,7 @@ type SearchConfig<TItem extends SearchItem> = {
 
 const searchConfigs: {
   clientes: SearchConfig<ClienteListItem>;
-  pedidos: SearchConfig<PedidoListItem>;
+  trabajos: SearchConfig<TrabajoListItem>;
 } = {
   clientes: {
     emptyMessage: "No se encontraron coincidencias.",
@@ -38,15 +38,15 @@ const searchConfigs: {
     getTitle: (item) => `#${item.numero_cliente} · ${item.apellido}, ${item.nombre}`,
     getSubtitle: (item) => item.telefono || "Sin teléfono",
   },
-  pedidos: {
-    emptyMessage: "No se encontraron pedidos.",
-    endpoint: "/api/pedidos/search",
-    label: "Busqueda de pedidos",
-    placeholder: "Buscar por numero o ID de pedido",
-    responseKey: "pedidos",
-    clearHref: "/pedidos",
-    getHref: (item) => `/pedidos/${item.id}`,
-    getTitle: (item) => `Pedido #${item.numero_pedido}`,
+  trabajos: {
+    emptyMessage: "No se encontraron trabajos.",
+    endpoint: "/api/trabajos/search",
+    label: "Busqueda de trabajos",
+    placeholder: "Buscar por numero o ID de trabajo",
+    responseKey: "trabajos",
+    clearHref: "/trabajos",
+    getHref: (item) => `/trabajos/${item.id}`,
+    getTitle: (item) => `Trabajo #${item.numero_trabajo}`,
     getSubtitle: (item) => item.cliente_nombre || "Sin cliente asignado",
   },
 };

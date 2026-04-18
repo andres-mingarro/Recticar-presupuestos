@@ -45,7 +45,7 @@ motores(id, nombre, cilindrada)
 vehiculos(id, modelo_id, motor_id)
 ```
 
-La base principal guarda `marca_id`, `modelo_id` y `motor_id` en `pedidos`, pero ya no depende de foreign keys al catálogo técnico local.
+La base principal guarda `marca_id`, `modelo_id` y `motor_id` en `trabajos`, pero ya no depende de foreign keys al catálogo técnico local.
 
 ## Migraciones
 
@@ -57,7 +57,7 @@ npm run db:migrate
 
 El runner registra cada archivo aplicado en la tabla `schema_migrations`.
 
-La migración `010_drop_technical_foreign_keys.sql` desacopla `pedidos` del catálogo técnico local para poder usar una base externa.
+La migración `010_drop_technical_foreign_keys.sql` desacopla `trabajos` del catálogo técnico local para poder usar una base externa.
 
 ## Desarrollo
 
@@ -69,8 +69,8 @@ npm run db:reset:dev
 
 Esto limpia:
 
-- `pedido_trabajos`
-- `pedidos`
+- `trabajo_trabajos`
+- `trabajos`
 - `clientes`
 - `marcas`
 - `modelos`
@@ -89,10 +89,10 @@ El seed toma combinaciones de marca, modelo y motor desde `TECHNICAL_DATABASE_UR
 
 - Dashboard inicial
 - Listado de clientes con búsqueda
-- Listado de pedidos con filtros por estado y prioridad
+- Listado de trabajos con filtros por estado y prioridad
 - Conexión server-side a Neon
 - Capa de queries SQL directas
-- Migración inicial para `clientes`, `pedidos` y `pedido_trabajos`
+- Migración inicial para `clientes`, `trabajos` y `trabajo_trabajos`
 
 ## Supuestos actuales
 

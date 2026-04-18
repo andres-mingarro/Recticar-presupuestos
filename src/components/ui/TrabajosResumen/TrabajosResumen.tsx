@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import type { RepuestoAgrupado, TrabajoAgrupado } from "@/lib/types";
-import { useTrabajosSeleccion } from "@/components/forms/PedidoForm/TrabajosSeleccionContext";
-import { useRepuestosSeleccion } from "@/components/forms/PedidoForm/RepuestosSeleccionContext";
+import { useTrabajosSeleccion } from "@/components/forms/TrabajoForm/TrabajosSeleccionContext";
+import { useRepuestosSeleccion } from "@/components/forms/TrabajoForm/RepuestosSeleccionContext";
 import { formatPrice } from "@/lib/format";
 
 type TrabajosResumenProps = {

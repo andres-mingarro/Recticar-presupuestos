@@ -137,7 +137,7 @@ export async function deleteRepuesto(id: number) {
   await templateRows`DELETE FROM repuestos WHERE id = ${id}`;
 }
 
-export async function getRepuestosDetalleByPedido(pedidoId: number) {
+export async function getRepuestosDetalleByTrabajo(trabajoId: number) {
   const rows = await queryRows<{
     categoria_id: number;
     categoria_nombre: string;
@@ -154,13 +154,13 @@ export async function getRepuestosDetalleByPedido(pedidoId: number) {
         r.nombre AS repuesto_nombre,
         pr.precio AS precio_unitario,
         pr.cantidad AS cantidad
-      FROM pedido_repuestos pr
+      FROM orden_trabajo_repuestos pr
       INNER JOIN repuestos r ON r.id = pr.repuesto_id
       INNER JOIN categorias_repuesto c ON c.id = r.categoria_id
-      WHERE pr.pedido_id = $1
+      WHERE pr.orden_trabajo_id = $1
       ORDER BY c.nombre ASC, r.nombre ASC
     `,
-    [pedidoId]
+    [trabajoId]
   );
 
   return rows.map((row) => ({

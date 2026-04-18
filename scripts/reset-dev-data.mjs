@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { loadDotEnvLocal } from "./lib/env.mjs";
 
 const DEV_CLIENT_EMAIL_DOMAIN = "@dev.recticar.local";
-const DEV_PEDIDO_TAG = "[DEV-SEED]";
+const DEV_TRABAJO_TAG = "[DEV-SEED]";
 
 async function main() {
   await loadDotEnvLocal();
@@ -13,19 +13,19 @@ async function main() {
   }
 
   const sql = neon(process.env.DATABASE_URL);
-  const pedidos = await sql`
+  const trabajos = await sql`
     SELECT id
-    FROM pedidos
-    WHERE observaciones ILIKE ${`${DEV_PEDIDO_TAG}%`}
+    FROM ordenes_trabajo
+    WHERE observaciones ILIKE ${`${DEV_TRABAJO_TAG}%`}
   `;
 
-  for (const pedido of pedidos) {
-    await sql`DELETE FROM pedido_trabajos WHERE pedido_id = ${pedido.id}`;
+  for (const trabajo of trabajos) {
+    await sql`DELETE FROM orden_trabajo_trabajos WHERE orden_trabajo_id = ${trabajo.id}`;
   }
 
   await sql`
-    DELETE FROM pedidos
-    WHERE observaciones ILIKE ${`${DEV_PEDIDO_TAG}%`}
+    DELETE FROM ordenes_trabajo
+    WHERE observaciones ILIKE ${`${DEV_TRABAJO_TAG}%`}
   `;
 
   await sql`

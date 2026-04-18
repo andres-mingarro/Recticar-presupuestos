@@ -4,7 +4,7 @@ import type {
   ClienteDetail,
   ClienteFormValues,
   ClienteListItem,
-  ClientePendingPedidoItem,
+  ClientePendingTrabajoItem,
 } from "@/lib/types";
 
 type ListClientesParams = {
@@ -13,8 +13,8 @@ type ListClientesParams = {
   offset?: number;
 };
 
-type ClientePendingPedidoRow = Omit<
-  ClientePendingPedidoItem,
+type ClientePendingTrabajoRow = Omit<
+  ClientePendingTrabajoItem,
   "marca_nombre" | "modelo_nombre" | "motor_nombre"
 >;
 
@@ -132,18 +132,18 @@ export async function getClienteById(id: number) {
   return rows[0] ?? null;
 }
 
-export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
+export async function listPendingTrabajosByClienteIds(clienteIds: number[]) {
   if (clienteIds.length === 0) {
-    return [] as ClientePendingPedidoItem[];
+    return [] as ClientePendingTrabajoItem[];
   }
 
   const [rows, [marcas, modelos, motores]] = await Promise.all([
-    queryRows<ClientePendingPedidoRow>(
+    queryRows<ClientePendingTrabajoRow>(
       `
         SELECT
           p.cliente_id,
           p.id,
-          p.numero_pedido,
+          p.numero_trabajo,
           p.cobrado,
           p.estado,
           p.prioridad,
@@ -152,7 +152,7 @@ export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
           p.modelo_id,
           p.motor_id,
           p.numero_serie_motor
-        FROM pedidos p
+        FROM ordenes_trabajo p
         WHERE p.cliente_id = ANY($1::int[])
           AND p.estado <> 'finalizado'
         ORDER BY
@@ -163,14 +163,14 @@ export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
             ELSE 3
           END,
           p.fecha_creacion ASC,
-          p.numero_pedido ASC
+          p.numero_trabajo ASC
       `,
       [clienteIds]
     ),
     Promise.all([listMarcas(), listModelos(), listMotores()]),
   ]);
 
-  if (rows.length === 0) return [] as ClientePendingPedidoItem[];
+  if (rows.length === 0) return [] as ClientePendingTrabajoItem[];
 
   const marcasById = new Map(marcas.map((m) => [m.id, m.nombre]));
   const modelosById = new Map(modelos.map((m) => [m.id, m.nombre]));
@@ -181,7 +181,7 @@ export async function listPendingPedidosByClienteIds(clienteIds: number[]) {
     marca_nombre: item.marca_id ? (marcasById.get(item.marca_id) ?? null) : null,
     modelo_nombre: item.modelo_id ? (modelosById.get(item.modelo_id) ?? null) : null,
     motor_nombre: item.motor_id ? (motoresById.get(item.motor_id) ?? null) : null,
-  })) as ClientePendingPedidoItem[];
+  })) as ClientePendingTrabajoItem[];
 }
 
 export async function createCliente(input: ClienteFormValues) {

@@ -30,8 +30,8 @@ function normalize(formData: FormData, key: string) {
 
 function revalidateTechnicalPages() {
   revalidatePath("/informacion-tecnica");
-  revalidatePath("/pedidos");
-  revalidatePath("/pedidos/nuevo");
+  revalidatePath("/trabajos");
+  revalidatePath("/trabajos/nuevo");
   revalidatePath("/clientes");
 }
 

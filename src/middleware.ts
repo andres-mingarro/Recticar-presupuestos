@@ -31,11 +31,11 @@ export async function middleware(req: NextRequest) {
     if (role === "operador") {
       const blocked =
         pathname.startsWith("/clientes/nuevo") ||
-        pathname.startsWith("/pedidos/nuevo") ||
+        pathname.startsWith("/trabajos/nuevo") ||
         pathname.startsWith("/precios") ||
         pathname.startsWith("/admin");
       if (blocked) {
-        return NextResponse.redirect(new URL("/pedidos", req.url));
+        return NextResponse.redirect(new URL("/trabajos", req.url));
       }
     }
 

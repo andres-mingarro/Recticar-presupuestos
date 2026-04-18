@@ -1,11 +1,11 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
-import type { PedidoPrioridad } from "@/lib/types";
+import type { TrabajoPrioridad } from "@/lib/types";
 
 type PrioridadContextValue = {
-  prioridad: PedidoPrioridad;
-  setPrioridad: (v: PedidoPrioridad) => void;
+  prioridad: TrabajoPrioridad;
+  setPrioridad: (v: TrabajoPrioridad) => void;
 };
 
 const PrioridadContext = createContext<PrioridadContextValue | null>(null);
@@ -14,7 +14,7 @@ export function PrioridadProvider({
   initialValue,
   children,
 }: {
-  initialValue: PedidoPrioridad;
+  initialValue: TrabajoPrioridad;
   children: ReactNode;
 }) {
   const [prioridad, setPrioridad] = useState(initialValue);

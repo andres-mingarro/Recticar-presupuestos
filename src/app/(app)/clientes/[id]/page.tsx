@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { ClienteDetailPage } from "@/components/pages/ClienteDetailPage";
 import type { ClienteFormState } from "@/components/forms/ClienteForm";
 import { getClienteById, updateCliente } from "@/lib/queries/clientes";
-import { listPedidosByCliente } from "@/lib/queries/pedidos";
+import { listTrabajosByCliente } from "@/lib/queries/trabajos";
 import type { ClienteFormValues } from "@/lib/types";
 
 function normalizeString(value: FormDataEntryValue | null) {
@@ -28,20 +28,20 @@ export default async function Page({
   const session = await getSession();
   const canEdit = session?.role !== "operador";
 
-  const [cliente, pedidos] = await Promise.all([
+  const [cliente, trabajos] = await Promise.all([
     getClienteById(clienteId),
-    listPedidosByCliente(clienteId),
+    listTrabajosByCliente(clienteId),
   ]);
 
   if (!cliente) {
     notFound();
   }
 
-  const pedidosVigentes = pedidos.filter(
-    (pedido) => pedido.estado === "pendiente" || pedido.estado === "aprobado"
+  const trabajosVigentes = trabajos.filter(
+    (trabajo) => trabajo.estado === "pendiente" || trabajo.estado === "aprobado"
   );
-  const pedidosFinalizados = pedidos.filter(
-    (pedido) => pedido.estado === "finalizado"
+  const trabajosFinalizados = trabajos.filter(
+    (trabajo) => trabajo.estado === "finalizado"
   );
 
   const initialState: ClienteFormState = {
@@ -111,8 +111,8 @@ export default async function Page({
       action={updateClienteAction}
       initialState={initialState}
       wasUpdated={query?.updated === "1"}
-      pedidosVigentes={pedidosVigentes}
-      pedidosFinalizados={pedidosFinalizados}
+      trabajosVigentes={trabajosVigentes}
+      trabajosFinalizados={trabajosFinalizados}
       canEdit={canEdit}
     />
   );

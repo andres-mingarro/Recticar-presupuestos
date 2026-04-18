@@ -44,4 +44,3 @@ CREATE INDEX idx_pedidos_cliente_id ON pedidos(cliente_id);
 CREATE INDEX idx_pedidos_estado_prioridad ON pedidos(estado, prioridad);
 CREATE INDEX idx_pedido_trabajos_pedido_id ON pedido_trabajos(pedido_id);
 CREATE INDEX idx_pedido_trabajos_trabajo_id ON pedido_trabajos(trabajo_id);
-

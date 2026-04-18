@@ -1,1 +1,0 @@
-export { PedidoMobileCard } from "./PedidoMobileCard";

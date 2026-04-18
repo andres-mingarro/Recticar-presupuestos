@@ -204,16 +204,16 @@ export async function renameCategoria(id: number, nombre: string) {
 }
 
 export async function deleteCategoria(id: number) {
-  // Check if any trabajo in this category is used in pedidos
+  // Check if any trabajo in this category is used in trabajos
   const used = await templateRows<{ count: number }>`
     SELECT COUNT(*)::int AS count
-    FROM pedido_trabajos pt
+    FROM orden_trabajo_trabajos pt
     INNER JOIN trabajos t ON t.id = pt.trabajo_id
     WHERE t.categoria_id = ${id}
   `;
   if (used[0].count > 0) {
     throw new Error(
-      "No se puede eliminar la categoría porque tiene trabajos usados en pedidos."
+      "No se puede eliminar la categoría porque tiene trabajos usados en trabajos."
     );
   }
   await templateRows`DELETE FROM trabajos WHERE categoria_id = ${id}`;
@@ -268,11 +268,11 @@ export async function reorderTrabajos(orderedIds: number[]) {
 
 export async function deleteTrabajo(id: number) {
   const used = await templateRows<{ count: number }>`
-    SELECT COUNT(*)::int AS count FROM pedido_trabajos WHERE trabajo_id = ${id}
+    SELECT COUNT(*)::int AS count FROM orden_trabajo_trabajos WHERE trabajo_id = ${id}
   `;
   if (used[0].count > 0) {
     throw new Error(
-      "No se puede eliminar el trabajo porque está usado en pedidos."
+      "No se puede eliminar el trabajo porque está usado en trabajos."
     );
   }
   await templateRows`DELETE FROM trabajos WHERE id = ${id}`;
@@ -286,7 +286,7 @@ export type TrabajoDetalleItem = {
   precio: number;
 };
 
-export async function getTrabajosDetalleByPedido(pedidoId: number, listaPrecios: 1 | 2 | 3 = 1) {
+export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecios: 1 | 2 | 3 = 1) {
   const precioCol = listaPrecios === 3 ? "t.precio_lista_3" : listaPrecios === 2 ? "t.precio_lista_2" : "t.precio_lista_1";
 
   const rows = await queryRows<{
@@ -303,13 +303,13 @@ export async function getTrabajosDetalleByPedido(pedidoId: number, listaPrecios:
         t.id AS trabajo_id,
         t.nombre AS trabajo_nombre,
         ${precioCol} AS precio
-      FROM pedido_trabajos pt
+      FROM orden_trabajo_trabajos pt
       INNER JOIN trabajos t ON t.id = pt.trabajo_id
       INNER JOIN categorias_trabajo c ON c.id = t.categoria_id
-      WHERE pt.pedido_id = $1
+      WHERE pt.orden_trabajo_id = $1
       ORDER BY c.nombre ASC, t.nombre ASC
     `,
-    [pedidoId]
+    [trabajoId]
   );
 
   return rows.map((row) => ({

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import type {
   ClienteListItem,
-  ClientePendingPedidoItem,
+  ClientePendingTrabajoItem,
 } from "@/lib/types";
 import { SearchForm } from "@/components/search/SearchForm";
 import { Pager } from "@/components/pagination/Pager";
@@ -24,7 +24,7 @@ import styles from "./ClientesPage.module.scss";
 type ClientesPageProps = {
   q: string;
   clientes: ClienteListItem[];
-  pendingPedidosByCliente: Record<number, ClientePendingPedidoItem[]>;
+  pendingTrabajosByCliente: Record<number, ClientePendingTrabajoItem[]>;
   errorMessage: string | null;
   currentPage: number;
   totalClientes: number;
@@ -54,7 +54,7 @@ function buildClientesHref(q: string, page: number) {
 export function ClientesPage({
   q,
   clientes,
-  pendingPedidosByCliente,
+  pendingTrabajosByCliente,
   errorMessage,
   currentPage,
   totalClientes,
@@ -69,8 +69,8 @@ export function ClientesPage({
   const router = useRouter();
   const [panelClientId, setPanelClientId] = useState<number | null>(null);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
-  const panelPedidos =
-    panelClientId !== null ? pendingPedidosByCliente[panelClientId] ?? [] : [];
+  const panelTrabajos =
+    panelClientId !== null ? pendingTrabajosByCliente[panelClientId] ?? [] : [];
   const panelClient = clientes.find((cliente) => cliente.id === panelClientId) ?? null;
 
   useEffect(() => {
@@ -159,7 +159,7 @@ export function ClientesPage({
               <ClienteMobileCard
                 key={cliente.id}
                 cliente={cliente}
-                pendientes={(pendingPedidosByCliente[cliente.id] ?? []).length}
+                pendientes={(pendingTrabajosByCliente[cliente.id] ?? []).length}
                 onPendientesClick={() => openPanel(cliente.id)}
               />
             ))
@@ -259,7 +259,7 @@ export function ClientesPage({
                           openPanel(cliente.id);
                         }}
                       >
-                        {(pendingPedidosByCliente[cliente.id] ?? []).length} Pendientes
+                        {(pendingTrabajosByCliente[cliente.id] ?? []).length} Pendientes
                       </Button>
                     </td>
                   </tr>
@@ -334,15 +334,15 @@ export function ClientesPage({
                 styles.ClientesPagePanelList
               )}
             >
-              {panelPedidos.length === 0 ? (
+              {panelTrabajos.length === 0 ? (
                 <p className="text-sm text-[var(--color-foreground-muted)]">
                   Este cliente no tiene trabajos pendientes.
                 </p>
               ) : (
-                panelPedidos.map((pedido) => (
+                panelTrabajos.map((trabajo) => (
                   <Link
-                    key={pedido.id}
-                    href={`/pedidos/${pedido.id}`}
+                    key={trabajo.id}
+                    href={`/trabajos/${trabajo.id}`}
                     className={cn(
                       "ClientesPagePanelItem",
                       styles.ClientesPagePanelItem
@@ -354,26 +354,26 @@ export function ClientesPage({
                         <p className="text-sm font-semibold text-[var(--color-foreground)]">
                           <span className="inline-flex items-center gap-2">
                             <Icon name="clipboard" className="h-4 w-4" />
-                            Pedido #{pedido.numero_pedido}
+                            Trabajo #{trabajo.numero_trabajo}
                           </span>
                         </p>
-                        <PaymentBadge cobrado={pedido.cobrado} />
+                        <PaymentBadge cobrado={trabajo.cobrado} />
                       </div>
                       <div>
-                        <StatusBadge estado={pedido.estado} />
+                        <StatusBadge estado={trabajo.estado} />
                       </div>
                       <p className="text-sm text-[var(--color-foreground-muted)]">
                         <span className="inline-flex items-center gap-2">
                           <Icon name="car" className="h-4 w-4" />
                           {getVehicleLabel([
-                            pedido.marca_nombre,
-                            pedido.modelo_nombre,
-                            pedido.motor_nombre,
+                            trabajo.marca_nombre,
+                            trabajo.modelo_nombre,
+                            trabajo.motor_nombre,
                           ])}
                         </span>
                       </p>
                       <p className="text-xs text-[var(--color-foreground-subtle)]">
-                        Serie: {pedido.numero_serie_motor || "Sin serie"}
+                        Serie: {trabajo.numero_serie_motor || "Sin serie"}
                       </p>
                     </div>
                   </Link>

@@ -2,13 +2,13 @@
 
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
-import type { PedidoPrioridad } from "@/lib/types";
+import type { TrabajoPrioridad } from "@/lib/types";
 import { usePrioridad } from "./PrioridadContext";
 
 export type ChangePrioridadActionState = { error: string | null; success?: boolean };
 
 const OPTIONS: Array<{
-  value: PedidoPrioridad;
+  value: TrabajoPrioridad;
   label: string;
   tooltip: string;
   activeTone: string;
@@ -34,7 +34,7 @@ const OPTIONS: Array<{
 ];
 
 type PrioridadSelectorProps = {
-  value: PedidoPrioridad;
+  value: TrabajoPrioridad;
   action: (
     prevState: ChangePrioridadActionState,
     formData: FormData

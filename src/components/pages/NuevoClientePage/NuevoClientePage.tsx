@@ -28,7 +28,7 @@ export function NuevoClientePage({
       <PageHeader
         eyebrow="Clientes"
         title="Nuevo cliente"
-        description="Cargá un nuevo cliente en la base del taller para poder asignarle pedidos, hacer seguimiento y centralizar sus datos de contacto."
+        description="Cargá un nuevo cliente en la base del taller para poder asignarle trabajos, hacer seguimiento y centralizar sus datos de contacto."
         actions={
           <Button as="a" href="/clientes" variant="secondary">
             Volver al listado
@@ -49,7 +49,7 @@ export function NuevoClientePage({
             </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--color-foreground-muted)]">
               Esta alta crea el cliente en Neon y lo deja disponible para el
-              buscador y para la asignación de pedidos.
+              buscador y para la asignación de trabajos.
             </p>
           </div>
 
@@ -79,7 +79,7 @@ export function NuevoClientePage({
             </p>
             <p className="mt-3 text-sm leading-6 text-[var(--color-foreground-muted)]">
               Cuando terminemos esta pantalla, el paso natural es completar la
-              ficha individual del cliente con edición y sus pedidos asociados.
+              ficha individual del cliente con edición y sus trabajos asociados.
             </p>
           </Card>
         </aside>

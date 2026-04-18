@@ -9,7 +9,7 @@ import styles from "./MainMenu.module.scss";
 const baseItems = [
   { href: "/", label: "Dashboard", icon: "gauge" as const, exact: true },
   { href: "/clientes", label: "Clientes", icon: "user" as const, exact: false },
-  { href: "/pedidos", label: "Pedidos", icon: "clipboard" as const, exact: false },
+  { href: "/trabajos", label: "Trabajos", icon: "clipboard" as const, exact: false },
   { href: "/precios", label: "Precios", icon: "tag" as const, exact: false },
   { href: "/repuestos", label: "Repuestos", icon: "package" as const, exact: false },
 ];

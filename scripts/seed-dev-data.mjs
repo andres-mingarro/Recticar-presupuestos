@@ -3,9 +3,9 @@ import { neon } from "@neondatabase/serverless";
 import { loadDotEnvLocal } from "./lib/env.mjs";
 
 const DEV_CLIENT_EMAIL_DOMAIN = "@dev.recticar.local";
-const DEV_PEDIDO_TAG = "[DEV-SEED]";
+const DEV_TRABAJO_TAG = "[DEV-SEED]";
 const DEV_CLIENTS_COUNT = 15;
-const DEV_PEDIDOS_COUNT = 15;
+const DEV_TRABAJOS_COUNT = 15;
 
 const nombres = [
   "Andres",
@@ -127,19 +127,19 @@ async function main() {
 
   console.log("Limpiando datos DEV-SEED previos...");
 
-  const pedidosPrevios = await sql`
+  const trabajosPrevios = await sql`
     SELECT id
-    FROM pedidos
-    WHERE observaciones ILIKE ${`${DEV_PEDIDO_TAG}%`}
+    FROM ordenes_trabajo
+    WHERE observaciones ILIKE ${`${DEV_TRABAJO_TAG}%`}
   `;
 
-  for (const pedido of pedidosPrevios) {
-    await sql`DELETE FROM pedido_trabajos WHERE pedido_id = ${pedido.id}`;
+  for (const trabajo of trabajosPrevios) {
+    await sql`DELETE FROM orden_trabajo_trabajos WHERE orden_trabajo_id = ${trabajo.id}`;
   }
 
   await sql`
-    DELETE FROM pedidos
-    WHERE observaciones ILIKE ${`${DEV_PEDIDO_TAG}%`}
+    DELETE FROM ordenes_trabajo
+    WHERE observaciones ILIKE ${`${DEV_TRABAJO_TAG}%`}
   `;
 
   await sql`
@@ -170,11 +170,11 @@ async function main() {
   `;
 
   if (combinaciones.length === 0) {
-    throw new Error("No hay combinaciones marca/modelo/motor disponibles para sembrar pedidos.");
+    throw new Error("No hay combinaciones marca/modelo/motor disponibles para sembrar trabajos.");
   }
 
   if (trabajos.length === 0) {
-    throw new Error("No hay trabajos cargados para asociar a los pedidos de prueba.");
+    throw new Error("No hay trabajos cargados para asociar a los trabajos de prueba.");
   }
 
   const clientes = [];
@@ -202,28 +202,28 @@ async function main() {
     clientes.push(inserted[0]);
   }
 
-  console.log(`Creando ${DEV_PEDIDOS_COUNT} pedidos de desarrollo...`);
+  console.log(`Creando ${DEV_TRABAJOS_COUNT} trabajos de desarrollo...`);
 
-  const basePedido = new Date("2026-03-01T10:00:00.000Z");
+  const baseTrabajo = new Date("2026-03-01T10:00:00.000Z");
   const prioridades = ["baja", "normal", "alta"];
   const estados = ["pendiente", "aprobado", "finalizado"];
-  let pedidosCreados = 0;
+  let trabajosCreados = 0;
 
-  for (let index = 0; index < DEV_PEDIDOS_COUNT; index += 1) {
+  for (let index = 0; index < DEV_TRABAJOS_COUNT; index += 1) {
     const cliente = clientes[index % clientes.length];
     const combinacion = combinaciones[index % combinaciones.length];
     const estado = estados[index % estados.length];
     const prioridad = prioridades[index % prioridades.length];
-    const fechaCreacion = toIso(plusDays(basePedido, index));
+    const fechaCreacion = toIso(plusDays(baseTrabajo, index));
     const fechaAprobacion =
       estado === "aprobado" || estado === "finalizado"
-        ? toIso(plusDays(basePedido, index + 2))
+        ? toIso(plusDays(baseTrabajo, index + 2))
         : null;
-    const observaciones = `${DEV_PEDIDO_TAG} Pedido demo ${index + 1} para ${cliente.apellido}, ${cliente.nombre}`;
+    const observaciones = `${DEV_TRABAJO_TAG} Trabajo demo ${index + 1} para ${cliente.apellido}, ${cliente.nombre}`;
     const serie = `DEV-${String(index + 1).padStart(4, "0")}-${combinacion.motor_id}`;
 
-    const insertedPedido = await sql`
-      INSERT INTO pedidos (
+    const insertedTrabajo = await sql`
+      INSERT INTO ordenes_trabajo (
         cliente_id,
         marca_id,
         modelo_id,
@@ -250,22 +250,22 @@ async function main() {
       RETURNING id
     `;
 
-    const pedidoId = insertedPedido[0].id;
-    const trabajosPorPedido = 2 + (index % 4);
+    const trabajoId = insertedTrabajo[0].id;
+    const trabajosPorTrabajo = 2 + (index % 4);
 
-    for (let offset = 0; offset < trabajosPorPedido; offset += 1) {
+    for (let offset = 0; offset < trabajosPorTrabajo; offset += 1) {
       const trabajo = trabajos[(index + offset) % trabajos.length];
       await sql`
-        INSERT INTO pedido_trabajos (pedido_id, trabajo_id)
-        VALUES (${pedidoId}, ${trabajo.id})
-        ON CONFLICT (pedido_id, trabajo_id) DO NOTHING
+        INSERT INTO orden_trabajo_trabajos (orden_trabajo_id, trabajo_id)
+        VALUES (${trabajoId}, ${trabajo.id})
+        ON CONFLICT (orden_trabajo_id, trabajo_id) DO NOTHING
       `;
     }
 
-    pedidosCreados += 1;
+    trabajosCreados += 1;
   }
 
-  console.log(`Seed completado: ${clientes.length} clientes y ${pedidosCreados} pedidos.`);
+  console.log(`Seed completado: ${clientes.length} clientes y ${trabajosCreados} trabajos.`);
 }
 
 main().catch((error) => {

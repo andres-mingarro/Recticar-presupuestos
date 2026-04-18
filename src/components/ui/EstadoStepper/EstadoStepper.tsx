@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
-import type { PedidoEstado } from "@/lib/types";
+import type { TrabajoEstado } from "@/lib/types";
 
 const STEPS: Array<{
-  value: PedidoEstado;
+  value: TrabajoEstado;
   label: string;
   num: string;
   activeBg: string;
@@ -30,7 +30,7 @@ const STEPS: Array<{
   },
   {
     value: "finalizado",
-    label: "Pedido finalizado",
+    label: "Trabajo finalizado",
     num: "3",
     activeBg: "bg-[linear-gradient(135deg,#059669,#34d399)]",
     activeText: "text-white",
@@ -38,7 +38,7 @@ const STEPS: Array<{
   },
 ];
 
-function stepStatus(stepValue: PedidoEstado, currentValue: PedidoEstado) {
+function stepStatus(stepValue: TrabajoEstado, currentValue: TrabajoEstado) {
   const currentIndex = STEPS.findIndex((s) => s.value === currentValue);
   const stepIndex = STEPS.findIndex((s) => s.value === stepValue);
   if (stepIndex < currentIndex) return "completed";
@@ -93,7 +93,7 @@ const BORDER_RIGHT = "border-b border-[var(--color-border)] md:border-b-0 md:bor
 
 // ─── Display mode ─────────────────────────────────────────────────────────────
 
-export function EstadoStepperDisplay({ value }: { value: PedidoEstado }) {
+export function EstadoStepperDisplay({ value }: { value: TrabajoEstado }) {
   return (
     <div className="EstadoStepperDisplay flex flex-col gap-1.5">
       <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">Estado</span>
@@ -129,16 +129,16 @@ export function EstadoStepperDisplay({ value }: { value: PedidoEstado }) {
 // ─── Form mode ────────────────────────────────────────────────────────────────
 
 type EstadoStepperProps = {
-  initialValue: PedidoEstado;
+  initialValue: TrabajoEstado;
   name: string;
   allowFinalizado?: boolean;
   form?: string;
-  value?: PedidoEstado;
-  onChange?: (value: PedidoEstado) => void;
+  value?: TrabajoEstado;
+  onChange?: (value: TrabajoEstado) => void;
 };
 
 export function EstadoStepper({ initialValue, name, allowFinalizado, form, value, onChange }: EstadoStepperProps) {
-  const [internalSelected, setInternalSelected] = useState<PedidoEstado>(initialValue);
+  const [internalSelected, setInternalSelected] = useState<TrabajoEstado>(initialValue);
   const selected = value ?? internalSelected;
 
   useEffect(() => {

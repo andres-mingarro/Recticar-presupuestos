@@ -18,7 +18,7 @@ export function HomePage() {
             </h1>
             <p className="max-w-2xl text-base leading-7 text-slate-200">
               Esta primera versión ya deja lista la base técnica de `Recticar
-              Presupuestos` para empezar a operar con clientes, pedidos y la
+              Presupuestos` para empezar a operar con clientes, trabajos y la
               conexión a Neon.
             </p>
             <div className="flex flex-wrap gap-3">
@@ -27,11 +27,11 @@ export function HomePage() {
               </Button>
               <Button
                 as="a"
-                href="/pedidos"
+                href="/trabajos"
                 variant="secondary"
                 className="border-white/20 bg-white/10 text-white hover:bg-white/20"
               >
-                Ver pedidos
+                Ver trabajos
               </Button>
             </div>
           </div>
@@ -68,17 +68,17 @@ export function HomePage() {
         </Link>
 
         <Link
-          href="/pedidos"
+          href="/trabajos"
           className="group rounded-[28px] border border-[var(--color-border)] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_70px_rgba(15,23,42,0.10)]"
         >
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
-            Pedidos
+            Trabajos
           </p>
           <h2 className="mt-3 text-2xl font-semibold tracking-tight">
             Seguimiento de presupuestos
           </h2>
           <p className="mt-2 text-sm leading-6 text-[var(--color-foreground-muted)]">
-            Filtrá pedidos por estado y prioridad, y dejá lista la base para
+            Filtrá trabajos por estado y prioridad, y dejá lista la base para
             formularios, aprobación y exportación futura.
           </p>
         </Link>

@@ -3,10 +3,10 @@ import { ClientesPage } from "@/components/pages/ClientesPage";
 import {
   countClientes,
   listClientes,
-  listPendingPedidosByClienteIds,
+  listPendingTrabajosByClienteIds,
 } from "@/lib/queries/clientes";
 import { resolveSearchParams } from "@/lib/search-params";
-import type { ClienteListItem, ClientePendingPedidoItem } from "@/lib/types";
+import type { ClienteListItem, ClientePendingTrabajoItem } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +30,7 @@ export default async function Page({
   let errorMessage: string | null = null;
   let clientes: ClienteListItem[] = [];
   let totalClientes = 0;
-  let pendingPedidosByCliente: Record<number, ClientePendingPedidoItem[]> = {};
+  let pendingTrabajosByCliente: Record<number, ClientePendingTrabajoItem[]> = {};
 
   try {
     [clientes, totalClientes] = await Promise.all([
@@ -42,18 +42,18 @@ export default async function Page({
       countClientes(q),
     ]);
 
-    const pendingPedidos = await listPendingPedidosByClienteIds(
+    const pendingTrabajos = await listPendingTrabajosByClienteIds(
       clientes.map((cliente) => cliente.id)
     );
 
-    pendingPedidosByCliente = pendingPedidos.reduce<
-      Record<number, ClientePendingPedidoItem[]>
-    >((acc, pedido) => {
-      if (!acc[pedido.cliente_id]) {
-        acc[pedido.cliente_id] = [];
+    pendingTrabajosByCliente = pendingTrabajos.reduce<
+      Record<number, ClientePendingTrabajoItem[]>
+    >((acc, trabajo) => {
+      if (!acc[trabajo.cliente_id]) {
+        acc[trabajo.cliente_id] = [];
       }
 
-      acc[pedido.cliente_id].push(pedido);
+      acc[trabajo.cliente_id].push(trabajo);
       return acc;
     }, {});
   } catch (error) {
@@ -65,7 +65,7 @@ export default async function Page({
     <ClientesPage
       q={q}
       clientes={clientes}
-      pendingPedidosByCliente={pendingPedidosByCliente}
+      pendingTrabajosByCliente={pendingTrabajosByCliente}
       errorMessage={errorMessage}
       currentPage={currentPage}
       totalClientes={totalClientes}

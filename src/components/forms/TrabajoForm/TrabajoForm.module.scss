@@ -1,0 +1,78 @@
+.TrabajoForm {
+  width: 100%;
+}
+
+.TrabajoFormSection {
+  display: grid;
+  gap: 1rem;
+}
+
+.TrabajoFormGrid {
+  gap: 1rem;
+}
+
+.TrabajoFormField {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.TrabajoFormOptionGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.TrabajoFormChecklist {
+  display: grid;
+  gap: 1rem;
+}
+
+.TrabajoFormAccordion[open] .TrabajoFormAccordionChevron {
+  transform: rotate(180deg);
+}
+
+.TrabajoFormActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Incrementor pill style solo en mobile dentro de repuestos */
+@media (max-width: 767px) {
+  .TrabajoFormChecklist :global(.Incrementor) {
+    gap: 0;
+    background: white;
+    border-radius: 5px;
+  }
+
+  .TrabajoFormChecklist :global(.Incrementor) > button:first-child {
+    border-radius: 5px 0 0 5px;
+    background-image: linear-gradient(135deg, var(--color-accent), var(--brown-burnt));
+    color: white;
+    border-color: transparent;
+  }
+
+  .TrabajoFormChecklist :global(.Incrementor) > button:last-child {
+    border-radius: 0 5px 5px 0;
+    background-image: linear-gradient(135deg, var(--color-accent), var(--brown-burnt));
+    color: white;
+    border-color: transparent;
+  }
+
+  .TrabajoFormChecklist :global(.Incrementor) > span {
+    border-radius: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .TrabajoFormGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .TrabajoFormOptionGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .TrabajoFormActions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

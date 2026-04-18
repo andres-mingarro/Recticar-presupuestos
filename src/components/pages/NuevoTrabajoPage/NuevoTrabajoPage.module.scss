@@ -1,0 +1,20 @@
+.NuevoTrabajoPage {
+  width: 100%;
+}
+
+.NuevoTrabajoPageContent {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.NuevoTrabajoPageSidebar {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 1200px) {
+  .NuevoTrabajoPageContent {
+    grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.75fr);
+    align-items: start;
+  }
+}

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import type { PedidoEstado, PedidoPrioridad } from "@/lib/types";
+import type { TrabajoEstado, TrabajoPrioridad } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 import styles from "./Badge.module.scss";
 
@@ -11,7 +11,7 @@ type ContactBadgeVariant =
   | "province"
   | "postalCode";
 
-export function PriorityBadge({ prioridad, className }: { prioridad: PedidoPrioridad; className?: string }) {
+export function PriorityBadge({ prioridad, className }: { prioridad: TrabajoPrioridad; className?: string }) {
   const priorityStyles = {
     baja:
       "border-slate-600 bg-[linear-gradient(135deg,#475569,#1e293b)] text-white shadow-[0_10px_24px_rgba(51,65,85,0.18)]",
@@ -37,7 +37,7 @@ export function PriorityBadge({ prioridad, className }: { prioridad: PedidoPrior
   );
 }
 
-export function StatusBadge({ estado, className }: { estado: PedidoEstado; className?: string }) {
+export function StatusBadge({ estado, className }: { estado: TrabajoEstado; className?: string }) {
   const statusStyles = {
     pendiente:
       "border-orange-200 bg-[linear-gradient(135deg,#fff7ed,#fed7aa)] text-orange-700 shadow-[0_10px_24px_rgba(251,146,60,0.16)]",
