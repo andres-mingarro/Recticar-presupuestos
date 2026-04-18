@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import type {
   Marca,
@@ -43,6 +44,7 @@ type TrabajoDetailPageProps = {
     formData: FormData
   ) => Promise<TrabajoFormState>;
   initialState: TrabajoFormState;
+  wasCreated: boolean;
   wasUpdated: boolean;
   marcas: Marca[];
   modelos: Modelo[];
@@ -57,6 +59,7 @@ export function TrabajoDetailPage({
   trabajo,
   action,
   initialState,
+  wasCreated,
   wasUpdated,
   marcas,
   modelos,
@@ -70,6 +73,7 @@ export function TrabajoDetailPage({
   const [formState, formAction, isPending] = useActionState(action, initialState);
   const [dirty, setDirty] = useState(false);
   const [selectedEstado, setSelectedEstado] = useState(trabajo.estado);
+  const lastSuccessfulUpdatedAtRef = useRef(initialState.values.updatedAt ?? "");
 
   useEffect(() => {
     if (isPending) setDirty(false);
@@ -78,6 +82,33 @@ export function TrabajoDetailPage({
   useEffect(() => {
     setSelectedEstado(formState.values.estado);
   }, [formState.values.estado]);
+
+  useEffect(() => {
+    if (!wasCreated && !wasUpdated) return;
+
+    toast.success(
+      wasCreated
+        ? `Trabajo #${trabajo.numero_trabajo} creado correctamente.`
+        : `Trabajo #${trabajo.numero_trabajo} guardado correctamente.`
+    );
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("created");
+    url.searchParams.delete("updated");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [trabajo.numero_trabajo, wasCreated, wasUpdated]);
+
+  useEffect(() => {
+    if (isPending) return;
+
+    const currentUpdatedAt = formState.values.updatedAt ?? "";
+    if (!currentUpdatedAt) return;
+    if (formState.error) return;
+    if (currentUpdatedAt === lastSuccessfulUpdatedAtRef.current) return;
+
+    lastSuccessfulUpdatedAtRef.current = currentUpdatedAt;
+    toast.success(`Trabajo #${trabajo.numero_trabajo} guardado correctamente.`);
+  }, [formState.error, formState.values.updatedAt, isPending, trabajo.numero_trabajo]);
 
   return (
     <PrioridadProvider initialValue={trabajo.prioridad}>
@@ -178,12 +209,6 @@ export function TrabajoDetailPage({
               />
             </div>
           </Card>
-
-          {wasUpdated ? (
-            <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
-              Los cambios del trabajo se guardaron correctamente.
-            </section>
-          ) : null}
 
           <div onInput={() => setDirty(true)}>
           <TrabajoForm

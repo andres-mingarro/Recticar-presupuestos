@@ -15,7 +15,7 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ updated?: string }>;
+  searchParams?: Promise<{ updated?: string; created?: string }>;
 }) {
   const { id } = await params;
   const query = await searchParams;
@@ -110,6 +110,7 @@ export default async function Page({
       cliente={cliente}
       action={updateClienteAction}
       initialState={initialState}
+      wasCreated={query?.created === "1"}
       wasUpdated={query?.updated === "1"}
       trabajosVigentes={trabajosVigentes}
       trabajosFinalizados={trabajosFinalizados}

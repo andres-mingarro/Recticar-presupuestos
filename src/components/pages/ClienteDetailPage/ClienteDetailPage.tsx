@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import type { ClienteDetail, ClienteTrabajoItem } from "@/lib/types";
 import { formatDate, getVehicleLabel } from "@/lib/format";
@@ -21,6 +22,7 @@ type ClienteDetailPageProps = {
     formData: FormData
   ) => Promise<ClienteFormState>;
   initialState: ClienteFormState;
+  wasCreated: boolean;
   wasUpdated: boolean;
   trabajosVigentes: ClienteTrabajoItem[];
   trabajosFinalizados: ClienteTrabajoItem[];
@@ -137,6 +139,7 @@ export function ClienteDetailPage({
   cliente,
   action,
   initialState,
+  wasCreated,
   wasUpdated,
   trabajosVigentes,
   trabajosFinalizados,
@@ -146,9 +149,29 @@ export function ClienteDetailPage({
   const [visibleFinalizados, setVisibleFinalizados] = useState(5);
   const finalizadosVisible = trabajosFinalizados.slice(0, visibleFinalizados);
   const hayMasFinalizados = visibleFinalizados < trabajosFinalizados.length;
+  const lastToastKeyRef = useRef<string | null>(null);
 
   const rawPhone = (cliente.telefono ?? "").replace(/\D/g, "");
   const waNumber = rawPhone.startsWith("54") ? rawPhone : `54${rawPhone}`;
+
+  useEffect(() => {
+    if (!wasCreated && !wasUpdated) return;
+
+    const toastKey = `${cliente.id}:${wasCreated ? "created" : "updated"}`;
+    if (lastToastKeyRef.current === toastKey) return;
+    lastToastKeyRef.current = toastKey;
+
+    toast.success(
+      wasCreated
+        ? `Cliente ${cliente.apellido}, ${cliente.nombre} creado correctamente.`
+        : `Cliente ${cliente.apellido}, ${cliente.nombre} guardado correctamente.`
+    );
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("created");
+    url.searchParams.delete("updated");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [cliente.apellido, cliente.nombre, wasCreated, wasUpdated]);
 
   return (
     <div className={cn("ClienteDetailPage", styles.page, "space-y-6")}>
@@ -279,12 +302,6 @@ export function ClienteDetailPage({
             </Button>
           )}
         </div>
-
-        {wasUpdated && (
-          <section className="rounded-[20px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
-            Los datos del cliente se actualizaron correctamente.
-          </section>
-        )}
 
         {/* Panel de edición */}
         <div

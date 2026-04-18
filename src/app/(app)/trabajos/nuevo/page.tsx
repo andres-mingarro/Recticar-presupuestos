@@ -123,7 +123,7 @@ export default async function Page({
       };
     }
 
-    redirect(`/trabajos/${trabajoId}`);
+    redirect(`/trabajos/${trabajoId}?created=1`);
   }
 
   return (

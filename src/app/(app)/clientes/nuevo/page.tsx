@@ -67,7 +67,7 @@ export default function Page() {
       };
     }
 
-    redirect(`/clientes/${clienteId}`);
+    redirect(`/clientes/${clienteId}?created=1`);
   }
 
   return (

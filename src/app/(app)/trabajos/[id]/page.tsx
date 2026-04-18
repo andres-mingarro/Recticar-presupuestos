@@ -31,7 +31,7 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ updated?: string }>;
+  searchParams?: Promise<{ updated?: string; created?: string }>;
 }) {
   const { id } = await params;
   const query = await searchParams;
@@ -204,6 +204,7 @@ export default async function Page({
       trabajo={trabajo}
       action={updateTrabajoAction}
       initialState={initialState}
+      wasCreated={query?.created === "1"}
       wasUpdated={query?.updated === "1"}
       marcas={marcas}
       modelos={modelos}
