@@ -1,6 +1,6 @@
 "use client";
 
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 
 function startPrintMode() {
@@ -14,13 +14,14 @@ function startPrintMode() {
 
 export function PrintButton() {
   return (
-    <button
+    <Button
       type="button"
+      variant="dark"
       onClick={startPrintMode}
-      className={buttonStyles({ variant: "dark", className: "PrintButton w-full gap-2" })}
+      className="PrintButton w-full"
+      icon={<Icon name="printer" className="h-4 w-4" />}
     >
-      <Icon name="printer" className="h-4 w-4" />
       IMPRIMIR ETIQUETA
-    </button>
+    </Button>
   );
 }

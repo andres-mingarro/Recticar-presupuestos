@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import styles from "./HomePage.module.scss";
 
 export function HomePage() {
@@ -22,19 +22,17 @@ export function HomePage() {
               conexión a Neon.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/clientes" className={buttonStyles()}>
+              <Button as="a" href="/clientes">
                 Ver clientes
-              </Link>
-              <Link
+              </Button>
+              <Button
+                as="a"
                 href="/pedidos"
-                className={buttonStyles({
-                  variant: "secondary",
-                  className:
-                    "border-white/20 bg-white/10 text-white hover:bg-white/20",
-                })}
+                variant="secondary"
+                className="border-white/20 bg-white/10 text-white hover:bg-white/20"
               >
                 Ver pedidos
-              </Link>
+              </Button>
             </div>
           </div>
 

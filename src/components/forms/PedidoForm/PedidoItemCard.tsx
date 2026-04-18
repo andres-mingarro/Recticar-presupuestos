@@ -12,6 +12,7 @@ type PedidoItemCardProps = {
   onCheckedChange: (checked: boolean) => void;
   className?: string;
   contentClassName?: string;
+  checkboxClassName?: string;
   children?: ReactNode;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "checked" | "value" | "onChange">;
 
@@ -22,6 +23,7 @@ export function PedidoItemCard({
   onCheckedChange,
   className,
   contentClassName,
+  checkboxClassName,
   children,
   ...inputProps
 }: PedidoItemCardProps) {
@@ -46,7 +48,7 @@ export function PedidoItemCard({
           value={value}
           checked={checked}
           onChange={(event) => onCheckedChange(event.target.checked)}
-          className="gap-0"
+          className={cn("gap-0", checkboxClassName)}
         />
         <span className="min-w-0 text-lg">{label}</span>
         </div>

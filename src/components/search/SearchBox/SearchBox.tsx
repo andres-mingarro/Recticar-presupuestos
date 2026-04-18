@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { ClienteListItem, PedidoListItem } from "@/lib/types";
 import { Input } from "@/components/ui/Input";
-import { buttonStyles } from "@/components/ui/Button";
 import styles from "./SearchBox.module.scss";
 
 export type SearchEntity = "clientes" | "pedidos";
@@ -159,11 +158,8 @@ export function SearchBox({ entity, initialValue }: SearchBoxProps) {
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       <span
-                        className={buttonStyles({
-                          variant: "ghost",
-                          size: "sm",
-                          className: "pointer-events-none",
-                        })}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl px-3 h-8 text-xs font-medium text-[var(--color-foreground-muted)] bg-transparent pointer-events-none"
+                        aria-hidden="true"
                       >
                         Abrir
                       </span>

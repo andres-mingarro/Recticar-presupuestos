@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { ClienteForm, type ClienteFormState } from "@/components/forms/ClienteForm";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import styles from "./NuevoClientePage.module.scss";
 
@@ -31,9 +30,9 @@ export function NuevoClientePage({
         title="Nuevo cliente"
         description="Cargá un nuevo cliente en la base del taller para poder asignarle pedidos, hacer seguimiento y centralizar sus datos de contacto."
         actions={
-          <Link href="/clientes" className={buttonStyles({ variant: "secondary" })}>
+          <Button as="a" href="/clientes" variant="secondary">
             Volver al listado
-          </Link>
+          </Button>
         }
       />
 

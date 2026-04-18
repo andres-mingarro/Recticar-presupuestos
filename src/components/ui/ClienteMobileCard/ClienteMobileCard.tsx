@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import type { ClienteListItem } from "@/lib/types";
+import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 
 type Props = {
@@ -33,17 +34,18 @@ export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Pr
           {cliente.numero_cliente}
         </span>
         {pendientes > 0 && (
-          <button
+          <Button
             type="button"
-            className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] px-2.5 py-1 text-xs font-medium text-[var(--color-foreground-muted)] hover:bg-[var(--color-surface-alt)]"
+            size="sm"
+            variant="ghost"
+            icon={<Icon name="clipboard" className="h-3 w-3" />}
             onClick={(e) => {
               e.stopPropagation();
               onPendientesClick?.();
             }}
           >
-            <Icon name="clipboard" className="h-3 w-3" />
             {pendientes} pendientes
-          </button>
+          </Button>
         )}
       </div>
 

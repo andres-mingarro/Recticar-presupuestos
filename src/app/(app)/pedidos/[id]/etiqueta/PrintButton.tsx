@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/Button";
+
 function startPrintMode() {
   const body = document.body;
   body.classList.add("print-etiqueta");
@@ -11,12 +13,12 @@ function startPrintMode() {
 
 export function PrintButton() {
   return (
-    <button
+    <Button
       type="button"
       onClick={startPrintMode}
-      className="print:hidden mt-6 rounded-lg bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--color-accent-strong)] transition-colors"
+      className="print:hidden mt-6"
     >
       Imprimir etiqueta
-    </button>
+    </Button>
   );
 }

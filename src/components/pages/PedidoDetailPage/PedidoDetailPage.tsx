@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import type {
@@ -17,7 +16,7 @@ import {
   PedidoForm,
   type PedidoFormState,
 } from "@/components/forms/PedidoForm";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { CobradoProvider, CobradoToggle } from "@/components/ui/CobradoToggle";
 import { EstadoStepper } from "@/components/ui/EstadoStepper";
 import {
@@ -93,13 +92,15 @@ export function PedidoDetailPage({
     <div className={cn("PedidoDetailPage", styles.PedidoDetailPage, "space-y-6")}>
       {/* Top bar: back button + save */}
       <div className="flex flex-wrap  lg:flex-nowrap flex-col gap-3 flex-row sm:items-center">
-        <Link
+        <Button
+          as="a"
           href="/pedidos"
-          className={buttonStyles({ variant: "secondary", className: "flex-1 lg:flex-none sm:w-auto" })}
+          variant="secondary"
+          className="flex-1 lg:flex-none sm:w-auto"
+          icon={<Icon name="chevronLeft" className="h-4 w-4" />}
         >
-          <Icon name="chevronLeft" className="h-4 w-4" />
           Volver al listado
-        </Link>
+        </Button>
 
         <PulsatingButton
           type="submit"
@@ -112,13 +113,16 @@ export function PedidoDetailPage({
           {isPending ? "Guardando..." : "Guardar pedido"}
         </PulsatingButton>
         <div className="block w-full lg:hidden flex flex-col gap-3 flex-row sm:items-center">
-          <a
-            href={`/api/pedidos/${pedido.id}/pdf`} target="_blank" rel="noopener noreferrer" className={buttonStyles({
-              className: "w-full gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white",
-            })}>
-            <Icon name="download" className="h-4 w-4" />
+          <Button
+            as="a"
+            href={`/api/pedidos/${pedido.id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white"
+            icon={<Icon name="download" className="h-4 w-4" />}
+          >
             DESCARGAR PRESUPUESTO
-          </a>
+          </Button>
         </div>
       </div>
 
@@ -139,13 +143,16 @@ export function PedidoDetailPage({
                     {pedido.cliente_nombre ?? "Sin cliente"}
                   </h1>
                   {pedido.cliente_id ? (
-                    <Link
+                    <Button
+                      as="a"
                       href={`/clientes/${pedido.cliente_id}`}
-                      className={buttonStyles({ variant: "secondary", size: "sm", className: "gap-1.5 shrink-0" })}
+                      variant="secondary"
+                      size="sm"
+                      className="shrink-0"
+                      icon={<Icon name="idCard" className="h-3.5 w-3.5" />}
                     >
-                      <Icon name="idCard" className="h-3.5 w-3.5" />
                       Ficha
-                    </Link>
+                    </Button>
                   ) : null}
                 </div>
               </div>
@@ -202,18 +209,16 @@ export function PedidoDetailPage({
 
         <aside className={cn("PedidoDetailPageSidebar", styles.PedidoDetailPageSidebar)}>
           <Card as="section" className="flex flex-col gap-3">
-            <a
+            <Button
+              as="a"
               href={`/api/pedidos/${pedido.id}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className={buttonStyles({
-                className:
-                  "w-full gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white",
-              })}
+              className="w-full bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white"
+              icon={<Icon name="download" className="h-4 w-4" />}
             >
-              <Icon name="download" className="h-4 w-4" />
               DESCARGAR PRESUPUESTO
-            </a>
+            </Button>
 
             {/* Etiqueta QR */}
             <div id="etiqueta-qr-print" className={styles.etiquetaWrapper}>

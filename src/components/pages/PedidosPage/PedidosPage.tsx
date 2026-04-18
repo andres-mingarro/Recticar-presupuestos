@@ -22,7 +22,7 @@ import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
 import { Select } from "@/components/ui/Select";
 import { Table } from "@/components/ui/Table";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import {
   formatDate,
   getBusinessDaysBetween,
@@ -286,17 +286,18 @@ export function PedidosPage({
           />
 
             <div className="flex gap-3">
-              <button type="submit" className={buttonStyles({ className: "w-full md:w-auto" })}>
-                <Icon name="search" className="h-4 w-4" />
+              <Button type="submit" className="w-full md:w-auto" icon={<Icon name="search" className="h-4 w-4" />}>
                 Filtrar
-              </button>
-              <Link
+              </Button>
+              <Button
+                as="a"
                 href="/pedidos"
-                className={buttonStyles({ variant: "secondary", className: "w-full md:w-auto" })}
+                variant="secondary"
+                className="w-full md:w-auto"
+                icon={<Icon name="x" className="h-4 w-4" />}
               >
-                <Icon name="x" className="h-4 w-4" />
                 Limpiar
-              </Link>
+              </Button>
             </div>
         </form>
 
@@ -331,14 +332,15 @@ export function PedidosPage({
             showBusinessDays={false}
           />
           {hayMas && (
-            <button
+            <Button
               type="button"
-              className={buttonStyles({ variant: "secondary", className: "w-full" })}
+              variant="secondary"
+              className="w-full"
               onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
+              icon={<Icon name="chevronDown" className="h-4 w-4" />}
             >
-              <Icon name="chevronDown" className="h-4 w-4" />
               Cargar más finalizados
-            </button>
+            </Button>
           )}
         </div>
 
@@ -352,14 +354,15 @@ export function PedidosPage({
             ))
           )}
           {hayMas && (
-            <button
+            <Button
               type="button"
-              className={buttonStyles({ variant: "secondary", className: "w-full" })}
+              variant="secondary"
+              className="w-full"
               onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
+              icon={<Icon name="chevronDown" className="h-4 w-4" />}
             >
-              <Icon name="chevronDown" className="h-4 w-4" />
               Cargar más finalizados
-            </button>
+            </Button>
           )}
         </div>
       </Card></div>

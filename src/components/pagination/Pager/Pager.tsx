@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 
 type PagerProps = {
@@ -29,39 +28,31 @@ export function Pager({
       <p className="text-sm text-[var(--color-foreground-muted)]">{summary}</p>
 
       <div className="flex w-full flex-wrap justify-between items-center gap-2 sm:w-auto sm:justify-end">
-        <Link
+        <Button
+          as="a"
           href={previousHref}
           aria-disabled={!hasPreviousPage}
-          className={buttonStyles({
-            variant: "secondary",
-            size: "sm",
-            className: cn(
-              "sm:w-auto",
-              !hasPreviousPage ? "pointer-events-none opacity-50" : undefined
-            ),
-          })}
+          variant="secondary"
+          size="sm"
+          className={cn("sm:w-auto", !hasPreviousPage ? "pointer-events-none opacity-50" : undefined)}
+          icon={<Icon name="chevronLeft" className="h-4 w-4" />}
         >
-          <Icon name="chevronLeft" className="h-4 w-4" />
           Anterior
-        </Link>
+        </Button>
         <span className="flex px-2 text-sm text-[var(--color-foreground-muted)]">
           <span className="hidden lg:block">Página</span> {currentPage} de {totalPages}
         </span>
-        <Link
+        <Button
+          as="a"
           href={nextHref}
           aria-disabled={!hasNextPage}
-          className={buttonStyles({
-            variant: "secondary",
-            size: "sm",
-            className: cn(
-              "sm:w-auto",
-              !hasNextPage ? "pointer-events-none opacity-50" : undefined
-            ),
-          })}
+          variant="secondary"
+          size="sm"
+          className={cn("sm:w-auto", !hasNextPage ? "pointer-events-none opacity-50" : undefined)}
+          iconRight={<Icon name="chevronRight" className="h-4 w-4" />}
         >
           Siguiente
-          <Icon name="chevronRight" className="h-4 w-4" />
-        </Link>
+        </Button>
       </div>
     </div>
   );

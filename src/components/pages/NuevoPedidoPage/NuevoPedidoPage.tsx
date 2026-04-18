@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/cn";
 import type {
@@ -19,7 +18,7 @@ import {
 import { TrabajosSeleccionProvider } from "@/components/forms/PedidoForm/TrabajosSeleccionContext";
 import { RepuestosSeleccionProvider } from "@/components/forms/PedidoForm/RepuestosSeleccionContext";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PedidoDatosCard } from "@/components/ui/PedidoDatosCard";
 import styles from "./NuevoPedidoPage.module.scss";
@@ -71,9 +70,9 @@ export function NuevoPedidoPage({
         title="Nuevo pedido"
         description="Creá un presupuesto nuevo con cliente, vehiculo, motor, checklist de trabajos y estado inicial."
         actions={
-          <Link href="/pedidos" className={buttonStyles({ variant: "secondary" })}>
+          <Button as="a" href="/pedidos" variant="secondary">
             Volver al listado
-          </Link>
+          </Button>
         }
       />
 

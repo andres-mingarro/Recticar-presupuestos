@@ -10,7 +10,7 @@ import type {
 } from "@/lib/types";
 import { SearchForm } from "@/components/search/SearchForm";
 import { Pager } from "@/components/pagination/Pager";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { PaymentBadge, StatusBadge } from "@/components/ui/Badge";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
@@ -237,39 +237,30 @@ export function ClientesPage({
                     </td>
                     <td className="px-4 py-4">
                       {cliente.telefono ? (
-                        <a
+                        <Button
+                          as="a"
                           href={`tel:${normalizePhoneLink(cliente.telefono)}`}
-                          className="relative z-[1] -mx-1 rounded-md px-1 font-medium text-[var(--color-accent)] underline decoration-[var(--color-accent)] underline-offset-4 transition hover:bg-orange-50 hover:text-[var(--color-accent-strong)] hover:decoration-[var(--color-accent-strong)] group-hover:text-[var(--color-accent-strong)] group-hover:decoration-[var(--color-accent-strong)]"
+                          variant="link"
+                          className="relative z-[1]"
                           onClick={(event) => event.stopPropagation()}
                         >
                           {cliente.telefono}
-                        </a>
+                        </Button>
                       ) : (
                         "Sin teléfono"
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      <button
-                        type="button"
-                        className={cn(
-                          "ClientesPagePendingBadge",
-                          styles.ClientesPagePendingBadge
-                        )}
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={(event) => {
                           event.stopPropagation();
                           openPanel(cliente.id);
                         }}
                       >
-                        <span
-                          className={cn(
-                            "ClientesPagePendingBadgeCount",
-                            styles.ClientesPagePendingBadgeCount
-                          )}
-                        >
-                          {(pendingPedidosByCliente[cliente.id] ?? []).length}
-                        </span>
-                        <span>Pendientes</span>
-                      </button>
+                        {(pendingPedidosByCliente[cliente.id] ?? []).length} Pendientes
+                      </Button>
                     </td>
                   </tr>
                 ))
@@ -326,14 +317,15 @@ export function ClientesPage({
                 </h3>
               </div>
 
-              <button
+              <Button
                 type="button"
-                className={buttonStyles({ variant: "ghost", size: "sm" })}
+                variant="ghost"
+                size="sm"
                 onClick={closePanel}
+                icon={<Icon name="x" className="h-4 w-4" />}
               >
-                <Icon name="x" className="h-4 w-4" />
                 Cerrar
-              </button>
+              </Button>
             </div>
 
             <div

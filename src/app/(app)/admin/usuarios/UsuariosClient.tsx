@@ -299,35 +299,39 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
                           </Button>
                         </div>
                       ) : (
-                        <button
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
                           title="Cambiar contraseña"
                           onClick={() => setEditPasswordFor(u.email)}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-foreground-muted)] transition-colors hover:bg-[var(--color-border)] hover:text-[var(--color-foreground)]"
-                        >
-                          <Icon name="key" className="h-4 w-4" />
-                        </button>
+                          icon={<Icon name="key" className="h-4 w-4" />}
+                        />
                       )}
 
-                      <button
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
                         title={u.activo ? "Desactivar usuario" : "Activar usuario"}
                         disabled={pending}
                         onClick={() => toggleActivoAction(u.email, !u.activo, u.role)}
-                        className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-[var(--color-border)] ${u.activo ? "text-emerald-600 hover:text-emerald-700" : "text-slate-400 hover:text-slate-600"}`}
-                      >
-                        <Icon name="power" className="h-4 w-4" />
-                      </button>
+                        className={u.activo ? "text-emerald-600 hover:text-emerald-700" : "text-slate-400 hover:text-slate-600"}
+                        icon={<Icon name="power" className="h-4 w-4" />}
+                      />
 
-                      <button
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
                         title="Eliminar usuario"
                         disabled={pending}
                         onClick={() => {
                           if (confirm(`¿Eliminar a ${u.nombre}?`))
                             eliminarUsuarioAction(u.email, u.role);
                         }}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-foreground-muted)] transition-colors hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Icon name="trash" className="h-4 w-4" />
-                      </button>
+                        icon={<Icon name="trash" className="h-4 w-4" />}
+                      />
                     </div>
                   )}
                 </td>

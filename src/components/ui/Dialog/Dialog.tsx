@@ -24,15 +24,17 @@ export function Dialog({
 export function DialogContent({
   children,
   className,
+  variant = "sheet",
 }: {
   children: React.ReactNode;
   className?: string;
+  variant?: "sheet" | "centered";
 }) {
   return (
     <RadixDialog.Portal>
       <RadixDialog.Overlay className={styles.overlay} />
       <RadixDialog.Content
-        className={cn("Dialog", styles.content, className)}
+        className={cn("Dialog", variant === "centered" ? styles.contentCentered : styles.content, className)}
         aria-describedby={undefined}
       >
         {children}

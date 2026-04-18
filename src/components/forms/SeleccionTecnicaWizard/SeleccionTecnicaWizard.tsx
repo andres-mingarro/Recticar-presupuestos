@@ -6,7 +6,7 @@ import Image from "next/image";
 import { cn } from "@/lib/cn";
 import type { Marca, Modelo, ModeloMotorRelation, Motor } from "@/lib/types";
 import { getBrandLogoUrl } from "@/lib/vehicle-logo";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import {
   Dialog,
@@ -235,24 +235,25 @@ export function SeleccionTecnicaWizard({
         </Carousel>
 
         <DialogFooter>
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            className="flex-1"
             onClick={() => goTo(step - 1)}
             disabled={!canGoBack}
-            className={buttonStyles({ variant: "secondary", className: "flex-1 gap-2" })}
+            icon={<Icon name="chevronLeft" className="h-4 w-4" />}
           >
-            <Icon name="chevronLeft" className="h-4 w-4" />
             Atrás
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            className="flex-1"
             onClick={() => goTo(step + 1)}
             disabled={!canGoNext}
-            className={buttonStyles({ className: "flex-1 gap-2" })}
+            iconRight={<Icon name="chevronRight" className="h-4 w-4" />}
           >
             Adelante
-            <Icon name="chevronRight" className="h-4 w-4" />
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

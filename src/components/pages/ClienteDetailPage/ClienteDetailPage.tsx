@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type { ClienteDetail, ClientePedidoItem } from "@/lib/types";
 import { formatDate, getVehicleLabel } from "@/lib/format";
 import { ClienteForm, type ClienteFormState } from "@/components/forms/ClienteForm";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { PaymentBadge, PriorityBadge, StatusBadge } from "@/components/ui/Badge";
 import { PedidoMobileCard } from "@/components/ui/PedidoMobileCard";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
@@ -119,13 +118,9 @@ function PedidoTable({
                   <td className="px-4 py-4"><StatusBadge estado={pedido.estado} /></td>
                   <td className="px-4 py-4">{formatDate(pedido.fecha_creacion)}</td>
                   <td className="px-4 py-4 text-right">
-                    <Link
-                      href={`/pedidos/${pedido.id}`}
-                      className={buttonStyles({ variant: "secondary", size: "sm", className: "gap-2" })}
-                    >
-                      <Icon name="arrowRight" className="h-4 w-4" />
+                    <Button as="a" href={`/pedidos/${pedido.id}`} variant="secondary" size="sm"  iconRight={<Icon name="arrowRight" className="h-4 w-4" />}>
                       Ver pedido
-                    </Link>
+                    </Button>
                   </td>
                 </tr>
               ))
@@ -158,13 +153,9 @@ export function ClienteDetailPage({
   return (
     <div className={cn("ClienteDetailPage", styles.page, "space-y-6")}>
       <div>
-        <Link
-          href="/clientes"
-          className={buttonStyles({ variant: "secondary", className: "" })}
-        >
-          <Icon name="chevronLeft" className="h-4 w-4" />
+        <Button as="a" href="/clientes" variant="secondary" icon={<Icon name="chevronLeft" className="h-4 w-4" />}>
           Volver al listado
-        </Link>
+        </Button>
       </div>
 
       <Card as="section" className={styles.headerCard}>
@@ -206,7 +197,7 @@ export function ClienteDetailPage({
             <InfoRow label="Teléfono" icon={<Icon name="phone" className="h-3.5 w-3.5" />}>
               {cliente.telefono ? (
                 <span className={styles.infoActions}>
-                  <a href={`tel:${rawPhone}`} className={styles.infoLink}>{cliente.telefono}</a>
+                  <Button as="a" href={`tel:${rawPhone}`} variant="link">{cliente.telefono}</Button>
                   <a
                     href={`https://wa.me/${waNumber}`}
                     target="_blank"
@@ -232,7 +223,7 @@ export function ClienteDetailPage({
           <div className={styles.infoGridRow}>
             <InfoRow label="Email" icon={<Icon name="mail" className="h-3.5 w-3.5" />}>
               {cliente.mail ? (
-                <a href={`mailto:${cliente.mail}`} className={styles.infoLinkTruncate}>{cliente.mail}</a>
+                <Button as="a" href={`mailto:${cliente.mail}`} variant="link" className="truncate">{cliente.mail}</Button>
               ) : (
                 <span className={styles.infoEmpty}>Sin email</span>
               )}
@@ -274,16 +265,18 @@ export function ClienteDetailPage({
 
         <div className="grid">
           {canEdit && (
-            <button
+            <Button
               type="button"
-              className={buttonStyles({ variant: "primary", size: "sm", className: "editBtn gap-2 max-w-[170px] w-full m-auto lg:ml-auto lg:mr-0" })}
+              variant="primary"
+              size="sm"
+              className="editBtn max-w-[170px] w-full m-auto lg:ml-auto lg:mr-0"
               aria-expanded={isEditOpen}
               aria-controls="cliente-edit-panel"
               onClick={() => setIsEditOpen((v) => !v)}
+              icon={<Icon name="edit" className="h-4 w-4" />}
             >
-              <Icon name="edit" className="h-4 w-4" />
               {isEditOpen ? "Cerrar" : "Editar"}
-            </button>
+            </Button>
           )}
         </div>
 
@@ -336,14 +329,14 @@ export function ClienteDetailPage({
         pedidos={finalizadosVisible}
         emptyMessage="Todavía no hay pedidos finalizados para este cliente."
         footer={hayMasFinalizados ? (
-          <button
-            type="button"
-            className={buttonStyles({ variant: "secondary", className: "w-full" })}
+          <Button
+            variant="secondary"
+            className="w-full"
             onClick={() => setVisibleFinalizados((v) => v + 5)}
+            icon={<Icon name="chevronDown" className="h-4 w-4" />}
           >
-            <Icon name="chevronDown" className="h-4 w-4" />
             Cargar más finalizados
-          </button>
+          </Button>
         ) : undefined}
       />
     </div>

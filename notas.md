@@ -1,6 +1,8 @@
 https://www.npmjs.com/package/@cardog-icons/react
 
 
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "dark" | "warm" | "burnt" | "outline" | "outline-warm" | "outline-dark" | "link";
+
 QUIERO USAR ESTO...
 
 https://headlessui.com/react/dialog

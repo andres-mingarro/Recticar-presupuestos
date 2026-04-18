@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
@@ -18,7 +17,7 @@ import type {
 import { useTrabajosSeleccion } from "./TrabajosSeleccionContext";
 import { useRepuestosSeleccion } from "./RepuestosSeleccionContext";
 import { PedidoItemCard } from "./PedidoItemCard";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EstadoStepper } from "@/components/ui/EstadoStepper";
 import { Icon } from "@/components/ui/Icon";
@@ -96,6 +95,31 @@ const prioridadCards: Array<{
     activeTone: "border-rose-600 bg-[linear-gradient(135deg,#e11d48,#fb7185)] text-white shadow-[0_10px_24px_rgba(225,29,72,0.3)]",
   },
 ];
+
+function RepuestoGrupoAccordion({
+  defaultOpen,
+  categoriaNombre,
+  children,
+}: {
+  defaultOpen: boolean;
+  categoriaNombre: string;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <details
+      open={open}
+      onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
+      className={cn("PedidoFormAccordion", styles.PedidoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4")}
+    >
+      <summary className={cn("PedidoFormAccordionSummary", styles.PedidoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)]")}>
+        <span>{categoriaNombre}</span>
+        <Icon name="chevronDown" className={cn("PedidoFormAccordionChevron", styles.PedidoFormAccordionChevron, "h-4 w-4 text-[var(--color-foreground-muted)] transition-transform duration-200")} />
+      </summary>
+      {children}
+    </details>
+  );
+}
 
 export function PedidoForm({
   action,
@@ -320,14 +344,15 @@ export function PedidoForm({
               </div>
             </div>
           ) : (
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              className="w-full"
               onClick={() => openWizard(0)}
-              className={buttonStyles({ variant: "secondary", className: "w-full gap-2" })}
+              icon={<Icon name="car" className="h-4 w-4" />}
             >
-              <Icon name="car" className="h-4 w-4" />
               Seleccionar vehículo
-            </button>
+            </Button>
           )}
           <SeleccionTecnicaWizard
             marcas={marcas}
@@ -537,15 +562,11 @@ export function PedidoForm({
                     selectedRepuestoIds.has(r.id)
                   );
                   return (
-                    <details
+                    <RepuestoGrupoAccordion
                       key={grupo.categoriaId}
-                      open={hasSelected}
-                      className={cn("PedidoFormAccordion", styles.PedidoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4")}
+                      defaultOpen={hasSelected}
+                      categoriaNombre={grupo.categoriaNombre}
                     >
-                      <summary className={cn("PedidoFormAccordionSummary", styles.PedidoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)]")}>
-                        <span>{grupo.categoriaNombre}</span>
-                        <Icon name="chevronDown" className={cn("PedidoFormAccordionChevron", styles.PedidoFormAccordionChevron, "h-4 w-4 text-[var(--color-foreground-muted)] transition-transform duration-200")} />
-                      </summary>
                       <div className="mt-4 grid gap-3">
                         {grupo.repuestos.map((repuesto) => (
                             <PedidoItemCard
@@ -554,9 +575,10 @@ export function PedidoForm({
                               value={repuesto.id}
                               onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked)}
                               label={repuesto.nombre}
-                              contentClassName="flex gap-3"
+                              contentClassName="flex-col gap-2"
+                              checkboxClassName="[--checkbox-size:27px]"
                               >
-                            <div className="content-pedido-item-card w-full lg:w-auto items-center gap-2 grid grid-cols-[120px_132px_1fr] lg:grid-cols-[120px_132px_120px]">
+                            <div className="content-pedido-item-card w-full items-center gap-2 grid grid-cols-[1fr_auto] lg:grid-cols-[120px_132px_120px]">
                               <Input
                                 type="number"
                                 min="0"
@@ -567,16 +589,16 @@ export function PedidoForm({
                                 onChange={(event) =>
                                   setPrecioUnitario(repuesto.id, Number(event.target.value))
                                 }
-                                className="text-right"
+                                className="text-right h-8 lg:h-11"
                               />
                               <Incrementor
                                 value={selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
                                 onDecrement={() => decrementCantidad(repuesto.id)}
                                 onIncrement={() => incrementCantidad(repuesto.id)}
                                 disabled={!selectedRepuestoIds.has(repuesto.id)}
-                                className="justify-start md:justify-center"
+                                className="justify-end lg:justify-center"
                               />
-                              <span className="text-right text-base font-bold text-[var(--color-foreground)]">
+                              <span className="col-span-2 lg:col-span-1 text-right text-[26px] font-bold text-[#5f2302] lg:text-base lg:text-[var(--color-foreground)] border-t border-[var(--color-border)] pt-1 mt-0.5 lg:border-0 lg:pt-0 lg:mt-0">
                                 {formatPrice(
                                   (selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0) *
                                     (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
@@ -586,7 +608,7 @@ export function PedidoForm({
                           </PedidoItemCard>
                         ))}
                       </div>
-                    </details>
+                    </RepuestoGrupoAccordion>
                   );
                 })}
               </div>
@@ -680,12 +702,14 @@ export function PedidoForm({
             {isPending ? <Spinner className="h-4 w-4" /> : null}
             {isPending ? "Guardando..." : "Guardar pedido"}
           </PulsatingButton>
-          <Link
+          <Button
+            as="a"
             href="/pedidos"
-            className={buttonStyles({ variant: "secondary", className: "w-full flex-1" })}
+            variant="secondary"
+            className="w-full flex-1"
           >
             Cancelar
-          </Link>
+          </Button>
         </div>
       ) : null}
     </form>

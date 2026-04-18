@@ -1,6 +1,6 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button, type ButtonVariant, type ButtonSize } from "@/components/ui/Button";
 
 const DEFAULT_DISTANCE = "12px";
 const DEFAULT_DURATION = "1.5s";
@@ -8,22 +8,28 @@ const DEFAULT_PULSE_COLOR = "var(--color-accent)";
 
 type PulsatingButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   pulsing?: boolean;
-  variant?: "pulse" | "ripple";
-  size?: "md" | "sm";
+  pulseStyle?: "pulse" | "ripple";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   distance?: string;
   duration?: string;
   pulseColor?: string;
+  icon?: ReactNode;
+  iconRight?: ReactNode;
 };
 
 export function PulsatingButton({
   className,
   children,
   pulsing = false,
-  variant = "pulse",
+  pulseStyle = "pulse",
+  variant,
   size = "md",
   distance = DEFAULT_DISTANCE,
   duration = DEFAULT_DURATION,
   pulseColor = DEFAULT_PULSE_COLOR,
+  icon,
+  iconRight,
   style,
   ...props
 }: PulsatingButtonProps) {
@@ -36,8 +42,12 @@ export function PulsatingButton({
 
   return (
     <>
-      <button
-        className={buttonStyles({ size, className: cn("relative isolate overflow-visible", className) })}
+      <Button
+        variant={variant}
+        size={size}
+        icon={icon}
+        iconRight={iconRight}
+        className={cn("relative isolate overflow-visible", className)}
         style={buttonStyle}
         {...props}
       >
@@ -46,16 +56,14 @@ export function PulsatingButton({
             aria-hidden="true"
             className={cn(
               "pointer-events-none absolute -z-10 rounded-[inherit]",
-              variant === "ripple"
+              pulseStyle === "ripple"
                 ? "inset-[calc(var(--pulsating-button-distance)*-1)] border border-[var(--pulsating-button-color)] opacity-0 [animation:recticar-pulsating-button-ripple_var(--pulsating-button-duration)_ease-out_infinite]"
                 : "inset-0 opacity-0 [animation:recticar-pulsating-button-pulse_var(--pulsating-button-duration)_ease-out_infinite]"
             )}
           />
         )}
-        <span className="relative z-10 inline-flex items-center justify-center">
-          {children}
-        </span>
-      </button>
+        {children}
+      </Button>
 
       <style jsx>{`
         @keyframes recticar-pulsating-button-pulse {

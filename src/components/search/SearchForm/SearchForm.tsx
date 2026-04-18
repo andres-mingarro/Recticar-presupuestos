@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { SearchBox, searchConfigs, type SearchEntity } from "@/components/search/SearchBox";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 
 type SearchFormProps = {
@@ -29,18 +28,19 @@ export function SearchForm({
       </label>
 
       <div className="flex w-full gap-3 sm:w-auto">
-        <button type="submit" className={buttonStyles({ className: "flex-1 sm:flex-none" })}>
-          <Icon name="search" className="h-4 w-4" />
+        <Button type="submit" className="flex-1 sm:flex-none" icon={<Icon name="search" className="h-4 w-4" />}>
           Buscar
-        </button>
+        </Button>
 
-        <Link
+        <Button
+          as="a"
           href={config.clearHref}
-          className={buttonStyles({ variant: "secondary", className: "flex-1 sm:flex-none" })}
+          variant="secondary"
+          className="flex-1 sm:flex-none"
+          icon={<Icon name="x" className="h-4 w-4" />}
         >
-          <Icon name="x" className="h-4 w-4" />
           Limpiar
-        </Link>
+        </Button>
       </div>
     </form>
   );

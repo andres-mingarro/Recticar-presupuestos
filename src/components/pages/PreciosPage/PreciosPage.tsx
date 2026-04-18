@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
 import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { buttonStyles } from "@/components/ui/Button";
+import { Button, buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
@@ -360,24 +360,26 @@ function CategoriaCard({
               {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
               {savePending ? "Guardando…" : "Guardar"}
             </PulsatingButton>
-            <button
+            <Button
               type="button"
+              size="sm"
+              variant="outline-dark"
               onClick={handleCancel}
-              className="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-surface-raised)]"
+              icon={<Icon name="x" className="h-3.5 w-3.5" />}
             >
-              <Icon name="x" className="h-3.5 w-3.5" />
               Cancelar
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
+          <Button
             type="button"
+            size="sm"
+            variant="ghost"
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-foreground-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+            icon={<Icon name="edit" className="h-3.5 w-3.5" />}
           >
-            <Icon name="edit" className="h-3.5 w-3.5" />
             Editar categoría
-          </button>
+          </Button>
         )}
 
         {/* Eliminar categoría — solo en modo edición */}
