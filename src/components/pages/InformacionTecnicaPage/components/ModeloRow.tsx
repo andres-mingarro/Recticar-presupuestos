@@ -61,7 +61,7 @@ export function ModeloRow({
         ) : (
           <>
             <span className={readCls}>{modelo.nombre}</span>
-            <span className={cn(readCls, "text-[var(--color-foreground-muted)]")}>
+            <span className={cn(readCls, "text-[var(--text-color-gray)]")}>
               {modelo.marcaNombre ?? "—"}
             </span>
           </>

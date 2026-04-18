@@ -127,7 +127,7 @@ export function SearchBox({ entity, initialValue }: SearchBoxProps) {
       />
 
       {isLoading ? (
-        <p className="mt-2 text-xs text-[var(--color-foreground-muted)]">
+        <p className="mt-2 text-xs text-[var(--text-color-gray)]">
           Buscando coincidencias...
         </p>
       ) : null}
@@ -136,7 +136,7 @@ export function SearchBox({ entity, initialValue }: SearchBoxProps) {
         <div className={cn("SearchBoxDropdown", styles.SearchBoxDropdown)}>
           <div className="rounded-2xl border border-[var(--color-border)] bg-white p-3 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
             {results.length === 0 ? (
-              <p className="px-2 py-3 text-sm text-[var(--color-foreground-muted)]">
+              <p className="px-2 py-3 text-sm text-[var(--text-color-gray)]">
                 {config.emptyMessage}
               </p>
             ) : (
@@ -149,16 +149,16 @@ export function SearchBox({ entity, initialValue }: SearchBoxProps) {
                     onClick={() => setIsOpen(false)}
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[var(--color-foreground)]">
+                      <p className="text-sm font-medium text-[var(--text-color-defult)]">
                         {config.getTitle(item as never)}
                       </p>
-                      <p className="truncate text-xs text-[var(--color-foreground-muted)]">
+                      <p className="truncate text-xs text-[var(--text-color-gray)]">
                         {config.getSubtitle(item as never)}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       <span
-                        className="inline-flex items-center justify-center gap-2 rounded-xl px-3 h-8 text-xs font-medium text-[var(--color-foreground-muted)] bg-transparent pointer-events-none"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl px-3 h-8 text-xs font-medium text-[var(--text-color-gray)] bg-transparent pointer-events-none"
                         aria-hidden="true"
                       >
                         Abrir

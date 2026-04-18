@@ -21,7 +21,7 @@ export function SearchForm({
   return (
     <form className={cn("SearchForm", className)}>
       <label className="grid gap-2">
-        <span className="text-sm font-medium text-[var(--color-foreground)]">
+        <span className="text-sm font-medium text-[var(--text-color-defult)]">
           {config.label}
         </span>
         <SearchBox entity={entity} initialValue={initialValue} />

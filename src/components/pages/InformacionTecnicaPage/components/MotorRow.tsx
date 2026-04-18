@@ -57,7 +57,7 @@ export function MotorRow({
         ) : (
           <>
             <span className={readCls}>{motor.nombre}</span>
-            <span className={cn(readCls, "text-[var(--color-foreground-muted)]")}>
+            <span className={cn(readCls, "text-[var(--text-color-gray)]")}>
               {motor.cilindrada ?? "—"}
             </span>
           </>

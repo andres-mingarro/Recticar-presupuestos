@@ -121,7 +121,7 @@ export function NuevoTrabajoPage({
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                     Reglas clave
                   </p>
-                  <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--color-foreground-muted)]">
+                  <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--text-color-gray)]">
                     <li>Un trabajo puede guardarse sin cliente solo si queda pendiente.</li>
                     <li>Si lo marcás como aprobado, el cliente es obligatorio.</li>
                     <li>La fecha de aprobacion se registra automaticamente.</li>
@@ -132,7 +132,7 @@ export function NuevoTrabajoPage({
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                     Proximo paso
                   </p>
-                  <p className="mt-3 text-sm leading-6 text-[var(--color-foreground-muted)]">
+                  <p className="mt-3 text-sm leading-6 text-[var(--text-color-gray)]">
                     Después de crear el trabajo, lo vamos a usar como base para la
                     edición completa, la aprobacion, el PDF y el link de WhatsApp.
                   </p>

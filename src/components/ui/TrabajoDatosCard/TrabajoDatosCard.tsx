@@ -49,7 +49,7 @@ export function TrabajoDatosCard({
 
       <dl className="space-y-3 text-sm">
         <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
             <Icon name="clipboard" className="h-4 w-4 shrink-0" />
             Estado
           </dt>
@@ -59,7 +59,7 @@ export function TrabajoDatosCard({
         </div>
 
         <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
             <Icon name="check" className="h-4 w-4 shrink-0" />
             Cobro
           </dt>
@@ -69,7 +69,7 @@ export function TrabajoDatosCard({
         </div>
 
         <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
             <Icon name="gauge" className="h-4 w-4 shrink-0" />
             Prioridad
           </dt>
@@ -79,44 +79,44 @@ export function TrabajoDatosCard({
         </div>
 
         <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
             <Icon name="car" className="h-4 w-4 shrink-0" />
             Vehículo
           </dt>
-          <dd className="font-medium text-[var(--color-foreground)] sm:text-right">
+          <dd className="font-medium text-[var(--text-color-defult)] sm:text-right">
             {vehicleLabel}
           </dd>
         </div>
 
         {numeroSerieMotor ? (
           <div className="flex gap-2 flex-row sm:items-center justify-between">
-            <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+            <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
               <Icon name="hash" className="h-4 w-4 shrink-0" />
               Serie
             </dt>
-            <dd className="font-medium text-[var(--color-foreground)]">
+            <dd className="font-medium text-[var(--text-color-defult)]">
               {numeroSerieMotor}
             </dd>
           </div>
         ) : null}
 
         <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
             <Icon name="calendar" className="h-4 w-4 shrink-0" />
             Creación
           </dt>
-          <dd className="font-medium text-[var(--color-foreground)]">
+          <dd className="font-medium text-[var(--text-color-defult)]">
             {formatDate(fechaCreacion)}
           </dd>
         </div>
 
         {fechaAprobacion ? (
           <div className="flex gap-2 flex-row sm:items-center justify-between">
-            <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+            <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
               <Icon name="calendar" className="h-4 w-4 shrink-0" />
               Aprobación
             </dt>
-            <dd className="font-medium text-[var(--color-foreground)]">
+            <dd className="font-medium text-[var(--text-color-defult)]">
               {formatDate(fechaAprobacion)}
             </dd>
           </div>
@@ -124,7 +124,7 @@ export function TrabajoDatosCard({
 
         <div className="space-y-2">
           <div className="flex gap-2 flex-row sm:items-center justify-between">
-            <dt className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+            <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
               <Icon name="clipboard" className="h-4 w-4 shrink-0" />
               Items
             </dt>

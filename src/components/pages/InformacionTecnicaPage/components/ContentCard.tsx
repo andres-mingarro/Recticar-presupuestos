@@ -52,10 +52,10 @@ export function ContentCard({
       {/* ── Toolbar ── */}
       <div className="flex flex-wrap items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2">
         <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
-        <span className="text-sm font-semibold uppercase tracking-widest text-[var(--color-foreground)]">
+        <span className="text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
           {SECTION_LABELS[section]}
         </span>
-        <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--color-foreground-muted)]">
+        <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
           {count}
         </span>
 
@@ -101,16 +101,16 @@ export function ContentCard({
               {hasPreviousPage ? (
                 <Link
                   href={buildSectionHref(section, q, currentPage - 1)}
-                  className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--color-foreground-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                  className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                 >
                   <Icon name="chevronLeft" className="h-3.5 w-3.5" />
                 </Link>
               ) : (
-                <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--color-foreground-muted)] opacity-40">
+                <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--text-color-gray)] opacity-40">
                   <Icon name="chevronLeft" className="h-3.5 w-3.5" />
                 </span>
               )}
-              <span className="text-xs text-[var(--color-foreground-muted)]">
+              <span className="text-xs text-[var(--text-color-gray)]">
                 {totalItems === 0 ? "0" : `${pageStart}–${pageEnd}`}
                 <span className="mx-1 opacity-40">/</span>
                 {totalItems}
@@ -118,12 +118,12 @@ export function ContentCard({
               {hasNextPage ? (
                 <Link
                   href={buildSectionHref(section, q, currentPage + 1)}
-                  className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--color-foreground-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                  className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                 >
                   <Icon name="chevronRight" className="h-3.5 w-3.5" />
                 </Link>
               ) : (
-                <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--color-foreground-muted)] opacity-40">
+                <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--text-color-gray)] opacity-40">
                   <Icon name="chevronRight" className="h-3.5 w-3.5" />
                 </span>
               )}
@@ -141,7 +141,7 @@ export function ContentCard({
 
       {/* ── Rows ── */}
       {totalItems === 0 ? (
-        <p className="px-4 py-4 text-sm text-[var(--color-foreground-muted)]">{emptyLabel}</p>
+        <p className="px-4 py-4 text-sm text-[var(--text-color-gray)]">{emptyLabel}</p>
       ) : (
         <div>{children}</div>
       )}

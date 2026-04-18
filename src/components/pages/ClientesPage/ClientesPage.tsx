@@ -128,7 +128,7 @@ export function ClientesPage({
 
       <Card as="section" className="space-y-4">
         <div>
-          <h2 className="text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+          <h2 className="text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
             Listado de clientes
           </h2>
         </div>
@@ -151,7 +151,7 @@ export function ClientesPage({
         {/* Cards mobile */}
         <div className="md:hidden space-y-2">
           {clientes.length === 0 ? (
-            <p className="px-2 py-8 text-center text-sm text-[var(--color-foreground-muted)]">
+            <p className="px-2 py-8 text-center text-sm text-[var(--text-color-gray)]">
               No hay clientes para mostrar.
             </p>
           ) : (
@@ -168,7 +168,7 @@ export function ClientesPage({
 
         <div className="hidden md:block"><Table>
           <table className="w-full text-left text-sm">
-            <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
+            <thead className="bg-[var(--color-surface-alt)] text-[var(--text-color-gray)]">
               <tr>
                 <th className="px-4 py-3 font-semibold w-[140px]">
                   <span className="inline-flex items-center gap-2">
@@ -201,7 +201,7 @@ export function ClientesPage({
                 <tr>
                   <td
                     colSpan={4}
-                    className="px-4 py-12 text-center text-[var(--color-foreground-muted)]"
+                    className="px-4 py-12 text-center text-[var(--text-color-gray)]"
                   >
                     No hay clientes para mostrar.
                   </td>
@@ -210,7 +210,7 @@ export function ClientesPage({
                 clientes.map((cliente) => (
                   <tr
                     key={cliente.id}
-                    className="group cursor-pointer border-t border-[var(--color-border)] text-[var(--color-foreground)] transition hover:bg-[var(--color-surface-alt)] focus-within:bg-[var(--color-surface-alt)]"
+                    className="group cursor-pointer border-t border-[var(--color-border)] text-[var(--text-color-defult)] transition hover:bg-[var(--color-surface-alt)] focus-within:bg-[var(--color-surface-alt)]"
                     role="link"
                     tabIndex={0}
                     onClick={() => router.push(`/clientes/${cliente.id}`)}
@@ -312,7 +312,7 @@ export function ClientesPage({
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                   Pendientes
                 </p>
-                <h3 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                <h3 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
                   {panelClient.apellido}, {panelClient.nombre}
                 </h3>
               </div>
@@ -335,7 +335,7 @@ export function ClientesPage({
               )}
             >
               {panelTrabajos.length === 0 ? (
-                <p className="text-sm text-[var(--color-foreground-muted)]">
+                <p className="text-sm text-[var(--text-color-gray)]">
                   Este cliente no tiene trabajos pendientes.
                 </p>
               ) : (
@@ -351,7 +351,7 @@ export function ClientesPage({
                   >
                     <div className="space-y-1">
                       <div className="flex items-start justify-between gap-3">
-                        <p className="text-sm font-semibold text-[var(--color-foreground)]">
+                        <p className="text-sm font-semibold text-[var(--text-color-defult)]">
                           <span className="inline-flex items-center gap-2">
                             <Icon name="clipboard" className="h-4 w-4" />
                             Trabajo #{trabajo.numero_trabajo}
@@ -362,7 +362,7 @@ export function ClientesPage({
                       <div>
                         <StatusBadge estado={trabajo.estado} />
                       </div>
-                      <p className="text-sm text-[var(--color-foreground-muted)]">
+                      <p className="text-sm text-[var(--text-color-gray)]">
                         <span className="inline-flex items-center gap-2">
                           <Icon name="car" className="h-4 w-4" />
                           {getVehicleLabel([
@@ -372,7 +372,7 @@ export function ClientesPage({
                           ])}
                         </span>
                       </p>
-                      <p className="text-xs text-[var(--color-foreground-subtle)]">
+                      <p className="text-xs text-[var(--text-color-ligth)]">
                         Serie: {trabajo.numero_serie_motor || "Sin serie"}
                       </p>
                     </div>

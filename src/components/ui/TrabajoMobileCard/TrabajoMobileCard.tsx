@@ -52,25 +52,25 @@ export function TrabajoMobileCard({ trabajo, showBusinessDays = true }: Props) {
             {trabajo.cliente_nombre ?? "Sin cliente asignado"}
           </Link>
         ) : (
-          <span className="flex items-center gap-1.5 text-base font-semibold text-[var(--color-foreground-muted)] truncate">
+          <span className="flex items-center gap-1.5 text-base font-semibold text-[var(--text-color-gray)] truncate">
             <Icon name="user" className="h-4 w-4 shrink-0" />
             Sin cliente asignado
           </span>
         )}
-        <span className="text-xs font-bold tracking-wide text-[var(--color-foreground-muted)] shrink-0">
+        <span className="text-xs font-bold tracking-wide text-[var(--text-color-gray)] shrink-0">
           #{trabajo.numero_trabajo}
         </span>
       </div>
 
       {/* Detalle vehículo */}
       <div className="flex flex-col gap-0.5">
-        <span className="text-[0.63rem] font-bold uppercase tracking-[0.15em] text-[var(--color-foreground-subtle)]">
+        <span className="text-[0.63rem] font-bold uppercase tracking-[0.15em] text-[var(--text-color-ligth)]">
           {trabajo.marca_nombre ?? "Marca sin definir"}
         </span>
-        <span className="text-sm font-medium text-[var(--color-foreground)]">
+        <span className="text-sm font-medium text-[var(--text-color-defult)]">
           {trabajo.modelo_nombre ?? "Modelo sin definir"}
         </span>
-        <span className="text-xs text-[var(--color-foreground-muted)]">
+        <span className="text-xs text-[var(--text-color-gray)]">
           {trabajo.motor_nombre ?? "Motor sin definir"}
         </span>
       </div>
@@ -84,13 +84,13 @@ export function TrabajoMobileCard({ trabajo, showBusinessDays = true }: Props) {
 
       {/* Footer: fechas + días hábiles */}
       <div className="flex items-center justify-between gap-1 border-t border-[var(--color-border)] pt-1.5">
-        <div className="flex items-center gap-1 text-[0.72rem] text-[var(--color-foreground-muted)]">
+        <div className="flex items-center gap-1 text-[0.72rem] text-[var(--text-color-gray)]">
           <span>{formatDate(trabajo.fecha_creacion)}</span>
           <span>→</span>
           <span>{trabajo.estado === "pendiente" ? "--/--/----" : formatDate(trabajo.fecha_aprobacion)}</span>
         </div>
         {showBusinessDays && (
-          <span className="inline-flex items-center rounded-full border border-[var(--color-border)] px-2.5 py-1 text-xs font-medium text-[var(--color-foreground-muted)]">
+          <span className="inline-flex items-center rounded-full border border-[var(--color-border)] px-2.5 py-1 text-xs font-medium text-[var(--text-color-gray)]">
             {businessDays} días háb.
           </span>
         )}

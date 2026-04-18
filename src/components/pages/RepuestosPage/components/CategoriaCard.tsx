@@ -70,7 +70,7 @@ export function CategoriaCard({
                 name="nombre"
                 defaultValue={grupo.categoriaNombre}
                 required
-                className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--color-foreground)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
               />
               <Button
                 type="submit"
@@ -82,7 +82,7 @@ export function CategoriaCard({
               />
             </form>
           ) : (
-            <span className="text-sm font-semibold uppercase tracking-widest text-[var(--color-foreground)]">
+            <span className="text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
               {grupo.categoriaNombre}
             </span>
           )}
@@ -90,7 +90,7 @@ export function CategoriaCard({
 
         <Divider orientation="vertical" className="h-5" />
 
-        <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--color-foreground-muted)]">
+        <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
           {grupo.repuestos.length} {grupo.repuestos.length === 1 ? "repuesto" : "repuestos"}
         </span>
 
@@ -104,7 +104,7 @@ export function CategoriaCard({
               size="sm"
               pulsing={!savePending}
               disabled={savePending}
-              className="inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-foreground-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:opacity-40"
             >
               {savePending ? <Spinner className="h-3.5 w-3.5" /> : null}
               {savePending ? "Guardando…" : "Guardar"}
@@ -158,7 +158,7 @@ export function CategoriaCard({
 
       {/* Lista de repuestos */}
       {grupo.repuestos.length === 0 ? (
-        <p className="px-5 py-4 text-sm text-[var(--color-foreground-muted)]">
+        <p className="px-5 py-4 text-sm text-[var(--text-color-gray)]">
           Sin repuestos. Agregá uno abajo.
         </p>
       ) : (
@@ -171,7 +171,7 @@ export function CategoriaCard({
             isEditing ? (
               <div className="flex items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-5 py-1.5">
                 <div className="w-4" />
-                <span className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
+                <span className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">
                   Repuesto
                 </span>
                 <div className="w-7" />

@@ -47,7 +47,7 @@ function DragHandle(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
       type="button"
       tabIndex={-1}
       aria-label="Reordenar"
-      className="cursor-grab touch-none text-[var(--color-foreground-muted)] hover:text-[var(--color-foreground)] active:cursor-grabbing"
+      className="cursor-grab touch-none text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)] active:cursor-grabbing"
       {...props}
     >
       <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" stroke="none">
@@ -111,7 +111,7 @@ function SortableTrabajoRow({
         tabIndex={isEditing ? -1 : undefined}
         required
         className={cn(
-          "flex-1 rounded-lg px-2 py-1 text-sm text-[var(--color-foreground)] transition",
+          "flex-1 rounded-lg px-2 py-1 text-sm text-[var(--text-color-defult)] transition",
           isEditing
             ? "border border-[var(--color-border)] bg-[var(--color-surface)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
             : "border border-transparent bg-transparent font-medium"
@@ -139,7 +139,7 @@ function SortableTrabajoRow({
                     parsePrecioInput(event.target.value)
                   )
                 }
-                className="w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--color-foreground)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                className="w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
               />
             </div>
           ) : (
@@ -317,19 +317,19 @@ function CategoriaCard({
                 name="nombre"
                 defaultValue={grupo.categoriaNombre}
                 required
-                className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--color-foreground)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
               />
               <button
                 type="submit"
                 disabled={renamePending}
                 title="Guardar nombre"
-                className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-success-bg)] hover:text-[var(--color-success-text)] disabled:opacity-40"
+                className="rounded-lg p-1.5 text-[var(--text-color-gray)] transition hover:bg-[var(--color-success-bg)] hover:text-[var(--color-success-text)] disabled:opacity-40"
               >
                 {renamePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
               </button>
             </form>
           ) : (
-            <span className="text-sm font-semibold uppercase tracking-widest text-[var(--color-foreground)]">
+            <span className="text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
               {grupo.categoriaNombre}
             </span>
           )}
@@ -339,7 +339,7 @@ function CategoriaCard({
         <Divider orientation="vertical" className="h-5" />
 
         {/* Contador */}
-        <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--color-foreground-muted)]">
+        <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
           {grupo.trabajos.length} {grupo.trabajos.length === 1 ? "trabajo" : "trabajos"}
         </span>
 
@@ -396,7 +396,7 @@ function CategoriaCard({
               type="submit"
               disabled={deletePending}
               title="Eliminar categoría"
-              className="rounded-lg p-1.5 text-[var(--color-foreground-muted)] transition hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] disabled:opacity-40"
+              className="rounded-lg p-1.5 text-[var(--text-color-gray)] transition hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] disabled:opacity-40"
             >
               <Icon name="trash" className="h-4 w-4" />
             </button>
@@ -413,7 +413,7 @@ function CategoriaCard({
 
       {/* ── Trabajos ── */}
       {grupo.trabajos.length === 0 ? (
-        <p className="px-5 py-4 text-sm text-[var(--color-foreground-muted)]">
+        <p className="px-5 py-4 text-sm text-[var(--text-color-gray)]">
           Sin trabajos. Agregá uno abajo.
         </p>
       ) : (
@@ -426,13 +426,13 @@ function CategoriaCard({
             isEditing ? (
               <div className="flex items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-5 py-1.5">
                 <div className="w-4" />
-                <span className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
+                <span className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">
                   Trabajo
                 </span>
                 <div className="flex shrink-0 gap-2">
                   {[1, 2, 3].map((lista) => (
                     <div key={lista} className="flex w-28 flex-col items-center gap-1">
-                      <span className="text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
+                      <span className="text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">
                         Lista {lista}
                       </span>
                       <Incrementor
@@ -478,7 +478,7 @@ function CategoriaCard({
             name="nombre"
             placeholder="Nombre del nuevo trabajo…"
             required
-            className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-3 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 backdrop-blur-sm"
+            className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-3 py-1.5 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 backdrop-blur-sm"
           />
           <button
             type="submit"
@@ -514,7 +514,7 @@ function AddCategoriaForm({
           name="nombre"
           placeholder="Nombre de la nueva categoría…"
           required
-          className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-4 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40"
+          className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-4 py-2 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40"
         />
         <button
           type="submit"

@@ -18,7 +18,7 @@ export default function GlobalError({
 
   return (
     <html lang="es" className="h-full antialiased" suppressHydrationWarning>
-      <body className="min-h-full bg-[var(--color-background)] text-[var(--color-foreground)]">
+      <body className="min-h-full bg-[var(--color-background)] text-[var(--text-color-defult)]">
         <ErrorState
           code="500"
           title="La app encontró un error crítico"

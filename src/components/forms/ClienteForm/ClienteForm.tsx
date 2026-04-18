@@ -191,12 +191,12 @@ export function ClienteForm({
               </p>
             ) : null}
             {title ? (
-              <h2 className={cn("text-xl font-semibold tracking-tight text-[var(--color-foreground)]", eyebrow ? "mt-2" : null)}>
+              <h2 className={cn("text-xl font-semibold tracking-tight text-[var(--text-color-defult)]", eyebrow ? "mt-2" : null)}>
                 {title}
               </h2>
             ) : null}
             {description ? (
-              <p className="mt-2 text-sm leading-6 text-[var(--color-foreground-muted)]">
+              <p className="mt-2 text-sm leading-6 text-[var(--text-color-gray)]">
                 {description}
               </p>
             ) : null}
@@ -234,7 +234,7 @@ export function ClienteForm({
         className={cn("ClienteFormGrid", styles.ClienteFormGrid)}
       >
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             Nombre
           </span>
           <Input
@@ -247,7 +247,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             Apellido
           </span>
           <Input
@@ -260,7 +260,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             Teléfono
           </span>
           <Input
@@ -272,7 +272,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             Mail
           </span>
           <Input
@@ -285,7 +285,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             Provincia
           </span>
           <Select
@@ -303,7 +303,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             Ciudad
           </span>
           {esChubut ? (
@@ -331,7 +331,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             Dirección
           </span>
           <Input
@@ -343,7 +343,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             CP
           </span>
           <Input
@@ -355,7 +355,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             DNI
           </span>
           <Input
@@ -369,7 +369,7 @@ export function ClienteForm({
         </label>
 
         <label className={cn("ClienteFormField", styles.ClienteFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             CUIT
           </span>
           <Input

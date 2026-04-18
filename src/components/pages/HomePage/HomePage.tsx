@@ -61,7 +61,7 @@ export function HomePage() {
           <h2 className="mt-3 text-2xl font-semibold tracking-tight">
             Base de clientes
           </h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--color-foreground-muted)]">
+          <p className="mt-2 text-sm leading-6 text-[var(--text-color-gray)]">
             Consultá los clientes cargados, buscá por nombre o apellido y dejá
             preparada la navegación para altas y edición.
           </p>
@@ -77,7 +77,7 @@ export function HomePage() {
           <h2 className="mt-3 text-2xl font-semibold tracking-tight">
             Seguimiento de presupuestos
           </h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--color-foreground-muted)]">
+          <p className="mt-2 text-sm leading-6 text-[var(--text-color-gray)]">
             Filtrá trabajos por estado y prioridad, y dejá lista la base para
             formularios, aprobación y exportación futura.
           </p>

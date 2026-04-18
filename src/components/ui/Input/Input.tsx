@@ -10,7 +10,7 @@ export function Input({ className, ...props }: InputProps) {
       className={cn(
         "Input",
         styles.Input,
-        "h-11 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-foreground)] outline-none transition placeholder:text-[var(--color-foreground-subtle)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]",
+        "h-11 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--text-color-defult)] outline-none transition placeholder:text-[var(--text-color-ligth)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]",
         className
       )}
       {...props}

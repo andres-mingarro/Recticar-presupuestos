@@ -43,7 +43,7 @@ export function ButtonGroup<T extends string | number>({
               buttonClassName,
               active
                 ? (option.activeTone ?? DEFAULT_ACTIVE_TONE)
-                : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]"
+                : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]"
             )}
           >
             {option.icon ? <Icon name={option.icon} className="h-4 w-4 shrink-0" /> : null}

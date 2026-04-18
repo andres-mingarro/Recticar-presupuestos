@@ -25,7 +25,7 @@ export function Pager({
 }: PagerProps) {
   return (
     <div className={cn("Pager", className)}>
-      <p className="text-sm text-[var(--color-foreground-muted)]">{summary}</p>
+      <p className="text-sm text-[var(--text-color-gray)]">{summary}</p>
 
       <div className="flex w-full flex-wrap justify-between items-center gap-2 sm:w-auto sm:justify-end">
         <Button
@@ -39,7 +39,7 @@ export function Pager({
         >
           Anterior
         </Button>
-        <span className="flex px-2 text-sm text-[var(--color-foreground-muted)]">
+        <span className="flex px-2 text-sm text-[var(--text-color-gray)]">
           <span className="hidden lg:block">Página</span> {currentPage} de {totalPages}
         </span>
         <Button

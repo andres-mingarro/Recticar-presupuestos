@@ -71,9 +71,6 @@ Clases utilitarias disponibles: `.text-xs`, `.text-sm`, `.text-base`, `.text-lg`
 | Variable                    | Valor                        | Uso                        |
 |-----------------------------|------------------------------|----------------------------|
 | `--color-background`        | `#f6f7fb`                    | Fondo de la app            |
-| `--color-foreground`        | `#111827`                    | Texto principal            |
-| `--color-foreground-muted`  | `#475569`                    | Texto secundario           |
-| `--color-foreground-subtle` | `#64748b`                    | Texto terciario/placeholders |
 | `--color-surface`           | `#f8fafc`                    | Superficie de cards        |
 | `--color-surface-alt`       | `#eef2f7`                    | Superficie alternativa     |
 | `--color-border`            | `rgba(148,163,184,0.26)`     | Bordes generales           |

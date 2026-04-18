@@ -34,14 +34,14 @@ export function TrabajoItemCard({
       htmlFor={inputId}
       className={cn(
         "TrabajoItemCard rounded-xl px-4 py-3 text-sm ",
-        checked ? "text-white" : "text-[var(--color-foreground)]",
+        checked ? "text-white" : "text-[var(--text-color-defult)]",
         styles.TrabajoItemCard,
         checked ? styles.TrabajoItemCardChecked : styles.TrabajoItemCardUnchecked,
         className
       )}
     >
       <div className={cn("flex items-start  flex-col lg:flex-row lg:items-center justify-between gap-3", styles.TrabajoItemCardContent, contentClassName)}>
-        <div className="content-trabajo-item-header flex items-center gap-3">
+        <div className="content-trabajo-item-header flex lg:flex-1 items-center gap-3">
         <CheckboxBeauti
           {...inputProps}
           id={inputId}
@@ -50,7 +50,7 @@ export function TrabajoItemCard({
           onChange={(event) => onCheckedChange(event.target.checked)}
           className={cn("gap-0", checkboxClassName)}
         />
-        <span className="min-w-0 text-lg">{label}</span>
+        <span className="min-w-0 text-lg capitalize">{label}</span>
         </div>
         {children}
       </div>

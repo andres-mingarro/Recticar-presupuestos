@@ -112,9 +112,9 @@ function RepuestoGrupoAccordion({
       onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
       className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4")}
     >
-      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)]")}>
+      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--text-color-defult)]")}>
         <span>{categoriaNombre}</span>
-        <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--color-foreground-muted)] transition-transform duration-200")} />
+        <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
       </summary>
       {children}
     </details>
@@ -295,7 +295,7 @@ export function TrabajoForm({
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
             Vehiculo y motor
           </p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+          <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
             Selección técnica
           </h2>
         </div>
@@ -322,24 +322,24 @@ export function TrabajoForm({
                   onClick={() => openWizard(0)}
                   className="flex w-full items-center justify-between py-3 text-left"
                 >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-foreground-subtle)]">Marca</span>
-                  <span className="text-lg font-bold text-[var(--color-foreground)]">{selectedMarcaNombre}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-ligth)]">Marca</span>
+                  <span className="text-lg font-bold text-[var(--text-color-defult)]">{selectedMarcaNombre}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => openWizard(1)}
                   className="flex w-full items-center justify-between py-3 text-left"
                 >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-foreground-subtle)]">Modelo</span>
-                  <span className="text-base font-semibold text-[var(--color-foreground-muted)]">{selectedModeloNombre ?? "—"}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-ligth)]">Modelo</span>
+                  <span className="text-base font-semibold text-[var(--text-color-gray)]">{selectedModeloNombre ?? "—"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => openWizard(2)}
                   className="flex w-full items-center justify-between py-3 text-left"
                 >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-foreground-subtle)]">Motor</span>
-                  <span className="text-base font-semibold text-[var(--color-foreground-muted)]">{selectedMotorNombre ?? "—"}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-ligth)]">Motor</span>
+                  <span className="text-base font-semibold text-[var(--text-color-gray)]">{selectedMotorNombre ?? "—"}</span>
                 </button>
               </div>
             </div>
@@ -374,7 +374,7 @@ export function TrabajoForm({
         </div>
 
         <label className={cn("TrabajoFormField md:hidden", styles.TrabajoFormField)}>
-          <span className="text-sm font-medium text-[var(--color-foreground)]">
+          <span className="text-sm font-medium text-[var(--text-color-defult)]">
             Número de serie del motor
           </span>
           <Input
@@ -393,7 +393,7 @@ export function TrabajoForm({
 
         <div className={cn("TrabajoFormGrid", styles.TrabajoFormGrid, "hidden md:grid")}>
           <label className={cn("TrabajoFormField", styles.TrabajoFormField)}>
-            <span className="text-sm font-medium text-[var(--color-foreground)]">
+            <span className="text-sm font-medium text-[var(--text-color-defult)]">
               Marca
             </span>
             <Select
@@ -414,7 +414,7 @@ export function TrabajoForm({
           </label>
 
           <label className={cn("TrabajoFormField", styles.TrabajoFormField)}>
-            <span className="text-sm font-medium text-[var(--color-foreground)]">
+            <span className="text-sm font-medium text-[var(--text-color-defult)]">
               Modelo
             </span>
             <Select
@@ -435,7 +435,7 @@ export function TrabajoForm({
           </label>
 
           <label className={cn("TrabajoFormField", styles.TrabajoFormField)}>
-            <span className="text-sm font-medium text-[var(--color-foreground)]">
+            <span className="text-sm font-medium text-[var(--text-color-defult)]">
               Motor
             </span>
             <Select
@@ -453,7 +453,7 @@ export function TrabajoForm({
           </label>
 
           <label className={cn("TrabajoFormField", styles.TrabajoFormField)}>
-            <span className="text-sm font-medium text-[var(--color-foreground)]">
+            <span className="text-sm font-medium text-[var(--text-color-defult)]">
               Número de serie del motor
             </span>
             <Input
@@ -492,14 +492,14 @@ export function TrabajoForm({
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                   Trabajos
                 </p>
-                <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
                   <Icon name="listCheck" size="lg" className="text-current" />
                   Checklist por categoria
                 </h2>
               </div>
 
               <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-[var(--color-foreground)]">Lista de precios</span>
+                <span className="text-sm font-medium text-[var(--text-color-defult)]">Lista de precios</span>
                 <ButtonGroup
                   options={[
                     { value: 1, label: "Lista 1", icon: "clipboardList" },
@@ -523,9 +523,9 @@ export function TrabajoForm({
                       open={hasSelected}
                       className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4")}
                     >
-                      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)]")}>
+                      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--text-color-defult)]")}>
                         <span>{grupo.categoriaNombre}</span>
-                        <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--color-foreground-muted)] transition-transform duration-200")} />
+                        <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
                       </summary>
                       <div className="mt-4 grid gap-3 md:grid-cols-2">
                         {grupo.trabajos.map((trabajo) => (
@@ -550,7 +550,7 @@ export function TrabajoForm({
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                   Repuestos
                 </p>
-                <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
                   <Icon name="listCheck" size="lg" className="text-current" />
                   Checklist por categoria
                 </h2>
@@ -578,7 +578,7 @@ export function TrabajoForm({
                               contentClassName="flex-col gap-2"
                               checkboxClassName="[--checkbox-size:27px]"
                               >
-                            <div className="content-trabajo-item-card w-full items-center gap-2 grid grid-cols-[1fr_auto] lg:grid-cols-[120px_132px_120px]">
+                            <div className="content-trabajo-item-card lg:flex-1 lg:flex w-full items-center gap-2 grid grid-cols-[1fr_auto] lg:grid-cols-[120px_132px_120px]">
                               <Input
                                 type="number"
                                 min="0"
@@ -589,7 +589,7 @@ export function TrabajoForm({
                                 onChange={(event) =>
                                   setPrecioUnitario(repuesto.id, Number(event.target.value))
                                 }
-                                className="text-right h-8 lg:h-11"
+                                className="text-right h-8 lg:h-11 lg:min-w-[88px] h-[33px]"
                               />
                               <Incrementor
                                 value={selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
@@ -598,7 +598,7 @@ export function TrabajoForm({
                                 disabled={!selectedRepuestoIds.has(repuesto.id)}
                                 className="justify-end lg:justify-center"
                               />
-                              <span className="col-span-2 lg:col-span-1 text-right text-[26px] font-bold text-[#5f2302] lg:text-base lg:text-[var(--color-foreground)] border-t border-[var(--color-border)] pt-1 mt-0.5 lg:border-0 lg:pt-0 lg:mt-0">
+                              <span className="col-span-2 lg:col-span-1 lg:min-w-[88px] text-right text-[26px] font-bold text-[#5f2302] lg:text-base lg:text-[var(--text-color-defult)] border-t border-[var(--color-border)] pt-1 mt-0.5 lg:border-0 lg:pt-0 lg:mt-0">
                                 {formatPrice(
                                   (selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0) *
                                     (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
@@ -629,7 +629,7 @@ export function TrabajoForm({
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Prioridad y estado
             </p>
-            <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
               Definicion del trabajo
             </h2>
           </div>
@@ -650,7 +650,7 @@ export function TrabajoForm({
           />
 
           <label className={cn("TrabajoFormField", styles.TrabajoFormField)}>
-            <span className="text-sm font-medium text-[var(--color-foreground)]">
+            <span className="text-sm font-medium text-[var(--text-color-defult)]">
               Observaciones
             </span>
             <Textarea
@@ -670,7 +670,7 @@ export function TrabajoForm({
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                 Notas
               </p>
-              <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+              <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
                 Observaciones
               </h2>
             </div>
@@ -739,13 +739,13 @@ export function TrabajoClienteSection({
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
           Cliente
         </p>
-        <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+        <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
           Asignación del cliente
         </h2>
       </div>
 
       <div className={cn("TrabajoFormField", styles.TrabajoFormField)}>
-        <span className="text-sm font-medium text-[var(--color-foreground)]">
+        <span className="text-sm font-medium text-[var(--text-color-defult)]">
           Cliente asociado
         </span>
         <ClienteAutocomplete

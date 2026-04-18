@@ -74,7 +74,7 @@ function StepCircle({
     );
   }
   return (
-    <span className={cn(base, "border-[var(--color-border)] bg-transparent text-[var(--color-foreground-muted)]")}>
+    <span className={cn(base, "border-[var(--color-border)] bg-transparent text-[var(--text-color-gray)]")}>
       <span className="text-xs font-bold">{num}</span>
     </span>
   );
@@ -96,7 +96,7 @@ const BORDER_RIGHT = "border-b border-[var(--color-border)] md:border-b-0 md:bor
 export function EstadoStepperDisplay({ value }: { value: TrabajoEstado }) {
   return (
     <div className="EstadoStepperDisplay flex flex-col gap-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">Estado</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">Estado</span>
     <div className={CONTAINER}>
       {STEPS.map((step, index) => {
         const status = stepStatus(step.value, value);
@@ -114,7 +114,7 @@ export function EstadoStepperDisplay({ value }: { value: TrabajoEstado }) {
             )}
           >
             <StepCircle status={status} num={step.num} light={step.isLight} />
-            <span className={cn("font-semibold leading-tight", isPainted ? step.activeText : "text-[var(--color-foreground-muted)]")}>
+            <span className={cn("font-semibold leading-tight", isPainted ? step.activeText : "text-[var(--text-color-gray)]")}>
               {step.label}
             </span>
             {!isLast && <StepDivider light={step.isLight} />}
@@ -151,7 +151,7 @@ export function EstadoStepper({ initialValue, name, allowFinalizado, form, value
 
   return (
     <div className="EstadoStepper flex flex-col gap-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">Estado</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">Estado</span>
     <div className={CONTAINER}>
       <input type="hidden" name={name} value={selected} form={form} />
       {visibleSteps.map((step, index) => {
@@ -175,7 +175,7 @@ export function EstadoStepper({ initialValue, name, allowFinalizado, form, value
             )}
           >
             <StepCircle status={status} num={step.num} light={step.isLight} />
-            <span className={cn("font-semibold leading-tight", isPainted ? step.activeText : "text-[var(--color-foreground-muted)]")}>
+            <span className={cn("font-semibold leading-tight", isPainted ? step.activeText : "text-[var(--text-color-gray)]")}>
               {step.label}
             </span>
             {!isLast && <StepDivider light={step.isLight} />}

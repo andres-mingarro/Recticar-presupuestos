@@ -37,7 +37,7 @@ export function ConfirmDialog({
           </div>
         </DialogHeader>
         {description && (
-          <p className="px-5 py-4 text-sm text-[var(--color-foreground-muted)]">{description}</p>
+          <p className="px-5 py-4 text-sm text-[var(--text-color-gray)]">{description}</p>
         )}
         <DialogFooter>
           <Button variant="outline-dark" className="flex-1" onClick={() => onOpenChange(false)} disabled={loading}>

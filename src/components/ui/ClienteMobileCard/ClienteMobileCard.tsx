@@ -29,7 +29,7 @@ export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Pr
     >
       {/* Número + pendientes */}
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-bold tracking-wide text-[var(--color-foreground-muted)]">
+        <span className="text-xs font-bold tracking-wide text-[var(--text-color-gray)]">
           <Icon name="hash" className="inline h-3 w-3 mr-0.5" />
           {cliente.numero_cliente}
         </span>
@@ -59,14 +59,14 @@ export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Pr
       {cliente.telefono ? (
         <a
           href={`tel:${cliente.telefono.replace(/\D/g, "")}`}
-          className="flex items-center gap-1.5 text-sm text-[var(--color-foreground-muted)] w-fit"
+          className="flex items-center gap-1.5 text-sm text-[var(--text-color-gray)] w-fit"
           onClick={(e) => e.stopPropagation()}
         >
           <Icon name="phone" className="h-3.5 w-3.5 shrink-0" />
           {cliente.telefono}
         </a>
       ) : (
-        <span className="flex items-center gap-1.5 text-sm text-[var(--color-foreground-subtle)]">
+        <span className="flex items-center gap-1.5 text-sm text-[var(--text-color-ligth)]">
           <Icon name="phone" className="h-3.5 w-3.5 shrink-0" />
           Sin teléfono
         </span>

@@ -26,7 +26,7 @@ export function PrioridadToggle({ form }: { form?: string }) {
 
   return (
     <div className="PrioridadToggle flex-1 flex flex-col gap-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">Prioridad</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">Prioridad</span>
       <input type="hidden" name="prioridad" value={prioridad} form={form} />
       <div className="flex w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5">
         {OPTIONS.map((option) => {
@@ -41,7 +41,7 @@ export function PrioridadToggle({ form }: { form?: string }) {
                 "flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
                 isActive
                   ? option.activeTone
-                  : "border-transparent bg-transparent text-[var(--color-foreground-muted)] hover:bg-white hover:text-[var(--color-foreground)]"
+                  : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]"
               )}
             >
               {option.label}

@@ -41,7 +41,7 @@ export function Toaster() {
           ),
           content: "gap-3 px-4 py-4 sm:px-5 sm:py-4",
           title: "text-[15px] font-semibold tracking-[-0.01em] text-[var(--brown-burnt)]",
-          description: "text-[13px] leading-5 text-[var(--color-foreground-muted)]",
+          description: "text-[13px] leading-5 text-[var(--text-color-gray)]",
           icon: "mt-0.5 shrink-0",
           closeButton: cn(
             "!left-auto !right-0 !top-[6px] !mt-0 !translate-x-0 !translate-y-0",
@@ -61,7 +61,7 @@ export function Toaster() {
             "linear-gradient(135deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.96))",
           border: "1px solid rgba(128, 54, 0, 0.08)",
           borderRadius: "24px",
-          color: "var(--color-foreground)",
+          color: "var(--text-color-defult)",
           boxShadow: "0 22px 70px rgba(15, 23, 42, 0.14)",
         },
       }}

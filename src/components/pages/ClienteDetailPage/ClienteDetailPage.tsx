@@ -68,7 +68,7 @@ function TrabajoTable({
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
           {eyebrow}
         </p>
-        <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+        <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
           <Icon name="clipboard" className="h-5 w-5" />
           {title}
         </h2>
@@ -77,7 +77,7 @@ function TrabajoTable({
       {/* Cards mobile */}
       <div className="md:hidden space-y-2">
         {trabajos.length === 0 ? (
-          <p className="py-6 text-center text-sm text-[var(--color-foreground-muted)]">{emptyMessage}</p>
+          <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">{emptyMessage}</p>
         ) : (
           trabajos.map((trabajo) => (
             <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} showBusinessDays={false} />
@@ -87,7 +87,7 @@ function TrabajoTable({
 
       <div className="hidden md:block"><Table>
         <table className="min-w-[720px] w-full text-left text-sm">
-          <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
+          <thead className="bg-[var(--color-surface-alt)] text-[var(--text-color-gray)]">
             <tr>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="hash" className="h-4 w-4" />N° Trabajo</span></th>
               <th className="px-4 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Vehículo / Motor</span></th>
@@ -101,7 +101,7 @@ function TrabajoTable({
           <tbody>
             {trabajos.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-[var(--color-foreground-muted)]">
+                <td colSpan={7} className="px-4 py-12 text-center text-[var(--text-color-gray)]">
                   {emptyMessage}
                 </td>
               </tr>
@@ -109,7 +109,7 @@ function TrabajoTable({
               trabajos.map((trabajo) => (
                 <tr
                   key={trabajo.id}
-                  className="border-t border-[var(--color-border)] text-[var(--color-foreground)]"
+                  className="border-t border-[var(--color-border)] text-[var(--text-color-defult)]"
                 >
                   <td className="px-4 py-4 font-semibold">#{trabajo.numero_trabajo}</td>
                   <td className="px-4 py-4">
@@ -188,7 +188,7 @@ export function ClienteDetailPage({
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Cliente #{cliente.numero_cliente}
             </p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[var(--text-color-defult)]">
               {cliente.apellido}, {cliente.nombre}
             </h1>
           </div>
@@ -314,7 +314,7 @@ export function ClienteDetailPage({
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                 Edición
               </p>
-              <h2 className="text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+              <h2 className="text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
                 Editar datos del cliente
               </h2>
             </div>

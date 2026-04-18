@@ -52,10 +52,10 @@ export function ErrorState({
               <p className="text-6xl font-black tracking-[-0.05em] text-[var(--brown-burnt)] sm:text-7xl">
                 {code}
               </p>
-              <h1 className="mt-4 max-w-xl text-3xl font-semibold tracking-tight text-[var(--color-foreground)] sm:text-4xl">
+              <h1 className="mt-4 max-w-xl text-3xl font-semibold tracking-tight text-[var(--text-color-defult)] sm:text-4xl">
                 {title}
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--color-foreground-muted)] sm:text-lg">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--text-color-gray)] sm:text-lg">
                 {description}
               </p>
             </div>
@@ -92,7 +92,7 @@ export function ErrorState({
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
                 Qué podés hacer
               </p>
-              <ul className="mt-5 space-y-4 text-sm leading-6 text-[var(--color-foreground-muted)] sm:text-base">
+              <ul className="mt-5 space-y-4 text-sm leading-6 text-[var(--text-color-gray)] sm:text-base">
                 <li className="rounded-2xl border border-[var(--color-border)] bg-white/70 px-4 py-3">
                   Volver al dashboard o al listado principal.
                 </li>

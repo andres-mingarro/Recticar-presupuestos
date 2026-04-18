@@ -26,7 +26,7 @@ export function buttonStyles({
     variant === "secondary" &&
       "border border-[var(--color-border)] bg-[linear-gradient(135deg,var(--cream-warm),var(--peach-soft))] text-[var(--brown-burnt)] hover:brightness-95 focus-visible:ring-[var(--color-accent)]",
     variant === "ghost" &&
-      "bg-transparent text-[var(--color-foreground-muted)] hover:bg-[var(--color-surface-alt)] focus-visible:ring-[var(--color-accent)]",
+      "bg-transparent text-[var(--text-color-gray)] hover:bg-[var(--color-surface-alt)] focus-visible:ring-[var(--color-accent)]",
     variant === "dark" &&
       "bg-[linear-gradient(135deg,#475569,#1e293b)] text-white hover:brightness-110 focus-visible:ring-slate-700",
     variant === "warm" &&
@@ -40,9 +40,9 @@ export function buttonStyles({
     variant === "outline-dark" &&
       "border border-[#475569] bg-transparent text-[#475569] hover:bg-slate-100 focus-visible:ring-slate-500",
     variant === "danger-ghost" &&
-      "bg-transparent text-[var(--color-foreground-muted)] hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] focus-visible:ring-[var(--color-danger-text)]",
+      "bg-transparent text-[var(--text-color-gray)] hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] focus-visible:ring-[var(--color-danger-text)]",
     variant === "outline-ghost" &&
-      "rounded-full border border-[var(--color-border)] bg-transparent text-[var(--color-foreground-muted)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] focus-visible:ring-[var(--color-accent)]",
+      "rounded-full border border-[var(--color-border)] bg-transparent text-[var(--text-color-gray)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] focus-visible:ring-[var(--color-accent)]",
     variant === "link" &&
       "h-auto px-0 rounded-none bg-transparent text-[var(--color-accent)] underline underline-offset-4 decoration-[var(--color-accent)] hover:text-[var(--color-accent-strong)] hover:decoration-[var(--color-accent-strong)] focus-visible:ring-[var(--color-accent)]",
     className

@@ -48,7 +48,7 @@ function CobroIcon({ cobrado }: { cobrado: boolean }) {
         "inline-flex items-center justify-center text-xl",
         cobrado
           ? "text-emerald-600"
-          : "text-[var(--color-foreground-subtle)]"
+          : "text-[var(--text-color-ligth)]"
       )}
       aria-label={cobrado ? "Cobrado" : "No cobrado"}
       title={cobrado ? "Cobrado" : "No cobrado"}
@@ -79,7 +79,7 @@ function TrabajoTable({
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
           {eyebrow}
         </p>
-        <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+        <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
           <Icon name="clipboard" className="h-5 w-5" />
           {title}
         </h2>
@@ -87,7 +87,7 @@ function TrabajoTable({
 
       <Table>
         <table className="w-full table-auto text-left text-sm">
-          <thead className="bg-[var(--color-surface-alt)] text-[var(--color-foreground-muted)]">
+          <thead className="bg-[var(--color-surface-alt)] text-[var(--text-color-gray)]">
             <tr>
               <th className="w-[56px] px-2 py-3 font-semibold">
                 <span className="inline-flex items-center" aria-label="Número de trabajo" title="Número de trabajo">
@@ -105,7 +105,7 @@ function TrabajoTable({
                 >
                   <Icon name="sackDollar" size="xl" />
                   <span
-                    className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 rounded-md bg-[var(--color-foreground)] px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-[0_10px_24px_rgba(15,23,42,0.18)] transition group-hover:opacity-100 group-focus-visible:opacity-100"
+                    className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 rounded-md bg-[var(--text-color-defult)] px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-[0_10px_24px_rgba(15,23,42,0.18)] transition group-hover:opacity-100 group-focus-visible:opacity-100"
                     role="tooltip"
                   >
                     Cobro
@@ -128,7 +128,7 @@ function TrabajoTable({
               <tr>
                 <td
                   colSpan={8}
-                  className="px-4 py-10 text-center text-[var(--color-foreground-muted)]"
+                  className="px-4 py-10 text-center text-[var(--text-color-gray)]"
                 >
                   {emptyMessage}
                 </td>
@@ -137,7 +137,7 @@ function TrabajoTable({
               trabajos.map((trabajo) => (
                 <tr
                   key={trabajo.id}
-                  className="cursor-pointer border-t border-[var(--color-border)] text-[var(--color-foreground)] transition hover:bg-[var(--color-surface-alt)] focus-within:bg-[var(--color-surface-alt)]"
+                  className="cursor-pointer border-t border-[var(--color-border)] text-[var(--text-color-defult)] transition hover:bg-[var(--color-surface-alt)] focus-within:bg-[var(--color-surface-alt)]"
                   role="link"
                   tabIndex={0}
                   onClick={() => router.push(`/trabajos/${trabajo.id}`)}
@@ -166,13 +166,13 @@ function TrabajoTable({
                   </td>
                   <td className="min-w-[90px] px-3 py-4">
                     <div className="space-y-1">
-                      <p className="text-[0.68rem] font-semibold uppercase leading-none text-[var(--color-foreground-subtle)]">
+                      <p className="text-[0.68rem] font-semibold uppercase leading-none text-[var(--text-color-ligth)]">
                         {trabajo.marca_nombre ?? "Marca sin definir"}
                       </p>
                       <p className="font-medium">
                         {trabajo.modelo_nombre ?? "Modelo sin definir"}
                       </p>
-                      <p className="text-xs text-[var(--color-foreground-muted)]">
+                      <p className="text-xs text-[var(--text-color-gray)]">
                         {trabajo.motor_nombre ?? "Motor sin definir"}
                       </p>
                     </div>
@@ -187,7 +187,7 @@ function TrabajoTable({
                     <StatusBadge estado={trabajo.estado} />
                   </td>
                   <td className="w-[146px] px-3 py-4">
-                    <div className="inline-flex items-center gap-2 text-[var(--color-foreground-muted)]">
+                    <div className="inline-flex items-center gap-2 text-[var(--text-color-gray)]">
                       <span>{formatDate(trabajo.fecha_creacion)}</span>
                       <Icon name="arrowRight" className="h-4 w-4" />
                       <span className="whitespace-nowrap">{trabajo.estado === "pendiente" ? "--/--/----" : formatDate(trabajo.fecha_aprobacion)}</span>
@@ -282,7 +282,7 @@ export function TrabajosPage({
             min="1"
             placeholder="Nº trabajo"
             defaultValue={numeroTrabajo ?? ""}
-            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-foreground-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--text-color-ligth)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           />
 
             <div className="flex gap-3">
@@ -313,7 +313,7 @@ export function TrabajosPage({
         <div className="md:hidden space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">Activos</p>
           {trabajosActivos.length === 0 ? (
-            <p className="py-6 text-center text-sm text-[var(--color-foreground-muted)]">No hay trabajos pendientes ni aprobados para mostrar.</p>
+            <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">No hay trabajos pendientes ni aprobados para mostrar.</p>
           ) : (
             trabajosActivos.map((trabajo) => (
               <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} />
@@ -347,7 +347,7 @@ export function TrabajosPage({
         <div className="md:hidden space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">Finalizados</p>
           {finalizadosVisible.length === 0 ? (
-            <p className="py-6 text-center text-sm text-[var(--color-foreground-muted)]">No hay trabajos finalizados para mostrar.</p>
+            <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">No hay trabajos finalizados para mostrar.</p>
           ) : (
             finalizadosVisible.map((trabajo) => (
               <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} showBusinessDays={false} />

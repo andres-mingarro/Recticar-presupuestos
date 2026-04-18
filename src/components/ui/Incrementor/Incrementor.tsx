@@ -36,7 +36,7 @@ export function Incrementor({
         onClick={onDecrement}
         disabled={disabled}
         className={cn(
-          "flex cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] font-semibold text-[var(--color-foreground)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40",
+          "flex cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] font-semibold text-[var(--text-color-defult)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40",
           incrementoSmall ? "h-7 w-7 text-sm" : "h-8 w-8 text-base"
         )}
       >
@@ -44,7 +44,7 @@ export function Incrementor({
       </button>
       <span
         className={cn(
-          "inline-flex justify-center rounded-full bg-[var(--color-surface-alt)] font-semibold text-[var(--color-foreground)]",
+          "inline-flex justify-center rounded-full bg-[var(--color-surface-alt)] font-semibold text-[var(--text-color-defult)]",
           incrementoSmall ? "min-w-[36px] px-1.5 py-0.5 text-sm leading-none" : "min-w-8 px-2 py-1 text-sm",
           valueClassName
         )}
@@ -56,7 +56,7 @@ export function Incrementor({
         onClick={onIncrement}
         disabled={disabled}
         className={cn(
-          "flex cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] font-semibold text-[var(--color-foreground)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40",
+          "flex cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] font-semibold text-[var(--text-color-defult)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40",
           incrementoSmall ? "h-7 w-7 text-sm" : "h-8 w-8 text-base"
         )}
       >

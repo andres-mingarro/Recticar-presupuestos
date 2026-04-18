@@ -61,7 +61,7 @@ function EyeToggle({ visible, onToggle }: { visible: boolean; onToggle: () => vo
     <button
       type="button"
       onClick={onToggle}
-      className="absolute inset-y-0 right-3 flex items-center text-[var(--color-foreground-muted)] hover:text-[var(--color-foreground)]"
+      className="absolute inset-y-0 right-3 flex items-center text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)]"
       aria-label={visible ? "Ocultar" : "Mostrar"}
     >
       {visible ? (
@@ -129,7 +129,7 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
             Administración
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-color-defult)]">
             Usuarios
           </h1>
         </div>
@@ -189,7 +189,7 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
       {/* Tabla */}
       <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[var(--color-border)] text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-foreground-muted)]">
+            <tr className="border-b border-[var(--color-border)] text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">
               <th className="px-6 py-4">Usuario</th>
               <th className="px-4 py-4">Contraseña</th>
               <th className="px-4 py-4">Rol</th>
@@ -206,7 +206,7 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
                     <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${AVATAR_COLORS[u.role]}`}>
                       {u.nombre.charAt(0).toUpperCase()}
                     </div>
-                    <span className="font-medium text-[var(--color-foreground)]">{u.nombre}</span>
+                    <span className="font-medium text-[var(--text-color-defult)]">{u.nombre}</span>
                   </div>
                 </td>
 
@@ -214,13 +214,13 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
                 <td className="px-4 py-4">
                   {u.password_plain ? (
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-sm text-[var(--color-foreground)]">
+                      <span className="font-mono text-sm text-[var(--text-color-defult)]">
                         {visiblePasswordFor === u.email ? u.password_plain : "••••••••"}
                       </span>
                       <button
                         type="button"
                         onClick={() => setVisiblePasswordFor(visiblePasswordFor === u.email ? null : u.email)}
-                        className="text-[var(--color-foreground-muted)] hover:text-[var(--color-foreground)]"
+                        className="text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)]"
                         aria-label={visiblePasswordFor === u.email ? "Ocultar" : "Mostrar"}
                       >
                         {visiblePasswordFor === u.email ? (
@@ -231,7 +231,7 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
                       </button>
                     </div>
                   ) : (
-                    <span className="text-xs text-[var(--color-foreground-muted)]">—</span>
+                    <span className="text-xs text-[var(--text-color-gray)]">—</span>
                   )}
                 </td>
 
@@ -339,7 +339,7 @@ export function UsuariosClient({ usuarios, sessionRole }: Props) {
             ))}
             {usuarios.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center text-[var(--color-foreground-muted)]">
+                <td colSpan={4} className="px-6 py-12 text-center text-[var(--text-color-gray)]">
                   No hay usuarios registrados.
                 </td>
               </tr>

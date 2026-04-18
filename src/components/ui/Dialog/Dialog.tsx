@@ -71,7 +71,7 @@ export function DialogTitle({
     <RadixDialog.Title
       className={cn(
         "DialogTitle",
-        "text-base font-semibold tracking-tight text-[var(--color-foreground)]",
+        "text-base font-semibold tracking-tight text-[var(--text-color-defult)]",
         className
       )}
     >

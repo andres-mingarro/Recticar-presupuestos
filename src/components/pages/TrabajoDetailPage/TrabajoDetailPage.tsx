@@ -170,7 +170,7 @@ export function TrabajoDetailPage({
                   Trabajo #{trabajo.numero_trabajo}
                 </p>
                 <div className="mt-1 flex items-center gap-2">
-                  <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">
+                  <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-color-defult)]">
                     {trabajo.cliente_nombre ?? "Sin cliente"}
                   </h1>
                   {trabajo.cliente_id ? (
@@ -188,7 +188,7 @@ export function TrabajoDetailPage({
                 </div>
               </div>
               {!trabajo.cliente_id ? (
-                <span className="text-sm text-[var(--color-foreground-muted)]">Sin cliente asignado</span>
+                <span className="text-sm text-[var(--text-color-gray)]">Sin cliente asignado</span>
               ) : null}
             </div>
 
@@ -290,7 +290,7 @@ export function TrabajoDetailPage({
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Reglas de estado
             </p>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--color-foreground-muted)]">
+            <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--text-color-gray)]">
               <li>Aprobado requiere cliente asignado y registra la fecha automáticamente.</li>
               <li>Finalizado mueve el trabajo al historial del cliente.</li>
               <li>La fecha de aprobación se guarda la primera vez que se aprueba.</li>

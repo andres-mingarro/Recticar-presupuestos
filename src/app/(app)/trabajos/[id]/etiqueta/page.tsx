@@ -48,11 +48,11 @@ export default async function EtiquetaPage({
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-accent)]">
             #{trabajo.numero_trabajo}
           </p>
-          <p className="truncate text-base font-semibold text-[var(--color-foreground)]">
+          <p className="truncate text-base font-semibold text-[var(--text-color-defult)]">
             {trabajo.cliente_nombre ?? "Sin cliente"}
           </p>
           {vehiculo ? (
-            <p className="truncate text-[0.8125rem] text-[var(--color-foreground-muted)]">{vehiculo}</p>
+            <p className="truncate text-[0.8125rem] text-[var(--text-color-gray)]">{vehiculo}</p>
           ) : null}
         </div>
       </div>

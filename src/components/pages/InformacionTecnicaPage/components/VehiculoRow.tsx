@@ -106,7 +106,7 @@ export function VehiculoRow({
               {vehiculo.marcaNombre ? `${vehiculo.marcaNombre} / ` : ""}
               {vehiculo.modeloNombre}
             </span>
-            <span className={cn("flex-1", readCls, "text-[var(--color-foreground-muted)]")}>
+            <span className={cn("flex-1", readCls, "text-[var(--text-color-gray)]")}>
               {vehiculo.motorNombre}
             </span>
             <Button
@@ -115,7 +115,7 @@ export function VehiculoRow({
               disabled={!canEdit}
               className={cn(
                 "shrink-0 h-auto p-1.5",
-                pendingHidden && "border-[var(--color-foreground-muted)] text-[var(--color-foreground-muted)]"
+                pendingHidden && "border-[var(--text-color-gray)] text-[var(--text-color-gray)]"
               )}
               title={canEdit ? (pendingHidden ? "Mostrar vehículo" : "Ocultar vehículo") : "Necesitás permisos para editar"}
               icon={<Icon name={pendingHidden ? "eyeSlash" : "eye"} className="h-4 w-4" />}

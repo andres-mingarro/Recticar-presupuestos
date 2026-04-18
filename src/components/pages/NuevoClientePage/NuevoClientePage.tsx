@@ -44,10 +44,10 @@ export function NuevoClientePage({
       >
         <Card as="section">
           <div className="mb-6">
-            <h2 className="text-xl font-semibold tracking-tight text-[var(--color-foreground)]">
+            <h2 className="text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
               Datos del cliente
             </h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--color-foreground-muted)]">
+            <p className="mt-2 text-sm leading-6 text-[var(--text-color-gray)]">
               Esta alta crea el cliente en Neon y lo deja disponible para el
               buscador y para la asignación de trabajos.
             </p>
@@ -66,7 +66,7 @@ export function NuevoClientePage({
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Recomendaciones
             </p>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--color-foreground-muted)]">
+            <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--text-color-gray)]">
               {tips.map((tip) => (
                 <li key={tip}>{tip}</li>
               ))}
@@ -77,7 +77,7 @@ export function NuevoClientePage({
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Siguiente paso
             </p>
-            <p className="mt-3 text-sm leading-6 text-[var(--color-foreground-muted)]">
+            <p className="mt-3 text-sm leading-6 text-[var(--text-color-gray)]">
               Cuando terminemos esta pantalla, el paso natural es completar la
               ficha individual del cliente con edición y sus trabajos asociados.
             </p>

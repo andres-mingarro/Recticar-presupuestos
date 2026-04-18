@@ -10,7 +10,7 @@ export function Textarea({ className, ...props }: TextareaProps) {
       className={cn(
         "Textarea",
         styles.Textarea,
-        "min-h-28 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-3 text-sm text-[var(--color-foreground)] outline-none transition placeholder:text-[var(--color-foreground-subtle)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]",
+        "min-h-28 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-3 text-sm text-[var(--text-color-defult)] outline-none transition placeholder:text-[var(--text-color-ligth)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]",
         className
       )}
       {...props}

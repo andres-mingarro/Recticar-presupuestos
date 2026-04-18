@@ -69,7 +69,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="username" className="text-sm font-medium text-[var(--color-foreground)]">
+            <label htmlFor="username" className="text-sm font-medium text-[var(--text-color-defult)]">
               Usuario
             </label>
             <Input
@@ -83,7 +83,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-medium text-[var(--color-foreground)]">
+            <label htmlFor="password" className="text-sm font-medium text-[var(--text-color-defult)]">
               Contraseña
             </label>
             <div className="relative">
@@ -99,7 +99,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute inset-y-0 right-3 flex items-center text-[var(--color-foreground-muted)] hover:text-[var(--color-foreground)]"
+                className="absolute inset-y-0 right-3 flex items-center text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)]"
                 aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
                 {showPassword ? (
@@ -125,7 +125,7 @@ export default function LoginPage() {
               />
             </div>
           ) : (
-            <p className="text-xs text-[var(--color-foreground-muted)]">
+            <p className="text-xs text-[var(--text-color-gray)]">
               El captcha está desactivado hasta configurar `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
             </p>
           )}

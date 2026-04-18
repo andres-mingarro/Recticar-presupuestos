@@ -44,9 +44,9 @@
 
 .TabsButtonInactive {
   background: var(--color-surface-alt);
-  color: var(--color-foreground-muted);
+  color: var(--text-color-gray);
 }
 
 .TabsButtonInactive:hover {
-  color: var(--color-foreground);
+  color: var(--text-color-defult);
 }
