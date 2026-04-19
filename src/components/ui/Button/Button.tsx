@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode, ElementType } from "react";
+import type { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import styles from "./Button.module.scss";
 

@@ -1,5 +1,4 @@
 import type { TechnicalSection } from "@/lib/queries/informacion-tecnica";
-import { cn } from "@/lib/cn";
 import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";

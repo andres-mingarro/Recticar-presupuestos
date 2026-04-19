@@ -2,7 +2,6 @@ import { PreciosPage } from "@/components/pages/PreciosPage";
 import { listTrabajosAgrupados } from "@/lib/queries/catalogo";
 import {
   createCategoriaAction,
-  renameCategoriaAction,
   deleteCategoriaAction,
   createTrabajoAction,
   deleteTrabajoAction,
@@ -17,7 +16,6 @@ export default async function Page() {
     <PreciosPage
       trabajos={trabajos}
       createCategoriaAction={createCategoriaAction}
-      renameCategoriaAction={renameCategoriaAction}
       deleteCategoriaAction={deleteCategoriaAction}
       createTrabajoAction={createTrabajoAction}
       deleteTrabajoAction={deleteTrabajoAction}
