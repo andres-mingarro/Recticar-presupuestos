@@ -50,86 +50,90 @@ export function ContentCard({
   return (
     <Card as="section" className="overflow-hidden p-0">
       {/* ── Toolbar ── */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2">
-        <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
-        <span className="text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
-          {SECTION_LABELS[section]}
-        </span>
-        <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
-          {count}
-        </span>
-
-        {tabsSlot && (
-          <>
-            <Divider orientation="vertical" className="h-5" />
-            {tabsSlot}
-          </>
-        )}
-
-        <Divider orientation="vertical" className="h-5" />
-
-        {/* Search */}
-        <form className="flex min-w-0 flex-1 items-center gap-1.5">
-          <input type="hidden" name="section" value={section} />
-          <input
-            type="text"
-            name="q"
-            defaultValue={q}
-            placeholder={`Buscar en ${SECTION_LABELS[section].toLowerCase()}…`}
-            className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
-          />
-          <Button type="submit" className="shrink-0" icon={<Icon name="search" className="h-4 w-4" />}>
-            Buscar
-          </Button>
-          {q && (
-            <Button
-              as="a"
-              href={buildSectionHref(section, "")}
-              variant="secondary"
-              className="shrink-0"
-              icon={<Icon name="x" className="h-4 w-4" />}
-            >
-              Limpiar
-            </Button>
+      <div className="flex flex-col gap-0 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)]">
+        {/* Row 1: título + tabs */}
+        <div className="flex items-center gap-2 px-3 py-2">
+          <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+          <span className="text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
+            {SECTION_LABELS[section]}
+          </span>
+          <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
+            {count}
+          </span>
+          {tabsSlot && (
+            <>
+              <Divider orientation="vertical" className="h-5" />
+              {tabsSlot}
+            </>
           )}
-        </form>
+        </div>
 
-        {(totalPages > 1 || currentPage > 1) && (
-          <>
-            <Divider orientation="vertical" className="h-5" />
-            <div className="flex shrink-0 items-center gap-1.5">
-              {hasPreviousPage ? (
-                <Link
-                  href={buildSectionHref(section, q, currentPage - 1)}
-                  className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
-                >
-                  <Icon name="chevronLeft" className="h-3.5 w-3.5" />
-                </Link>
-              ) : (
-                <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--text-color-gray)] opacity-40">
-                  <Icon name="chevronLeft" className="h-3.5 w-3.5" />
+        {/* Row 2: búsqueda + paginación */}
+        <div className="flex items-center gap-2 border-t border-[var(--color-border)] px-3 py-2">
+          {/* Search */}
+          <form className="flex min-w-0 flex-1 items-center gap-1.5">
+            <input type="hidden" name="section" value={section} />
+            <input
+              type="text"
+              name="q"
+              defaultValue={q}
+              placeholder={`Buscar…`}
+              className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
+            />
+            <Button type="submit" size="sm" className="shrink-0" icon={<Icon name="search" className="h-4 w-4" />}>
+              <span className="hidden sm:inline">Buscar</span>
+            </Button>
+            {q && (
+              <Button
+                as="a"
+                href={buildSectionHref(section, "")}
+                variant="secondary"
+                size="sm"
+                className="shrink-0"
+                icon={<Icon name="x" className="h-4 w-4" />}
+              >
+                <span className="hidden sm:inline">Limpiar</span>
+              </Button>
+            )}
+          </form>
+
+          {(totalPages > 1 || currentPage > 1) && (
+            <>
+              <Divider orientation="vertical" className="h-5" />
+              <div className="flex shrink-0 items-center gap-1.5">
+                {hasPreviousPage ? (
+                  <Link
+                    href={buildSectionHref(section, q, currentPage - 1)}
+                    className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                  >
+                    <Icon name="chevronLeft" className="h-3.5 w-3.5" />
+                  </Link>
+                ) : (
+                  <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--text-color-gray)] opacity-40">
+                    <Icon name="chevronLeft" className="h-3.5 w-3.5" />
+                  </span>
+                )}
+                <span className="text-xs text-[var(--text-color-gray)]">
+                  {totalItems === 0 ? "0" : `${pageStart}–${pageEnd}`}
+                  <span className="mx-1 opacity-40">/</span>
+                  {totalItems}
                 </span>
-              )}
-              <span className="text-xs text-[var(--text-color-gray)]">
-                {totalItems === 0 ? "0" : `${pageStart}–${pageEnd}`}
-                <span className="mx-1 opacity-40">/</span>
-                {totalItems}
-              </span>
-              {hasNextPage ? (
-                <Link
-                  href={buildSectionHref(section, q, currentPage + 1)}
-                  className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
-                >
-                  <Icon name="chevronRight" className="h-3.5 w-3.5" />
-                </Link>
-              ) : (
-                <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--text-color-gray)] opacity-40">
-                  <Icon name="chevronRight" className="h-3.5 w-3.5" />
-                </span>
-              )}
-            </div>
-          </>
-        )}
+                {hasNextPage ? (
+                  <Link
+                    href={buildSectionHref(section, q, currentPage + 1)}
+                    className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                  >
+                    <Icon name="chevronRight" className="h-3.5 w-3.5" />
+                  </Link>
+                ) : (
+                  <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--text-color-gray)] opacity-40">
+                    <Icon name="chevronRight" className="h-3.5 w-3.5" />
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* ── Column headers ── */}

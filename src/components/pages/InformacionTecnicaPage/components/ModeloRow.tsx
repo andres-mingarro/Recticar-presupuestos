@@ -30,41 +30,47 @@ export function ModeloRow({
     <div className={cn(index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
       <form
         action={canEdit ? formAction : undefined}
-        className="grid items-center gap-2 px-4 py-2.5 md:grid-cols-[1fr_180px_auto_auto]"
+        className="px-2 py-2.5 lg:px-4"
       >
         <input type="hidden" name="modeloId" value={modelo.id} />
         {canEdit ? (
-          <>
-            <input
-              type="text"
-              name="nombre"
-              defaultValue={modelo.nombre}
-              disabled={isPending}
-              className={cn("min-w-0", fieldCls)}
-            />
-            <select
-              name="marcaId"
-              defaultValue={modelo.marcaId}
-              disabled={isPending}
-              className={fieldCls}
-            >
-              {marcas.map((m) => (
-                <option key={m.id} value={m.id}>{m.nombre}</option>
-              ))}
-            </select>
-            <PulsatingButton size="sm" type="submit" pulsing={!isPending} disabled={isPending} className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}>
-              {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
-              {isPending ? "Guardando…" : "Guardar"}
-            </PulsatingButton>
-            <DeleteButton form={deleteFormId} disabled={deletePending} />
-          </>
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <div className="row-header flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap lg:flex-1">
+              <input
+                type="text"
+                name="nombre"
+                defaultValue={modelo.nombre}
+                disabled={isPending}
+                className={cn("min-w-0 flex-1", fieldCls)}
+              />
+              <select
+                name="marcaId"
+                defaultValue={modelo.marcaId}
+                disabled={isPending}
+                className={cn("w-full sm:w-[220px] lg:w-[200px]", fieldCls)}
+              >
+                {marcas.map((m) => (
+                  <option key={m.id} value={m.id}>{m.nombre}</option>
+                ))}
+              </select>
+            </div>
+            <div className="row-footer flex shrink-0 items-center gap-1.5 self-end lg:self-auto">
+              <PulsatingButton size="sm" type="submit" pulsing={!isPending} disabled={isPending} className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}>
+                {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                {isPending ? "Guardando…" : "Guardar"}
+              </PulsatingButton>
+              <DeleteButton form={deleteFormId} disabled={deletePending} />
+            </div>
+          </div>
         ) : (
-          <>
-            <span className={readCls}>{modelo.nombre}</span>
-            <span className={cn(readCls, "text-[var(--text-color-gray)]")}>
-              {modelo.marcaNombre ?? "—"}
-            </span>
-          </>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:gap-2">
+              <span className={cn("flex-1 truncate", readCls)}>{modelo.nombre}</span>
+              <span className={cn("flex-1 truncate", readCls, "text-[var(--text-color-gray)]")}>
+                {modelo.marcaNombre ?? "—"}
+              </span>
+            </div>
+          </div>
         )}
       </form>
       <form id={deleteFormId} action={deleteFormAction} className="hidden">

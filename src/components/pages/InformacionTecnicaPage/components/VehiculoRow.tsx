@@ -57,98 +57,106 @@ export function VehiculoRow({
     <div className={cn(index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
       <form
         action={canEdit ? formAction : undefined}
-        className={cn("grid items-center gap-2 px-4 py-2.5", isEditing && canEdit ? "md:grid-cols-[1fr_1fr_auto_auto_auto]" : "")}
+        className="vehiculos-item px-2 lg:px-4 py-2.5"
       >
         <input type="hidden" name="vehiculoId" value={vehiculo.id} />
         {isEditing && canEdit ? (
-          <>
-            <select
-              name="modeloId"
-              defaultValue={vehiculo.modeloId}
-              disabled={isPending}
-              className={fieldCls}
-            >
-              {modelos.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {(m.marcaNombre ? `${m.marcaNombre} / ` : "") + m.nombre}
-                </option>
-              ))}
-            </select>
-            <select
-              name="motorId"
-              defaultValue={vehiculo.motorId}
-              disabled={isPending}
-              className={fieldCls}
-            >
-              {motores.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.nombre}{m.cilindrada ? ` (${m.cilindrada})` : ""}
-                </option>
-              ))}
-            </select>
-            <PulsatingButton size="sm" type="submit" pulsing={!isPending} disabled={isPending} className={saveRowBtnCls}>
-              Guardar
-            </PulsatingButton>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline-ghost"
-              onClick={() => setIsEditing(false)}
-              disabled={isPending}
-            >
-              Cancelar
-            </Button>
-            <DeleteButton form={deleteFormId} disabled={deletePending} />
-          </>
+          <div className="flex flex-col lg:flex-row lg:justify-between gap-2">
+            <div className="row-header flex flex-wrap gap-2 w-full">
+              <select
+                name="modeloId"
+                defaultValue={vehiculo.modeloId}
+                disabled={isPending}
+                className={cn("flex-1  max-w-[100%] lg:max-w-[unset]", fieldCls )}
+              >
+                {modelos.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {(m.marcaNombre ? `${m.marcaNombre} / ` : "") + m.nombre}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="motorId"
+                defaultValue={vehiculo.motorId}
+                disabled={isPending}
+                className={cn( "flex-1 max-w-[100%] lg:max-w-[unset]", fieldCls)}
+              >
+                {motores.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.nombre}{m.cilindrada ? ` (${m.cilindrada})` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="row-footer flex items-center gap-1.5">
+              <PulsatingButton size="sm" type="submit" pulsing={!isPending} disabled={isPending} className={saveRowBtnCls}>
+                Guardar
+              </PulsatingButton>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline-ghost"
+                onClick={() => setIsEditing(false)}
+                disabled={isPending}
+              >
+                Cancelar
+              </Button>
+              <DeleteButton form={deleteFormId} disabled={deletePending} />
+            </div>
+          </div>
         ) : (
-          <div className="flex items-center gap-2 px-4 py-2.5">
-            <span className={cn("flex-1", readCls)}>
-              {vehiculo.marcaNombre ? `${vehiculo.marcaNombre} / ` : ""}
-              {vehiculo.modeloNombre}
-            </span>
-            <span className={cn("flex-1", readCls, "text-[var(--text-color-gray)]")}>
-              {vehiculo.motorNombre}
-            </span>
-            <Button
-              variant="outline-ghost"
-              onClick={() => setPendingHidden((prev) => !prev)}
-              disabled={!canEdit}
-              className={cn(
-                "shrink-0 h-auto p-1.5",
-                pendingHidden && "border-[var(--text-color-gray)] text-[var(--text-color-gray)]"
-              )}
-              title={canEdit ? (pendingHidden ? "Mostrar vehículo" : "Ocultar vehículo") : "Necesitás permisos para editar"}
-              icon={<Icon name={pendingHidden ? "eyeSlash" : "eye"} className="h-4 w-4" />}
-            />
-            {canEdit && (
-              <>
-                {pendingHidden !== isHidden && (
-                  <PulsatingButton
-                    type="submit"
-                    form={toggleHiddenFormId}
-                    pulsing={!togglePending}
-                    disabled={togglePending}
-                    className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}
-                  >
-                    {togglePending ? <Spinner className="h-3.5 w-3.5" /> : null}
-                    {togglePending ? "Guardando…" : "Guardar"}
-                  </PulsatingButton>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:gap-2">
+              <span className={cn("flex-1 truncate", readCls)}>
+                {vehiculo.marcaNombre ? `${vehiculo.marcaNombre} / ` : ""}
+                {vehiculo.modeloNombre}
+              </span>
+              <span className={cn("flex-1 truncate", readCls, "text-[var(--text-color-gray)]")}>
+                {vehiculo.motorNombre}
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <Button
+                variant="outline-ghost"
+                onClick={() => setPendingHidden((prev) => !prev)}
+                disabled={!canEdit}
+                className={cn(
+                  "h-auto p-1.5",
+                  pendingHidden && "border-[var(--text-color-gray)] text-[var(--text-color-gray)]"
                 )}
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline-ghost"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Editar
-                </Button>
-                <DeleteButton form={deleteFormId} disabled={deletePending} />
-              </>
-            )}
+                title={canEdit ? (pendingHidden ? "Mostrar vehículo" : "Ocultar vehículo") : "Necesitás permisos para editar"}
+                icon={<Icon name={pendingHidden ? "eyeSlash" : "eye"} className="h-4 w-4" />}
+              />
+              {canEdit && (
+                <>
+                  {pendingHidden !== isHidden && (
+                    <PulsatingButton
+                      type="submit"
+                      form={toggleHiddenFormId}
+                      pulsing={!togglePending}
+                      disabled={togglePending}
+                      className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}
+                    >
+                      {togglePending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                      {togglePending ? "Guardando…" : "Guardar"}
+                    </PulsatingButton>
+                  )}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline-ghost"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Editar
+                  </Button>
+                  <DeleteButton form={deleteFormId} disabled={deletePending} />
+                </>
+              )}
+            </div>
           </div>
         )}
       </form>
-      <form id={deleteFormId} action={deleteFormAction} className="hidden">
+      <form className="vehiculos-item-edit hidden" id={deleteFormId} action={deleteFormAction} >
         <input type="hidden" name="vehiculoId" value={vehiculo.id} />
       </form>
       <form id={toggleHiddenFormId} action={toggleHiddenFormAction} className="hidden">

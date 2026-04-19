@@ -93,7 +93,7 @@ export default async function ConfiguracionPage({
             description="Accedé a la administración técnica, a la gestión de usuarios y a los datos de empresa que salen en el PDF."
           />
 
-          <div className="grid gap-6 xl:grid-cols-2">
+          <div className="flex gap-6 flex-col lg:flex-row">
             <ConfigCard
               href="/informacion-tecnica"
               title="Información técnica"
@@ -131,98 +131,104 @@ export default async function ConfiguracionPage({
             )}
           </div>
 
-          <Card as="section" className="space-y-6">
+          <Card as="section" className="space-y-5">
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
                 Limpieza automática
               </p>
-              <h2 className="text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-                Presupuestos entregados
-              </h2>
               <p className="text-sm leading-6 text-[var(--text-color-gray)]">
-                Borra físicamente trabajos en estado `presupuesto_entregado` cuando vencen los meses definidos.
+                Borra automaticamente presupuestos que fueron entregados pero el cliente nunca confirmo hacer el trabajo.
               </p>
             </div>
 
-            <form action={updateEmpresaCleanupConfigAction} className="grid gap-4">
-              <label className="flex items-start gap-3 rounded-xl border border-[var(--color-border)] bg-white px-4 py-3">
-                <input
-                  type="checkbox"
-                  name="autoEliminarPresupuestosEntregados"
-                  value="true"
-                  defaultChecked={empresa.autoEliminarPresupuestosEntregados}
-                  disabled={!canEditEmpresa}
-                  className="mt-1 h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]"
-                />
-                <span className="space-y-1">
-                  <span className="block text-sm font-medium text-[var(--text-color-defult)]">
-                    Eliminar automáticamente
-                  </span>
-                  <span className="block text-xs leading-5 text-[var(--text-color-gray)]">
-                    Si está desactivado, la tarea mensual no borra trabajos aunque estén vencidos.
-                  </span>
-                </span>
-              </label>
+            <div className="grid gap-4 items-start lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
+              <form action={updateEmpresaCleanupConfigAction} className="grid gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+                <div className="flex flex-wrap gap-4 flex-col sm:flex-row">
+                  <label className="flex flex-1 items-start gap-3 ">
+                    <input
+                      type="checkbox"
+                      name="autoEliminarPresupuestosEntregados"
+                      value="true"
+                      defaultChecked={empresa.autoEliminarPresupuestosEntregados}
+                      disabled={!canEditEmpresa}
+                      className="mt-1 h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]"
+                    />
+                    <span className="space-y-1">
+                      <span className="block text-sm font-medium text-[var(--text-color-defult)]">
+                        Eliminar automáticamente
+                      </span>
+                      <span className="block text-xs leading-5 text-[var(--text-color-gray)]">
+                        Si está desactivado, la tarea mensual no borra trabajos aunque estén vencidos.
+                      </span>
+                    </span>
+                  </label>
 
-              <label className="space-y-2">
-                <FieldLabel icon="settings">Meses antes de borrar</FieldLabel>
-                <Input
-                  type="number"
-                  min="1"
-                  step="1"
-                  inputMode="numeric"
-                  name="mesesRetencionPresupuestoEntregado"
-                  defaultValue={empresa.mesesRetencionPresupuestoEntregado}
-                  disabled={!canEditEmpresa}
-                />
-              </label>
-
-              <div className="rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning-text)]">
-                El borrado es definitivo y sólo aplica a trabajos no cobrados en estado `presupuesto_entregado`.
-              </div>
-
-              {empresa.ultimaEjecucionLimpieza ? (
-                <p className="text-xs text-[var(--text-color-gray)]">
-                  Última ejecución de limpieza: {new Date(empresa.ultimaEjecucionLimpieza).toLocaleString("es-AR")}
-                </p>
-              ) : null}
-
-              <div className="flex flex-wrap gap-3 pt-2">
+                  <label className="flex-1">
+                    <FieldLabel icon="settings">Meses antes de borrar</FieldLabel>
+                    <Input
+                      type="number"
+                      min="1"
+                      step="1"
+                      inputMode="numeric"
+                      name="mesesRetencionPresupuestoEntregado"
+                      defaultValue={empresa.mesesRetencionPresupuestoEntregado}
+                      disabled={!canEditEmpresa}
+                      className="h-10"
+                    />
+                  </label>
+                </div>
                 {canEditEmpresa ? (
-                  <Button type="submit" className="w-full sm:w-auto">
-                    Guardar limpieza automática
-                  </Button>
+                  <div className="flex flex-wrap gap-3">
+                    <Button type="submit" className="w-full sm:w-auto">
+                      Guardar limpieza automática
+                    </Button>
+                  </div>
                 ) : (
                   <p className="text-sm text-[var(--text-color-gray)]">
                     Solo `admin` y `superuser` pueden editar estos datos.
                   </p>
                 )}
-              </div>
-            </form>
-
-            <div className="space-y-2 border-t border-[var(--color-border)] pt-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                Mantenimiento
-              </p>
-              <h3 className="text-base font-semibold tracking-tight text-[var(--text-color-defult)]">
-                Ejecutar limpieza ahora
-              </h3>
-              <p className="text-sm leading-6 text-[var(--text-color-gray)]">
-                Corre el mismo proceso mensual en este momento, respetando la configuración actual.
-              </p>
-            </div>
-
-            {canEditEmpresa ? (
-              <form action={runPresupuestosCleanupNowAction}>
-                <Button type="submit" variant="secondary" className="w-full sm:w-auto">
-                  Ejecutar limpieza
-                </Button>
               </form>
-            ) : (
-              <p className="text-sm text-[var(--text-color-gray)]">
-                Solo `admin` y `superuser` pueden ejecutar limpieza manual.
-              </p>
-            )}
+
+              <div className="flex h-full flex-col gap-4 rounded-[24px] border border-[var(--color-border)] bg-[linear-gradient(135deg,rgba(255,247,237,0.72),rgba(255,255,255,0.98))] p-4">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+                    Mantenimiento
+                  </p>
+                  <h3 className="text-base font-semibold tracking-tight text-[var(--text-color-defult)]">
+                    Ejecutar limpieza ahora
+                  </h3>
+                  <p className="text-sm leading-6 text-[var(--text-color-gray)]">
+                    Corre el mismo proceso mensual en este momento, respetando la configuración actual.
+                  </p>
+                </div>
+
+                {empresa.ultimaEjecucionLimpieza ? (
+                  <div className="rounded-2xl border border-[var(--color-border)] bg-white/80 px-4 py-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-color-gray)]">
+                      Última ejecución
+                    </p>
+                    <p className="mt-1 text-sm text-[var(--text-color-defult)]">
+                      {new Date(empresa.ultimaEjecucionLimpieza).toLocaleString("es-AR")}
+                    </p>
+                  </div>
+                ) : null}
+
+                <div className="mt-auto">
+                  {canEditEmpresa ? (
+                    <form action={runPresupuestosCleanupNowAction}>
+                      <Button type="submit" variant="secondary" className="w-full sm:w-auto">
+                        Ejecutar limpieza
+                      </Button>
+                    </form>
+                  ) : (
+                    <p className="text-sm text-[var(--text-color-gray)]">
+                      Solo `admin` y `superuser` pueden ejecutar limpieza manual.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           </Card>
         </div>
 
