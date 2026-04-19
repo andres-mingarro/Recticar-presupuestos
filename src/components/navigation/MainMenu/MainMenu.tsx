@@ -58,29 +58,16 @@ export function MainMenu({ role, onClose }: Props) {
       </nav>
 
       <div className={styles.footer}>
-        {canManageUsuarios && (
-          <Link
-            href="/admin/usuarios"
-            onClick={onClose}
-            className={cn(
-              styles.tecnicaLink,
-              isActive(pathname, "/admin/usuarios", false) && styles.tecnicaLinkActive
-            )}
-          >
-            <Icon name="shieldUser" className="h-4 w-4 shrink-0" />
-            Usuarios
-          </Link>
-        )}
         <Link
-          href="/informacion-tecnica"
+          href="/configuracion"
           onClick={onClose}
           className={cn(
             styles.tecnicaLink,
-            isActive(pathname, "/informacion-tecnica", false) && styles.tecnicaLinkActive
+            isActive(pathname, "/configuracion", false) && styles.tecnicaLinkActive
           )}
         >
-          <Icon name="car" className="h-4 w-4 shrink-0" />
-          Información técnica
+          <Icon name="settings" className="h-4 w-4 shrink-0" />
+          Configuración
         </Link>
         <div className={styles.divider} />
         <button type="button" onClick={handleLogout} className={styles.logoutBtn}>

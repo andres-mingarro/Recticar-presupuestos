@@ -2,6 +2,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import React from "react";
 import { getTrabajoDetailById } from "@/lib/queries/trabajos";
 import { getTrabajosDetalleByTrabajo } from "@/lib/queries/catalogo";
+import { getEmpresaConfig } from "@/lib/queries/empresa";
 import { getRepuestosDetalleByTrabajo } from "@/lib/queries/repuestos";
 import { PresupuestoPdf } from "@/lib/pdf/PresupuestoPdf";
 import { generateQrDataUrl } from "@/lib/qr";
@@ -33,16 +34,17 @@ export async function GET(
     return new Response("Trabajo no encontrado", { status: 404 });
   }
 
-  const [trabajos, repuestos] = await Promise.all([
+  const [trabajos, repuestos, empresa] = await Promise.all([
     getTrabajosDetalleByTrabajo(trabajoId, (trabajo.lista_precio as 1 | 2 | 3) ?? 1),
     getRepuestosDetalleByTrabajo(trabajoId),
+    getEmpresaConfig(),
   ]);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const qrDataUrl = await generateQrDataUrl(`${baseUrl}/trabajos/${trabajoId}`);
 
   const buffer = await renderToBuffer(
     // @ts-expect-error: @react-pdf/renderer types incompatibles con React 19
-    React.createElement(PresupuestoPdf, { trabajo, trabajos, repuestos, qrDataUrl })
+    React.createElement(PresupuestoPdf, { trabajo, trabajos, repuestos, qrDataUrl, empresa })
   );
   const clienteSlug = slugifyFilenamePart(trabajo.cliente_nombre);
   const fileName = `presupuesto-${trabajo.numero_trabajo}-${clienteSlug}.pdf`;

@@ -10,6 +10,7 @@ import {
 } from "@react-pdf/renderer";
 import type { TrabajoDetail } from "@/lib/types";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
+import type { EmpresaConfig } from "@/lib/queries/empresa";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 
 Font.registerHyphenationCallback((word) => [word]);
@@ -239,14 +240,20 @@ type Props = {
   trabajos: TrabajoDetalleItem[];
   repuestos: RepuestoDetalleItem[];
   qrDataUrl: string;
+  empresa: EmpresaConfig;
 };
 
-export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl }: Props) {
+function buildCompanyLocation(empresa: EmpresaConfig) {
+  return [empresa.direccion, empresa.ciudad, empresa.provincia].filter(Boolean).join(", ");
+}
+
+export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empresa }: Props) {
   const groups = groupByCategory(trabajos);
   const repuestoGroups = groupRepuestosByCategory(repuestos);
   const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio, 0);
   const totalRepuestos = repuestos.reduce((sum, r) => sum + r.total, 0);
   const totalGeneral = totalTrabajos + totalRepuestos;
+  const companyLocation = buildCompanyLocation(empresa);
 
   const allRows: Array<
     | { type: "category"; nombre: string }
@@ -263,19 +270,29 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl }: Prop
 
   return (
     <Document
-      title={`Presupuesto #${trabajo.numero_trabajo} - Recticar`}
-      author="Recticar"
+      title={`Presupuesto #${trabajo.numero_trabajo} - ${empresa.nombre}`}
+      author={empresa.nombre}
     >
       <Page size="A4" style={styles.page}>
         {/* HEADER */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.companyName}>Recticar</Text>
-            <Text style={styles.companyTagline}>Rectificación de motores</Text>
-            <Text style={styles.companyMeta}>Tel: 02800 443-6272</Text>
-            <Text style={styles.companyMeta}>
-              Cadfan Hughes 164, U9100 Trelew, Chubut
-            </Text>
+            <Text style={styles.companyName}>{empresa.nombre}</Text>
+            {empresa.tagline ? (
+              <Text style={styles.companyTagline}>{empresa.tagline}</Text>
+            ) : null}
+            {empresa.telefono ? (
+              <Text style={styles.companyMeta}>Tel: {empresa.telefono}</Text>
+            ) : null}
+            {empresa.email ? (
+              <Text style={styles.companyMeta}>{empresa.email}</Text>
+            ) : null}
+            {companyLocation ? (
+              <Text style={styles.companyMeta}>{companyLocation}</Text>
+            ) : null}
+            {empresa.cuit ? (
+              <Text style={styles.companyMeta}>CUIT: {empresa.cuit}</Text>
+            ) : null}
           </View>
           <View style={styles.headerRight}>
             <View style={styles.headerInfo}>
@@ -509,7 +526,10 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl }: Prop
 
         {/* FOOTER */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>Recticar — Rectificación de motores</Text>
+          <Text style={styles.footerText}>
+            {empresa.nombre}
+            {empresa.tagline ? ` — ${empresa.tagline}` : ""}
+          </Text>
           <Text style={styles.footerText}>
             Presupuesto #{trabajo.numero_trabajo} · {formatDate(trabajo.fecha_creacion)}
           </Text>
