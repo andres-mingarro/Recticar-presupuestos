@@ -562,12 +562,6 @@ Total de variables root relevadas: **88**
 - Archivos:
   - 2x en `src/components/ui/Button/Button.tsx`
 
-## --color-border-light
-
-- Usos totales: **1**
-- Archivos:
-  - 1x en `src/components/forms/TrabajoForm/TrabajoItemCard.module.scss`
-
 ## --color-danger-border
 
 - Usos totales: **1**

@@ -34,7 +34,7 @@ export function TrabajoItemCard({
       htmlFor={inputId}
       className={cn(
         "TrabajoItemCard rounded-xl px-4 py-3 text-sm ",
-        checked ? "text-white" : "text-[var(--text-color-defult)]",
+        checked ? "text-[var(--text-color-defult)]" : "text-[var(--text-color-defult)]",
         styles.TrabajoItemCard,
         checked ? styles.TrabajoItemCardChecked : styles.TrabajoItemCardUnchecked,
         className

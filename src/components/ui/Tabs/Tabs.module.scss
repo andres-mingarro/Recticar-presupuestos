@@ -1,52 +1,5 @@
 .Tabs {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.25rem;
-  padding-inline: 1rem;
-}
-
-.TabsExpanded {
-  width: 100%;
 }
 
 .TabsButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: 1px solid transparent;
-  border-bottom: 0;
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
-  padding: 0.9rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  transition:
-    color 160ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease;
-}
-
-.TabsButton :global(.Icon) {
-  width: 1.35rem;
-  height: 1.35rem;
-}
-
-.TabsButtonExpanded {
-  flex: 1 1 0;
-}
-
-.TabsButtonActive {
-  border-color: var(--color-border);
-  background: white;
-  color: var(--color-accent);
-}
-
-.TabsButtonInactive {
-  background: var(--color-surface-alt);
-  color: var(--text-color-gray);
-}
-
-.TabsButtonInactive:hover {
-  color: var(--text-color-defult);
 }

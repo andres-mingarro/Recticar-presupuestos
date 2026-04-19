@@ -110,7 +110,7 @@ function RepuestoGrupoAccordion({
     <details
       open={open}
       onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
-      className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4")}
+      className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--gray-20)] p-4")}
     >
       <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--text-color-defult)]")}>
         <span>{categoriaNombre}</span>
@@ -521,7 +521,7 @@ export function TrabajoForm({
                     <details
                       key={grupo.categoriaId}
                       open={hasSelected}
-                      className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4")}
+                      className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--gray-20)] p-4")}
                     >
                       <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--text-color-defult)]")}>
                         <span>{grupo.categoriaNombre}</span>
@@ -589,7 +589,7 @@ export function TrabajoForm({
                                 onChange={(event) =>
                                   setPrecioUnitario(repuesto.id, Number(event.target.value))
                                 }
-                                className="text-right h-8 lg:h-11 lg:min-w-[88px] h-[33px]"
+                                className="text-right border-dark h-8 lg:h-11 lg:min-w-[88px] h-[33px]"
                               />
                               <Incrementor
                                 value={selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
