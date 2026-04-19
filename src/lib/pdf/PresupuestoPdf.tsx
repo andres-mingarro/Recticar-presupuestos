@@ -201,16 +201,17 @@ function formatDate(value: string | null | undefined) {
 
 function groupByCategory(trabajos: TrabajoDetalleItem[]) {
   const map = new Map<
-    number,
+    string,
     { nombre: string; items: TrabajoDetalleItem[] }
   >();
 
   for (const t of trabajos) {
-    const group = map.get(t.categoriaId);
+    const groupKey = t.categoriaId === null ? `snapshot:${t.categoriaNombre}` : String(t.categoriaId);
+    const group = map.get(groupKey);
     if (group) {
       group.items.push(t);
     } else {
-      map.set(t.categoriaId, { nombre: t.categoriaNombre, items: [t] });
+      map.set(groupKey, { nombre: t.categoriaNombre, items: [t] });
     }
   }
 

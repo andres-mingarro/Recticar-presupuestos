@@ -303,3 +303,41 @@ export function BusinessDaysBadge({ days }: { days: number }) {
     </span>
   );
 }
+
+export function ListPriceBadge({
+  lista,
+  value,
+  label,
+  hideLabelOnMobile = false,
+  className,
+}: {
+  lista: 1 | 2 | 3;
+  value?: string;
+  label?: string;
+  hideLabelOnMobile?: boolean;
+  className?: string;
+}) {
+  const tones: Record<1 | 2 | 3, string> = {
+    1: "border-[var(--color-neutral-border)] bg-[var(--color-neutral-bg)] text-[var(--color-neutral-text-strong)]",
+    2: "border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]",
+    3: "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success-text-strong)]",
+  };
+
+  return (
+    <span
+      className={cn(
+        "ListPriceBadge",
+        "Badge",
+        styles.Badge,
+        "inline-flex min-w-[128px] items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold",
+        tones[lista],
+        className
+      )}
+    >
+      <span className={cn("opacity-60", hideLabelOnMobile && "hidden md:inline")}>
+        {label ?? `L${lista}`}
+      </span>
+      {value ? <span className="ml-auto text-right">{value}</span> : null}
+    </span>
+  );
+}

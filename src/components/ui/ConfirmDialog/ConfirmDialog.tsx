@@ -39,13 +39,18 @@ export function ConfirmDialog({
         {description && (
           <p className="px-5 py-4 text-sm text-[var(--text-color-gray)]">{description}</p>
         )}
-        <DialogFooter>
-          <Button variant="outline-dark" className="flex-1" onClick={() => onOpenChange(false)} disabled={loading}>
+        <DialogFooter className="items-stretch">
+          <Button
+            variant="outline-dark"
+            className="h-auto min-h-11 flex-1 whitespace-normal px-3 py-2 text-center leading-5"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             {cancelLabel}
           </Button>
           <Button
             variant="dark"
-            className="flex-1"
+            className="h-auto min-h-11 flex-1 whitespace-normal px-3 py-2 text-center leading-5"
             onClick={onConfirm}
             disabled={loading}
             icon={loading ? undefined : <Icon name="trash" className="h-4 w-4" />}

@@ -10,7 +10,7 @@ Total de variables root relevadas: **88**
 - Usos totales: **124**
 - Archivos:
   - 8x en `src/components/ui/TrabajoDatosCard/TrabajoDatosCard.tsx`
-  - 7x en `src/components/pages/InformacionTecnicaPage/components/ContentCard.tsx`
+  - 7x en `src/components/pages/InformacionTecnicaPage/components/HeaderTable.tsx`
   - 7x en `src/components/pages/PreciosPage/PreciosPage.tsx`
   - 7x en `src/components/search/ClienteAutocomplete/ClienteAutocomplete.tsx`
   - 6x en `src/components/pages/TrabajosPage/TrabajosPage.tsx`
@@ -60,7 +60,7 @@ Total de variables root relevadas: **88**
 - Archivos:
   - 14x en `src/components/ui/Button/Button.tsx`
   - 7x en `src/components/forms/TrabajoForm/TrabajoForm.tsx`
-  - 7x en `src/components/pages/InformacionTecnicaPage/components/ContentCard.tsx`
+  - 7x en `src/components/pages/InformacionTecnicaPage/components/HeaderTable.tsx`
   - 7x en `src/components/pages/PreciosPage/PreciosPage.tsx`
   - 6x en `src/components/pages/TrabajosPage/TrabajosPage.tsx`
   - 5x en `src/components/pages/RepuestosPage/components/CategoriaCard.tsx`
@@ -129,7 +129,7 @@ Total de variables root relevadas: **88**
   - 1x en `src/components/forms/TrabajoForm/TrabajoItemCard.tsx`
   - 1x en `src/components/layout/AppShell/AppShell.module.scss`
   - 1x en `src/components/layout/Date/Date.module.scss`
-  - 1x en `src/components/pages/InformacionTecnicaPage/components/ContentCard.tsx`
+  - 1x en `src/components/pages/InformacionTecnicaPage/components/HeaderTable.tsx`
   - 1x en `src/components/pages/InformacionTecnicaPage/components/SectionTabs.tsx`
   - 1x en `src/components/pages/NuevoClientePage/NuevoClientePage.tsx`
   - 1x en `src/components/pages/RepuestosPage/components/DragHandle.tsx`
@@ -156,7 +156,7 @@ Total de variables root relevadas: **88**
 - Usos totales: **99**
 - Archivos:
   - 8x en `src/components/pages/ClienteDetailPage/ClienteDetailPage.module.scss`
-  - 8x en `src/components/pages/InformacionTecnicaPage/components/ContentCard.tsx`
+  - 8x en `src/components/pages/InformacionTecnicaPage/components/HeaderTable.tsx`
   - 6x en `src/components/pages/PreciosPage/PreciosPage.tsx`
   - 5x en `src/app/(app)/admin/usuarios/UsuariosClient.tsx`
   - 5x en `src/components/feedback/ErrorState/ErrorState.tsx`
@@ -207,7 +207,7 @@ Total de variables root relevadas: **88**
 
 - Usos totales: **41**
 - Archivos:
-  - 4x en `src/components/pages/InformacionTecnicaPage/components/ContentCard.tsx`
+  - 4x en `src/components/pages/InformacionTecnicaPage/components/HeaderTable.tsx`
   - 3x en `src/components/pages/ClientesPage/ClientesPage.tsx`
   - 3x en `src/components/pages/PreciosPage/PreciosPage.tsx`
   - 3x en `src/components/pages/TrabajosPage/TrabajosPage.tsx`

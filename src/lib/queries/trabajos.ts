@@ -15,6 +15,13 @@ type TrabajoFilters = {
   numeroTrabajo?: number;
 };
 
+type TrabajoCatalogSnapshot = {
+  trabajoId: number;
+  categoriaNombreSnapshot: string;
+  trabajoNombreSnapshot: string;
+  precioSnapshot: number;
+};
+
 type TrabajoListRow = Omit<
   TrabajoListItem,
   "marca_nombre" | "modelo_nombre" | "motor_nombre"
@@ -42,6 +49,47 @@ function normalizeLegacyTrabajoEstado<T extends {
     estado: "presupuesto_entregado",
     fecha_presupuesto_entregado: row.fecha_presupuesto_entregado ?? row.fecha_creacion,
   };
+}
+
+async function getTrabajoCatalogSnapshots(
+  trabajosIds: number[],
+  listaPrecios: 1 | 2 | 3
+): Promise<TrabajoCatalogSnapshot[]> {
+  if (trabajosIds.length === 0) return [];
+
+  const precioCol =
+    listaPrecios === 3 ? "t.precio_lista_3" : listaPrecios === 2 ? "t.precio_lista_2" : "t.precio_lista_1";
+
+  const rows = await queryRows<{
+    trabajo_id: number;
+    categoria_nombre_snapshot: string;
+    trabajo_nombre_snapshot: string;
+    precio_snapshot: number;
+  }>(
+    `
+      SELECT
+        t.id AS trabajo_id,
+        c.nombre AS categoria_nombre_snapshot,
+        t.nombre AS trabajo_nombre_snapshot,
+        ${precioCol} AS precio_snapshot
+      FROM trabajos t
+      INNER JOIN categorias_trabajo c ON c.id = t.categoria_id
+      WHERE t.id = ANY($1::int[])
+      ORDER BY array_position($1::int[], t.id)
+    `,
+    [trabajosIds]
+  );
+
+  if (rows.length !== trabajosIds.length) {
+    throw new Error("Uno o más trabajos del catálogo ya no existen.");
+  }
+
+  return rows.map((row) => ({
+    trabajoId: row.trabajo_id,
+    categoriaNombreSnapshot: row.categoria_nombre_snapshot,
+    trabajoNombreSnapshot: row.trabajo_nombre_snapshot,
+    precioSnapshot: Number(row.precio_snapshot),
+  }));
 }
 
 export async function listTrabajos(filters: TrabajoFilters = {}) {
@@ -183,7 +231,7 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
         p.observaciones,
         p.lista_precio,
         (
-          SELECT array_agg(pt.trabajo_id ORDER BY pt.trabajo_id)
+          SELECT array_agg(pt.trabajo_id ORDER BY pt.trabajo_id) FILTER (WHERE pt.trabajo_id IS NOT NULL)
           FROM orden_trabajo_trabajos pt
           WHERE pt.orden_trabajo_id = p.id
         ) AS trabajos_ids,
@@ -246,6 +294,7 @@ export async function updateTrabajo(
   const modeloId = input.modeloId ? Number(input.modeloId) : null;
   const motorId = input.motorId ? Number(input.motorId) : null;
   const trabajosIds = input.trabajosIds.map(Number);
+  const trabajoSnapshots = await getTrabajoCatalogSnapshots(trabajosIds, input.listaPrecios);
   const repuestosIds = input.repuestos.map((r) => Number(r.repuestoId));
   const precios = input.repuestos.map((r) => r.precioUnitario);
   const cantidades = input.repuestos.map((r) => r.cantidad);
@@ -289,10 +338,25 @@ export async function updateTrabajo(
             AND repuesto_id != ALL($14::int[])
         ),
         ins_trabajos AS (
-          INSERT INTO orden_trabajo_trabajos (orden_trabajo_id, trabajo_id)
-          SELECT (SELECT id FROM upd), unnest($13::int[])
+          INSERT INTO orden_trabajo_trabajos (
+            orden_trabajo_id,
+            trabajo_id,
+            categoria_nombre_snapshot,
+            trabajo_nombre_snapshot,
+            precio_snapshot
+          )
+          SELECT
+            (SELECT id FROM upd),
+            unnest($13::int[]),
+            unnest($17::text[]),
+            unnest($18::text[]),
+            unnest($19::numeric[])
           WHERE (SELECT id FROM upd) IS NOT NULL
-          ON CONFLICT DO NOTHING
+          ON CONFLICT (orden_trabajo_id, trabajo_id) DO UPDATE
+            SET
+              categoria_nombre_snapshot = EXCLUDED.categoria_nombre_snapshot,
+              trabajo_nombre_snapshot = EXCLUDED.trabajo_nombre_snapshot,
+              precio_snapshot = EXCLUDED.precio_snapshot
         ),
         ins_repuestos AS (
           INSERT INTO orden_trabajo_repuestos (orden_trabajo_id, repuesto_id, precio, cantidad)
@@ -324,6 +388,9 @@ export async function updateTrabajo(
       repuestosIds,
       precios,
       cantidades,
+      trabajoSnapshots.map((item) => item.categoriaNombreSnapshot),
+      trabajoSnapshots.map((item) => item.trabajoNombreSnapshot),
+      trabajoSnapshots.map((item) => item.precioSnapshot),
     ]
   );
 
@@ -337,6 +404,8 @@ export async function createTrabajo(input: TrabajoFormValues) {
   const marcaId = input.marcaId ? Number(input.marcaId) : null;
   const modeloId = input.modeloId ? Number(input.modeloId) : null;
   const motorId = input.motorId ? Number(input.motorId) : null;
+  const trabajosIds = input.trabajosIds.map(Number);
+  const trabajoSnapshots = await getTrabajoCatalogSnapshots(trabajosIds, input.listaPrecios);
   const fechaAprobacion =
     input.estado === "aprobado" ? new Date().toISOString() : null;
   const fechaPresupuestoEntregado =
@@ -380,17 +449,35 @@ export async function createTrabajo(input: TrabajoFormValues) {
     return null;
   }
 
-  if (input.trabajosIds.length > 0) {
-    const valuesSql = input.trabajosIds
-      .map((trabajoCatalogoId) => `(${trabajoId}, ${Number(trabajoCatalogoId)})`)
-      .join(", ");
-
+  if (trabajoSnapshots.length > 0) {
     await queryRows(
       `
-        INSERT INTO orden_trabajo_trabajos (orden_trabajo_id, trabajo_id)
-        VALUES ${valuesSql}
-        ON CONFLICT (orden_trabajo_id, trabajo_id) DO NOTHING
-      `
+        INSERT INTO orden_trabajo_trabajos (
+          orden_trabajo_id,
+          trabajo_id,
+          categoria_nombre_snapshot,
+          trabajo_nombre_snapshot,
+          precio_snapshot
+        )
+        SELECT
+          $1,
+          unnest($2::int[]),
+          unnest($3::text[]),
+          unnest($4::text[]),
+          unnest($5::numeric[])
+        ON CONFLICT (orden_trabajo_id, trabajo_id) DO UPDATE
+          SET
+            categoria_nombre_snapshot = EXCLUDED.categoria_nombre_snapshot,
+            trabajo_nombre_snapshot = EXCLUDED.trabajo_nombre_snapshot,
+            precio_snapshot = EXCLUDED.precio_snapshot
+      `,
+      [
+        trabajoId,
+        trabajoSnapshots.map((item) => item.trabajoId),
+        trabajoSnapshots.map((item) => item.categoriaNombreSnapshot),
+        trabajoSnapshots.map((item) => item.trabajoNombreSnapshot),
+        trabajoSnapshots.map((item) => item.precioSnapshot),
+      ]
     );
   }
 
@@ -412,6 +499,47 @@ export async function createTrabajo(input: TrabajoFormValues) {
   }
 
   return trabajoId;
+}
+
+export async function refreshTrabajoSnapshotPrices(id: number) {
+  const rows = await queryRows<{ updated_count: number }>(
+    `
+      WITH snapshot_source AS (
+        SELECT
+          ott.orden_trabajo_id,
+          ott.trabajo_id,
+          c.nombre AS categoria_nombre_snapshot,
+          t.nombre AS trabajo_nombre_snapshot,
+          CASE ot.lista_precio
+            WHEN 3 THEN t.precio_lista_3
+            WHEN 2 THEN t.precio_lista_2
+            ELSE t.precio_lista_1
+          END AS precio_snapshot
+        FROM orden_trabajo_trabajos ott
+        INNER JOIN ordenes_trabajo ot ON ot.id = ott.orden_trabajo_id
+        INNER JOIN trabajos t ON t.id = ott.trabajo_id
+        INNER JOIN categorias_trabajo c ON c.id = t.categoria_id
+        WHERE ott.orden_trabajo_id = $1
+          AND ott.trabajo_id IS NOT NULL
+      ),
+      upd AS (
+        UPDATE orden_trabajo_trabajos ott
+        SET
+          categoria_nombre_snapshot = src.categoria_nombre_snapshot,
+          trabajo_nombre_snapshot = src.trabajo_nombre_snapshot,
+          precio_snapshot = src.precio_snapshot
+        FROM snapshot_source src
+        WHERE ott.orden_trabajo_id = src.orden_trabajo_id
+          AND ott.trabajo_id = src.trabajo_id
+        RETURNING 1
+      )
+      SELECT COUNT(*)::int AS updated_count
+      FROM upd
+    `,
+    [id]
+  );
+
+  return rows[0]?.updated_count ?? 0;
 }
 
 export async function listTrabajosByCliente(clienteId: number) {

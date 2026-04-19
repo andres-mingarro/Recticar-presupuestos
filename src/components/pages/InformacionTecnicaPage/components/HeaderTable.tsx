@@ -14,7 +14,7 @@ const SECTION_LABELS: Record<TechnicalSection, string> = {
   vehiculos: "Vehículos",
 };
 
-export function ContentCard({
+export function HeaderTable({
   section,
   count,
   q,
@@ -48,24 +48,30 @@ export function ContentCard({
   tabsSlot?: React.ReactNode;
 }) {
   return (
-    <Card as="section" className="overflow-hidden p-0">
+    <Card as="section" className="HeaderTable overflow-hidden p-0">
       {/* ── Toolbar ── */}
-      <div className="flex flex-col gap-0 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)]">
+      <div className="toolbar flex flex-col gap-0 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)]">
         {/* Row 1: título + tabs */}
-        <div className="flex items-center gap-2 px-3 py-2">
-          <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
-          <span className="text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
-            {SECTION_LABELS[section]}
-          </span>
-          <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
-            {count}
-          </span>
-          {tabsSlot && (
-            <>
-              <Divider orientation="vertical" className="h-5" />
-              {tabsSlot}
-            </>
-          )}
+        <div className="toolbar-inner flex lg:flex-row flex-col items-center gap-2 px-3 py-2">
+          <div className="toolbar-header">
+            <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+            <span className="text-lg lg:text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
+              {SECTION_LABELS[section]}
+            </span>
+            <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
+              {count}
+            </span>
+          </div>
+          <div className="toolbar-footer">
+            {tabsSlot && (
+              <>
+                <Divider orientation="vertical" className="h-5" />
+                {tabsSlot}
+              </>
+            )}
+          </div>
+
+
         </div>
 
         {/* Row 2: búsqueda + paginación */}

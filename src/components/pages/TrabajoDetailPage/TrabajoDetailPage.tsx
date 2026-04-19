@@ -36,6 +36,7 @@ import { useCobrado } from "@/components/ui/CobradoToggle/CobradoContext";
 import { TrabajoDatosCard } from "@/components/ui/TrabajoDatosCard";
 import { PrintButton } from "./PrintButton";
 import styles from "./TrabajoDetailPage.module.scss";
+import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 
 type TrabajoDetailPageProps = {
   trabajo: TrabajoDetail;
@@ -53,6 +54,11 @@ type TrabajoDetailPageProps = {
   trabajos: TrabajoAgrupado[];
   repuestos: RepuestoAgrupado[];
   qrSvg: string;
+  snapshotTrabajos: TrabajoDetalleItem[];
+  refreshSnapshotPricesAction: (
+    state: { error: string | null; success: boolean; updatedCount: number },
+    formData: FormData
+  ) => Promise<{ error: string | null; success: boolean; updatedCount: number }>;
 };
 
 export function TrabajoDetailPage({
@@ -68,6 +74,8 @@ export function TrabajoDetailPage({
   trabajos,
   repuestos,
   qrSvg,
+  snapshotTrabajos,
+  refreshSnapshotPricesAction,
 }: TrabajoDetailPageProps) {
   const formId = `trabajo-form-${trabajo.id}`;
   const [formState, formAction, isPending] = useActionState(action, initialState);
@@ -273,12 +281,14 @@ export function TrabajoDetailPage({
             <PrintButton />
           </Card>
 
-          <TrabajoDetailSummaryCard
-            estado={selectedEstado}
-            trabajo={trabajo}
-            trabajos={trabajos}
-            repuestos={repuestos}
-          />
+            <TrabajoDetailSummaryCard
+              estado={selectedEstado}
+              trabajo={trabajo}
+              trabajos={trabajos}
+              repuestos={repuestos}
+              snapshotTrabajos={snapshotTrabajos}
+              refreshSnapshotPricesAction={refreshSnapshotPricesAction}
+            />
 
           <TrabajoClienteSection
             initialClienteId={initialState.values.clienteId}
@@ -312,11 +322,18 @@ function TrabajoDetailSummaryCard({
   trabajo,
   trabajos,
   repuestos,
+  snapshotTrabajos,
+  refreshSnapshotPricesAction,
 }: {
   estado: TrabajoDetail["estado"];
   trabajo: TrabajoDetail;
   trabajos: TrabajoAgrupado[];
   repuestos: RepuestoAgrupado[];
+  snapshotTrabajos: TrabajoDetalleItem[];
+  refreshSnapshotPricesAction: (
+    state: { error: string | null; success: boolean; updatedCount: number },
+    formData: FormData
+  ) => Promise<{ error: string | null; success: boolean; updatedCount: number }>;
 }) {
   const { cobrado } = useCobrado();
   const { prioridad } = usePrioridad();
@@ -334,6 +351,8 @@ function TrabajoDetailSummaryCard({
       fechaAprobacion={trabajo.fecha_aprobacion}
       trabajos={trabajos}
       repuestos={repuestos}
+      snapshotTrabajos={snapshotTrabajos}
+      refreshSnapshotPricesAction={refreshSnapshotPricesAction}
     />
   );
 }

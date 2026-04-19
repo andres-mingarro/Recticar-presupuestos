@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { toast } from "sonner";
 import type { TrabajoAgrupado } from "@/lib/types";
 import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { cn } from "@/lib/cn";
@@ -10,24 +11,19 @@ import { formatPrice } from "@/lib/format";
 import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button, buttonStyles } from "@/components/ui/Button";
+import { ListPriceBadge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { Divider } from "@/components/ui/Divider";
 import { EngineIcons, EngineIconGlyph, isEngineIconName, type EngineIconName } from "@/components/ui/EngineIcons";
 import { Icon } from "@/components/ui/Icon";
 import { SortableList } from "@/components/sortable/SortableList";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Incrementor } from "@/components/ui/Incrementor";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 // ─── Category card ────────────────────────────────────────────────────────────
 
 type Trabajo = TrabajoAgrupado["trabajos"][number];
-
-const LISTA_COLORS = [
-  "bg-[var(--color-info-bg)] text-[var(--color-info-text-strong)] border-[var(--color-info-border)]",
-  "bg-[var(--color-violet-bg)] text-[var(--color-violet-text)] border-[var(--color-violet-border)]",
-  "bg-[var(--color-success-bg)] text-[var(--color-success-text-strong)] border-[var(--color-success-border)]",
-];
 
 function formatPrecio(value: number | null | undefined) {
   return formatPrice(value ?? 0);
@@ -90,89 +86,109 @@ function SortableTrabajoRow({
     preciosDraft?.precioLista3 ?? trabajo.precioLista3,
   ];
   const names = ["precio_lista_1", "precio_lista_2", "precio_lista_3"];
+  const mobileListLabels = ["Precios lista 1", "Precios lista 2", "Precios lista 3"];
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-3 px-5 py-3",
+        "precios-item-row flex flex-col md:flex-row items-start md:items-center gap-3 px-5 py-3",
         index % 2 === 1 && "bg-[var(--color-surface-alt)]/40",
         isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
       )}
     >
-      <DragHandle {...attributes} {...listeners} />
-
-      <input
-        form={formId}
-        type="text"
-        name={`nombre_${trabajo.id}`}
-        defaultValue={trabajo.nombre}
-        disabled={!isEditing}
-        tabIndex={isEditing ? -1 : undefined}
-        required
-        className={cn(
-          "flex-1 rounded-lg px-2 py-1 text-sm text-[var(--text-color-defult)] transition",
-          isEditing
-            ? "border border-[var(--color-border)] bg-[var(--color-surface)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
-            : "border border-transparent bg-transparent font-medium"
+      <div className="precios-item-row-header flex w-full gap-2">
+        <DragHandle {...attributes} {...listeners} />
+        <input
+          form={formId}
+          type="text"
+          name={`nombre_${trabajo.id}`}
+          defaultValue={trabajo.nombre}
+          disabled={!isEditing}
+          tabIndex={isEditing ? -1 : undefined}
+          required
+          className={cn(
+            "flex-1 w-full rounded-lg px-2 py-1 text-sm text-[var(--text-color-defult)] transition",
+            isEditing
+              ? "border border-[var(--color-border)] bg-[var(--color-surface)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+              : "border border-transparent bg-transparent font-medium"
+          )}
+        />
+        {isEditing && (
+          <div className="md:hidden">
+            <DeleteItemForm
+              itemId={trabajo.id}
+              idFieldName="trabajoId"
+              title="Eliminar trabajo"
+              action={deleteTrabajoAction}
+            />
+          </div>
         )}
-      />
-
-      <div className="flex shrink-0 items-center gap-2">
-        {precios.map((precio, i) =>
-          isEditing ? (
-            <div key={i} className="relative">
-              <input
-                form={formId}
-                type="hidden"
-                name={`${names[i]}_${trabajo.id}`}
-                value={precio ?? 0}
-              />
-              <input
-                type="text"
-                value={formatPrecioInput(precio ?? 0)}
-                inputMode="numeric"
-                onChange={(event) =>
-                  onPrecioChange(
-                    trabajo.id,
-                    (i + 1) as 1 | 2 | 3,
-                    parsePrecioInput(event.target.value)
-                  )
-                }
-                className="w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
-              />
-            </div>
-          ) : (
-            <span
-              key={i}
-              className={cn(
-                "inline-flex min-w-[128px] items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold",
-                LISTA_COLORS[i]
-              )}
-            >
-              <span className="opacity-60">L{i + 1}</span>
-              <span className="ml-auto text-right">{formatPrecio(precio)}</span>
-            </span>
-          )
-        )}
+      </div>
+      <div className="precios-item-row-footer w-full md:w-auto">
+        <div className="flex flex-col md:flex-row w-full  md:w-auto items-hrink-0 items-end md:items-center gap-2">
+          {precios.map((precio, i) =>
+            isEditing ? (
+              <div key={i} className="flex w-full items-center justify-between gap-3 md:w-auto">
+                <span className="text-sm font-medium text-[var(--text-color-gray)] md:hidden">
+                  {mobileListLabels[i]}
+                </span>
+                <div className="relative">
+                  <input
+                    form={formId}
+                    type="hidden"
+                    name={`${names[i]}_${trabajo.id}`}
+                    value={precio ?? 0}
+                  />
+                  <input
+                    type="text"
+                    value={formatPrecioInput(precio ?? 0)}
+                    inputMode="numeric"
+                    onChange={(event) =>
+                      onPrecioChange(
+                        trabajo.id,
+                        (i + 1) as 1 | 2 | 3,
+                        parsePrecioInput(event.target.value)
+                      )
+                    }
+                    className="w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div key={i} className="flex w-full items-center justify-between gap-3 md:w-auto">
+                <span className="text-sm font-medium text-[var(--text-color-gray)] md:hidden">
+                  {mobileListLabels[i]}
+                </span>
+                <ListPriceBadge
+                  lista={(i + 1) as 1 | 2 | 3}
+                  value={formatPrecio(precio)}
+                  hideLabelOnMobile
+                />
+              </div>
+            )
+          )}
+        </div>
       </div>
 
       {isEditing && (
-        <DeleteItemForm
-          itemId={trabajo.id}
-          idFieldName="trabajoId"
-          title="Eliminar trabajo"
-          action={deleteTrabajoAction}
-        />
+        <div className="hidden md:block">
+          <DeleteItemForm
+            itemId={trabajo.id}
+            idFieldName="trabajoId"
+            title="Eliminar trabajo"
+            action={deleteTrabajoAction}
+          />
+        </div>
       )}
+
     </div>
   );
 }
 
 function CategoriaCard({
   grupo,
-  renameCategoriaAction,
   deleteCategoriaAction,
   createTrabajoAction,
   deleteTrabajoAction,
@@ -180,7 +196,6 @@ function CategoriaCard({
   updateCategoriaAction,
 }: {
   grupo: TrabajoAgrupado;
-  renameCategoriaAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
   deleteCategoriaAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
   createTrabajoAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
   deleteTrabajoAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
@@ -189,7 +204,10 @@ function CategoriaCard({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const lastToastKeyRef = useRef<string | null>(null);
+  const deleteFormRef = useRef<HTMLFormElement>(null);
   const [engineIconsOpen, setEngineIconsOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ajustesPorcentaje, setAjustesPorcentaje] = useState<Record<1 | 2 | 3, number>>({
     1: 0,
     2: 0,
@@ -202,7 +220,6 @@ function CategoriaCard({
     Record<number, { precioLista1: number; precioLista2: number; precioLista3: number }>
   >({});
 
-  const [renameState, renameFormAction, renamePending] = useActionState(renameCategoriaAction, { error: null });
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteCategoriaAction, { error: null });
   const [addState, addFormAction, addPending] = useActionState(createTrabajoAction, { error: null, resetKey: 0 });
   const [saveState, saveFormAction, savePending] = useActionState(updateCategoriaAction, { error: null });
@@ -210,6 +227,16 @@ function CategoriaCard({
   useEffect(() => {
     if (saveState.success) setIsEditing(false);
   }, [saveState]);
+
+  useEffect(() => {
+    if (!saveState.success) return;
+
+    const toastKey = `precios-saved-${grupo.categoriaId}`;
+    if (lastToastKeyRef.current === toastKey) return;
+    lastToastKeyRef.current = toastKey;
+
+    toast.success(`Cambios guardados en "${grupo.categoriaNombre}".`);
+  }, [saveState.success, grupo.categoriaId, grupo.categoriaNombre]);
 
   useEffect(() => {
     setPrecioDrafts(
@@ -306,7 +333,7 @@ function CategoriaCard({
   }
 
   return (
-    <Card as="section" className="space-y-0 overflow-hidden p-0">
+    <Card as="section" className=" HeaderTable space-y-0 overflow-hidden p-0">
       {/* Save form — hidden anchor, inputs reference it via form={formId} */}
       <form id={formId} action={saveFormAction} className="hidden">
         <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
@@ -314,132 +341,115 @@ function CategoriaCard({
       </form>
 
       {/* ── Toolbar ── */}
-      <div className="flex items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2">
+      {/* ── Toolbar mobile: 2 filas / desktop: 1 fila ── */}
+      <div className="toolbar flex flex-col border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] md:flex-row md:items-center md:gap-2 md:px-3 md:py-2">
 
-        {/* Nombre de categoría */}
-        <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          {categoriaIcono ? (
-            <EngineIconGlyph
-              name={categoriaIcono}
-              className="h-8 w-8 shrink-0 text-[var(--text-color-defult)]"
-            />
+        {/* Fila 1 (mobile) / izquierda (desktop): ícono + nombre + contador */}
+        <div className="flex items-center gap-2 px-3 py-2 md:min-w-0 md:flex-1 md:p-0">
+          {isEditing ? (
+            <button
+              type="button"
+              onClick={() => setEngineIconsOpen(true)}
+              title={categoriaIcono ? "Cambiar imagen" : "Asignar imagen"}
+              className="h-8 w-8 shrink-0 rounded-lg border border-dashed border-[var(--color-border)] flex items-center justify-center text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+            >
+              {categoriaIcono ? (
+                <EngineIconGlyph name={categoriaIcono} className="h-8 w-8 text-[var(--text-color-defult)]" />
+              ) : (
+                <Icon name="plus" className="h-3.5 w-3.5" />
+              )}
+            </button>
+          ) : categoriaIcono ? (
+            <EngineIconGlyph name={categoriaIcono} className="h-8 w-8 shrink-0 text-[var(--text-color-defult)]" />
           ) : (
             <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
           )}
           {isEditing ? (
-            <form action={renameFormAction} className="flex min-w-0 flex-1 items-center gap-1" key={grupo.categoriaNombre}>
-              <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
-              <input
-                type="text"
-                name="nombre"
-                defaultValue={grupo.categoriaNombre}
-                required
-                className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
-              />
-              <button
-                type="submit"
-                disabled={renamePending}
-                title="Guardar nombre"
-                className="rounded-lg p-1.5 text-[var(--text-color-gray)] transition hover:bg-[var(--color-success-bg)] hover:text-[var(--color-success-text)] disabled:opacity-40"
-              >
-                {renamePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
-              </button>
-            </form>
+            <input
+              form={formId}
+              type="text"
+              name="nombre"
+              defaultValue={grupo.categoriaNombre}
+              required
+              className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+            />
           ) : (
-            <span className="text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
+            <span className="flex-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
               {grupo.categoriaNombre}
             </span>
           )}
+          <span className="hidden md:flex shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
+            {grupo.trabajos.length} {grupo.trabajos.length === 1 ? "trabajo" : "trabajos"}
+          </span>
         </div>
 
-        {/* Separador */}
-        <Divider orientation="vertical" className="h-5" />
-
-        {isEditing ? (
-          <>
+        {/* Fila 2 (mobile) / derecha (desktop): acciones */}
+        <div className="flex items-center gap-1.5 border-t border-[var(--color-border)] px-3 py-2 md:shrink-0 md:border-t-0 md:p-0">
+          {isEditing ? (
+            <>
+              <PulsatingButton
+                form={formId}
+                type="submit"
+                size="sm"
+                pulsing={!savePending}
+                disabled={savePending}
+                className="flex items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
+              >
+                {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
+                {savePending ? "Guardando…" : "Guardar"}
+              </PulsatingButton>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline-dark"
+                onClick={handleCancel}
+                icon={<Icon name="x" className="h-3.5 w-3.5" />}
+              >
+                Cancelar
+              </Button>
+              <form ref={deleteFormRef} action={deleteFormAction}>
+                <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={deletePending}
+                  title="Eliminar categoría"
+                  className="rounded-lg p-1.5 text-[var(--text-color-gray)] transition hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] disabled:opacity-40"
+                  onClick={() => setDeleteDialogOpen(true)}
+                  icon={<Icon name="trash" className="h-4 w-4" />}
+                />
+              </form>
+              <ConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                title="¿Eliminar categoría?"
+                description={`Vas a eliminar "${grupo.categoriaNombre}" y todos sus trabajos. Esta acción no se puede deshacer.`}
+                confirmLabel="Eliminar categoría"
+                loading={deletePending}
+                onConfirm={() => {
+                  setDeleteDialogOpen(false);
+                  deleteFormRef.current?.requestSubmit();
+                }}
+              />
+            </>
+          ) : (
             <Button
               type="button"
               size="sm"
-              variant="secondary"
-              onClick={() => setEngineIconsOpen(true)}
-              className="shrink-0"
+              variant="ghost"
+              onClick={() => setIsEditing(true)}
+              icon={<Icon name="edit" className="h-3.5 w-3.5" />}
             >
-              {categoriaIcono ? "Cambiar imagen" : "Agregar imagen"}
+              Editar categoría
             </Button>
-            <Divider orientation="vertical" className="h-5" />
-          </>
-        ) : null}
-
-        {/* Contador */}
-        <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
-          {grupo.trabajos.length} {grupo.trabajos.length === 1 ? "trabajo" : "trabajos"}
-        </span>
-
-        {/* Separador */}
-        <Divider orientation="vertical" className="h-5" />
-
-        {/* Editar precios / Guardar+Cancelar */}
-        {isEditing ? (
-          <div className="flex items-center gap-1.5">
-            <PulsatingButton
-              form={formId}
-              type="submit"
-              size="sm"
-              pulsing={!savePending}
-              disabled={savePending}
-              className="flex items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
-            >
-              {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
-              {savePending ? "Guardando…" : "Guardar"}
-            </PulsatingButton>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline-dark"
-              onClick={handleCancel}
-              icon={<Icon name="x" className="h-3.5 w-3.5" />}
-            >
-              Cancelar
-            </Button>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={() => setIsEditing(true)}
-            icon={<Icon name="edit" className="h-3.5 w-3.5" />}
-          >
-            Editar categoría
-          </Button>
-        )}
-
-        {/* Eliminar categoría — solo en modo edición */}
-        {isEditing && (
-          <form
-            action={deleteFormAction}
-            onSubmit={(e) => {
-              if (!confirm(`¿Eliminar la categoría "${grupo.categoriaNombre}" y todos sus trabajos? Esta acción no se puede deshacer.`))
-                e.preventDefault();
-            }}
-          >
-            <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
-            <button
-              type="submit"
-              disabled={deletePending}
-              title="Eliminar categoría"
-              className="rounded-lg p-1.5 text-[var(--text-color-gray)] transition hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] disabled:opacity-40"
-            >
-              <Icon name="trash" className="h-4 w-4" />
-            </button>
-          </form>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Errores */}
-      {(renameState.error || deleteState.error || saveState.error) && (
+      {(deleteState.error || saveState.error) && (
         <p className="px-5 py-2 text-xs text-[var(--color-danger-text)]">
-          {renameState.error ?? deleteState.error ?? saveState.error}
+          {deleteState.error ?? saveState.error}
         </p>
       )}
 
@@ -456,15 +466,14 @@ function CategoriaCard({
           onReorder={reorderTrabajosAction}
           renderHeader={
             isEditing ? (
-              <div className="flex items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-5 py-1.5">
-                <div className="w-4" />
-                <span className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">
-                  Trabajo
+              <div className="adjust-values flex flex-col gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-5 py-2 md:flex-row md:items-center md:gap-3 md:py-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)] md:flex-1">
+                  Ajuste porcentual por lista
                 </span>
-                <div className="flex shrink-0 gap-2">
+                <div className="flex flex-wrap gap-3 md:shrink-0 md:flex-nowrap md:gap-2">
                   {[1, 2, 3].map((lista) => (
-                    <div key={lista} className="flex w-28 flex-col items-center gap-1">
-                      <span className="text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">
+                    <div key={lista} className="flex items-center gap-2 md:w-28 md:flex-col md:gap-1">
+                      <span className="w-14 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)] md:w-auto md:text-center">
                         Lista {lista}
                       </span>
                       <Incrementor
@@ -478,7 +487,6 @@ function CategoriaCard({
                     </div>
                   ))}
                 </div>
-                <div className="w-7" />
               </div>
             ) : null
           }
@@ -502,7 +510,7 @@ function CategoriaCard({
         <form
           key={addState.resetKey ?? 0}
           action={addFormAction}
-          className="flex flex-1 items-center gap-3"
+          className="flex flex-col md:flex-row flex-1 items-center gap-3"
         >
           <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
           <input
@@ -510,12 +518,12 @@ function CategoriaCard({
             name="nombre"
             placeholder="Nombre del nuevo trabajo…"
             required
-            className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-3 py-1.5 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 backdrop-blur-sm"
+            className="flex-1 w-full md:w-auto rounded-xl border border-[var(--color-info-border)] bg-white/80 px-3 py-1.5 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 backdrop-blur-sm"
           />
           <button
             type="submit"
             disabled={addPending}
-            className={buttonStyles({ className: "gap-2 !text-white bg-[var(--color-info-text)] uppercase hover:bg-[var(--color-info-text-strong)]" })}
+            className={buttonStyles({ className: "gap-2 w-full md:w-auto !text-white bg-[var(--color-info-text)] uppercase hover:bg-[var(--color-info-text-strong)]" })}
           >
             {addPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
             {addPending ? "Agregando…" : "Agregar trabajo"}
@@ -576,7 +584,6 @@ function AddCategoriaForm({
 type PreciosPageProps = {
   trabajos: TrabajoAgrupado[];
   createCategoriaAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
-  renameCategoriaAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
   deleteCategoriaAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
   createTrabajoAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
   deleteTrabajoAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
@@ -587,7 +594,6 @@ type PreciosPageProps = {
 export function PreciosPage({
   trabajos,
   createCategoriaAction,
-  renameCategoriaAction,
   deleteCategoriaAction,
   createTrabajoAction,
   deleteTrabajoAction,
@@ -609,7 +615,6 @@ export function PreciosPage({
           <CategoriaCard
             key={grupo.categoriaId}
             grupo={grupo}
-            renameCategoriaAction={renameCategoriaAction}
             deleteCategoriaAction={deleteCategoriaAction}
             createTrabajoAction={createTrabajoAction}
             deleteTrabajoAction={deleteTrabajoAction}

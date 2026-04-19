@@ -3,6 +3,7 @@ import { TrabajoDetailPage } from "@/components/pages/TrabajoDetailPage";
 import type { TrabajoFormState } from "@/components/forms/TrabajoForm";
 import type { ChangeEstadoActionState } from "@/components/ui/EstadoStepper";
 import {
+  getTrabajosDetalleByTrabajo,
   listMarcas,
   listModeloMotorRelations,
   listModelos,
@@ -10,12 +11,13 @@ import {
   listTrabajosAgrupados,
 } from "@/lib/queries/catalogo";
 import { listRepuestosAgrupados } from "@/lib/queries/repuestos";
-import { getTrabajoDetailById, updateTrabajo } from "@/lib/queries/trabajos";
+import { getTrabajoDetailById, refreshTrabajoSnapshotPrices, updateTrabajo } from "@/lib/queries/trabajos";
 import { generateQrSvg } from "@/lib/qr";
 import { queryRows } from "@/lib/db";
 import { parseTrabajoRepuestos } from "@/lib/trabajo-repuestos";
 import type { TrabajoEstado, TrabajoFormValues, TrabajoPrioridad } from "@/lib/types";
 import type { ChangePrioridadActionState } from "@/components/ui/PrioridadSelector";
+import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +57,11 @@ export default async function Page({
   if (!trabajo) {
     notFound();
   }
+
+  const snapshotTrabajos = await getTrabajosDetalleByTrabajo(
+    trabajoId,
+    (trabajo.lista_precio as 1 | 2 | 3) ?? 1
+  );
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const qrSvg = await generateQrSvg(`${baseUrl}/trabajos/${trabajoId}`);
@@ -206,6 +213,24 @@ export default async function Page({
     return { error: null, success: true };
   }
 
+  async function refreshSnapshotPricesAction(
+    _prevState: { error: string | null; success: boolean; updatedCount: number },
+    _formData: FormData
+  ) {
+    "use server";
+    void _prevState;
+    void _formData;
+
+    const updatedCount = await refreshTrabajoSnapshotPrices(trabajoId);
+    revalidatePath(`/trabajos/${trabajoId}`);
+
+    return {
+      error: null,
+      success: true,
+      updatedCount,
+    };
+  }
+
   return (
     <TrabajoDetailPage
       trabajo={trabajo}
@@ -220,6 +245,8 @@ export default async function Page({
       trabajos={trabajos}
       repuestos={repuestos}
       qrSvg={qrSvg}
+      snapshotTrabajos={snapshotTrabajos}
+      refreshSnapshotPricesAction={refreshSnapshotPricesAction}
     />
   );
 }

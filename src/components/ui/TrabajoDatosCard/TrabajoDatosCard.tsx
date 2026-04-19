@@ -5,6 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { PaymentBadge, PriorityBadge, StatusBadge } from "@/components/ui/Badge";
 import { TrabajosResumen } from "@/components/ui/TrabajosResumen/TrabajosResumen";
 import { formatDate, getVehicleLabel } from "@/lib/format";
+import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type {
   TrabajoEstado,
   TrabajoPrioridad,
@@ -24,6 +25,11 @@ type TrabajoDatosCardProps = {
   fechaAprobacion?: string | null;
   trabajos: TrabajoAgrupado[];
   repuestos?: RepuestoAgrupado[];
+  snapshotTrabajos?: TrabajoDetalleItem[];
+  refreshSnapshotPricesAction?: (
+    state: { error: string | null; success: boolean; updatedCount: number },
+    formData: FormData
+  ) => Promise<{ error: string | null; success: boolean; updatedCount: number }>;
 };
 
 export function TrabajoDatosCard({
@@ -38,6 +44,8 @@ export function TrabajoDatosCard({
   fechaAprobacion,
   trabajos,
   repuestos = [],
+  snapshotTrabajos = [],
+  refreshSnapshotPricesAction,
 }: TrabajoDatosCardProps) {
   const vehicleLabel = getVehicleLabel([marcaNombre, modeloNombre, motorNombre]);
 
@@ -129,7 +137,12 @@ export function TrabajoDatosCard({
               Items
             </dt>
           </div>
-          <TrabajosResumen trabajos={trabajos} repuestos={repuestos} />
+          <TrabajosResumen
+            trabajos={trabajos}
+            repuestos={repuestos}
+            snapshotTrabajos={snapshotTrabajos}
+            refreshSnapshotPricesAction={refreshSnapshotPricesAction}
+          />
         </div>
       </dl>
     </Card>

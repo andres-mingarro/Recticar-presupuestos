@@ -60,9 +60,12 @@ export async function updateCategoriaTrabajos(
     }
   }
 
+  const nombreCategoria = normalize(formData, "nombre");
+
   try {
     if (!Number.isNaN(categoriaId)) {
       await updateCategoria(categoriaId, icono);
+      if (nombreCategoria) await renameCategoria(categoriaId, nombreCategoria);
     }
     if (nombreUpdates.length > 0) await updateTrabajoNombres(nombreUpdates);
     if (precioUpdates.size > 0) await updateTrabajoPrecios(Array.from(precioUpdates.values()));

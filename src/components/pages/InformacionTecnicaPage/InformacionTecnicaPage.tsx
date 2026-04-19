@@ -16,7 +16,7 @@ import styles from "./InformacionTecnicaPage.module.scss";
 import { type ActionFn, ColHeaders } from "./components/shared";
 import { buildSectionHref } from "./components/buildSectionHref";
 import { SectionTabs } from "./components/SectionTabs";
-import { ContentCard } from "./components/ContentCard";
+import { HeaderTable } from "./components/HeaderTable";
 import { MarcaRow } from "./components/MarcaRow";
 import { ModeloRow } from "./components/ModeloRow";
 import { MotorRow } from "./components/MotorRow";
@@ -161,7 +161,7 @@ export function InformacionTecnicaPage({
     const marcasOcultas = marcas.filter(m => hiddenMarcas.has(m.id));
     const marcasActivas = marcasTab === "visible" ? marcasVisibles : marcasOcultas;
     sectionContent = (
-      <ContentCard
+      <HeaderTable
         {...cardCommon}
         emptyLabel={
           marcasTab === "ocultas"
@@ -194,13 +194,13 @@ export function InformacionTecnicaPage({
             confirmMarcaHiddenChange={confirmMarcaHiddenChange}
           />
         ))}
-      </ContentCard>
+      </HeaderTable>
     );
   }
 
   if (activeSection === "modelos") {
     sectionContent = (
-      <ContentCard
+      <HeaderTable
         {...cardCommon}
         emptyLabel={q ? "Sin resultados para la búsqueda." : "No hay modelos aún."}
         columnHeaders={
@@ -230,13 +230,13 @@ export function InformacionTecnicaPage({
             canEdit={canEdit}
           />
         ))}
-      </ContentCard>
+      </HeaderTable>
     );
   }
 
   if (activeSection === "motores") {
     sectionContent = (
-      <ContentCard
+      <HeaderTable
         {...cardCommon}
         emptyLabel={q ? "Sin resultados para la búsqueda." : "No hay motores aún."}
         columnHeaders={
@@ -261,7 +261,7 @@ export function InformacionTecnicaPage({
             canEdit={canEdit}
           />
         ))}
-      </ContentCard>
+      </HeaderTable>
     );
   }
 
@@ -270,7 +270,7 @@ export function InformacionTecnicaPage({
     const vehiculosOcultos = vehiculos.filter(v => hiddenVehiculos.has(v.id));
     const vehiculosActivos = vehiculosTab === "visible" ? vehiculosVisibles : vehiculosOcultos;
     sectionContent = (
-      <ContentCard
+      <HeaderTable
         {...cardCommon}
         emptyLabel={
           vehiculosTab === "ocultos"
@@ -324,7 +324,7 @@ export function InformacionTecnicaPage({
             toggleHiddenAction={toggleVehiculoHiddenAction}
           />
         ))}
-      </ContentCard>
+      </HeaderTable>
     );
   }
 

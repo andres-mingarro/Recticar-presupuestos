@@ -36,7 +36,7 @@ export function SectionTabs({
             key={section}
             href={buildSectionHref(section, q)}
             className={cn(
-              "inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition",
+              "inline-flex w-full md:w-auto items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition",
               active
                 ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white"
                 : "border-[var(--color-border)] bg-white text-[var(--text-color-gray)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"

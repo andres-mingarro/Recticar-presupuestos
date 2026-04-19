@@ -215,18 +215,6 @@ export async function updateCategoria(id: number, icono: string | null) {
 }
 
 export async function deleteCategoria(id: number) {
-  // Check if any trabajo in this category is used in trabajos
-  const used = await templateRows<{ count: number }>`
-    SELECT COUNT(*)::int AS count
-    FROM orden_trabajo_trabajos pt
-    INNER JOIN trabajos t ON t.id = pt.trabajo_id
-    WHERE t.categoria_id = ${id}
-  `;
-  if (used[0].count > 0) {
-    throw new Error(
-      "No se puede eliminar la categoría porque tiene trabajos usados en trabajos."
-    );
-  }
   await templateRows`DELETE FROM trabajos WHERE categoria_id = ${id}`;
   await templateRows`DELETE FROM categorias_trabajo WHERE id = ${id}`;
 }
@@ -278,21 +266,13 @@ export async function reorderTrabajos(orderedIds: number[]) {
 }
 
 export async function deleteTrabajo(id: number) {
-  const used = await templateRows<{ count: number }>`
-    SELECT COUNT(*)::int AS count FROM orden_trabajo_trabajos WHERE trabajo_id = ${id}
-  `;
-  if (used[0].count > 0) {
-    throw new Error(
-      "No se puede eliminar el trabajo porque está usado en trabajos."
-    );
-  }
   await templateRows`DELETE FROM trabajos WHERE id = ${id}`;
 }
 
 export type TrabajoDetalleItem = {
-  categoriaId: number;
+  categoriaId: number | null;
   categoriaNombre: string;
-  trabajoId: number;
+  trabajoId: number | null;
   trabajoNombre: string;
   precio: number;
 };
@@ -301,24 +281,24 @@ export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecio
   const precioCol = listaPrecios === 3 ? "t.precio_lista_3" : listaPrecios === 2 ? "t.precio_lista_2" : "t.precio_lista_1";
 
   const rows = await queryRows<{
-    categoria_id: number;
+    categoria_id: number | null;
     categoria_nombre: string;
-    trabajo_id: number;
+    trabajo_id: number | null;
     trabajo_nombre: string;
     precio: number;
   }>(
     `
       SELECT
-        c.id AS categoria_id,
-        c.nombre AS categoria_nombre,
-        t.id AS trabajo_id,
-        t.nombre AS trabajo_nombre,
-        ${precioCol} AS precio
+        t.categoria_id AS categoria_id,
+        COALESCE(pt.categoria_nombre_snapshot, c.nombre) AS categoria_nombre,
+        pt.trabajo_id AS trabajo_id,
+        COALESCE(pt.trabajo_nombre_snapshot, t.nombre) AS trabajo_nombre,
+        COALESCE(pt.precio_snapshot, ${precioCol}) AS precio
       FROM orden_trabajo_trabajos pt
-      INNER JOIN trabajos t ON t.id = pt.trabajo_id
-      INNER JOIN categorias_trabajo c ON c.id = t.categoria_id
+      LEFT JOIN trabajos t ON t.id = pt.trabajo_id
+      LEFT JOIN categorias_trabajo c ON c.id = t.categoria_id
       WHERE pt.orden_trabajo_id = $1
-      ORDER BY c.nombre ASC, t.nombre ASC
+      ORDER BY COALESCE(pt.categoria_nombre_snapshot, c.nombre) ASC, COALESCE(pt.trabajo_nombre_snapshot, t.nombre) ASC
     `,
     [trabajoId]
   );
