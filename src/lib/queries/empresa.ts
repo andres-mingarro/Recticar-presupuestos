@@ -9,6 +9,9 @@ export type EmpresaConfig = {
   ciudad: string | null;
   provincia: string | null;
   cuit: string | null;
+  autoEliminarPresupuestosEntregados: boolean;
+  mesesRetencionPresupuestoEntregado: number;
+  ultimaEjecucionLimpieza: string | null;
   updatedAt: string;
 };
 
@@ -21,6 +24,8 @@ export type EmpresaConfigInput = {
   ciudad: string;
   provincia: string;
   cuit: string;
+  autoEliminarPresupuestosEntregados: boolean;
+  mesesRetencionPresupuestoEntregado: number;
 };
 
 const DEFAULT_EMPRESA_CONFIG: EmpresaConfig = {
@@ -32,6 +37,9 @@ const DEFAULT_EMPRESA_CONFIG: EmpresaConfig = {
   ciudad: "Trelew",
   provincia: "Chubut",
   cuit: null,
+  autoEliminarPresupuestosEntregados: false,
+  mesesRetencionPresupuestoEntregado: 3,
+  ultimaEjecucionLimpieza: null,
   updatedAt: new Date(0).toISOString(),
 };
 
@@ -45,6 +53,9 @@ export async function getEmpresaConfig() {
     ciudad: string | null;
     provincia: string | null;
     cuit: string | null;
+    auto_eliminar_presupuestos_entregados: boolean | null;
+    meses_retencion_presupuesto_entregado: number | null;
+    ultima_ejecucion_limpieza: string | null;
     updated_at: string;
   }>`
     SELECT
@@ -56,6 +67,9 @@ export async function getEmpresaConfig() {
       ciudad,
       provincia,
       cuit,
+      auto_eliminar_presupuestos_entregados,
+      meses_retencion_presupuesto_entregado,
+      ultima_ejecucion_limpieza,
       updated_at
     FROM empresa_configuracion
     WHERE id = 1
@@ -74,6 +88,9 @@ export async function getEmpresaConfig() {
     ciudad: row.ciudad,
     provincia: row.provincia,
     cuit: row.cuit,
+    autoEliminarPresupuestosEntregados: Boolean(row.auto_eliminar_presupuestos_entregados),
+    mesesRetencionPresupuestoEntregado: Math.max(1, Number(row.meses_retencion_presupuesto_entregado ?? 3)),
+    ultimaEjecucionLimpieza: row.ultima_ejecucion_limpieza,
     updatedAt: row.updated_at,
   } satisfies EmpresaConfig;
 }
@@ -88,6 +105,9 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
     ciudad: string | null;
     provincia: string | null;
     cuit: string | null;
+    auto_eliminar_presupuestos_entregados: boolean;
+    meses_retencion_presupuesto_entregado: number;
+    ultima_ejecucion_limpieza: string | null;
     updated_at: string;
   }>`
     INSERT INTO empresa_configuracion (
@@ -100,6 +120,9 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
       ciudad,
       provincia,
       cuit,
+      auto_eliminar_presupuestos_entregados,
+      meses_retencion_presupuesto_entregado,
+      ultima_ejecucion_limpieza,
       updated_at
     )
     VALUES (
@@ -112,6 +135,9 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
       ${input.ciudad || null},
       ${input.provincia || null},
       ${input.cuit || null},
+      ${input.autoEliminarPresupuestosEntregados},
+      ${Math.max(1, input.mesesRetencionPresupuestoEntregado)},
+      NULL,
       now()
     )
     ON CONFLICT (id) DO UPDATE SET
@@ -123,6 +149,8 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
       ciudad = EXCLUDED.ciudad,
       provincia = EXCLUDED.provincia,
       cuit = EXCLUDED.cuit,
+      auto_eliminar_presupuestos_entregados = EXCLUDED.auto_eliminar_presupuestos_entregados,
+      meses_retencion_presupuesto_entregado = EXCLUDED.meses_retencion_presupuesto_entregado,
       updated_at = now()
     RETURNING
       nombre,
@@ -133,6 +161,9 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
       ciudad,
       provincia,
       cuit,
+      auto_eliminar_presupuestos_entregados,
+      meses_retencion_presupuesto_entregado,
+      ultima_ejecucion_limpieza,
       updated_at
   `;
 
@@ -147,6 +178,17 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
     ciudad: row.ciudad,
     provincia: row.provincia,
     cuit: row.cuit,
+    autoEliminarPresupuestosEntregados: row.auto_eliminar_presupuestos_entregados,
+    mesesRetencionPresupuestoEntregado: Number(row.meses_retencion_presupuesto_entregado),
+    ultimaEjecucionLimpieza: row.ultima_ejecucion_limpieza,
     updatedAt: row.updated_at,
   } satisfies EmpresaConfig;
+}
+
+export async function updateEmpresaCleanupLastRun(isoDate: string) {
+  await templateRows`
+    UPDATE empresa_configuracion
+    SET ultima_ejecucion_limpieza = ${isoDate}::timestamptz
+    WHERE id = 1
+  `;
 }

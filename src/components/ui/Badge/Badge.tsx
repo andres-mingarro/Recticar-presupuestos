@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import type { TrabajoEstado, TrabajoPrioridad } from "@/lib/types";
+import { TRABAJO_ESTADO_LABELS, type TrabajoEstado, type TrabajoPrioridad } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 import styles from "./Badge.module.scss";
 
@@ -37,12 +37,27 @@ export function PriorityBadge({ prioridad, className }: { prioridad: TrabajoPrio
   );
 }
 
-export function StatusBadge({ estado, className }: { estado: TrabajoEstado; className?: string }) {
+const TRABAJO_ESTADO_SHORT_LABELS: Record<TrabajoEstado, string> = {
+  presupuesto_entregado: "Entregado",
+  aprobado: "Aceptado",
+  finalizado: "Finalizado",
+  pendiente: "Entregado",
+};
+
+export function StatusBadge({
+  estado,
+  className,
+  compact = false,
+}: {
+  estado: TrabajoEstado;
+  className?: string;
+  compact?: boolean;
+}) {
   const statusStyles = {
     pendiente:
+      "border-slate-300 bg-[linear-gradient(135deg,#f8fafc,#e2e8f0)] text-slate-700 shadow-[0_10px_24px_rgba(148,163,184,0.16)]",
+    presupuesto_entregado:
       "border-orange-200 bg-[linear-gradient(135deg,#fff7ed,#fed7aa)] text-orange-700 shadow-[0_10px_24px_rgba(251,146,60,0.16)]",
-    entregado:
-      "border-orange-200 bg-orange-50 text-orange-700",
     aprobado:
       "border-orange-600 bg-[linear-gradient(135deg,#ea580c,#fb923c)] text-white shadow-[0_10px_24px_rgba(234,88,12,0.18)]",
     finalizado:
@@ -60,7 +75,7 @@ export function StatusBadge({ estado, className }: { estado: TrabajoEstado; clas
         className
       )}
     >
-      {estado}
+      {compact ? TRABAJO_ESTADO_SHORT_LABELS[estado] : TRABAJO_ESTADO_LABELS[estado]}
     </span>
   );
 }

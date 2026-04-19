@@ -291,6 +291,7 @@ export function TrabajoDetailPage({
               Reglas de estado
             </p>
             <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--text-color-gray)]">
+              <li>`Presupuesto entregado` marca el momento en que el cliente ya recibió el presupuesto.</li>
               <li>Aprobado requiere cliente asignado y registra la fecha automáticamente.</li>
               <li>Finalizado mueve el trabajo al historial del cliente.</li>
               <li>La fecha de aprobación se guarda la primera vez que se aprueba.</li>

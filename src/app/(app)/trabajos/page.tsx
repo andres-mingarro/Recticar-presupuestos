@@ -13,7 +13,7 @@ import {
 export const dynamic = "force-dynamic";
 
 function isTrabajoEstado(value: string): value is TrabajoEstado {
-  return TRABAJO_ESTADOS.includes(value as TrabajoEstado);
+  return (TRABAJO_ESTADOS as readonly string[]).includes(value);
 }
 
 function isTrabajoPrioridad(value: string): value is TrabajoPrioridad {

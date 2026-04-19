@@ -23,7 +23,7 @@ function normalizeString(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-const VALID_ESTADOS: TrabajoEstado[] = ["pendiente", "aprobado", "finalizado"];
+const VALID_ESTADOS: TrabajoEstado[] = ["presupuesto_entregado", "aprobado", "finalizado"];
 const VALID_PRIORIDADES: TrabajoPrioridad[] = ["baja", "normal", "alta"];
 
 export default async function Page({
@@ -89,9 +89,11 @@ export default async function Page({
     const estadoValue =
       estadoRaw === "aprobado"
         ? "aprobado"
+        : estadoRaw === "presupuesto_entregado"
+          ? "presupuesto_entregado"
         : estadoRaw === "finalizado"
           ? "finalizado"
-          : "pendiente";
+          : "presupuesto_entregado";
 
     const values: TrabajoFormValues = {
       updatedAt: normalizeString(formData.get("updatedAt")),
@@ -169,6 +171,11 @@ export default async function Page({
     await queryRows(
       `UPDATE ordenes_trabajo SET
         estado = $2::orden_trabajo_estado,
+        fecha_presupuesto_entregado = CASE
+          WHEN $2::text = 'presupuesto_entregado' AND fecha_presupuesto_entregado IS NULL THEN now()
+          WHEN $2::text <> 'presupuesto_entregado' THEN NULL
+          ELSE fecha_presupuesto_entregado
+        END,
         fecha_aprobacion = CASE
           WHEN $2::text = 'aprobado' AND fecha_aprobacion IS NULL THEN now()
           ELSE fecha_aprobacion

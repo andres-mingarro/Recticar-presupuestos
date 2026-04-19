@@ -360,7 +360,7 @@ export function ClientesPage({
                         <PaymentBadge cobrado={trabajo.cobrado} />
                       </div>
                       <div>
-                        <StatusBadge estado={trabajo.estado} />
+                        <StatusBadge estado={trabajo.estado} compact />
                       </div>
                       <p className="text-sm text-[var(--text-color-gray)]">
                         <span className="inline-flex items-center gap-2">

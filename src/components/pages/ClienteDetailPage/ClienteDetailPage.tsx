@@ -117,7 +117,7 @@ function TrabajoTable({
                   </td>
                   <td className="px-4 py-4"><PriorityBadge prioridad={trabajo.prioridad} className="w-full justify-center" /></td>
                   <td className="px-4 py-4"><PaymentBadge cobrado={trabajo.cobrado} /></td>
-                  <td className="px-4 py-4"><StatusBadge estado={trabajo.estado} /></td>
+                  <td className="px-4 py-4"><StatusBadge estado={trabajo.estado} compact /></td>
                   <td className="px-4 py-4">{formatDate(trabajo.fecha_creacion)}</td>
                   <td className="px-4 py-4 text-right">
                     <Button as="a" href={`/trabajos/${trabajo.id}`} variant="secondary" size="sm"  iconRight={<Icon name="arrowRight" className="h-4 w-4" />}>
@@ -337,7 +337,7 @@ export function ClienteDetailPage({
         eyebrow="Trabajos vigentes"
         title="Trabajos vigentes"
         trabajos={trabajosVigentes}
-        emptyMessage="Este cliente no tiene trabajos pendientes ni aprobados."
+        emptyMessage="Este cliente no tiene trabajos abiertos."
       />
 
       <TrabajoTable

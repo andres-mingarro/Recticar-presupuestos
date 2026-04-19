@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 import {
+  TRABAJO_ESTADO_LABELS,
   TRABAJO_ESTADOS,
   TRABAJO_PRIORIDADES,
   type TrabajoEstado,
@@ -30,6 +31,18 @@ import {
 } from "@/lib/format";
 import { TrabajoMobileCard } from "@/components/ui/TrabajoMobileCard";
 import styles from "./TrabajosPage.module.scss";
+
+function getEstadoReferenceDate(trabajo: TrabajoListItem) {
+  if (trabajo.estado === "presupuesto_entregado") {
+    return trabajo.fecha_presupuesto_entregado;
+  }
+
+  if (trabajo.estado === "aprobado" || trabajo.estado === "finalizado") {
+    return trabajo.fecha_aprobacion;
+  }
+
+  return null;
+}
 
 type TrabajosPageProps = {
   estado?: TrabajoEstado;
@@ -114,7 +127,7 @@ function TrabajoTable({
               </th>
               <th className="w-[96px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Estado</span></th>
               <th className="w-[146px] px-3 py-3 font-semibold">
-                <span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación / aprobación</span>
+                <span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación / hito</span>
               </th>
               {showBusinessDays ? (
                 <th className="w-[96px] px-3 py-3 font-semibold whitespace-nowrap"><span className="inline-flex items-center gap-2"><Icon name="clock" className="h-4 w-4" />Días hábiles</span></th>
@@ -184,13 +197,15 @@ function TrabajoTable({
                     <CobroIcon cobrado={trabajo.cobrado} />
                   </td>
                   <td className="w-[96px] px-3 py-4">
-                    <StatusBadge estado={trabajo.estado} />
+                    <StatusBadge estado={trabajo.estado} compact />
                   </td>
                   <td className="w-[146px] px-3 py-4">
                     <div className="inline-flex items-center gap-2 text-[var(--text-color-gray)]">
                       <span>{formatDate(trabajo.fecha_creacion)}</span>
                       <Icon name="arrowRight" className="h-4 w-4" />
-                      <span className="whitespace-nowrap">{trabajo.estado === "pendiente" ? "--/--/----" : formatDate(trabajo.fecha_aprobacion)}</span>
+                      <span className="whitespace-nowrap">
+                        {formatDate(getEstadoReferenceDate(trabajo))}
+                      </span>
                     </div>
                   </td>
                   {showBusinessDays ? (
@@ -240,7 +255,7 @@ export function TrabajosPage({
       <PageHeader
         eyebrow="Trabajos"
         title="Listado de trabajos"
-        description="Filtrá presupuestos por estado y prioridad. La base ya queda lista para seguir con alta, edición, aprobación y PDF."
+        description="Filtrá trabajos por estado y prioridad. La base ya queda lista para seguir con entrega de presupuesto, aprobación y PDF."
         actions={
           canEdit ? (
             <ButtonAdd classNameInner="w-full md:w-auto" href="/trabajos/nuevo">
@@ -262,7 +277,7 @@ export function TrabajosPage({
             <option value="">Todos los estados</option>
             {TRABAJO_ESTADOS.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {TRABAJO_ESTADO_LABELS[item]}
               </option>
             ))}
           </Select>
@@ -306,14 +321,14 @@ export function TrabajosPage({
             eyebrow="Activos"
             title="Trabajos activos"
             trabajos={trabajosActivos}
-            emptyMessage="No hay trabajos pendientes ni aprobados para mostrar."
+            emptyMessage="No hay trabajos abiertos para mostrar."
           />
         </div>
 
         <div className="md:hidden space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">Activos</p>
           {trabajosActivos.length === 0 ? (
-            <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">No hay trabajos pendientes ni aprobados para mostrar.</p>
+            <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">No hay trabajos abiertos para mostrar.</p>
           ) : (
             trabajosActivos.map((trabajo) => (
               <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} />

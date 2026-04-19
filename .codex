@@ -78,6 +78,10 @@
 - `admin` y `superuser` pueden editar informacion tecnica; `operador` queda en solo lectura
 - `/precios` permite editar listas con ajustes porcentuales por categoria usando `Incrementor`
 - Existen paginas globales de error y not found en `src/app/error.tsx`, `src/app/global-error.tsx` y `src/app/not-found.tsx`
+- `/configuracion` usa `PageHeader` dentro de `ConfiguracionPageMain`
+- `/configuracion` muestra `Informacion tecnica` y `Usuarios` en una misma fila responsive
+- `/configuracion` deja el sidebar para datos de empresa del PDF y mueve la limpieza automatica al contenido principal
+- `/configuracion` separa el guardado de empresa y el guardado de limpieza automatica en server actions distintas
 
 ## Trabajos
 - `TrabajoDetailPage` concentra la experiencia de edicion del trabajo y reutiliza `TrabajoForm`
@@ -95,6 +99,10 @@
 - `TrabajosSeleccionProvider` maneja seleccion de trabajos y `listaPrecios`
 - Los importes del sitio se muestran y se persisten como enteros, sin decimales
 - Los inputs numericos pueden seguir usando `type="number"` con `inputMode="numeric"` pero sin spinners visibles, via `src/components/ui/Input/Input.module.scss`
+- El flujo visible del estado de trabajo es `presupuesto_entregado -> aprobado -> finalizado`
+- `pendiente` ya no se muestra en UI; si aparece en datos legacy, la app lo normaliza como `presupuesto_entregado`
+- El estado inicial de un trabajo nuevo es `presupuesto_entregado`
+- `StatusBadge` acepta `compact` para mostrar labels cortos como `Entregado`, `Aceptado` y `Finalizado` en tablas y resumenes
 
 ## QR e impresion
 - La pagina `src/app/(app)/trabajos/[id]/etiqueta` renderiza dentro del `AppShell`, por lo que la impresion debe ocultar explicitamente top bar y sidebar
@@ -131,7 +139,18 @@
 - Existe la migracion `011_add_estado_entregado.sql` para agregar `entregado` al enum historico
 - Existe la migracion `014_add_precio_cantidad_to_pedido_repuestos.sql` como antecedente del esquema previo
 - Existe la migracion `016_rename_pedidos_to_ordenes_trabajo.sql` que renombra tablas, enums, indices y `numero_pedido` a `numero_trabajo`
+- Existe la migracion `019_add_presupuesto_entregado_cleanup.sql` que agrega `fecha_presupuesto_entregado` y la configuracion de limpieza automatica
 - Revisar consistencia entre estados persistidos, labels del stepper y filtros/listados cuando se agreguen estados nuevos
+
+## Limpieza automatica
+- La limpieza automatica vive en `src/lib/maintenance/trabajos-cleanup.ts`
+- Borra fisicamente trabajos en estado `presupuesto_entregado` con `fecha_presupuesto_entregado` vencida y `cobrado = false`
+- La configuracion se persiste en `empresa_configuracion` con `auto_eliminar_presupuestos_entregados`, `meses_retencion_presupuesto_entregado` y `ultima_ejecucion_limpieza`
+- La ejecucion manual desde Configuracion usa `runPresupuestosCleanupNowAction`
+- Existe el endpoint protegido `src/app/api/maintenance/trabajos-cleanup/route.ts` para cron mensual via `CRON_SECRET`
+- Hay un script reusable de prueba en `scripts/test-trabajos-cleanup.mjs`
+- Uso del script: `npm run cleanup:test -- --id=39`
+- El script prepara un trabajo real, fuerza configuracion de limpieza, ejecuta la SQL de borrado y verifica padre e hijos
 
 ## Notas
 - `DATABASE_URL` y `TECHNICAL_DATABASE_URL` se leen desde `.env.local`

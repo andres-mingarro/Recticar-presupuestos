@@ -1,7 +1,14 @@
-export const TRABAJO_ESTADOS = ["pendiente", "aprobado", "finalizado"] as const;
+export const TRABAJO_ESTADOS = ["presupuesto_entregado", "aprobado", "finalizado"] as const;
 export const TRABAJO_PRIORIDADES = ["baja", "normal", "alta"] as const;
 
-export type TrabajoEstado = (typeof TRABAJO_ESTADOS)[number];
+export const TRABAJO_ESTADO_LABELS: Record<TrabajoEstado, string> = {
+  presupuesto_entregado: "Presupuesto entregado",
+  aprobado: "Presupuesto aceptado",
+  finalizado: "Trabajo finalizado",
+  pendiente: "Presupuesto entregado",
+};
+
+export type TrabajoEstado = ((typeof TRABAJO_ESTADOS)[number]) | "pendiente";
 export type TrabajoPrioridad = (typeof TRABAJO_PRIORIDADES)[number];
 
 export type ClienteListItem = {
@@ -60,6 +67,7 @@ export type TrabajoListItem = {
   estado: TrabajoEstado;
   prioridad: TrabajoPrioridad;
   fecha_creacion: string;
+  fecha_presupuesto_entregado: string | null;
   fecha_aprobacion: string | null;
   cliente_id: number | null;
   cliente_nombre: string | null;

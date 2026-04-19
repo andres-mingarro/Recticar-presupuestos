@@ -11,6 +11,18 @@ import {
 import { Icon } from "@/components/ui/Icon";
 import { formatDate, getBusinessDaysBetween, getBusinessDaysSince } from "@/lib/format";
 
+function getEstadoReferenceDate(trabajo: TrabajoListItem) {
+  if (trabajo.estado === "presupuesto_entregado") {
+    return trabajo.fecha_presupuesto_entregado;
+  }
+
+  if (trabajo.estado === "aprobado" || trabajo.estado === "finalizado") {
+    return trabajo.fecha_aprobacion;
+  }
+
+  return null;
+}
+
 type Props = {
   trabajo: TrabajoListItem;
   showBusinessDays?: boolean;
@@ -87,7 +99,7 @@ export function TrabajoMobileCard({ trabajo, showBusinessDays = true }: Props) {
         <div className="flex items-center gap-1 text-[0.72rem] text-[var(--text-color-gray)]">
           <span>{formatDate(trabajo.fecha_creacion)}</span>
           <span>→</span>
-          <span>{trabajo.estado === "pendiente" ? "--/--/----" : formatDate(trabajo.fecha_aprobacion)}</span>
+          <span>{formatDate(getEstadoReferenceDate(trabajo))}</span>
         </div>
         {showBusinessDays && (
           <span className="inline-flex items-center rounded-full border border-[var(--color-border)] px-2.5 py-1 text-xs font-medium text-[var(--text-color-gray)]">

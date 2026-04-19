@@ -26,7 +26,7 @@ const initialState: TrabajoFormState = {
     numeroSerieMotor: "",
     cobrado: false,
     prioridad: "normal",
-    estado: "pendiente",
+    estado: "presupuesto_entregado",
     observaciones: "",
     trabajosIds: [],
     repuestosIds: [],
@@ -95,7 +95,11 @@ export default async function Page({
       estado:
         normalizeString(formData.get("estado")) === "aprobado"
           ? "aprobado"
-          : "pendiente",
+        : normalizeString(formData.get("estado")) === "presupuesto_entregado"
+            ? "presupuesto_entregado"
+            : normalizeString(formData.get("estado")) === "finalizado"
+              ? "finalizado"
+              : "presupuesto_entregado",
       observaciones: normalizeString(formData.get("observaciones")),
       trabajosIds: formData
         .getAll("trabajosIds")

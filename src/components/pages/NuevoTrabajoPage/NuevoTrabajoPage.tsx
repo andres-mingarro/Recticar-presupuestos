@@ -68,7 +68,7 @@ export function NuevoTrabajoPage({
       <PageHeader
         eyebrow="Trabajos"
         title="Nuevo trabajo"
-        description="Creá un presupuesto nuevo con cliente, vehiculo, motor, checklist de trabajos y estado inicial."
+        description="Creá un presupuesto nuevo con cliente, vehiculo, motor y checklist para entregarlo y esperar la aprobación del cliente."
         actions={
           <Button as="a" href="/trabajos" variant="secondary">
             Volver al listado
@@ -122,7 +122,8 @@ export function NuevoTrabajoPage({
                     Reglas clave
                   </p>
                   <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--text-color-gray)]">
-                    <li>Un trabajo puede guardarse sin cliente solo si queda pendiente.</li>
+                    <li>Todo trabajo nuevo arranca como `presupuesto entregado`.</li>
+                    <li>Ese estado representa que el presupuesto ya fue entregado y ahora se espera la respuesta del cliente.</li>
                     <li>Si lo marcás como aprobado, el cliente es obligatorio.</li>
                     <li>La fecha de aprobacion se registra automaticamente.</li>
                   </ul>

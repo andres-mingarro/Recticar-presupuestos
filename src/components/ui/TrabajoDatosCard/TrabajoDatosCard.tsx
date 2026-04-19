@@ -54,7 +54,7 @@ export function TrabajoDatosCard({
             Estado
           </dt>
           <dd>
-            <StatusBadge estado={estado} className="inline-flex w-[130px] justify-center" />
+            <StatusBadge estado={estado} compact className="inline-flex w-[130px] justify-center" />
           </dd>
         </div>
 

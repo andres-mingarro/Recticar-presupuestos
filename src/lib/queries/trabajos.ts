@@ -28,6 +28,22 @@ type TrabajoDetailRow = Omit<
   repuestos_ids: number[] | null;
 };
 
+function normalizeLegacyTrabajoEstado<T extends {
+  estado: TrabajoEstado;
+  fecha_creacion: string;
+  fecha_presupuesto_entregado: string | null;
+}>(row: T): T {
+  if (row.estado !== "pendiente") {
+    return row;
+  }
+
+  return {
+    ...row,
+    estado: "presupuesto_entregado",
+    fecha_presupuesto_entregado: row.fecha_presupuesto_entregado ?? row.fecha_creacion,
+  };
+}
+
 export async function listTrabajos(filters: TrabajoFilters = {}) {
   const conditions: string[] = [];
   const params: Array<string> = [];
@@ -60,6 +76,7 @@ export async function listTrabajos(filters: TrabajoFilters = {}) {
           p.estado,
           p.prioridad,
           p.fecha_creacion,
+          p.fecha_presupuesto_entregado,
           p.fecha_aprobacion,
           p.cliente_id,
           p.marca_id,
@@ -93,12 +110,16 @@ export async function listTrabajos(filters: TrabajoFilters = {}) {
   const modelosById = new Map(modelos.map((m) => [m.id, m.nombre]));
   const motoresById = new Map(motores.map((m) => [m.id, m.nombre]));
 
-  return rows.map((item) => ({
-    ...item,
-    marca_nombre: item.marca_id ? (marcasById.get(item.marca_id) ?? null) : null,
-    modelo_nombre: item.modelo_id ? (modelosById.get(item.modelo_id) ?? null) : null,
-    motor_nombre: item.motor_id ? (motoresById.get(item.motor_id) ?? null) : null,
-  }));
+  return rows.map((item) => {
+    const normalizedItem = normalizeLegacyTrabajoEstado(item);
+
+    return {
+      ...normalizedItem,
+      marca_nombre: normalizedItem.marca_id ? (marcasById.get(normalizedItem.marca_id) ?? null) : null,
+      modelo_nombre: normalizedItem.modelo_id ? (modelosById.get(normalizedItem.modelo_id) ?? null) : null,
+      motor_nombre: normalizedItem.motor_id ? (motoresById.get(normalizedItem.motor_id) ?? null) : null,
+    };
+  });
 }
 
 export async function getTrabajoById(id: number) {
@@ -111,6 +132,7 @@ export async function getTrabajoById(id: number) {
         p.estado,
         p.prioridad,
         p.fecha_creacion,
+        p.fecha_presupuesto_entregado,
         p.fecha_aprobacion,
         p.cliente_id,
         p.marca_id,
@@ -129,7 +151,7 @@ export async function getTrabajoById(id: number) {
     [id]
   );
 
-  const hydrated = await hydrateTechnicalLabels(rows);
+  const hydrated = await hydrateTechnicalLabels(rows.map(normalizeLegacyTrabajoEstado));
   return hydrated[0] ?? null;
 }
 
@@ -143,6 +165,7 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
         p.estado,
         p.prioridad,
         p.fecha_creacion,
+        p.fecha_presupuesto_entregado,
         p.fecha_aprobacion,
         p.updated_at::text AS updated_at,
         p.cliente_id,
@@ -199,7 +222,7 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
 
   const hydrated = await hydrateTechnicalLabels([
     {
-      ...row,
+      ...normalizeLegacyTrabajoEstado(row),
       trabajos_ids: row.trabajos_ids ?? [],
       repuestos_ids: row.repuestos_ids ?? [],
       repuestos: repuestos.map((item) => ({
@@ -241,6 +264,11 @@ export async function updateTrabajo(
             prioridad          = $9::orden_trabajo_prioridad,
             estado             = $10::orden_trabajo_estado,
             lista_precio       = $11,
+            fecha_presupuesto_entregado = CASE
+              WHEN $10::text = 'presupuesto_entregado' AND fecha_presupuesto_entregado IS NULL THEN now()
+              WHEN $10::text <> 'presupuesto_entregado' THEN NULL
+              ELSE fecha_presupuesto_entregado
+            END,
             fecha_aprobacion   = CASE
               WHEN $10::text = 'aprobado' AND fecha_aprobacion IS NULL THEN now()
               ELSE fecha_aprobacion
@@ -311,6 +339,8 @@ export async function createTrabajo(input: TrabajoFormValues) {
   const motorId = input.motorId ? Number(input.motorId) : null;
   const fechaAprobacion =
     input.estado === "aprobado" ? new Date().toISOString() : null;
+  const fechaPresupuestoEntregado =
+    input.estado === "presupuesto_entregado" ? new Date().toISOString() : null;
 
   const insertedTrabajo = await templateRows<{ id: number }>`
     INSERT INTO ordenes_trabajo (
@@ -322,6 +352,7 @@ export async function createTrabajo(input: TrabajoFormValues) {
       cobrado,
       prioridad,
       estado,
+      fecha_presupuesto_entregado,
       fecha_aprobacion,
       observaciones,
       lista_precio
@@ -335,6 +366,7 @@ export async function createTrabajo(input: TrabajoFormValues) {
       ${input.cobrado},
       ${input.prioridad},
       ${input.estado},
+      ${fechaPresupuestoEntregado},
       ${fechaAprobacion},
       ${input.observaciones || null},
       ${input.listaPrecios}
@@ -392,6 +424,7 @@ export async function listTrabajosByCliente(clienteId: number) {
         p.estado,
         p.prioridad,
         p.fecha_creacion,
+        p.fecha_presupuesto_entregado,
         p.fecha_aprobacion,
         p.cliente_id,
         p.marca_id,
@@ -407,14 +440,16 @@ export async function listTrabajosByCliente(clienteId: number) {
       WHERE p.cliente_id = $1
       ORDER BY
         CASE
-          WHEN p.estado = 'pendiente' THEN 1
+          WHEN p.estado = 'presupuesto_entregado' THEN 1
           WHEN p.estado = 'aprobado' THEN 2
-          ELSE 3
+          WHEN p.estado = 'finalizado' THEN 3
+          WHEN p.estado = 'pendiente' THEN 4
+          ELSE 5
         END,
         p.numero_trabajo DESC
     `,
     [clienteId]
   );
 
-  return hydrateTechnicalLabels(rows);
+  return hydrateTechnicalLabels(rows.map(normalizeLegacyTrabajoEstado));
 }

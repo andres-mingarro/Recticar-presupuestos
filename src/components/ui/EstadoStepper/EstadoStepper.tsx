@@ -13,7 +13,7 @@ const STEPS: Array<{
   isLight: boolean;
 }> = [
   {
-    value: "pendiente",
+    value: "presupuesto_entregado",
     label: "Presupuesto entregado",
     num: "1",
     activeBg: "bg-[linear-gradient(135deg,#fff7ed,#fed7aa)]",
@@ -38,9 +38,19 @@ const STEPS: Array<{
   },
 ];
 
-function stepStatus(stepValue: TrabajoEstado, currentValue: TrabajoEstado) {
-  const currentIndex = STEPS.findIndex((s) => s.value === currentValue);
-  const stepIndex = STEPS.findIndex((s) => s.value === stepValue);
+function normalizeStepperValue(value: TrabajoEstado) {
+  return value === "pendiente" ? "presupuesto_entregado" : value;
+}
+
+function getVisibleSteps(allowFinalizado = true) {
+  return allowFinalizado
+    ? STEPS
+    : STEPS.filter((step) => step.value !== "finalizado");
+}
+
+function stepStatus(stepValue: TrabajoEstado, currentValue: TrabajoEstado, visibleSteps: typeof STEPS) {
+  const currentIndex = visibleSteps.findIndex((s) => s.value === currentValue);
+  const stepIndex = visibleSteps.findIndex((s) => s.value === stepValue);
   if (stepIndex < currentIndex) return "completed";
   if (stepIndex === currentIndex) return "active";
   return "pending";
@@ -94,13 +104,16 @@ const BORDER_RIGHT = "border-b border-[var(--color-border)] md:border-b-0 md:bor
 // ─── Display mode ─────────────────────────────────────────────────────────────
 
 export function EstadoStepperDisplay({ value }: { value: TrabajoEstado }) {
+  const normalizedValue = normalizeStepperValue(value);
+  const visibleSteps = getVisibleSteps();
+
   return (
     <div className="EstadoStepperDisplay flex flex-col gap-1.5">
       <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">Estado</span>
     <div className={CONTAINER}>
-      {STEPS.map((step, index) => {
-        const status = stepStatus(step.value, value);
-        const isLast = index === STEPS.length - 1;
+      {visibleSteps.map((step, index) => {
+        const status = stepStatus(step.value, normalizedValue, visibleSteps);
+        const isLast = index === visibleSteps.length - 1;
         const isPainted = status === "active" || status === "completed";
 
         return (
@@ -138,24 +151,23 @@ type EstadoStepperProps = {
 };
 
 export function EstadoStepper({ initialValue, name, allowFinalizado, form, value, onChange }: EstadoStepperProps) {
-  const [internalSelected, setInternalSelected] = useState<TrabajoEstado>(initialValue);
+  const [internalSelected, setInternalSelected] = useState<TrabajoEstado>(normalizeStepperValue(initialValue));
   const selected = value ?? internalSelected;
 
   useEffect(() => {
-    setInternalSelected(initialValue);
+    setInternalSelected(normalizeStepperValue(initialValue));
   }, [initialValue]);
 
-  const visibleSteps = allowFinalizado === false
-    ? STEPS.filter((s) => s.value !== "finalizado")
-    : STEPS;
+  const normalizedSelected = normalizeStepperValue(selected);
+  const visibleSteps = getVisibleSteps(allowFinalizado !== false);
 
   return (
     <div className="EstadoStepper flex flex-col gap-1.5">
       <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">Estado</span>
     <div className={CONTAINER}>
-      <input type="hidden" name={name} value={selected} form={form} />
+      <input type="hidden" name={name} value={normalizedSelected} form={form} />
       {visibleSteps.map((step, index) => {
-        const status = stepStatus(step.value, selected);
+        const status = stepStatus(step.value, normalizedSelected, visibleSteps);
         const isLast = index === visibleSteps.length - 1;
         const isPainted = status === "active" || status === "completed";
 
