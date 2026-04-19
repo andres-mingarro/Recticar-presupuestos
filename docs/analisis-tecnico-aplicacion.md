@@ -237,6 +237,21 @@ La pantalla `/precios` administra este catálogo y permite ajuste porcentual mas
 
 La query agrupada principal es `listTrabajosAgrupados()` en `src/lib/queries/catalogo.ts`.
 
+Además, desde la migración `020_add_trabajo_snapshots.sql`, cada trabajo seleccionado dentro de una orden guarda snapshot histórico de:
+
+- categoría,
+- nombre,
+- precio correspondiente a la lista elegida al momento de guardar.
+
+Ese snapshot vive en `orden_trabajo_trabajos` y es la fuente de verdad para:
+
+- el resumen del trabajo,
+- la vista detalle,
+- el PDF,
+- la persistencia histórica cuando el catálogo cambia.
+
+Si mañana cambia el nombre del trabajo o alguna lista de precios en `/precios`, los presupuestos viejos deben seguir mostrando el valor histórico guardado. Solo el botón de actualización explícita puede refrescar ese snapshot.
+
 ### 7.4 Repuestos
 
 Los repuestos también se organizan por categorías, pero el modelo cambió respecto de versiones anteriores.
@@ -256,6 +271,20 @@ En consecuencia:
 - el total de un repuesto en un trabajo es `precio_unitario x cantidad`.
 
 Este cambio quedó formalizado por la migración `014_add_precio_cantidad_to_trabajo_repuestos.sql`.
+
+Desde la migración `021_add_repuesto_snapshots.sql`, además de `precio` y `cantidad`, la relación `orden_trabajo_repuestos` guarda snapshot de:
+
+- nombre de categoría,
+- nombre de repuesto.
+
+La regla de negocio importante es esta:
+
+- el precio del repuesto dentro del presupuesto pertenece al trabajo, no al catálogo,
+- el catálogo de repuestos funciona como base de nombres/categorías vivas,
+- renombrar o borrar un repuesto no debe alterar el precio histórico ya guardado,
+- el PDF y los resúmenes deben poder seguir mostrando el repuesto aunque ya no exista en catálogo.
+
+Por eso, a diferencia de los trabajos, el refresco desde catálogo para repuestos solo puede actualizar metadatos de identidad viva como nombre/categoría, pero nunca debe pisar `precio`.
 
 ### 7.5 Información técnica
 
@@ -384,11 +413,18 @@ Cuando el usuario envía el formulario:
 La función `updateTrabajo()` en `src/lib/queries/trabajos.ts` hace una estrategia simple y robusta:
 
 1. actualiza la fila principal del trabajo,
-2. borra `trabajo_trabajos`,
-3. borra `trabajo_repuestos`,
-4. reinserta relaciones actuales.
+2. elimina relaciones que ya no siguen seleccionadas,
+3. inserta o actualiza relaciones vigentes,
+4. persiste snapshot histórico de trabajos y repuestos junto con sus valores.
 
-No hay diff fino entre estado viejo y nuevo. El diseño favorece simplicidad y previsibilidad por encima de optimización micro.
+El diseño sigue siendo simple, pero ya no depende de “borrar todo y reinsertar” porque el snapshot histórico necesita sobrevivir a renombres y bajas del catálogo.
+
+Detalles importantes del guardado actual:
+
+- trabajos: guardan `categoria_nombre_snapshot`, `trabajo_nombre_snapshot` y `precio_snapshot`,
+- repuestos: guardan `categoria_nombre_snapshot`, `repuesto_nombre_snapshot`, `precio` y `cantidad`,
+- la pantalla de edición debe preferir labels snapshot para items ya guardados,
+- si un repuesto fue borrado del catálogo, el trabajo puede seguir mostrándolo en resumen y PDF gracias al snapshot y al `ON DELETE SET NULL`.
 
 ### 8.8 Reglas de negocio visibles en código
 
@@ -397,7 +433,11 @@ Hoy existen al menos estas reglas:
 - un trabajo no puede aprobarse sin cliente asignado,
 - la fecha de aprobación se guarda la primera vez que pasa a `aprobado`,
 - `finalizado` mueve el trabajo a historial a nivel de UX y listados,
-- prioridad y cobrado forman parte del mismo flujo de edición.
+- prioridad y cobrado forman parte del mismo flujo de edición,
+- los trabajos históricos deben mostrar nombre y precio snapshot aunque cambie el catálogo,
+- los repuestos históricos deben mostrar nombre snapshot y precio histórico propio del trabajo,
+- la alerta de “catálogo cambió” compara solo trabajos, no repuestos,
+- el botón `Actualizar precios` refresca precios solo para trabajos; en repuestos refresca nombre/categoría si todavía existen en catálogo, pero no su precio.
 
 ## 9. Generación de presupuesto PDF
 
@@ -407,8 +447,8 @@ El flujo es:
 
 1. recibe `id`,
 2. carga `TrabajoDetail`,
-3. carga trabajos ya resueltos para la lista de precios activa,
-4. carga repuestos del trabajo con precio y cantidad,
+3. carga trabajos snapshot ya resueltos para la lista de precios histórica del trabajo,
+4. carga repuestos snapshot del trabajo con precio y cantidad históricos,
 5. genera un QR como data URL,
 6. renderiza `PresupuestoPdf`,
 7. devuelve un PDF inline.
@@ -417,6 +457,7 @@ Puntos a notar:
 
 - el nombre del archivo se arma dinámicamente con número de trabajo y cliente,
 - el PDF usa datos ya cocinados por la capa de queries,
+- el PDF no debe depender del nombre vivo del catálogo para trabajos o repuestos ya guardados,
 - observaciones ya forman parte del documento,
 - los importes hoy se muestran como enteros, sin decimales.
 
@@ -502,7 +543,14 @@ El proyecto muestra una evolución bastante clara:
 - listas de precios,
 - desacople del catálogo técnico,
 - incorporación de repuestos,
-- precio y cantidad por repuesto dentro del trabajo.
+- precio y cantidad por repuesto dentro del trabajo,
+- snapshots históricos de trabajos,
+- snapshots históricos de identidad para repuestos.
+
+Migraciones especialmente relevantes para el flujo histórico actual:
+
+- `020_add_trabajo_snapshots.sql`: agrega snapshot de categoría, nombre y precio a `orden_trabajo_trabajos`,
+- `021_add_repuesto_snapshots.sql`: agrega snapshot de categoría y nombre a `orden_trabajo_repuestos`, permite `repuesto_id` nulo y redefine el FK con `ON DELETE SET NULL`.
 
 Una observación útil: hay versiones repetidas en nombres de migración como `008_*` y `009_*`. Eso no necesariamente rompe el runner, pero sí exige disciplina al revisar historial y orden de aplicación.
 
@@ -531,11 +579,28 @@ La impresión de etiquetas depende de selectores que conocen la estructura del s
 
 ### Persistencia histórica de precios
 
-El cambio de repuestos fue correcto, pero todavía conviene vigilar que ninguna pantalla vuelva a tomar el precio del catálogo como si fuera precio presupuestado.
+El sistema ya protege bastante bien el histórico, pero sigue siendo un punto sensible:
+
+- ningún resumen o PDF debe reconstruir trabajos desde el catálogo vivo si existe snapshot,
+- ningún flujo debe volver a usar el precio del catálogo de repuestos como si fuera precio presupuestado,
+- la edición visual del trabajo debe reflejar labels snapshot para items ya guardados,
+- si un item fue eliminado del catálogo, el trabajo histórico debe seguir siendo legible.
 
 ### Base técnica externa
 
 La disponibilidad y forma del catálogo técnico son críticas. Si cambia el esquema externo o la conectividad, se impactan formularios de trabajo, PDFs y listados que hidratan etiquetas técnicas.
+
+### Conectividad con Neon
+
+El acceso a base usa `@neondatabase/serverless`, por lo que una caída de red o disponibilidad puede aparecer como `fetch failed`.
+
+`src/lib/db.ts` hoy envuelve esos errores para distinguir:
+
+- base principal,
+- base técnica,
+- host que falló.
+
+Si reaparece un error de conexión, revisar primero variables de entorno, red y disponibilidad de Neon antes de asumir un bug de negocio.
 
 ## 17. Archivos clave para mantenimiento
 

@@ -93,6 +93,13 @@
 - La URL base para QR usa `NEXT_PUBLIC_BASE_URL` y cae a `http://localhost:3000` si no existe
 - Los repuestos del trabajo guardan `precio` y `cantidad` en `orden_trabajo_repuestos`
 - El catalogo `/repuestos` ya no define el precio final usado en presupuesto; ese valor se decide por trabajo
+- `orden_trabajo_trabajos` guarda snapshot de `categoria_nombre_snapshot`, `trabajo_nombre_snapshot` y `precio_snapshot`
+- `orden_trabajo_repuestos` guarda snapshot de `categoria_nombre_snapshot` y `repuesto_nombre_snapshot`; el `precio` sigue siendo el valor historico del trabajo
+- Los snapshots son la fuente de verdad para resumen del trabajo, PDF y labels historicos en edicion
+- Si cambia el catalogo de trabajos, los presupuestos viejos deben seguir mostrando nombre y precio snapshot
+- Si cambia o se borra un repuesto del catalogo, el presupuesto viejo debe seguir mostrando nombre snapshot y precio historico propio
+- El boton `Actualizar precios` refresca precios solo para trabajos; en repuestos solo refresca nombre/categoria si el item todavia existe
+- La alerta de cambio de catalogo compara solo trabajos; repuestos no deben compararse contra precio vivo de catalogo
 - `TrabajoForm` usa `TrabajoItemCard` y `CheckboxBeauti` para los items de trabajos y repuestos
 - `TrabajoForm` usa `Tabs` para separar `Trabajos` y `Repuestos`
 - `RepuestosSeleccionProvider` maneja seleccion, precio unitario y cantidad por repuesto
@@ -140,6 +147,8 @@
 - Existe la migracion `014_add_precio_cantidad_to_pedido_repuestos.sql` como antecedente del esquema previo
 - Existe la migracion `016_rename_pedidos_to_ordenes_trabajo.sql` que renombra tablas, enums, indices y `numero_pedido` a `numero_trabajo`
 - Existe la migracion `019_add_presupuesto_entregado_cleanup.sql` que agrega `fecha_presupuesto_entregado` y la configuracion de limpieza automatica
+- Existe la migracion `020_add_trabajo_snapshots.sql` para snapshots historicos de trabajos
+- Existe la migracion `021_add_repuesto_snapshots.sql` para snapshots historicos de identidad de repuestos y `ON DELETE SET NULL`
 - Revisar consistencia entre estados persistidos, labels del stepper y filtros/listados cuando se agreguen estados nuevos
 
 ## Limpieza automatica
@@ -160,3 +169,4 @@
 - `npm run db:seed:dev` crea 15 clientes fake y 15 trabajos fake usando combinaciones de la base tecnica externa
 - `redirect()` de Next lanza una excepcion internamente; no envolverlo en `try/catch`
 - Muchas pages que leen DB usan `export const dynamic = "force-dynamic"`
+- `src/lib/db.ts` envuelve errores de Neon para indicar mejor si fallo la base principal o la tecnica
