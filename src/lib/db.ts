@@ -14,6 +14,14 @@ type QueryParams = QueryParamValue[];
 let cachedSql: NeonSql | null = null;
 let cachedTechnicalSql: NeonSql | null = null;
 
+function getDatabaseHost(databaseUrl: string) {
+  try {
+    return new URL(databaseUrl).host;
+  } catch {
+    return "host-desconocido";
+  }
+}
+
 function requireDatabaseUrl(envKey: "DATABASE_URL" | "TECHNICAL_DATABASE_URL") {
   const fallbackKey = envKey === "TECHNICAL_DATABASE_URL" ? "DATABASE_URL" : null;
   const databaseUrl =
@@ -52,30 +60,74 @@ export async function templateRows<T extends Record<string, unknown>>(
   strings: TemplateStringsArray,
   ...values: QueryParams
 ) {
-  const rows = await getSql()(strings, ...values);
-  return rows as T[];
+  try {
+    const rows = await getSql()(strings, ...values);
+    return rows as T[];
+  } catch (error) {
+    const databaseUrl = requireDatabaseUrl("DATABASE_URL");
+    const causeMessage = error instanceof Error ? error.message : String(error);
+
+    throw new Error(
+      `No se pudo conectar a la base principal (${getDatabaseHost(databaseUrl)}). ` +
+        `Verificá la red, la disponibilidad de Neon y la variable DATABASE_URL. ` +
+        `Detalle: ${causeMessage}`
+    );
+  }
 }
 
 export async function queryRows<T extends Record<string, unknown>>(
   query: string,
   params: QueryParams = []
 ) {
-  const rows = await getSql().query(query, params);
-  return rows as T[];
+  try {
+    const rows = await getSql().query(query, params);
+    return rows as T[];
+  } catch (error) {
+    const databaseUrl = requireDatabaseUrl("DATABASE_URL");
+    const causeMessage = error instanceof Error ? error.message : String(error);
+
+    throw new Error(
+      `No se pudo conectar a la base principal (${getDatabaseHost(databaseUrl)}). ` +
+        `Verificá la red, la disponibilidad de Neon y la variable DATABASE_URL. ` +
+        `Detalle: ${causeMessage}`
+    );
+  }
 }
 
 export async function templateRowsFromTechnical<T extends Record<string, unknown>>(
   strings: TemplateStringsArray,
   ...values: QueryParams
 ) {
-  const rows = await getTechnicalSql()(strings, ...values);
-  return rows as T[];
+  try {
+    const rows = await getTechnicalSql()(strings, ...values);
+    return rows as T[];
+  } catch (error) {
+    const databaseUrl = requireDatabaseUrl("TECHNICAL_DATABASE_URL");
+    const causeMessage = error instanceof Error ? error.message : String(error);
+
+    throw new Error(
+      `No se pudo conectar a la base técnica (${getDatabaseHost(databaseUrl)}). ` +
+        `Verificá la red, la disponibilidad de Neon y la variable TECHNICAL_DATABASE_URL. ` +
+        `Detalle: ${causeMessage}`
+    );
+  }
 }
 
 export async function queryRowsFromTechnical<T extends Record<string, unknown>>(
   query: string,
   params: QueryParams = []
 ) {
-  const rows = await getTechnicalSql().query(query, params);
-  return rows as T[];
+  try {
+    const rows = await getTechnicalSql().query(query, params);
+    return rows as T[];
+  } catch (error) {
+    const databaseUrl = requireDatabaseUrl("TECHNICAL_DATABASE_URL");
+    const causeMessage = error instanceof Error ? error.message : String(error);
+
+    throw new Error(
+      `No se pudo conectar a la base técnica (${getDatabaseHost(databaseUrl)}). ` +
+        `Verificá la red, la disponibilidad de Neon y la variable TECHNICAL_DATABASE_URL. ` +
+        `Detalle: ${causeMessage}`
+    );
+  }
 }

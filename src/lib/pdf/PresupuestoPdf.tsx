@@ -220,16 +220,17 @@ function groupByCategory(trabajos: TrabajoDetalleItem[]) {
 
 function groupRepuestosByCategory(repuestos: RepuestoDetalleItem[]) {
   const map = new Map<
-    number,
+    string,
     { nombre: string; items: RepuestoDetalleItem[] }
   >();
 
   for (const r of repuestos) {
-    const group = map.get(r.categoriaId);
+    const groupKey = r.categoriaId === null ? `snapshot:${r.categoriaNombre}` : String(r.categoriaId);
+    const group = map.get(groupKey);
     if (group) {
       group.items.push(r);
     } else {
-      map.set(r.categoriaId, { nombre: r.categoriaNombre, items: [r] });
+      map.set(groupKey, { nombre: r.categoriaNombre, items: [r] });
     }
   }
 

@@ -2,9 +2,9 @@ import { queryRows, templateRows } from "@/lib/db";
 import type { RepuestoAgrupado } from "@/lib/types";
 
 export type RepuestoDetalleItem = {
-  categoriaId: number;
+  categoriaId: number | null;
   categoriaNombre: string;
-  repuestoId: number;
+  repuestoId: number | null;
   repuestoNombre: string;
   precioUnitario: number;
   cantidad: number;
@@ -139,26 +139,26 @@ export async function deleteRepuesto(id: number) {
 
 export async function getRepuestosDetalleByTrabajo(trabajoId: number) {
   const rows = await queryRows<{
-    categoria_id: number;
+    categoria_id: number | null;
     categoria_nombre: string;
-    repuesto_id: number;
+    repuesto_id: number | null;
     repuesto_nombre: string;
     precio_unitario: number;
     cantidad: number;
   }>(
     `
       SELECT
-        c.id AS categoria_id,
-        c.nombre AS categoria_nombre,
-        r.id AS repuesto_id,
-        r.nombre AS repuesto_nombre,
+        r.categoria_id AS categoria_id,
+        COALESCE(pr.categoria_nombre_snapshot, c.nombre) AS categoria_nombre,
+        pr.repuesto_id AS repuesto_id,
+        COALESCE(pr.repuesto_nombre_snapshot, r.nombre) AS repuesto_nombre,
         pr.precio AS precio_unitario,
         pr.cantidad AS cantidad
       FROM orden_trabajo_repuestos pr
-      INNER JOIN repuestos r ON r.id = pr.repuesto_id
-      INNER JOIN categorias_repuesto c ON c.id = r.categoria_id
+      LEFT JOIN repuestos r ON r.id = pr.repuesto_id
+      LEFT JOIN categorias_repuesto c ON c.id = r.categoria_id
       WHERE pr.orden_trabajo_id = $1
-      ORDER BY c.nombre ASC, r.nombre ASC
+      ORDER BY COALESCE(pr.categoria_nombre_snapshot, c.nombre) ASC, COALESCE(pr.repuesto_nombre_snapshot, r.nombre) ASC
     `,
     [trabajoId]
   );

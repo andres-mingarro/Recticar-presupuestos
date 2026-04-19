@@ -37,6 +37,7 @@ import { TrabajoDatosCard } from "@/components/ui/TrabajoDatosCard";
 import { PrintButton } from "./PrintButton";
 import styles from "./TrabajoDetailPage.module.scss";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
+import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 
 type TrabajoDetailPageProps = {
   trabajo: TrabajoDetail;
@@ -55,6 +56,7 @@ type TrabajoDetailPageProps = {
   repuestos: RepuestoAgrupado[];
   qrSvg: string;
   snapshotTrabajos: TrabajoDetalleItem[];
+  snapshotRepuestos: RepuestoDetalleItem[];
   refreshSnapshotPricesAction: (
     state: { error: string | null; success: boolean; updatedCount: number },
     formData: FormData
@@ -75,6 +77,7 @@ export function TrabajoDetailPage({
   repuestos,
   qrSvg,
   snapshotTrabajos,
+  snapshotRepuestos,
   refreshSnapshotPricesAction,
 }: TrabajoDetailPageProps) {
   const formId = `trabajo-form-${trabajo.id}`;
@@ -233,6 +236,8 @@ export function TrabajoDetailPage({
             relations={relations}
             trabajos={trabajos}
             repuestos={repuestos}
+            snapshotTrabajos={snapshotTrabajos}
+            snapshotRepuestos={snapshotRepuestos}
             allowFinalizado
             showClienteSection={false}
             showPrioridadSection={false}
@@ -287,6 +292,7 @@ export function TrabajoDetailPage({
               trabajos={trabajos}
               repuestos={repuestos}
               snapshotTrabajos={snapshotTrabajos}
+              snapshotRepuestos={snapshotRepuestos}
               refreshSnapshotPricesAction={refreshSnapshotPricesAction}
             />
 
@@ -323,6 +329,7 @@ function TrabajoDetailSummaryCard({
   trabajos,
   repuestos,
   snapshotTrabajos,
+  snapshotRepuestos,
   refreshSnapshotPricesAction,
 }: {
   estado: TrabajoDetail["estado"];
@@ -330,6 +337,7 @@ function TrabajoDetailSummaryCard({
   trabajos: TrabajoAgrupado[];
   repuestos: RepuestoAgrupado[];
   snapshotTrabajos: TrabajoDetalleItem[];
+  snapshotRepuestos: RepuestoDetalleItem[];
   refreshSnapshotPricesAction: (
     state: { error: string | null; success: boolean; updatedCount: number },
     formData: FormData
@@ -352,6 +360,7 @@ function TrabajoDetailSummaryCard({
       trabajos={trabajos}
       repuestos={repuestos}
       snapshotTrabajos={snapshotTrabajos}
+      snapshotRepuestos={snapshotRepuestos}
       refreshSnapshotPricesAction={refreshSnapshotPricesAction}
     />
   );

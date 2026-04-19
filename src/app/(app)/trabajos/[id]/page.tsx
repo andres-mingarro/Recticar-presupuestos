@@ -10,7 +10,7 @@ import {
   listMotores,
   listTrabajosAgrupados,
 } from "@/lib/queries/catalogo";
-import { listRepuestosAgrupados } from "@/lib/queries/repuestos";
+import { getRepuestosDetalleByTrabajo, listRepuestosAgrupados } from "@/lib/queries/repuestos";
 import { getTrabajoDetailById, refreshTrabajoSnapshotPrices, updateTrabajo } from "@/lib/queries/trabajos";
 import { generateQrSvg } from "@/lib/qr";
 import { queryRows } from "@/lib/db";
@@ -62,6 +62,7 @@ export default async function Page({
     trabajoId,
     (trabajo.lista_precio as 1 | 2 | 3) ?? 1
   );
+  const snapshotRepuestos = await getRepuestosDetalleByTrabajo(trabajoId);
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const qrSvg = await generateQrSvg(`${baseUrl}/trabajos/${trabajoId}`);
@@ -246,6 +247,7 @@ export default async function Page({
       repuestos={repuestos}
       qrSvg={qrSvg}
       snapshotTrabajos={snapshotTrabajos}
+      snapshotRepuestos={snapshotRepuestos}
       refreshSnapshotPricesAction={refreshSnapshotPricesAction}
     />
   );

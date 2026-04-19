@@ -34,6 +34,8 @@ import { EngineIconGlyph, isEngineIconName } from "@/components/ui/EngineIcons";
 import { SeleccionTecnicaWizard } from "@/components/forms/SeleccionTecnicaWizard";
 import { getBrandLogoUrl } from "@/lib/vehicle-logo";
 import Image from "next/image";
+import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
+import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import styles from "./TrabajoForm.module.scss";
 
 export type TrabajoFormState = {
@@ -64,6 +66,8 @@ type TrabajoFormProps = {
   relations: ModeloMotorRelation[];
   trabajos: TrabajoAgrupado[];
   repuestos: RepuestoAgrupado[];
+  snapshotTrabajos?: TrabajoDetalleItem[];
+  snapshotRepuestos?: RepuestoDetalleItem[];
   allowFinalizado?: boolean;
   formId?: string;
   showClienteSection?: boolean;
@@ -132,6 +136,8 @@ export function TrabajoForm({
   relations,
   trabajos,
   repuestos,
+  snapshotTrabajos = [],
+  snapshotRepuestos = [],
   allowFinalizado = false,
   formId,
   showClienteSection = true,
@@ -233,6 +239,24 @@ export function TrabajoForm({
   const selectedMotorNombre = useMemo(
     () => motores.find((motor) => String(motor.id) === selectedMotor)?.nombre ?? null,
     [motores, selectedMotor]
+  );
+  const snapshotTrabajoNombreById = useMemo(
+    () =>
+      new Map(
+        snapshotTrabajos
+          .filter((item) => item.trabajoId !== null)
+          .map((item) => [item.trabajoId as number, item.trabajoNombre])
+      ),
+    [snapshotTrabajos]
+  );
+  const snapshotRepuestoNombreById = useMemo(
+    () =>
+      new Map(
+        snapshotRepuestos
+          .filter((item) => item.repuestoId !== null)
+          .map((item) => [item.repuestoId as number, item.repuestoNombre])
+      ),
+    [snapshotRepuestos]
   );
 
   useEffect(() => {
@@ -543,7 +567,11 @@ export function TrabajoForm({
                             checked={selectedTrabajoIds.has(trabajo.id)}
                             value={trabajo.id}
                             onCheckedChange={(checked) => toggleTrabajo(trabajo.id, checked)}
-                            label={trabajo.nombre}
+                            label={
+                              selectedTrabajoIds.has(trabajo.id)
+                                ? (snapshotTrabajoNombreById.get(trabajo.id) ?? trabajo.nombre)
+                                : trabajo.nombre
+                            }
                           >
                           </TrabajoItemCard>
                         ))}
@@ -583,7 +611,11 @@ export function TrabajoForm({
                               checked={selectedRepuestoIds.has(repuesto.id)}
                               value={repuesto.id}
                               onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked)}
-                              label={repuesto.nombre}
+                              label={
+                                selectedRepuestoIds.has(repuesto.id)
+                                  ? (snapshotRepuestoNombreById.get(repuesto.id) ?? repuesto.nombre)
+                                  : repuesto.nombre
+                              }
                               contentClassName="flex-col gap-2"
                               checkboxClassName="[--checkbox-size:27px]"
                               >

@@ -9,11 +9,13 @@ import { useRepuestosSeleccion } from "@/components/forms/TrabajoForm/RepuestosS
 import { Button } from "@/components/ui/Button";
 import { ListPriceBadge } from "@/components/ui/Badge";
 import { formatPrice } from "@/lib/format";
+import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 
 type TrabajosResumenProps = {
   trabajos: TrabajoAgrupado[];
   repuestos?: RepuestoAgrupado[];
   snapshotTrabajos?: TrabajoDetalleItem[];
+  snapshotRepuestos?: RepuestoDetalleItem[];
   refreshSnapshotPricesAction?: (
     state: { error: string | null; success: boolean; updatedCount: number },
     formData: FormData
@@ -30,6 +32,7 @@ export function TrabajosResumen({
   trabajos,
   repuestos = [],
   snapshotTrabajos = [],
+  snapshotRepuestos = [],
   refreshSnapshotPricesAction,
 }: TrabajosResumenProps) {
   const { selectedIds, listaPrecios } = useTrabajosSeleccion();
@@ -68,20 +71,68 @@ export function TrabajosResumen({
   );
 
   const selectedRepuestos = useMemo(
-    () =>
-      Object.entries(selectedRepuestoItems).map(([id, item]) => {
-        const repuesto = repuestos
-          .flatMap((g) => g.repuestos)
-          .find((current) => current.id === Number(id));
+    () => {
+      if (snapshotRepuestos.length === 0) {
+        const repuestosById = new Map(
+          repuestos.flatMap((g) => g.repuestos).map((repuesto) => [repuesto.id, repuesto])
+        );
+
+        return Object.entries(selectedRepuestoItems).map(([id, item]) => {
+          const numericId = Number(id);
+          const repuesto = repuestosById.get(numericId);
+
+          return {
+            id: numericId,
+            nombre: repuesto?.nombre ?? "Repuesto",
+            cantidad: item.cantidad,
+            total: item.precioUnitario * item.cantidad,
+          };
+        });
+      }
+
+      const repuestosById = new Map(
+        repuestos.flatMap((g) => g.repuestos).map((repuesto) => [repuesto.id, repuesto])
+      );
+      const snapshotSelected = snapshotRepuestos.filter((item) =>
+        item.repuestoId === null || selectedRepuestoItems[item.repuestoId] !== undefined
+      );
+      const snapshotIds = new Set(
+        snapshotSelected
+          .map((item) => item.repuestoId)
+          .filter((item): item is number => item !== null)
+      );
+      const snapshotRows = snapshotSelected.map((item) => {
+        const currentSelection =
+          item.repuestoId !== null ? selectedRepuestoItems[item.repuestoId] : undefined;
 
         return {
-          id: Number(id),
+          id: item.repuestoId ?? `snapshot-${item.categoriaNombre}-${item.repuestoNombre}`,
+          nombre: item.repuestoNombre,
+          cantidad: currentSelection?.cantidad ?? item.cantidad,
+          total:
+            (currentSelection?.precioUnitario ?? item.precioUnitario) *
+            (currentSelection?.cantidad ?? item.cantidad),
+        };
+      });
+      const currentOnlyRows = Object.entries(selectedRepuestoItems).flatMap(([id, item]) => {
+        const numericId = Number(id);
+        if (snapshotIds.has(numericId)) {
+          return [];
+        }
+
+        const repuesto = repuestosById.get(numericId);
+
+        return [{
+          id: numericId,
           nombre: repuesto?.nombre ?? "Repuesto",
           cantidad: item.cantidad,
           total: item.precioUnitario * item.cantidad,
-        };
-      }),
-    [repuestos, selectedRepuestoItems]
+        }];
+      });
+
+      return [...snapshotRows, ...currentOnlyRows];
+    },
+    [repuestos, selectedRepuestoItems, snapshotRepuestos]
   );
 
   const total = useMemo(
@@ -92,8 +143,6 @@ export function TrabajosResumen({
   );
 
   const snapshotDiffs = useMemo(() => {
-    if (snapshotTrabajos.length === 0) return [];
-
     return snapshotTrabajos
       .filter((item) => item.trabajoId === null || selectedIds.has(item.trabajoId))
       .map((item) => {
