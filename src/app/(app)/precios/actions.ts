@@ -9,6 +9,7 @@ import {
   deleteTrabajo,
   renameCategoria,
   reorderTrabajos,
+  updateCategoria,
   updateTrabajoNombres,
   updateTrabajoPrecios,
 } from "@/lib/queries/catalogo";
@@ -24,6 +25,9 @@ export async function updateCategoriaTrabajos(
   _prev: CatalogActionState,
   formData: FormData
 ): Promise<CatalogActionState> {
+  const categoriaId = Number(normalize(formData, "categoriaId"));
+  const iconoRaw = normalize(formData, "icono");
+  const icono = iconoRaw || null;
   const nombreUpdates: Array<{ id: number; nombre: string }> = [];
   const precioUpdates = new Map<
     number,
@@ -57,6 +61,9 @@ export async function updateCategoriaTrabajos(
   }
 
   try {
+    if (!Number.isNaN(categoriaId)) {
+      await updateCategoria(categoriaId, icono);
+    }
     if (nombreUpdates.length > 0) await updateTrabajoNombres(nombreUpdates);
     if (precioUpdates.size > 0) await updateTrabajoPrecios(Array.from(precioUpdates.values()));
   } catch {

@@ -30,6 +30,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Tabs } from "@/components/ui/Tabs";
 import { Incrementor } from "@/components/ui/Incrementor";
+import { EngineIconGlyph, isEngineIconName } from "@/components/ui/EngineIcons";
 import { SeleccionTecnicaWizard } from "@/components/forms/SeleccionTecnicaWizard";
 import { getBrandLogoUrl } from "@/lib/vehicle-logo";
 import Image from "next/image";
@@ -524,7 +525,15 @@ export function TrabajoForm({
                       className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--gray-20)] p-4")}
                     >
                       <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--text-color-defult)]")}>
-                        <span>{grupo.categoriaNombre}</span>
+                        <span className="flex items-center gap-2">
+                          {isEngineIconName(grupo.categoriaIcono) ? (
+                            <EngineIconGlyph
+                              name={grupo.categoriaIcono}
+                              className="h-7 w-7 shrink-0 text-[var(--text-color-defult)]"
+                            />
+                          ) : null}
+                          <span>{grupo.categoriaNombre}</span>
+                        </span>
                         <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
                       </summary>
                       <div className="mt-4 grid gap-3 md:grid-cols-2">

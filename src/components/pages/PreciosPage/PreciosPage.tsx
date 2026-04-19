@@ -12,6 +12,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button, buttonStyles } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
+import { EngineIcons, EngineIconGlyph, isEngineIconName, type EngineIconName } from "@/components/ui/EngineIcons";
 import { Icon } from "@/components/ui/Icon";
 import { SortableList } from "@/components/sortable/SortableList";
 import { Spinner } from "@/components/ui/Spinner";
@@ -188,11 +189,15 @@ function CategoriaCard({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [engineIconsOpen, setEngineIconsOpen] = useState(false);
   const [ajustesPorcentaje, setAjustesPorcentaje] = useState<Record<1 | 2 | 3, number>>({
     1: 0,
     2: 0,
     3: 0,
   });
+  const [categoriaIcono, setCategoriaIcono] = useState<EngineIconName | null>(
+    isEngineIconName(grupo.categoriaIcono) ? grupo.categoriaIcono : null
+  );
   const [precioDrafts, setPrecioDrafts] = useState<
     Record<number, { precioLista1: number; precioLista2: number; precioLista3: number }>
   >({});
@@ -220,6 +225,7 @@ function CategoriaCard({
       )
     );
     setAjustesPorcentaje({ 1: 0, 2: 0, 3: 0 });
+    setCategoriaIcono(isEngineIconName(grupo.categoriaIcono) ? grupo.categoriaIcono : null);
   }, [grupo]);
 
   const formId = `save-cat-${grupo.categoriaId}`;
@@ -227,6 +233,7 @@ function CategoriaCard({
   function handleCancel() {
     setIsEditing(false);
     setResetKey((k) => k + 1);
+    setCategoriaIcono(isEngineIconName(grupo.categoriaIcono) ? grupo.categoriaIcono : null);
     setPrecioDrafts(
       Object.fromEntries(
         grupo.trabajos.map((trabajo) => [
@@ -301,14 +308,24 @@ function CategoriaCard({
   return (
     <Card as="section" className="space-y-0 overflow-hidden p-0">
       {/* Save form — hidden anchor, inputs reference it via form={formId} */}
-      <form id={formId} action={saveFormAction} className="hidden" />
+      <form id={formId} action={saveFormAction} className="hidden">
+        <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
+        <input type="hidden" name="icono" value={categoriaIcono ?? ""} />
+      </form>
 
       {/* ── Toolbar ── */}
       <div className="flex items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2">
 
         {/* Nombre de categoría */}
         <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+          {categoriaIcono ? (
+            <EngineIconGlyph
+              name={categoriaIcono}
+              className="h-8 w-8 shrink-0 text-[var(--text-color-defult)]"
+            />
+          ) : (
+            <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+          )}
           {isEditing ? (
             <form action={renameFormAction} className="flex min-w-0 flex-1 items-center gap-1" key={grupo.categoriaNombre}>
               <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
@@ -337,6 +354,21 @@ function CategoriaCard({
 
         {/* Separador */}
         <Divider orientation="vertical" className="h-5" />
+
+        {isEditing ? (
+          <>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => setEngineIconsOpen(true)}
+              className="shrink-0"
+            >
+              {categoriaIcono ? "Cambiar imagen" : "Agregar imagen"}
+            </Button>
+            <Divider orientation="vertical" className="h-5" />
+          </>
+        ) : null}
 
         {/* Contador */}
         <span className="shrink-0 rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
@@ -493,6 +525,13 @@ function CategoriaCard({
           )}
         </form>
       </div>}
+
+      <EngineIcons
+        open={engineIconsOpen}
+        onOpenChange={setEngineIconsOpen}
+        value={categoriaIcono}
+        onSelect={setCategoriaIcono}
+      />
     </Card>
   );
 }

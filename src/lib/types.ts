@@ -162,6 +162,7 @@ export type TechnicalVehiculo = {
 export type TrabajoAgrupado = {
   categoriaId: number;
   categoriaNombre: string;
+  categoriaIcono: string | null;
   trabajos: Array<{
     id: number;
     nombre: string;

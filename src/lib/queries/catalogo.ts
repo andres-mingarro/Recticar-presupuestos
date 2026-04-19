@@ -130,6 +130,7 @@ export async function listTrabajosAgrupados() {
   const rows = await templateRows<{
     categoria_id: number;
     categoria_nombre: string;
+    categoria_icono: string | null;
     trabajo_id: number | null;
     trabajo_nombre: string | null;
     trabajo_precio: number | null;
@@ -140,6 +141,7 @@ export async function listTrabajosAgrupados() {
     SELECT
       c.id AS categoria_id,
       c.nombre AS categoria_nombre,
+      c.icono AS categoria_icono,
       t.id AS trabajo_id,
       t.nombre AS trabajo_nombre,
       t.precio AS trabajo_precio,
@@ -173,6 +175,7 @@ export async function listTrabajosAgrupados() {
     grouped.set(row.categoria_id, {
       categoriaId: row.categoria_id,
       categoriaNombre: row.categoria_nombre,
+      categoriaIcono: row.categoria_icono,
       trabajos:
         row.trabajo_id !== null
           ? [{
@@ -192,7 +195,7 @@ export async function listTrabajosAgrupados() {
 
 export async function createCategoria(nombre: string) {
   const rows = await templateRows<{ id: number }>`
-    INSERT INTO categorias_trabajo (nombre) VALUES (${nombre}) RETURNING id
+    INSERT INTO categorias_trabajo (nombre, icono) VALUES (${nombre}, NULL) RETURNING id
   `;
   return rows[0];
 }
@@ -200,6 +203,14 @@ export async function createCategoria(nombre: string) {
 export async function renameCategoria(id: number, nombre: string) {
   await templateRows`
     UPDATE categorias_trabajo SET nombre = ${nombre} WHERE id = ${id}
+  `;
+}
+
+export async function updateCategoria(id: number, icono: string | null) {
+  await templateRows`
+    UPDATE categorias_trabajo
+    SET icono = ${icono}
+    WHERE id = ${id}
   `;
 }
 
