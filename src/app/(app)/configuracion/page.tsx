@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSession } from "@/lib/auth";
+import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
 import { resolveSearchParams } from "@/lib/search-params";
 import { getEmpresaConfig } from "@/lib/queries/empresa";
 import {
@@ -63,10 +63,9 @@ export default async function ConfiguracionPage({
 }: {
   searchParams?: Promise<{ saved?: string; error?: string; cleanup?: string; deleted?: string }>;
 }) {
-  const session = await getSession();
-  const role = session?.role;
-  const canManageUsuarios = role === "admin" || role === "superuser";
-  const canEditEmpresa = role === "admin" || role === "superuser";
+  const { session } = await getSessionWithPermisos();
+  const canManageUsuarios = isSuperAdmin(session);
+  const canEditEmpresa = isSuperAdmin(session);
   const params = await resolveSearchParams(searchParams);
   const empresa = await getEmpresaConfig();
   const hasNombreError = params.error === "nombre";

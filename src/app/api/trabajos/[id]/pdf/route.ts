@@ -1,5 +1,6 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import React from "react";
+import { getSession } from "@/lib/auth";
 import { getTrabajoDetailById } from "@/lib/queries/trabajos";
 import { getTrabajosDetalleByTrabajo } from "@/lib/queries/catalogo";
 import { getEmpresaConfig } from "@/lib/queries/empresa";
@@ -21,6 +22,12 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await getSession();
+
+  if (!session) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const { id } = await params;
   const trabajoId = Number(id);
 

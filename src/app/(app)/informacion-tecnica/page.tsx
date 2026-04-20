@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth";
+import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
 import { resolveSearchParams } from "@/lib/search-params";
 import { InformacionTecnicaPage } from "@/components/pages/InformacionTecnicaPage";
 import {
@@ -43,8 +43,8 @@ export default async function Page({
 }: {
   searchParams?: Promise<{ section?: string; q?: string; page?: string }>;
 }) {
-  const session = await getSession();
-  const canEdit = session?.role === "admin" || session?.role === "superuser";
+  const { session } = await getSessionWithPermisos();
+  const canEdit = isSuperAdmin(session);
 
   const params = await resolveSearchParams(searchParams);
   const section =

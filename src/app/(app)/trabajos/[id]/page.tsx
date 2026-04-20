@@ -1,7 +1,6 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { TrabajoDetailPage } from "@/components/pages/TrabajoDetailPage";
 import type { TrabajoFormState } from "@/components/forms/TrabajoForm";
-import type { ChangeEstadoActionState } from "@/components/ui/EstadoStepper";
 import {
   getTrabajosDetalleByTrabajo,
   listMarcas,
@@ -13,10 +12,8 @@ import {
 import { getRepuestosDetalleByTrabajo, listRepuestosAgrupados } from "@/lib/queries/repuestos";
 import { getTrabajoDetailById, refreshTrabajoSnapshotPrices, updateTrabajo } from "@/lib/queries/trabajos";
 import { generateQrSvg } from "@/lib/qr";
-import { queryRows } from "@/lib/db";
 import { parseTrabajoRepuestos } from "@/lib/trabajo-repuestos";
-import type { TrabajoEstado, TrabajoFormValues, TrabajoPrioridad } from "@/lib/types";
-import type { ChangePrioridadActionState } from "@/components/ui/PrioridadSelector";
+import type { TrabajoFormValues } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
@@ -24,9 +21,6 @@ export const dynamic = "force-dynamic";
 function normalizeString(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
 }
-
-const VALID_ESTADOS: TrabajoEstado[] = ["presupuesto_entregado", "aprobado", "finalizado"];
-const VALID_PRIORIDADES: TrabajoPrioridad[] = ["baja", "normal", "alta"];
 
 export default async function Page({
   params,
@@ -149,69 +143,6 @@ export default async function Page({
       error: null,
       values: { ...values, updatedAt: result.updatedAt },
     };
-  }
-
-  async function changeEstadoAction(
-    _prevState: ChangeEstadoActionState,
-    formData: FormData
-  ): Promise<ChangeEstadoActionState> {
-    "use server";
-
-    const estadoRaw = normalizeString(formData.get("estado"));
-    if (!VALID_ESTADOS.includes(estadoRaw as TrabajoEstado)) {
-      return { error: "Estado inválido." };
-    }
-    const newEstado = estadoRaw as TrabajoEstado;
-
-    // Fetch current cliente_id to validate
-    const rows = await queryRows<{ cliente_id: number | null }>(
-      "SELECT cliente_id FROM ordenes_trabajo WHERE id = $1 LIMIT 1",
-      [trabajoId]
-    );
-    const current = rows[0];
-
-    if (!current) return { error: "Trabajo no encontrado." };
-
-    if (newEstado === "aprobado" && !current.cliente_id) {
-      return { error: "Para aprobar el trabajo necesitás asignar un cliente primero." };
-    }
-
-    await queryRows(
-      `UPDATE ordenes_trabajo SET
-        estado = $2::orden_trabajo_estado,
-        fecha_presupuesto_entregado = CASE
-          WHEN $2::text = 'presupuesto_entregado' AND fecha_presupuesto_entregado IS NULL THEN now()
-          WHEN $2::text <> 'presupuesto_entregado' THEN NULL
-          ELSE fecha_presupuesto_entregado
-        END,
-        fecha_aprobacion = CASE
-          WHEN $2::text = 'aprobado' AND fecha_aprobacion IS NULL THEN now()
-          ELSE fecha_aprobacion
-        END
-       WHERE id = $1`,
-      [trabajoId, newEstado]
-    );
-
-    redirect(`/trabajos/${trabajoId}?updated=1`);
-  }
-
-  async function changePrioridadAction(
-    _prevState: ChangePrioridadActionState,
-    formData: FormData
-  ): Promise<ChangePrioridadActionState> {
-    "use server";
-
-    const raw = normalizeString(formData.get("prioridad"));
-    if (!VALID_PRIORIDADES.includes(raw as TrabajoPrioridad)) {
-      return { error: "Prioridad inválida." };
-    }
-
-    await queryRows(
-      "UPDATE ordenes_trabajo SET prioridad = $2::orden_trabajo_prioridad WHERE id = $1",
-      [trabajoId, raw]
-    );
-
-    return { error: null, success: true };
   }
 
   async function refreshSnapshotPricesAction(

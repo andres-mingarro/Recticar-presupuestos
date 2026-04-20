@@ -11,9 +11,10 @@ import styles from "./AppShell.module.scss";
 type Props = {
   children: React.ReactNode;
   role?: string;
+  permisos?: string[];
 };
 
-export function AppShell({ children, role }: Props) {
+export function AppShell({ children, role, permisos }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export function AppShell({ children, role }: Props) {
           aria-label="Navegación principal"
         >
           <div className={styles.sidebarInner}>
-            <MainMenu role={role} onClose={closeMenu} />
+            <MainMenu role={role} permisos={permisos} onClose={closeMenu} />
           </div>
         </aside>
 

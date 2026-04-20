@@ -1,90 +1,67 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { getSession } from "@/lib/auth";
+import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
 import {
   createUsuario,
   deleteUsuario,
   toggleUsuarioActivo,
   updateUsuarioPassword,
-  updateUsuarioRole,
+  setUsuarioPermisos,
+  updatePantallaInicio,
 } from "@/lib/queries/usuarios";
+import type { AppPermiso, PantallaInicio } from "@/lib/queries/usuarios";
 import { revalidatePath } from "next/cache";
 
-async function getSessionRole() {
-  const session = await getSession();
-  return session?.role ?? null;
-}
-
-function canManage(
-  actorRole: string | null,
-  targetRole: string
-): boolean {
-  if (!actorRole) return false;
-  if (actorRole === "admin") return true;
-  // superuser puede manejar solo a operadores
-  if (actorRole === "superuser" && targetRole === "operador") return true;
-  return false;
+async function requireSuperAdmin() {
+  const { session } = await getSessionWithPermisos();
+  if (!isSuperAdmin(session)) throw new Error("Sin permiso");
 }
 
 export async function crearUsuarioAction(formData: FormData) {
-  const role = await getSessionRole();
-  if (role !== "admin" && role !== "superuser") throw new Error("Sin permiso");
+  await requireSuperAdmin();
 
   const nombre = formData.get("nombre") as string;
   const password = formData.get("password") as string;
-  const nuevoRol = formData.get("role") as "superuser" | "operador";
-
-  if (role === "superuser" && nuevoRol === "superuser")
-    throw new Error("Sin permiso para crear superusers");
 
   const hash = await bcrypt.hash(password, 12);
-  await createUsuario(nombre, nombre, hash, password, nuevoRol);
+  await createUsuario(nombre, nombre, hash, password, "operario");
   revalidatePath("/admin/usuarios");
 }
 
-export async function cambiarRolAction(
+export async function actualizarPermisosAction(
   email: string,
-  nuevoRol: "superuser" | "operador",
-  targetRole: string
+  permisos: AppPermiso[]
 ) {
-  const role = await getSessionRole();
-  if (!canManage(role, targetRole)) throw new Error("Sin permiso");
-  if (role === "superuser" && nuevoRol === "superuser")
-    throw new Error("Sin permiso para asignar superuser");
-  await updateUsuarioRole(email, nuevoRol);
+  await requireSuperAdmin();
+  await setUsuarioPermisos(email, permisos);
   revalidatePath("/admin/usuarios");
 }
 
-export async function cambiarPasswordAction(
-  email: string,
-  password: string,
-  targetRole: string
-) {
-  const role = await getSessionRole();
-  if (!canManage(role, targetRole)) throw new Error("Sin permiso");
+export async function cambiarPasswordAction(email: string, password: string) {
+  await requireSuperAdmin();
   const hash = await bcrypt.hash(password, 12);
   await updateUsuarioPassword(email, hash, password);
   revalidatePath("/admin/usuarios");
 }
 
-export async function toggleActivoAction(
-  email: string,
-  activo: boolean,
-  targetRole: string
-) {
-  const role = await getSessionRole();
-  if (!canManage(role, targetRole)) throw new Error("Sin permiso");
+export async function toggleActivoAction(email: string, activo: boolean) {
+  await requireSuperAdmin();
   await toggleUsuarioActivo(email, activo);
   revalidatePath("/admin/usuarios");
 }
 
-export async function eliminarUsuarioAction(
+export async function actualizarPantallaInicioAction(
   email: string,
-  targetRole: string
+  pantalla: PantallaInicio
 ) {
-  const role = await getSessionRole();
-  if (!canManage(role, targetRole)) throw new Error("Sin permiso");
+  await requireSuperAdmin();
+  await updatePantallaInicio(email, pantalla);
+  revalidatePath("/admin/usuarios");
+}
+
+export async function eliminarUsuarioAction(email: string) {
+  await requireSuperAdmin();
   await deleteUsuario(email);
   revalidatePath("/admin/usuarios");
 }

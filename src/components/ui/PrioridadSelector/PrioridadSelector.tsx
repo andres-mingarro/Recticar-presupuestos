@@ -34,14 +34,13 @@ const OPTIONS: Array<{
 ];
 
 type PrioridadSelectorProps = {
-  value: TrabajoPrioridad;
   action: (
     prevState: ChangePrioridadActionState,
     formData: FormData
   ) => Promise<ChangePrioridadActionState>;
 };
 
-export function PrioridadSelector({ value, action }: PrioridadSelectorProps) {
+export function PrioridadSelector({ action }: PrioridadSelectorProps) {
   const [state, formAction, isPending] = useActionState(action, { error: null });
   const { prioridad, setPrioridad } = usePrioridad();
 

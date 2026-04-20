@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
     username === process.env.ADMIN_USER &&
     password === process.env.ADMIN_PASSWORD
   ) {
-    const token = await createToken({ email: username, nombre: "Admin", role: "admin" });
-    const res = NextResponse.json({ ok: true });
+    const token = await createToken({ email: username, nombre: "Admin", role: "super_admin", pantallaInicio: "dashboard" });
+    const res = NextResponse.json({ ok: true, pantallaInicio: "dashboard" });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -54,9 +54,10 @@ export async function POST(req: NextRequest) {
     email: usuario.email,
     nombre: usuario.nombre,
     role: usuario.role,
+    pantallaInicio: usuario.pantalla_inicio,
   });
 
-  const res = NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true, pantallaInicio: usuario.pantalla_inicio });
   res.cookies.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

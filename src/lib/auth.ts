@@ -1,16 +1,20 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import type { UserRole } from "@/lib/queries/usuarios";
 
 const COOKIE_NAME = "recticar_token";
 const EXPIRES_IN = 60 * 60 * 24 * 30; // 30 días
 
+export type PantallaInicio = "dashboard" | "trabajos" | "clientes";
+
 export interface SessionPayload {
   email: string;
   nombre: string;
   role: UserRole;
   sessionId: string;
+  pantallaInicio: PantallaInicio;
 }
 
 function secret() {
@@ -46,6 +50,8 @@ export async function verifyToken(token: string): Promise<SessionPayload | null>
       role: payload.role as UserRole,
       sessionId:
         typeof payload.sessionId === "string" ? payload.sessionId : `legacy-${token.slice(-12)}`,
+      pantallaInicio:
+        (payload.pantallaInicio as PantallaInicio | undefined) ?? "dashboard",
     };
   } catch {
     return null;
@@ -58,6 +64,16 @@ export async function getSession(): Promise<SessionPayload | null> {
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
   return verifyToken(token);
+}
+
+export async function requireSession(): Promise<SessionPayload> {
+  const session = await getSession();
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  return session;
 }
 
 export { COOKIE_NAME, EXPIRES_IN };

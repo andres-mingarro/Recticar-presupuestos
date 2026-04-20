@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
 import { getEmpresaConfig, upsertEmpresaConfig } from "@/lib/queries/empresa";
 import { cleanupExpiredPresupuestosEntregados } from "@/lib/maintenance/trabajos-cleanup";
 
@@ -12,12 +12,8 @@ function normalize(formData: FormData, key: string) {
 }
 
 export async function updateEmpresaConfigAction(formData: FormData) {
-  const session = await getSession();
-  const role = session?.role;
-
-  if (role !== "admin" && role !== "superuser") {
-    redirect("/configuracion");
-  }
+  const { session } = await getSessionWithPermisos();
+  if (!isSuperAdmin(session)) redirect("/configuracion");
 
   const nombre = normalize(formData, "nombre");
 
@@ -47,12 +43,8 @@ export async function updateEmpresaConfigAction(formData: FormData) {
 }
 
 export async function updateEmpresaCleanupConfigAction(formData: FormData) {
-  const session = await getSession();
-  const role = session?.role;
-
-  if (role !== "admin" && role !== "superuser") {
-    redirect("/configuracion");
-  }
+  const { session } = await getSessionWithPermisos();
+  if (!isSuperAdmin(session)) redirect("/configuracion");
 
   const empresaActual = await getEmpresaConfig();
 
@@ -78,12 +70,8 @@ export async function updateEmpresaCleanupConfigAction(formData: FormData) {
 }
 
 export async function runPresupuestosCleanupNowAction() {
-  const session = await getSession();
-  const role = session?.role;
-
-  if (role !== "admin" && role !== "superuser") {
-    redirect("/configuracion");
-  }
+  const { session } = await getSessionWithPermisos();
+  if (!isSuperAdmin(session)) redirect("/configuracion");
 
   const result = await cleanupExpiredPresupuestosEntregados();
 

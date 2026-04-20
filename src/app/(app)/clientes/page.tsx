@@ -1,4 +1,5 @@
-import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getSessionWithPermisos, hasPermission } from "@/lib/permisos";
 import { ClientesPage } from "@/components/pages/ClientesPage";
 import {
   countClientes,
@@ -17,8 +18,11 @@ export default async function Page({
 }: {
   searchParams?: Promise<{ q?: string; page?: string }>;
 }) {
-  const session = await getSession();
-  const canEdit = session?.role !== "operador";
+  const { session, permisos } = await getSessionWithPermisos();
+  if (!session || !hasPermission(session, permisos, "clientes.acceso")) {
+    redirect("/trabajos");
+  }
+  const canEdit = session.role === "super_admin";
 
   const params = await resolveSearchParams(searchParams);
   const q = typeof params.q === "string" ? params.q.trim() : "";

@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getSessionWithPermisos, hasPermission } from "@/lib/permisos";
 import { ClienteDetailPage } from "@/components/pages/ClienteDetailPage";
 import type { ClienteFormState } from "@/components/forms/ClienteForm";
 import { getClienteById, updateCliente } from "@/lib/queries/clientes";
@@ -25,8 +25,11 @@ export default async function Page({
     notFound();
   }
 
-  const session = await getSession();
-  const canEdit = session?.role !== "operador";
+  const { session, permisos } = await getSessionWithPermisos();
+  if (!session || !hasPermission(session, permisos, "clientes.acceso")) {
+    redirect("/trabajos");
+  }
+  const canEdit = session.role === "super_admin";
 
   const [cliente, trabajos] = await Promise.all([
     getClienteById(clienteId),

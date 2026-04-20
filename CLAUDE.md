@@ -69,7 +69,8 @@ Variables CSS definidas en `src/scss/globals.css`:
 | `src/app/(app)/trabajos/[id]` | Edición de trabajo; concentra cobrado, prioridad, estado y form en un único guardado |
 | `src/app/(app)/trabajos/[id]/etiqueta` | Vista imprimible de etiqueta con QR (sin header ni menú del AppShell) |
 | `src/app/(app)/precios` | Administración de trabajos y listas de precios con ajustes porcentuales por categoría (`Incrementor`) |
-| `src/app/(app)/informacion-tecnica` | Edición del catálogo técnico externo (marcas, modelos, motores, vehículos); búsqueda y paginación server-side; solo `admin` y `superuser` pueden editar |
+| `src/app/(app)/informacion-tecnica` | Edición del catálogo técnico externo (marcas, modelos, motores, vehículos); búsqueda y paginación server-side; solo `super_admin` puede editar |
+| `src/app/(app)/admin/usuarios` | Gestión de usuarios; solo `super_admin`; cards con switches de permisos por operario |
 | `src/app/api/clientes/search` | Autocomplete de clientes |
 
 ---
@@ -213,3 +214,39 @@ npm run db:seed:dev      # crea 15 clientes fake y 15 trabajos fake
 - En WSL2 con archivos en Linux FS nativo, el HMR funciona sin `WATCHPACK_POLLING`.
 - `src/middleware.ts` (no en raíz) por la estructura con `src/`.
 - Variables de entorno en `.env.local`: `DATABASE_URL`, `TECHNICAL_DATABASE_URL`, `NEXT_PUBLIC_BASE_URL`.
+
+---
+
+## Sistema de roles y permisos
+
+### Roles
+- `super_admin` — acceso total, sin restricciones.
+- `operario` — acceso configurable mediante permisos por switch.
+
+El rol hardcodeado en `.env` (`ADMIN_USER` / `ADMIN_PASSWORD`) es `super_admin`.
+
+### Permisos (`src/lib/permisos.ts`)
+Helpers centralizados: `hasPermission(session, permisos, permiso)`, `requirePermission(permiso, redirectTo)`, `getSessionWithPermisos()`, `isSuperAdmin(session)`.
+
+Permisos disponibles (tipo `AppPermiso` en `src/lib/queries/usuarios.ts`):
+- `trabajos.ver` — ver listado y detalle de trabajos
+- `trabajos.crear` — crear nuevos presupuestos/trabajos
+- `trabajos.editar` — modificar trabajos existentes (también protege `/precios`)
+- `clientes.acceso` — acceso de solo lectura al módulo de clientes
+
+Preset por defecto al crear un operario: `trabajos.ver` + `trabajos.crear`.
+
+Módulos bloqueados para operarios: `precios`, `repuestos`, `configuracion`, `informacion-tecnica`, `admin/usuarios`.
+
+### Pantalla de inicio
+Columna `pantalla_inicio` en `usuarios` (`dashboard` | `trabajos` | `clientes`). Se incluye en el JWT y el login redirige al destino correcto. Configurable por `super_admin` en la pantalla de usuarios.
+
+### Archivos clave
+| Archivo | Rol |
+|---|---|
+| `src/lib/auth.ts` | JWT, `SessionPayload` (incluye `role` y `pantallaInicio`) |
+| `src/lib/permisos.ts` | Helpers de permisos centralizados |
+| `src/lib/queries/usuarios.ts` | Tipos `UserRole`, `AppPermiso`, `PantallaInicio`; queries de usuarios y permisos |
+| `src/app/(app)/admin/usuarios/` | UI de gestión de usuarios (cards + switches) |
+| `migrations/022_roles_y_permisos.sql` | Renombra roles, crea tabla `usuario_permisos` |
+| `migrations/023_pantalla_inicio.sql` | Agrega columna `pantalla_inicio` a `usuarios` |

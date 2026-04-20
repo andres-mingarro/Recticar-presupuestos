@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { NuevoClientePage } from "@/components/pages/NuevoClientePage";
 import type { ClienteFormValues } from "@/lib/types";
+import { isSuperAdmin, getSessionWithPermisos } from "@/lib/permisos";
 import { createCliente } from "@/lib/queries/clientes";
 import type { ClienteFormState } from "@/components/forms/ClienteForm";
 
@@ -24,7 +25,10 @@ function normalizeString(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export default function Page() {
+export default async function Page() {
+  const { session } = await getSessionWithPermisos();
+  if (!isSuperAdmin(session)) redirect("/clientes");
+
   async function createClienteAction(
     _previousState: ClienteFormState,
     formData: FormData

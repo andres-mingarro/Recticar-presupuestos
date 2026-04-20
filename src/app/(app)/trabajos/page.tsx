@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth";
+import { getSessionWithPermisos, hasPermission } from "@/lib/permisos";
 import { TrabajosPage } from "@/components/pages/TrabajosPage";
 import { listTrabajos } from "@/lib/queries/trabajos";
 import { resolveSearchParams } from "@/lib/search-params";
@@ -39,8 +39,8 @@ export default async function Page({
       ? Number(params.numero)
       : undefined;
 
-  const session = await getSession();
-  const canEdit = session?.role !== "operador";
+  const { session, permisos } = await getSessionWithPermisos();
+  const canEdit = session ? hasPermission(session, permisos, "trabajos.editar") : false;
 
   let errorMessage: string | null = null;
   let trabajos: TrabajoListItem[] = [];

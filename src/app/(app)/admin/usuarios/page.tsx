@@ -1,15 +1,13 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
 import { getAllUsuarios } from "@/lib/queries/usuarios";
 import { UsuariosClient } from "./UsuariosClient";
 
 export default async function UsuariosPage() {
-  const session = await getSession();
-  const role = session?.role;
-
-  if (role !== "admin" && role !== "superuser") redirect("/");
+  const { session } = await getSessionWithPermisos();
+  if (!isSuperAdmin(session)) redirect("/");
 
   const usuarios = await getAllUsuarios();
 
-  return <UsuariosClient usuarios={usuarios} sessionRole={role} />;
+  return <UsuariosClient usuarios={usuarios} />;
 }

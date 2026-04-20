@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { NuevoTrabajoPage } from "@/components/pages/NuevoTrabajoPage";
 import type { TrabajoFormState } from "@/components/forms/TrabajoForm";
+import { requirePermission } from "@/lib/permisos";
 import { parseTrabajoRepuestos } from "@/lib/trabajo-repuestos";
 import {
   listMarcas,
@@ -44,6 +45,8 @@ export default async function Page({
 }: {
   searchParams?: Promise<{ clienteId?: string }>;
 }) {
+  await requirePermission("trabajos.crear", "/trabajos");
+
   const params = await searchParams;
   const clienteIdParam =
     typeof params?.clienteId === "string" ? Number(params.clienteId) : Number.NaN;

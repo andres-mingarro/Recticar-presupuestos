@@ -171,7 +171,7 @@ export function ClienteDetailPage({
     url.searchParams.delete("created");
     url.searchParams.delete("updated");
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-  }, [cliente.apellido, cliente.nombre, wasCreated, wasUpdated]);
+  }, [cliente.apellido, cliente.id, cliente.nombre, wasCreated, wasUpdated]);
 
   return (
     <div className={cn("ClienteDetailPage", styles.page, "space-y-6")}>

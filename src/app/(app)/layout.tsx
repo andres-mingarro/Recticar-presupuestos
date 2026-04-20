@@ -1,8 +1,16 @@
 import { AppShell } from "@/components/layout/AppShell";
-import { getSession } from "@/lib/auth";
+import { requireSession } from "@/lib/auth";
+import { getUsuarioPermisos } from "@/lib/queries/usuarios";
+import type { AppPermiso } from "@/lib/queries/usuarios";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession();
+  const session = await requireSession();
+  const permisos: AppPermiso[] =
+    session.role === "super_admin" ? [] : await getUsuarioPermisos(session.email);
 
-  return <AppShell role={session?.role}>{children}</AppShell>;
+  return (
+    <AppShell role={session.role} permisos={permisos}>
+      {children}
+    </AppShell>
+  );
 }

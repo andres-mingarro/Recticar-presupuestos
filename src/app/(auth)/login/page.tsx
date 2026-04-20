@@ -43,7 +43,11 @@ export default function LoginPage() {
     });
 
     if (res.ok) {
-      router.replace("/");
+      const data = await res.json() as { pantallaInicio?: string };
+      const dest = data.pantallaInicio === "trabajos" ? "/trabajos"
+        : data.pantallaInicio === "clientes" ? "/clientes"
+        : "/";
+      router.replace(dest);
     } else {
       const data = await res.json() as { error?: string };
       setError(data.error ?? "Error al iniciar sesión.");
