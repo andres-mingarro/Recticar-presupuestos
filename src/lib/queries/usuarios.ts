@@ -11,7 +11,6 @@ export type AppPermiso =
 export type PantallaInicio = "dashboard" | "trabajos" | "clientes";
 
 export type Usuario = Record<string, unknown> & {
-  email: string;
   nombre: string;
   password_hash: string;
   password_plain: string | null;
@@ -22,7 +21,6 @@ export type Usuario = Record<string, unknown> & {
 };
 
 export type UsuarioPublico = Record<string, unknown> & {
-  email: string;
   nombre: string;
   password_plain: string | null;
   role: UserRole;
@@ -32,17 +30,16 @@ export type UsuarioPublico = Record<string, unknown> & {
   permisos: AppPermiso[];
 };
 
-export async function getUsuarioByEmail(email: string): Promise<Usuario | null> {
+export async function getUsuarioByNombre(nombre: string): Promise<Usuario | null> {
   const rows = await queryRows<Usuario>(
-    "SELECT * FROM usuarios WHERE email = $1 AND activo = TRUE",
-    [email]
+    "SELECT * FROM usuarios WHERE nombre = $1 AND activo = TRUE",
+    [nombre]
   );
   return rows[0] ?? null;
 }
 
 export async function getAllUsuarios(): Promise<UsuarioPublico[]> {
   type UsuarioRow = {
-    email: string;
     nombre: string;
     password_plain: string | null;
     role: UserRole;
@@ -51,95 +48,91 @@ export async function getAllUsuarios(): Promise<UsuarioPublico[]> {
     pantalla_inicio: PantallaInicio;
   };
   const usuarios = await queryRows<UsuarioRow>(
-    "SELECT email, nombre, role, activo, password_plain, created_at, pantalla_inicio FROM usuarios ORDER BY created_at DESC"
+    "SELECT nombre, role, activo, password_plain, created_at, pantalla_inicio FROM usuarios ORDER BY created_at DESC"
   );
   if (usuarios.length === 0) return [];
 
-  const emails = usuarios.map((u) => u.email);
-  const permisoRows = await queryRows<{ email: string; permiso: AppPermiso }>(
-    `SELECT email, permiso FROM usuario_permisos WHERE email = ANY($1)`,
-    [emails]
+  const nombres = usuarios.map((u) => u.nombre);
+  const permisoRows = await queryRows<{ nombre: string; permiso: AppPermiso }>(
+    `SELECT nombre, permiso FROM usuario_permisos WHERE nombre = ANY($1)`,
+    [nombres]
   );
 
-  const permisosByEmail = new Map<string, AppPermiso[]>();
+  const permisosByNombre = new Map<string, AppPermiso[]>();
   for (const row of permisoRows) {
-    const list = permisosByEmail.get(row.email) ?? [];
+    const list = permisosByNombre.get(row.nombre) ?? [];
     list.push(row.permiso);
-    permisosByEmail.set(row.email, list);
+    permisosByNombre.set(row.nombre, list);
   }
 
   return usuarios.map((u) => ({
     ...u,
-    permisos: permisosByEmail.get(u.email) ?? [],
+    permisos: permisosByNombre.get(u.nombre) ?? [],
   }));
 }
 
 export async function createUsuario(
-  email: string,
   nombre: string,
   passwordHash: string,
   passwordPlain: string,
-  role: "operario"
+  role: "operario" | "super_admin"
 ): Promise<void> {
   await queryRows(
-    "INSERT INTO usuarios (email, nombre, password_hash, password_plain, role) VALUES ($1, $2, $3, $4, $5)",
-    [email, nombre, passwordHash, passwordPlain, role]
+    "INSERT INTO usuarios (nombre, password_hash, password_plain, role) VALUES ($1, $2, $3, $4)",
+    [nombre, passwordHash, passwordPlain, role]
   );
-  // Preset por defecto para operarios
-  await queryRows(
-    `INSERT INTO usuario_permisos (email, permiso) VALUES ($1, 'trabajos.ver'), ($1, 'trabajos.crear') ON CONFLICT DO NOTHING`,
-    [email]
-  );
-}
-
-export async function updateUsuarioRole(email: string, role: "operario"): Promise<void> {
-  await queryRows("UPDATE usuarios SET role = $1 WHERE email = $2", [role, email]);
-}
-
-export async function updateUsuarioPassword(
-  email: string,
-  passwordHash: string,
-  passwordPlain: string
-): Promise<void> {
-  await queryRows(
-    "UPDATE usuarios SET password_hash = $1, password_plain = $2 WHERE email = $3",
-    [passwordHash, passwordPlain, email]
-  );
-}
-
-export async function toggleUsuarioActivo(email: string, activo: boolean): Promise<void> {
-  await queryRows("UPDATE usuarios SET activo = $1 WHERE email = $2", [activo, email]);
-}
-
-export async function deleteUsuario(email: string): Promise<void> {
-  await queryRows("DELETE FROM usuarios WHERE email = $1", [email]);
-}
-
-export async function updatePantallaInicio(
-  email: string,
-  pantalla: PantallaInicio
-): Promise<void> {
-  await queryRows("UPDATE usuarios SET pantalla_inicio = $1 WHERE email = $2", [pantalla, email]);
-}
-
-export async function setUsuarioPermisos(
-  email: string,
-  permisos: AppPermiso[]
-): Promise<void> {
-  await queryRows("DELETE FROM usuario_permisos WHERE email = $1", [email]);
-  if (permisos.length === 0) return;
-  for (const permiso of permisos) {
+  if (role === "operario") {
     await queryRows(
-      "INSERT INTO usuario_permisos (email, permiso) VALUES ($1, $2) ON CONFLICT DO NOTHING",
-      [email, permiso]
+      `INSERT INTO usuario_permisos (nombre, permiso) VALUES ($1, 'trabajos.ver'), ($1, 'trabajos.crear') ON CONFLICT DO NOTHING`,
+      [nombre]
     );
   }
 }
 
-export async function getUsuarioPermisos(email: string): Promise<AppPermiso[]> {
+export async function updateUsuarioPassword(
+  nombre: string,
+  passwordHash: string,
+  passwordPlain: string
+): Promise<void> {
+  await queryRows(
+    "UPDATE usuarios SET password_hash = $1, password_plain = $2 WHERE nombre = $3",
+    [passwordHash, passwordPlain, nombre]
+  );
+}
+
+export async function toggleUsuarioActivo(nombre: string, activo: boolean): Promise<void> {
+  await queryRows("UPDATE usuarios SET activo = $1 WHERE nombre = $2", [activo, nombre]);
+}
+
+export async function deleteUsuario(nombre: string): Promise<void> {
+  await queryRows("DELETE FROM usuarios WHERE nombre = $1", [nombre]);
+}
+
+export async function updatePantallaInicio(
+  nombre: string,
+  pantalla: PantallaInicio
+): Promise<void> {
+  await queryRows("UPDATE usuarios SET pantalla_inicio = $1 WHERE nombre = $2", [pantalla, nombre]);
+}
+
+export async function setUsuarioPermisos(
+  nombre: string,
+  permisos: AppPermiso[]
+): Promise<void> {
+  await queryRows("DELETE FROM usuario_permisos WHERE nombre = $1", [nombre]);
+  if (permisos.length === 0) return;
+  for (const permiso of permisos) {
+    await queryRows(
+      "INSERT INTO usuario_permisos (nombre, permiso) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+      [nombre, permiso]
+    );
+  }
+}
+
+export async function getUsuarioPermisos(nombre: string): Promise<AppPermiso[]> {
   const rows = await queryRows<{ permiso: AppPermiso }>(
-    "SELECT permiso FROM usuario_permisos WHERE email = $1",
-    [email]
+    "SELECT permiso FROM usuario_permisos WHERE nombre = $1",
+    [nombre]
   );
   return rows.map((r) => r.permiso);
 }

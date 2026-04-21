@@ -10,7 +10,7 @@ export async function getSessionPermisos(): Promise<AppPermiso[]> {
   const session = await getSession();
   if (!session) return [];
   if (session.role === "super_admin") return [];
-  return getUsuarioPermisos(session.email);
+  return getUsuarioPermisos(session.nombre);
 }
 
 export function hasPermission(
@@ -30,7 +30,7 @@ export async function requirePermission(
   if (session.role === "super_admin") {
     return { session, permisos: [] };
   }
-  const permisos = await getUsuarioPermisos(session.email);
+  const permisos = await getUsuarioPermisos(session.nombre);
   if (!permisos.includes(permiso)) {
     redirect(redirectTo);
   }
@@ -44,7 +44,7 @@ export async function getSessionWithPermisos(): Promise<{
   const session = await getSession();
   if (!session) return { session: null, permisos: [] };
   if (session.role === "super_admin") return { session, permisos: [] };
-  const permisos = await getUsuarioPermisos(session.email);
+  const permisos = await getUsuarioPermisos(session.nombre);
   return { session, permisos };
 }
 

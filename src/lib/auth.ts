@@ -10,7 +10,6 @@ const EXPIRES_IN = 60 * 60 * 24 * 30; // 30 días
 export type PantallaInicio = "dashboard" | "trabajos" | "clientes";
 
 export interface SessionPayload {
-  email: string;
   nombre: string;
   role: UserRole;
   sessionId: string;
@@ -37,7 +36,6 @@ export async function verifyToken(token: string): Promise<SessionPayload | null>
   try {
     const { payload } = await jwtVerify(token, secret());
     if (
-      typeof payload.email !== "string" ||
       typeof payload.nombre !== "string" ||
       typeof payload.role !== "string"
     ) {
@@ -45,7 +43,6 @@ export async function verifyToken(token: string): Promise<SessionPayload | null>
     }
 
     return {
-      email: payload.email,
       nombre: payload.nombre,
       role: payload.role as UserRole,
       sessionId:

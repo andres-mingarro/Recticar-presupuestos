@@ -6,7 +6,7 @@ import type { AppPermiso } from "@/lib/queries/usuarios";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await requireSession();
   const permisos: AppPermiso[] =
-    session.role === "super_admin" ? [] : await getUsuarioPermisos(session.email);
+    session.role === "super_admin" ? [] : await getUsuarioPermisos(session.nombre);
 
   return (
     <AppShell role={session.role} permisos={permisos}>

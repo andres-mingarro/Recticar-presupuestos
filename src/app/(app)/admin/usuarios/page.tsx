@@ -9,5 +9,5 @@ export default async function UsuariosPage() {
 
   const usuarios = await getAllUsuarios();
 
-  return <UsuariosClient usuarios={usuarios} />;
+  return <UsuariosClient usuarios={usuarios} currentNombre={session?.nombre ?? ""} protectedNombre={process.env.ADMIN_USER ?? ""} />;
 }

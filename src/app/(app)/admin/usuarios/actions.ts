@@ -23,45 +23,47 @@ export async function crearUsuarioAction(formData: FormData) {
 
   const nombre = formData.get("nombre") as string;
   const password = formData.get("password") as string;
+  const role = (formData.get("role") as string) === "super_admin" ? "super_admin" : "operario";
 
   const hash = await bcrypt.hash(password, 12);
-  await createUsuario(nombre, nombre, hash, password, "operario");
+  await createUsuario(nombre, hash, password, role);
   revalidatePath("/admin/usuarios");
 }
 
 export async function actualizarPermisosAction(
-  email: string,
+  nombre: string,
   permisos: AppPermiso[]
 ) {
   await requireSuperAdmin();
-  await setUsuarioPermisos(email, permisos);
+  await setUsuarioPermisos(nombre, permisos);
   revalidatePath("/admin/usuarios");
 }
 
-export async function cambiarPasswordAction(email: string, password: string) {
+export async function cambiarPasswordAction(nombre: string, password: string) {
   await requireSuperAdmin();
   const hash = await bcrypt.hash(password, 12);
-  await updateUsuarioPassword(email, hash, password);
+  await updateUsuarioPassword(nombre, hash, password);
   revalidatePath("/admin/usuarios");
 }
 
-export async function toggleActivoAction(email: string, activo: boolean) {
+export async function toggleActivoAction(nombre: string, activo: boolean) {
   await requireSuperAdmin();
-  await toggleUsuarioActivo(email, activo);
+  await toggleUsuarioActivo(nombre, activo);
   revalidatePath("/admin/usuarios");
 }
 
 export async function actualizarPantallaInicioAction(
-  email: string,
+  nombre: string,
   pantalla: PantallaInicio
 ) {
   await requireSuperAdmin();
-  await updatePantallaInicio(email, pantalla);
+  await updatePantallaInicio(nombre, pantalla);
   revalidatePath("/admin/usuarios");
 }
 
-export async function eliminarUsuarioAction(email: string) {
+export async function eliminarUsuarioAction(nombre: string) {
   await requireSuperAdmin();
-  await deleteUsuario(email);
+  if (nombre === process.env.ADMIN_USER) throw new Error("El usuario admin no se puede eliminar");
+  await deleteUsuario(nombre);
   revalidatePath("/admin/usuarios");
 }

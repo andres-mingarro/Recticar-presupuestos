@@ -22,6 +22,8 @@ import type { PantallaInicio } from "@/lib/queries/usuarios";
 
 type Props = {
   usuarios: UsuarioPublico[];
+  currentNombre: string;
+  protectedNombre: string;
 };
 
 const PERMISOS_LABELS: { permiso: AppPermiso; label: string }[] = [
@@ -54,12 +56,12 @@ function EyeToggle({ visible, onToggle }: { visible: boolean; onToggle: () => vo
 }
 
 function PermisosToggles({
-  email,
+  nombre,
   permisos,
   onDirtyChange,
   onSaveRef,
 }: {
-  email: string;
+  nombre: string;
   permisos: AppPermiso[];
   onDirtyChange: (dirty: boolean) => void;
   onSaveRef: (fn: () => Promise<void>) => void;
@@ -73,7 +75,7 @@ function PermisosToggles({
     setCurrent(next);
     onDirtyChange(true);
     onSaveRef(async () => {
-      await actualizarPermisosAction(email, next);
+      await actualizarPermisosAction(nombre, next);
       onDirtyChange(false);
     });
   }
@@ -110,9 +112,13 @@ function PermisosToggles({
 function UsuarioCard({
   u,
   isSuperAdmin,
+  isCurrentUser,
+  isProtectedAdmin,
 }: {
   u: UsuarioPublico;
   isSuperAdmin: boolean;
+  isCurrentUser: boolean;
+  isProtectedAdmin: boolean;
 }) {
   const [editingPassword, setEditingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -131,7 +137,7 @@ function UsuarioCard({
     try {
       if (permisosDirty && permisosSaveFn) await permisosSaveFn();
       if (pantallaDirty) {
-        await actualizarPantallaInicioAction(u.email, pantallaValue);
+        await actualizarPantallaInicioAction(u.nombre, pantallaValue);
         setPantallaDirty(false);
       }
     } finally {
@@ -143,7 +149,7 @@ function UsuarioCard({
     if (!newPassword.trim()) return;
     setPending(true);
     try {
-      await cambiarPasswordAction(u.email, newPassword);
+      await cambiarPasswordAction(u.nombre, newPassword);
       setEditingPassword(false);
       setNewPassword("");
     } finally {
@@ -234,7 +240,7 @@ function UsuarioCard({
             </div>
           ) : (
             <PermisosToggles
-              email={u.email}
+              nombre={u.nombre}
               permisos={u.permisos}
               onDirtyChange={setPermisosDirty}
               onSaveRef={(fn) => setPermisosSaveFn(() => fn)}
@@ -265,13 +271,13 @@ function UsuarioCard({
             size="sm"
             variant="ghost"
             title={u.activo ? "Desactivar usuario" : "Activar usuario"}
-            onClick={() => toggleActivoAction(u.email, !u.activo)}
+            onClick={() => toggleActivoAction(u.nombre, !u.activo)}
             className={u.activo ? "text-emerald-600 hover:text-emerald-700" : "text-slate-400 hover:text-slate-600"}
             icon={<Icon name="power" className="h-4 w-4" />}
           >
             {u.activo ? "Desactivar" : "Activar"}
           </Button>
-          {!isSuperAdmin && (
+          {!isCurrentUser && !isProtectedAdmin && (
             <>
               <Button
                 type="button"
@@ -289,7 +295,7 @@ function UsuarioCard({
                 description="Esta acción no se puede deshacer."
                 confirmLabel="Eliminar"
                 cancelLabel="Cancelar"
-                onConfirm={() => eliminarUsuarioAction(u.email)}
+                onConfirm={() => eliminarUsuarioAction(u.nombre)}
               />
             </>
           )}
@@ -312,9 +318,10 @@ function UsuarioCard({
   );
 }
 
-export function UsuariosClient({ usuarios }: Props) {
+export function UsuariosClient({ usuarios, currentNombre, protectedNombre }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [newRole, setNewRole] = useState<"operario" | "super_admin">("operario");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
 
@@ -328,6 +335,7 @@ export function UsuariosClient({ usuarios }: Props) {
     try {
       await crearUsuarioAction(new FormData(e.currentTarget));
       setShowForm(false);
+      setNewRole("operario");
       (e.target as HTMLFormElement).reset();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al crear usuario");
@@ -351,7 +359,7 @@ export function UsuariosClient({ usuarios }: Props) {
       {/* Formulario nuevo operario */}
       {showForm && (
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-          <p className="mb-4 text-sm font-semibold text-[var(--text-color-defult)]">Nuevo operario</p>
+          <p className="mb-4 text-sm font-semibold text-[var(--text-color-defult)]">{newRole === "super_admin" ? "Nuevo administrador" : "Nuevo operario"}</p>
           <form onSubmit={handleCrear} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">Nombre (usuario para entrar)</label>
@@ -370,11 +378,23 @@ export function UsuariosClient({ usuarios }: Props) {
                 <EyeToggle visible={showNewPassword} onToggle={() => setShowNewPassword((v) => !v)} />
               </div>
             </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">Rol</label>
+              <select
+                name="role"
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value as "operario" | "super_admin")}
+                className="h-10 rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]"
+              >
+                <option value="operario">Operario</option>
+                <option value="super_admin">Administrador</option>
+              </select>
+            </div>
             {error && <p className="col-span-2 text-sm text-red-600">{error}</p>}
             <div className="col-span-2 flex justify-end">
               <Button type="submit" disabled={pending} className="gap-2">
                 {pending ? <Spinner className="h-4 w-4" /> : null}
-                {pending ? "Guardando..." : "Crear operario"}
+                {pending ? "Guardando..." : newRole === "super_admin" ? "Crear administrador" : "Crear operario"}
               </Button>
             </div>
           </form>
@@ -389,7 +409,7 @@ export function UsuariosClient({ usuarios }: Props) {
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {superAdmins.map((u) => (
-              <UsuarioCard key={u.email} u={u} isSuperAdmin />
+              <UsuarioCard key={u.nombre} u={u} isSuperAdmin isCurrentUser={u.nombre === currentNombre} isProtectedAdmin={u.nombre === protectedNombre} />
             ))}
           </div>
         </section>
@@ -405,7 +425,7 @@ export function UsuariosClient({ usuarios }: Props) {
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {operarios.map((u) => (
-              <UsuarioCard key={u.email} u={u} isSuperAdmin={false} />
+              <UsuarioCard key={u.nombre} u={u} isSuperAdmin={false} isCurrentUser={u.nombre === currentNombre} isProtectedAdmin={false} />
             ))}
           </div>
         )}
