@@ -684,3 +684,112 @@ export async function listTrabajosByCliente(clienteId: number) {
 
   return hydrateTechnicalLabels(rows.map(normalizeLegacyTrabajoEstado));
 }
+
+export type DashboardStats = {
+  trabajosActivos: number;
+  trabajosSinCobrar: number;
+  trabajosAltaPrioridad: number;
+  clientesTotales: number;
+};
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+  const rows = await queryRows<DashboardStats>(`
+    SELECT
+      COUNT(*) FILTER (WHERE estado IN ('presupuesto_entregado', 'aprobado'))::int AS "trabajosActivos",
+      COUNT(*) FILTER (WHERE cobrado = false AND estado != 'finalizado')::int AS "trabajosSinCobrar",
+      COUNT(*) FILTER (WHERE prioridad = 'alta' AND estado IN ('presupuesto_entregado', 'aprobado'))::int AS "trabajosAltaPrioridad",
+      (SELECT COUNT(*)::int FROM clientes) AS "clientesTotales"
+    FROM ordenes_trabajo
+  `);
+  return rows[0] ?? { trabajosActivos: 0, trabajosSinCobrar: 0, trabajosAltaPrioridad: 0, clientesTotales: 0 };
+}
+
+export type TrabajoAprobadoRow = {
+  id: number;
+  numero_trabajo: number;
+  cliente_nombre: string | null;
+  prioridad: TrabajoPrioridad;
+  fecha_aprobacion: string | null;
+  dias_desde_aprobacion: number;
+};
+
+export async function listTrabajosAprobados(limit = 8): Promise<TrabajoAprobadoRow[]> {
+  return queryRows<TrabajoAprobadoRow>(`
+    SELECT
+      p.id,
+      p.numero_trabajo,
+      CASE WHEN c.id IS NULL THEN NULL ELSE concat(c.apellido, ', ', c.nombre) END AS cliente_nombre,
+      p.prioridad,
+      p.fecha_aprobacion,
+      EXTRACT(DAY FROM now() - p.fecha_aprobacion)::int AS dias_desde_aprobacion
+    FROM ordenes_trabajo p
+    LEFT JOIN clientes c ON c.id = p.cliente_id
+    WHERE p.estado = 'aprobado'
+    ORDER BY
+      CASE p.prioridad WHEN 'alta' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END,
+      p.fecha_aprobacion ASC
+    LIMIT $1
+  `, [limit]);
+}
+
+export type PresupuestoVencidoRow = {
+  id: number;
+  numero_trabajo: number;
+  cliente_nombre: string | null;
+  fecha_presupuesto_entregado: string;
+  dias_esperando: number;
+};
+
+export async function listPresupuestosVencidos(diasMinimos = 7, limit = 5): Promise<PresupuestoVencidoRow[]> {
+  return queryRows<PresupuestoVencidoRow>(`
+    SELECT
+      p.id,
+      p.numero_trabajo,
+      CASE WHEN c.id IS NULL THEN NULL ELSE concat(c.apellido, ', ', c.nombre) END AS cliente_nombre,
+      p.fecha_presupuesto_entregado,
+      EXTRACT(DAY FROM now() - p.fecha_presupuesto_entregado)::int AS dias_esperando
+    FROM ordenes_trabajo p
+    LEFT JOIN clientes c ON c.id = p.cliente_id
+    WHERE p.estado IN ('presupuesto_entregado', 'pendiente')
+      AND p.fecha_presupuesto_entregado IS NOT NULL
+      AND p.fecha_presupuesto_entregado < now() - ($1 || ' days')::interval
+    ORDER BY p.fecha_presupuesto_entregado ASC
+    LIMIT $2
+  `, [diasMinimos, limit]);
+}
+
+export type MotorMasUsadoRow = {
+  motor_id: number;
+  cantidad: number;
+};
+
+export async function listMotoresMasUsados(limit = 5): Promise<MotorMasUsadoRow[]> {
+  return queryRows<MotorMasUsadoRow>(`
+    SELECT
+      motor_id,
+      COUNT(*)::int AS cantidad
+    FROM ordenes_trabajo
+    WHERE motor_id IS NOT NULL
+    GROUP BY motor_id
+    ORDER BY cantidad DESC
+    LIMIT $1
+  `, [limit]);
+}
+
+export type RepuestoMasUsadoRow = {
+  repuesto_nombre_snapshot: string;
+  cantidad: number;
+};
+
+export async function listRepuestosMasUsados(limit = 5): Promise<RepuestoMasUsadoRow[]> {
+  return queryRows<RepuestoMasUsadoRow>(`
+    SELECT
+      repuesto_nombre_snapshot,
+      COUNT(*)::int AS cantidad
+    FROM orden_trabajo_repuestos
+    WHERE repuesto_nombre_snapshot IS NOT NULL AND repuesto_nombre_snapshot != ''
+    GROUP BY repuesto_nombre_snapshot
+    ORDER BY cantidad DESC
+    LIMIT $1
+  `, [limit]);
+}
