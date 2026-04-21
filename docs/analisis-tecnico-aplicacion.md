@@ -2,633 +2,341 @@
 
 ## 1. Propósito del sistema
 
-Recticar Presupuestos es una aplicación web para administrar clientes, trabajos y presupuestos de una rectificadora. El sistema cubre tres necesidades principales:
+Recticar Presupuestos es una aplicación web interna para administrar clientes, trabajos y presupuestos de una rectificadora de motores. No es un portal público ni orientado al cliente final.
+
+Cubre tres necesidades principales:
 
 1. Registrar y consultar clientes.
-2. Crear, editar y seguir trabajos de trabajo.
-3. Construir presupuestos combinando trabajos y repuestos, con salida en PDF y etiqueta QR.
+2. Crear, editar y seguir trabajos.
+3. Construir presupuestos combinando mano de obra y repuestos, con salida en PDF y etiqueta QR.
 
-La aplicación está pensada para operación interna. No es un portal público ni un sistema orientado a autoservicio del cliente final.
+---
 
-## 2. Stack y decisiones técnicas
+## 2. Stack
 
-La base tecnológica actual es:
+- Next.js 15 con App Router
+- React 19
+- TypeScript
+- Tailwind CSS v4 + SCSS Modules por componente
+- PostgreSQL en Neon, accedido con `@neondatabase/serverless`
+- SQL directo, sin ORM
+- `@react-pdf/renderer` para PDFs
+- `qrcode` para la etiqueta QR
+- Font Awesome para iconografía
+- `sonner` para toasts de feedback
 
-- Next.js 15 con App Router.
-- React 19.
-- TypeScript.
-- Tailwind CSS v4 para utilidades rápidas.
-- SCSS Modules para estilos por componente.
-- PostgreSQL en Neon, accedido con `@neondatabase/serverless`.
-- SQL directo, sin ORM.
-- `@react-pdf/renderer` para generar el presupuesto en PDF.
-- `qrcode` para generar la etiqueta QR.
-- Font Awesome como sistema de iconografía.
+Dos decisiones de arquitectura impactan en todo el proyecto:
 
-Hay dos decisiones de arquitectura que impactan en todo el proyecto:
+- **Sin ORM.** Toda la persistencia es SQL explícito en `src/lib/queries/`.
+- **Dos bases de datos.** La operación comercial y el catálogo técnico pueden vivir separados (ver sección 6).
 
-- No se usa ORM. Toda la lógica de persistencia está escrita como queries SQL en `src/lib/queries`.
-- El catálogo técnico no necesariamente vive en la misma base que la operación comercial. La app soporta una base principal y una base técnica separada.
+---
 
-## 3. Estructura general del proyecto
+## 3. Estructura del proyecto
 
-La organización del código sigue una separación bastante clara entre rutas, pantallas, formularios, componentes base y acceso a datos.
+```
+src/app/(auth)/login              Login
+src/app/(app)/                    Rutas protegidas
+  clientes/                       Listado, alta, detalle
+  trabajos/                       Listado, alta, detalle
+  trabajos/[id]/etiqueta          Etiqueta imprimible con QR
+  precios/                        Administración de precios y listas
+  repuestos/                      Catálogo de repuestos
+  configuracion/                  Config de empresa + links a subrutas
+  informacion-tecnica/            Catálogo técnico externo
+  admin/usuarios/                 Gestión de usuarios
 
-### Rutas principales
+src/components/pages/             Pantallas completas (client components)
+src/components/forms/             Formularios complejos y sus contextos
+src/components/ui/                Componentes base reutilizables
+src/components/layout/            AppShell (shell con topbar, sidebar, main)
+src/components/navigation/        MainMenu
+src/lib/queries/                  Acceso a base de datos
+src/lib/                          Helpers: auth, permisos, formato, QR, PDF
+migrations/                       Migraciones SQL versionadas
+scripts/                          Herramientas de dev (seed, reset, cleanup)
+```
 
-- `src/app/(auth)/login`: login.
-- `src/app/(app)/clientes`: listado, alta y detalle de clientes.
-- `src/app/(app)/trabajos`: listado, alta y detalle de trabajos.
-- `src/app/(app)/trabajos/[id]/etiqueta`: etiqueta imprimible con QR.
-- `src/app/(app)/precios`: administración de trabajos y listas de precios.
-- `src/app/(app)/repuestos`: catálogo de repuestos.
-- `src/app/(app)/informacion-tecnica`: mantenimiento del catálogo técnico.
-- `src/app/(app)/admin/usuarios`: administración de usuarios.
+---
 
-### Capas internas
+## 4. Modelo de ejecución
 
-- `src/components/pages`: componentes de página completos.
-- `src/components/forms`: formularios complejos y sus contextos.
-- `src/components/ui`: componentes reutilizables.
-- `src/lib/queries`: acceso a base de datos.
-- `src/lib`: helpers transversales como auth, formato, QR y parsing de formularios.
-- `migrations/`: migraciones SQL versionadas.
+La app usa el modelo híbrido de App Router:
 
-## 4. Modelo de ejecución: servidor, cliente y formularios
+1. La página servidor (`page.tsx`) carga datos y define server actions.
+2. Renderiza un componente cliente con esos datos y las actions inyectadas.
+3. El componente cliente maneja interacción, dirty state y UX.
+4. Al enviar el formulario, la server action parsea `FormData`, valida y persiste.
 
-La app usa el modelo híbrido típico de App Router:
+Esto se ve con claridad en el detalle de trabajo:
 
-- Las páginas (`page.tsx`) suelen ejecutarse en servidor.
-- Esas páginas leen datos desde la base.
-- Luego delegan la interfaz interactiva a componentes cliente (`"use client"`), sobre todo en formularios y vistas complejas.
+- Página servidor: `src/app/(app)/trabajos/[id]/page.tsx`
+- Orquestador cliente: `src/components/pages/TrabajoDetailPage/TrabajoDetailPage.tsx`
+- Formulario reutilizable: `src/components/forms/TrabajoForm/TrabajoForm.tsx`
 
-Un patrón importante del proyecto es el siguiente:
-
-1. La página servidor carga datos iniciales.
-2. Define una o más server actions.
-3. Renderiza un componente cliente con esos datos y con la action inyectada.
-4. El componente cliente maneja interacción local, selección, dirty state y UX.
-5. Al enviar el formulario, la server action parsea el `FormData`, valida y persiste.
-
-Este patrón se ve con claridad en el detalle de trabajo:
-
-- La página servidor vive en `src/app/(app)/trabajos/[id]/page.tsx`.
-- La pantalla cliente vive en `src/components/pages/TrabajoDetailPage/TrabajoDetailPage.tsx`.
-- El formulario reusable vive en `src/components/forms/TrabajoForm/TrabajoForm.tsx`.
+---
 
 ## 5. Autenticación y autorización
 
-La autenticación está basada en JWT firmado y almacenado en cookie HTTP-only.
-
 ### Login
 
-El login se resuelve en `src/app/api/auth/login/route.ts`.
-
-El flujo es:
+El flujo está en `src/app/api/auth/login/route.ts`:
 
 1. El cliente envía `username`, `password` y token de Cloudflare Turnstile.
 2. El backend valida Turnstile.
-3. Si coincide con credenciales de admin definidas por variables de entorno, genera sesión admin.
-4. Si no, busca el usuario en base y compara password con `bcrypt`.
-5. Si todo es correcto, emite un JWT y lo guarda en la cookie `recticar_token`.
+3. Si coincide con el admin de `.env`, genera sesión directamente.
+4. Si no, busca el usuario en la base y compara password con bcrypt.
+5. Si todo es correcto, emite un JWT y lo guarda en la cookie `recticar_token` (HTTP-only, 30 días).
 
 ### Sesión
 
-La utilidad central es `src/lib/auth.ts`.
+`src/lib/auth.ts` expone `createToken`, `verifyToken`, `getSession` y `requireSession`.
 
-Ahí se definen:
+La sesión contiene: `nombre`, `role`, `sessionId`, `pantallaInicio`.
 
-- creación del token,
-- verificación,
-- lectura de sesión para server components y server actions.
+> No hay campo `email`. El identificador de usuario es `nombre` (el username de login).
 
-La sesión incluye:
+### Roles y permisos
 
-- email,
-- nombre,
-- rol,
-- sessionId.
+Hay dos roles: `super_admin` y `operario`.
 
-### Control de acceso
+- `super_admin` tiene acceso total a todo.
+- `operario` tiene permisos configurables por switch, guardados en la tabla `usuario_permisos`.
 
-El archivo `src/middleware.ts` protege casi toda la aplicación.
+Permisos disponibles:
 
-Reglas actuales:
+| Permiso | Qué habilita |
+|---|---|
+| `trabajos.ver` | Ver listado y detalle de trabajos |
+| `trabajos.crear` | Crear nuevos presupuestos/trabajos |
+| `trabajos.editar` | Editar trabajos (también protege `/precios`) |
+| `clientes.acceso` | Acceso de solo lectura a clientes |
 
-- `/login` y `/api/auth/*` son públicas.
-- el resto requiere cookie válida,
-- el rol `operador` queda bloqueado para:
-  - `/clientes/nuevo`
-  - `/trabajos/nuevo`
-  - `/precios`
-  - `/admin`
+Los helpers de permisos viven en `src/lib/permisos.ts`.
 
-En la práctica, el middleware implementa un modelo simple de acceso por rol y redirige al listado de trabajos si el usuario no puede entrar.
+El usuario `admin` (definido en `.env`) **nunca puede ser eliminado**, ni desde la UI ni desde el servidor.
 
-## 6. Persistencia y bases de datos
+---
 
-La capa de acceso a datos está centralizada en `src/lib/db.ts`.
+## 6. Bases de datos
 
-### Dos conexiones distintas
+`src/lib/db.ts` mantiene dos conexiones:
 
-La app diferencia dos fuentes de datos:
+- `DATABASE_URL` — base principal: clientes, ordenes_trabajo, catálogo de trabajos, repuestos, usuarios.
+- `TECHNICAL_DATABASE_URL` — catálogo técnico externo: marcas, modelos, motores, vehículos. Si no está definida, hace fallback a la base principal.
 
-- `DATABASE_URL`: base principal de la aplicación.
-- `TECHNICAL_DATABASE_URL`: catálogo técnico externo.
+Los trabajos guardan IDs técnicos (`marca_id`, `modelo_id`, `motor_id`) pero no tienen FK locales al catálogo técnico. Eso fue desacoplado en la migración `010_drop_technical_foreign_keys.sql`.
 
-Si `TECHNICAL_DATABASE_URL` no está presente, el código hace fallback a `DATABASE_URL`.
+---
 
-### Helpers de acceso
-
-`src/lib/db.ts` expone cuatro helpers:
-
-- `getSql()`
-- `getTechnicalSql()`
-- `templateRows() / queryRows()`
-- `templateRowsFromTechnical() / queryRowsFromTechnical()`
-
-Esto permite decidir explícitamente si una query pega a la base operativa o a la base técnica.
-
-### Implicancias arquitectónicas
-
-- Clientes, trabajos, trabajos, repuestos, usuarios y relaciones comerciales viven en la base principal.
-- Marcas, modelos, motores y combinaciones técnicas se leen desde la base técnica.
-- Los trabajos guardan IDs técnicos (`marca_id`, `modelo_id`, `motor_id`) pero ya no dependen de foreign keys locales al catálogo técnico.
-
-Esa desacoplación fue formalizada por la migración `010_drop_technical_foreign_keys.sql`.
-
-## 7. Dominios funcionales principales
+## 7. Dominios funcionales
 
 ### 7.1 Clientes
 
-El dominio clientes cubre alta, búsqueda, detalle y relación con trabajos.
+Campos: nombre, apellido, teléfono, mail, dirección, ciudad, provincia, CP, DNI, CUIT.
 
-Tipos principales:
+El endpoint `src/app/api/clientes/search/route.ts` alimenta el autocomplete al crear un trabajo.
 
-- `ClienteListItem`
-- `ClienteDetail`
+### 7.2 Trabajos (presupuestos/órdenes)
 
-Campos relevantes:
+La tabla principal es `ordenes_trabajo`. Las relaciones viven en:
 
-- nombre,
-- apellido,
-- teléfono,
-- mail,
-- dirección,
-- ciudad,
-- provincia,
-- código postal,
-- DNI,
-- CUIT.
+- `orden_trabajo_trabajos` — ítems de mano de obra
+- `orden_trabajo_repuestos` — ítems de repuestos
 
-Además existe un endpoint de soporte para autocomplete:
+El identificador visible es `numero_trabajo`.
 
-- `src/app/api/clientes/search/route.ts`
+**Estados:** `presupuesto_entregado → aprobado → finalizado`
 
-Ese endpoint devuelve coincidencias por nombre y alimenta el selector de cliente en trabajos.
+El estado inicial de un trabajo nuevo es `presupuesto_entregado`. El valor `pendiente` existe en el enum por compatibilidad histórica pero no se usa en la UI; si aparece en datos viejos, la app lo normaliza como `presupuesto_entregado`.
 
-### 7.2 Trabajos
+**Prioridades:** `baja`, `normal`, `alta`.
 
-Es el dominio central del sistema.
+### 7.3 Catálogo de trabajos (mano de obra)
 
-Tipos principales en `src/lib/types.ts`:
+Los trabajos pertenecen a categorías y tienen cuatro precios: `precio`, `precio_lista_1`, `precio_lista_2`, `precio_lista_3`.
 
-- `TrabajoListItem`
-- `TrabajoDetail`
-- `TrabajoFormValues`
+La pantalla `/precios` administra este catálogo con ajuste porcentual masivo por lista.
 
-Un trabajo combina:
-
-- cliente,
-- selección técnica,
-- número de serie de motor,
-- estado,
-- prioridad,
-- condición de cobro,
-- observaciones,
-- lista de precios,
-- trabajos seleccionados,
-- repuestos seleccionados.
-
-Estados hoy vigentes:
-
-- `pendiente`
-- `aprobado`
-- `finalizado`
-
-Prioridades:
-
-- `baja`
-- `normal`
-- `alta`
-
-### 7.3 Trabajos
-
-Los trabajos pertenecen a categorías y se usan como ítems de presupuesto.
-
-Cada trabajo guarda varios precios:
-
-- `precio`
-- `precio_lista_1`
-- `precio_lista_2`
-- `precio_lista_3`
-
-La pantalla `/precios` administra este catálogo y permite ajuste porcentual masivo por lista.
-
-La query agrupada principal es `listTrabajosAgrupados()` en `src/lib/queries/catalogo.ts`.
-
-Además, desde la migración `020_add_trabajo_snapshots.sql`, cada trabajo seleccionado dentro de una orden guarda snapshot histórico de:
-
-- categoría,
-- nombre,
-- precio correspondiente a la lista elegida al momento de guardar.
-
-Ese snapshot vive en `orden_trabajo_trabajos` y es la fuente de verdad para:
-
-- el resumen del trabajo,
-- la vista detalle,
-- el PDF,
-- la persistencia histórica cuando el catálogo cambia.
-
-Si mañana cambia el nombre del trabajo o alguna lista de precios en `/precios`, los presupuestos viejos deben seguir mostrando el valor histórico guardado. Solo el botón de actualización explícita puede refrescar ese snapshot.
+Cada ítem seleccionado dentro de un presupuesto guarda un **snapshot histórico** de categoría, nombre y precio (migración `020`). Si cambia el catálogo, los presupuestos viejos siguen mostrando el valor guardado. Solo el botón "Actualizar precios" puede refrescar ese snapshot.
 
 ### 7.4 Repuestos
 
-Los repuestos también se organizan por categorías, pero el modelo cambió respecto de versiones anteriores.
+El catálogo (`/repuestos`) es una base de nombres y categorías. El precio de un repuesto **no se toma del catálogo** — se define dentro de cada trabajo.
 
-Hoy hay que distinguir dos niveles:
+`orden_trabajo_repuestos` guarda: `repuesto_id`, `precio`, `cantidad`, más snapshot de nombre de categoría y nombre de repuesto (migración `021`).
 
-1. Catálogo de repuestos.
-2. Repuesto dentro de un trabajo.
+Si un repuesto es borrado del catálogo, el trabajo histórico sigue siendo legible gracias al snapshot y al `ON DELETE SET NULL` en el FK.
 
-El catálogo (`/repuestos`) hoy funciona esencialmente como una base de nombres y categorías. El precio útil para presupuestar ya no debe salir de ahí.
+A diferencia de los trabajos, el refresco desde catálogo para repuestos solo actualiza nombre/categoría, nunca el precio.
 
-El precio real se decide dentro de cada trabajo.
+### 7.5 Catálogo técnico (información técnica)
 
-En consecuencia:
+Tablas esperadas en la base técnica: `marcas`, `modelos`, `motores`, `vehiculos`.
 
-- `trabajo_repuestos` guarda `repuesto_id`, `precio` y `cantidad`,
-- el total de un repuesto en un trabajo es `precio_unitario x cantidad`.
+La pantalla `/informacion-tecnica` permite ver y editar este catálogo. Solo `super_admin` puede editar; los operarios tienen solo lectura.
 
-Este cambio quedó formalizado por la migración `014_add_precio_cantidad_to_trabajo_repuestos.sql`.
-
-Desde la migración `021_add_repuesto_snapshots.sql`, además de `precio` y `cantidad`, la relación `orden_trabajo_repuestos` guarda snapshot de:
-
-- nombre de categoría,
-- nombre de repuesto.
-
-La regla de negocio importante es esta:
-
-- el precio del repuesto dentro del presupuesto pertenece al trabajo, no al catálogo,
-- el catálogo de repuestos funciona como base de nombres/categorías vivas,
-- renombrar o borrar un repuesto no debe alterar el precio histórico ya guardado,
-- el PDF y los resúmenes deben poder seguir mostrando el repuesto aunque ya no exista en catálogo.
-
-Por eso, a diferencia de los trabajos, el refresco desde catálogo para repuestos solo puede actualizar metadatos de identidad viva como nombre/categoría, pero nunca debe pisar `precio`.
-
-### 7.5 Información técnica
-
-La selección técnica vive conceptualmente fuera del núcleo comercial.
-
-El catálogo técnico esperado contiene:
-
-- `marcas`
-- `modelos`
-- `motores`
-- `vehiculos`
-
-La relación modelo-motor se resuelve desde `vehiculos`.
-
-La capa `src/lib/queries/catalogo.ts` hace dos trabajos distintos:
-
-- leer catálogo técnico externo,
-- leer y administrar trabajos comerciales.
-
-Eso conviene tenerlo presente porque el archivo mezcla responsabilidades históricas y de negocio.
+Esta ruta vive bajo `/configuracion` a nivel lógico aunque la URL es independiente.
 
 ### 7.6 Usuarios
 
-Los usuarios internos viven en la base principal y participan del login cuando no se usan credenciales de admin por variables de entorno.
+La tabla `usuarios` tiene: `nombre` (PK, es el username), `password_hash`, `password_plain`, `role`, `activo`, `pantalla_inicio`.
 
-Hay una pantalla administrativa en `/admin/usuarios`.
+La tabla `usuario_permisos` relaciona usuario y permiso.
 
-## 8. Flujo de información del trabajo
+La gestión está en `/admin/usuarios`, también bajo `/configuracion` a nivel lógico.
 
-El trabajo es donde más se cruzan servidor, cliente, estado local y persistencia.
+---
 
-### 8.1 Carga inicial del detalle
+## 8. Flujo del detalle de trabajo
 
-Cuando se entra a `/trabajos/[id]`, la página servidor:
+### Carga inicial
 
-1. valida el `id`,
-2. carga el trabajo,
-3. carga marcas, modelos, motores y relaciones,
-4. carga trabajos agrupados,
-5. carga repuestos agrupados,
-6. genera el SVG del QR,
-7. arma un `initialState` para el formulario.
+La página servidor carga: el trabajo, los datos técnicos (marcas/modelos/motores), el catálogo de trabajos agrupados, los repuestos agrupados y genera el SVG del QR.
 
-Esto ocurre en `src/app/(app)/trabajos/[id]/page.tsx`.
+Los nombres técnicos (marca, modelo, motor) no se guardan como texto — se hidratan al vuelo desde los IDs usando `hydrateTechnicalLabels()`.
 
-### 8.2 Hidratación de nombres técnicos
+### Pantalla cliente
 
-Los trabajos guardan IDs técnicos, no los nombres.
+`TrabajoDetailPage` orquesta la edición. Envuelve cuatro providers de contexto:
 
-Para mostrar marca, modelo y motor, la app usa `hydrateTechnicalLabels()` en `src/lib/queries/catalogo.ts`, que:
+- `PrioridadProvider` / `CobradoProvider` — sincronizan UI antes del submit
+- `TrabajosSeleccionProvider` — IDs seleccionados + lista de precios activa
+- `RepuestosSeleccionProvider` — selección, precio unitario y cantidad por repuesto
 
-1. consulta marcas, modelos y motores,
-2. arma mapas por ID,
-3. agrega `marca_nombre`, `modelo_nombre` y `motor_nombre` a los objetos.
+### Formulario
 
-Esto permite mantener persistencia mínima en trabajos y resolver etiquetas al vuelo.
+`TrabajoForm` maneja: selección técnica, observaciones, tabs de trabajos/repuestos, dirty state y serialización.
 
-### 8.3 Pantalla cliente del trabajo
+Los ítems seleccionados se serializan como hidden inputs (`trabajosIds`, `repuestosIds`, `repuestoPrecio_<id>`, `repuestoCantidad_<id>`) para usar el submit por `FormData` sin perder la riqueza de la UI cliente.
 
-`TrabajoDetailPage` actúa como orquestador visual.
+### Guardado
 
-Encapsula varios providers:
+La server action `updateTrabajoAction` recibe el `FormData`, valida y llama a `updateTrabajo()`, que:
 
-- `PrioridadProvider`
-- `CobradoProvider`
-- `TrabajosSeleccionProvider`
-- `RepuestosSeleccionProvider`
+1. Actualiza la fila principal del trabajo.
+2. Elimina relaciones que ya no están seleccionadas.
+3. Inserta o actualiza las vigentes.
+4. Persiste snapshot histórico de nombres y precios.
 
-La idea es que la UI pueda reaccionar inmediatamente a cambios sin depender de roundtrip al servidor.
+### Reglas de negocio
 
-### 8.4 Formulario de trabajo
+- Un trabajo no puede aprobarse sin cliente asignado.
+- La fecha de aprobación se guarda solo la primera vez que pasa a `aprobado`.
+- `finalizado` mueve el trabajo a historial en UX y listados.
+- La alerta de "catálogo cambió" compara solo trabajos; los repuestos no se comparan contra el catálogo vivo.
 
-`TrabajoForm` concentra la mayor parte de la edición.
+---
 
-Responsabilidades principales:
+## 9. PDF y etiqueta QR
 
-- selección técnica,
-- observaciones,
-- tabs de trabajos y repuestos,
-- serialización de selecciones al submit,
-- control de dirty state,
-- interoperabilidad con una action externa.
+**PDF:** El endpoint `src/app/api/trabajos/[id]/pdf/route.ts` carga el trabajo con sus snapshots, genera un QR como data URL, renderiza `PresupuestoPdf` con `@react-pdf/renderer` y devuelve el archivo inline. El nombre del archivo incluye número de trabajo y cliente.
 
-Un detalle importante es que trabajos y repuestos complejos se serializan como hidden inputs. Por ejemplo:
+**Etiqueta QR:** La página `/trabajos/[id]/etiqueta` se renderiza dentro del `AppShell`. La impresión oculta el shell via CSS en `globals.css` usando `body:has(#etiqueta-qr-print)`. Si cambia la estructura del shell, hay que revisar que la impresión siga siendo correcta.
 
-- `trabajosIds`
-- `repuestosIds`
-- `repuestoPrecio_<id>`
-- `repuestoCantidad_<id>`
+---
 
-Eso permite usar controles cliente ricos sin perder la semántica simple del submit por `FormData`.
+## 10. Limpieza automática de presupuestos
 
-### 8.5 Selección de trabajos
+El módulo `src/lib/maintenance/trabajos-cleanup.ts` borra físicamente trabajos en estado `presupuesto_entregado` que tengan `fecha_presupuesto_entregado` vencida y `cobrado = false`.
 
-Los trabajos se manejan con `TrabajosSeleccionProvider`.
+La configuración vive en `empresa_configuracion`: `auto_eliminar_presupuestos_entregados`, `meses_retencion_presupuesto_entregado`, `ultima_ejecucion_limpieza`.
 
-Ese contexto guarda:
+Se puede ejecutar manualmente desde `/configuracion`. También existe un endpoint cron en `src/app/api/maintenance/trabajos-cleanup/route.ts` protegido con `CRON_SECRET`.
 
-- IDs seleccionados,
-- lista de precios activa.
+Para probar: `npm run cleanup:test -- --id=39`
 
-La lista elegida impacta en el valor mostrado y luego en el cálculo del resumen y del PDF.
+---
 
-### 8.6 Selección de repuestos
+## 11. Navegación y breadcrumbs
 
-Los repuestos se manejan con `RepuestosSeleccionProvider`.
+El `AppShell` renderiza automáticamente un breadcrumb en todas las páginas excepto el dashboard.
 
-Ese contexto guarda por repuesto:
+`/informacion-tecnica` y `/admin/usuarios` tienen jerarquía virtual bajo Configuración, aunque sus URLs son independientes.
 
-- selección,
-- precio unitario,
-- cantidad.
+---
 
-Esto es relevante porque el catálogo no define el precio final presupuestado.
+## 12. Componentes UI propios
 
-### 8.7 Guardado
+El proyecto tiene un sistema de UI propio. Piezas clave:
 
-Cuando el usuario envía el formulario:
+| Componente | Uso |
+|---|---|
+| `Button` / `PulsatingButton` | Botones; PulsatingButton indica dirty state |
+| `Card`, `PageHeader` | Layout de páginas |
+| `EstadoStepper` | Stepper de estado del trabajo (interactivo y display) |
+| `CobradoToggle`, `PrioridadToggle` | Toggles con contexto propio |
+| `TrabajoItemCard`, `CheckboxBeauti` | Ítems seleccionables en el formulario |
+| `Incrementor` | Control (+/-) para ajuste porcentual en `/precios` |
+| `Tabs`, `ButtonGroup` | Navegación por pestañas y selección múltiple |
+| `Breadcrumb` / `AppBreadcrumb` | Breadcrumbs automáticos en AppShell |
+| `ConfirmDialog` | Modal de confirmación — siempre en lugar de `window.confirm()` |
+| `Icon` | Todos los íconos pasan por acá, nunca SVG inline |
+| `Spinner` | Feedback de carga en botones pending |
 
-1. la server action `updateTrabajoAction` recibe el `FormData`,
-2. normaliza strings y valores simples,
-3. reconstruye los repuestos con `parseTrabajoRepuestos()` desde `src/lib/trabajo-repuestos.ts`,
-4. valida reglas de negocio,
-5. llama a `updateTrabajo()`.
+Convenciones:
 
-La función `updateTrabajo()` en `src/lib/queries/trabajos.ts` hace una estrategia simple y robusta:
+- Cada componente tiene una className raíz con su nombre.
+- Los widgets fuera del `<form>` usan `<input type="hidden" form={formId} />`.
+- Importes como enteros, sin decimales.
 
-1. actualiza la fila principal del trabajo,
-2. elimina relaciones que ya no siguen seleccionadas,
-3. inserta o actualiza relaciones vigentes,
-4. persiste snapshot histórico de trabajos y repuestos junto con sus valores.
+---
 
-El diseño sigue siendo simple, pero ya no depende de “borrar todo y reinsertar” porque el snapshot histórico necesita sobrevivir a renombres y bajas del catálogo.
+## 13. Migraciones
 
-Detalles importantes del guardado actual:
+Las migraciones viven en `migrations/` y se aplican con `npm run db:migrate`.
 
-- trabajos: guardan `categoria_nombre_snapshot`, `trabajo_nombre_snapshot` y `precio_snapshot`,
-- repuestos: guardan `categoria_nombre_snapshot`, `repuesto_nombre_snapshot`, `precio` y `cantidad`,
-- la pantalla de edición debe preferir labels snapshot para items ya guardados,
-- si un repuesto fue borrado del catálogo, el trabajo puede seguir mostrándolo en resumen y PDF gracias al snapshot y al `ON DELETE SET NULL`.
+Migraciones más relevantes para entender el estado actual:
 
-### 8.8 Reglas de negocio visibles en código
+| Migración | Qué hace |
+|---|---|
+| `010` | Desacopla FK del catálogo técnico |
+| `016` | Renombra pedidos → ordenes_trabajo |
+| `019` | Agrega `fecha_presupuesto_entregado` y config de limpieza |
+| `020` | Snapshots históricos de trabajos |
+| `021` | Snapshots de repuestos + ON DELETE SET NULL |
+| `022` | Roles super_admin/operario + tabla usuario_permisos |
+| `023` | Columna `pantalla_inicio` en usuarios |
+| `024` | Elimina columna `email` de usuarios; `nombre` pasa a ser PK |
 
-Hoy existen al menos estas reglas:
+Hay migraciones con números repetidos (`008_*`, `009_*`) — no rompen el runner pero hay que tenerlo en cuenta al revisar el historial.
 
-- un trabajo no puede aprobarse sin cliente asignado,
-- la fecha de aprobación se guarda la primera vez que pasa a `aprobado`,
-- `finalizado` mueve el trabajo a historial a nivel de UX y listados,
-- prioridad y cobrado forman parte del mismo flujo de edición,
-- los trabajos históricos deben mostrar nombre y precio snapshot aunque cambie el catálogo,
-- los repuestos históricos deben mostrar nombre snapshot y precio histórico propio del trabajo,
-- la alerta de “catálogo cambió” compara solo trabajos, no repuestos,
-- el botón `Actualizar precios` refresca precios solo para trabajos; en repuestos refresca nombre/categoría si todavía existen en catálogo, pero no su precio.
+---
 
-## 9. Generación de presupuesto PDF
-
-El PDF sale por `src/app/api/trabajos/[id]/pdf/route.ts`.
-
-El flujo es:
-
-1. recibe `id`,
-2. carga `TrabajoDetail`,
-3. carga trabajos snapshot ya resueltos para la lista de precios histórica del trabajo,
-4. carga repuestos snapshot del trabajo con precio y cantidad históricos,
-5. genera un QR como data URL,
-6. renderiza `PresupuestoPdf`,
-7. devuelve un PDF inline.
-
-Puntos a notar:
-
-- el nombre del archivo se arma dinámicamente con número de trabajo y cliente,
-- el PDF usa datos ya cocinados por la capa de queries,
-- el PDF no debe depender del nombre vivo del catálogo para trabajos o repuestos ya guardados,
-- observaciones ya forman parte del documento,
-- los importes hoy se muestran como enteros, sin decimales.
-
-## 10. Etiqueta QR e impresión
-
-La etiqueta QR se ve en `/trabajos/[id]/etiqueta`.
-
-La página se renderiza dentro del `AppShell`, por lo que la impresión requiere ocultar layout global. Ese ajuste está actualmente en:
-
-- `src/app/(app)/trabajos/[id]/etiqueta/EtiquetaPage.module.scss`
-
-Esto es un punto delicado de mantenimiento: si cambia la estructura del shell, la hoja de impresión puede volver a mostrar header o menú lateral.
-
-## 11. Convenciones de interfaz y componentes reutilizables
-
-El proyecto fue consolidando un pequeño sistema de UI propio.
-
-Piezas relevantes:
-
-- `Button`
-- `Card`
-- `Badge`
-- `Table`
-- `PageHeader`
-- `PulsatingButton`
-- `Tabs`
-- `ButtonGroup`
-- `Incrementor`
-- `CheckboxBeauti`
-- `TrabajoItemCard`
-- `EstadoStepper`
-- `PrioridadToggle`
-- `CobradoToggle`
-- `Icon`
-
-Convenciones actuales importantes:
-
-- cada componente debe tener una clase raíz identificable,
-- se prefiere usar componentes base antes que recrear estilos ad hoc,
-- los íconos deben pasar por `src/components/ui/Icon`,
-- el detalle del trabajo usa un único botón de guardado,
-- cuando un widget vive fuera del `<form>`, sus datos se envían mediante hidden inputs asociados por `form={formId}`.
-
-## 12. Formato de dinero y reglas de importes
-
-La aplicación trabaja hoy con importes enteros.
-
-Esto afecta:
-
-- visualización en formularios,
-- resúmenes,
-- PDF,
-- precios de trabajos,
-- precio unitario de repuestos por trabajo.
-
-La normalización de formato está centralizada en `src/lib/format.ts`.
-
-## 13. API interna y endpoints auxiliares
-
-Además del login y el PDF, existen endpoints de soporte:
-
-- `/api/clientes/search`: autocomplete de clientes.
-- `/api/georef/provincias`
-- `/api/georef/localidades`
-- `/api/auth/logout`
-
-En general no exponen una API pública de negocio. Son endpoints de apoyo a la interfaz.
-
-## 14. Migraciones y evolución del esquema
-
-Las migraciones viven en `migrations/` y se ejecutan con:
+## 14. Scripts de desarrollo
 
 ```bash
-npm run db:migrate
+npm run db:migrate             # Aplica migraciones pendientes
+npm run db:reset:dev           # Borra clientes y trabajos marcados DEV-SEED
+npm run db:seed:dev            # Crea 15 clientes y 15 trabajos de prueba
+npm run cleanup:test -- --id=39  # Prueba limpieza automática sobre un trabajo real
 ```
 
-El proyecto muestra una evolución bastante clara:
+---
 
-- esquema base de clientes y trabajos,
-- ampliaciones de datos de cliente,
-- incorporación de precios por trabajo,
-- incorporación de usuarios,
-- listas de precios,
-- desacople del catálogo técnico,
-- incorporación de repuestos,
-- precio y cantidad por repuesto dentro del trabajo,
-- snapshots históricos de trabajos,
-- snapshots históricos de identidad para repuestos.
+## 15. Variables de entorno
 
-Migraciones especialmente relevantes para el flujo histórico actual:
+```
+DATABASE_URL                    Base principal (Neon)
+TECHNICAL_DATABASE_URL          Catálogo técnico (Neon, opcional)
+JWT_SECRET                      Firma JWT
+ADMIN_USER / ADMIN_PASSWORD     Credenciales del admin principal (nunca en DB)
+NEXT_PUBLIC_BASE_URL            URL base para QR codes
+NEXT_PUBLIC_TURNSTILE_SITE_KEY  Cloudflare Turnstile (login)
+TURNSTILE_SECRET_KEY            Cloudflare Turnstile (servidor)
+CRON_SECRET                     Protege el endpoint de limpieza automática
+```
 
-- `020_add_trabajo_snapshots.sql`: agrega snapshot de categoría, nombre y precio a `orden_trabajo_trabajos`,
-- `021_add_repuesto_snapshots.sql`: agrega snapshot de categoría y nombre a `orden_trabajo_repuestos`, permite `repuesto_id` nulo y redefine el FK con `ON DELETE SET NULL`.
+---
 
-Una observación útil: hay versiones repetidas en nombres de migración como `008_*` y `009_*`. Eso no necesariamente rompe el runner, pero sí exige disciplina al revisar historial y orden de aplicación.
+## 16. Puntos a vigilar
 
-## 15. Puntos fuertes de la arquitectura actual
+**Snapshots históricos** — Ningún resumen, PDF o edición debe reconstruir datos desde el catálogo vivo si existe snapshot. Esta regla es fácil de romper al agregar features nuevas.
 
-- Separación razonable entre rutas, pantallas, componentes y queries.
-- SQL explícito y fácil de rastrear.
-- Buen uso del modelo híbrido servidor/cliente de App Router.
-- Formulario de trabajo suficientemente flexible para una UI rica.
-- Desacople correcto entre catálogo técnico y operación comercial.
-- Evolución acertada de repuestos hacia un precio por trabajo, que refleja mejor la realidad del negocio.
+**Catálogo técnico externo** — Si cambia el esquema de la base técnica o falla la conexión, se rompen formularios de trabajo, PDFs y listados que hidratan marca/modelo/motor.
 
-## 16. Riesgos técnicos y puntos a vigilar
+**Impresión de etiqueta** — La hoja de impresión conoce la estructura del shell. Si cambia el layout, la impresión puede mostrar header o menú.
 
-### Mezcla de responsabilidades en algunos archivos
+**`catalogo.ts` mezcla responsabilidades** — Concentra consultas al catálogo técnico externo y al catálogo de trabajos comerciales. Funciona, pero es un archivo a dividir si el proyecto crece.
 
-`src/lib/queries/catalogo.ts` concentra catálogo técnico y trabajos comerciales. Funciona, pero complica la lectura y hace más difícil separar contextos de negocio.
-
-### Estrategia de reescritura total en relaciones del trabajo
-
-Borrar y reinsertar `trabajo_trabajos` y `trabajo_repuestos` es simple, pero puede volverse costoso o incómodo si mañana se agregan auditorías, trazabilidad fina o edición concurrente.
-
-### Dependencia estructural del AppShell para impresión
-
-La impresión de etiquetas depende de selectores que conocen la estructura del shell. Si cambia el layout, la impresión puede degradarse sin tocar código de QR.
-
-### Persistencia histórica de precios
-
-El sistema ya protege bastante bien el histórico, pero sigue siendo un punto sensible:
-
-- ningún resumen o PDF debe reconstruir trabajos desde el catálogo vivo si existe snapshot,
-- ningún flujo debe volver a usar el precio del catálogo de repuestos como si fuera precio presupuestado,
-- la edición visual del trabajo debe reflejar labels snapshot para items ya guardados,
-- si un item fue eliminado del catálogo, el trabajo histórico debe seguir siendo legible.
-
-### Base técnica externa
-
-La disponibilidad y forma del catálogo técnico son críticas. Si cambia el esquema externo o la conectividad, se impactan formularios de trabajo, PDFs y listados que hidratan etiquetas técnicas.
-
-### Conectividad con Neon
-
-El acceso a base usa `@neondatabase/serverless`, por lo que una caída de red o disponibilidad puede aparecer como `fetch failed`.
-
-`src/lib/db.ts` hoy envuelve esos errores para distinguir:
-
-- base principal,
-- base técnica,
-- host que falló.
-
-Si reaparece un error de conexión, revisar primero variables de entorno, red y disponibilidad de Neon antes de asumir un bug de negocio.
-
-## 17. Archivos clave para mantenimiento
-
-Si alguien nuevo entra al proyecto, estos archivos son los mejores puntos de arranque:
-
-- `README.md`: stack, variables y scripts.
-- `src/lib/db.ts`: estrategia de conexión a bases.
-- `src/middleware.ts`: seguridad y autorización.
-- `src/lib/auth.ts`: sesión y JWT.
-- `src/lib/types.ts`: modelo tipado compartido.
-- `src/lib/queries/trabajos.ts`: núcleo del negocio de trabajos.
-- `src/lib/queries/catalogo.ts`: trabajos y catálogo técnico.
-- `src/lib/queries/repuestos.ts`: catálogo y detalle de repuestos por trabajo.
-- `src/app/(app)/trabajos/[id]/page.tsx`: ensamblado servidor del detalle.
-- `src/components/pages/TrabajoDetailPage/TrabajoDetailPage.tsx`: orquestación cliente del detalle.
-- `src/components/forms/TrabajoForm/TrabajoForm.tsx`: formulario principal.
-- `src/app/api/trabajos/[id]/pdf/route.ts`: salida PDF.
-
-## 18. Conclusión
-
-La aplicación tiene una arquitectura pragmática y bastante alineada con su problema de negocio. No intenta abstraer de más: usa SQL directo, formularios claros, server actions y componentes cliente donde realmente hacen falta.
-
-El centro del sistema es el trabajo. Todo lo demás orbita alrededor de esa entidad:
-
-- clientes para identificar al dueño del trabajo,
-- catálogo técnico para describir el vehículo o motor,
-- trabajos para presupuestar mano de obra,
-- repuestos para presupuestar materiales con precio variable por caso,
-- PDF y QR para materializar el trabajo fuera de la pantalla.
-
-Desde el punto de vista técnico, la base es sólida para seguir creciendo. Los próximos cuidados deberían enfocarse en mantener clara la separación de responsabilidades, proteger el flujo del trabajo y evitar que el crecimiento de la UI termine duplicando reglas de negocio en demasiados lugares.
+**Conectividad con Neon** — Un error de red aparece como `fetch failed`. `src/lib/db.ts` distingue base principal vs técnica en el mensaje de error. Ante un error de conexión, revisar variables de entorno y disponibilidad de Neon antes de asumir un bug.

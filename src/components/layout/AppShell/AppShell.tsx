@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { Date } from "@/components/layout/Date";
 import { MainMenu } from "@/components/navigation/MainMenu";
+import { AppBreadcrumb } from "@/components/ui/Breadcrumb";
 import styles from "./AppShell.module.scss";
 
 type Props = {
@@ -74,7 +75,10 @@ export function AppShell({ children, role, permisos }: Props) {
           </div>
         </aside>
 
-        <main className={styles.main}>{children}</main>
+        <main className={styles.main}>
+          <AppBreadcrumb />
+          {children}
+        </main>
       </div>
     </div>
   );
