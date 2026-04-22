@@ -19,6 +19,7 @@ import {
   StatusBadge,
 } from "@/components/ui/Badge";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
+import { useMobileActionsRegister } from "@/components/layout/MobileActions";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
 import { Select } from "@/components/ui/Select";
@@ -266,6 +267,18 @@ export function TrabajosPage({
 
   const hayFiltros = estado || prioridad || numeroTrabajo;
 
+  useMobileActionsRegister(
+    canEdit ? (
+      <Link
+        href="/trabajos/nuevo"
+        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white text-sm font-semibold shadow-sm"
+      >
+        <Icon name="plus" className="h-3.5 w-3.5" />
+        Nuevo trabajo
+      </Link>
+    ) : null
+  );
+
   return (
     <div className={cn("TrabajosPage", styles.TrabajosPage, "space-y-6")}>
       <PageHeader
@@ -274,9 +287,11 @@ export function TrabajosPage({
         description="Filtrá por estado, prioridad o número. La base queda lista para presupuesto, aprobación y PDF."
         actions={
           canEdit ? (
-            <ButtonAdd classNameInner="w-full md:w-auto" href="/trabajos/nuevo">
-              Nuevo trabajo
-            </ButtonAdd>
+            <div className="hidden md:block">
+              <ButtonAdd href="/trabajos/nuevo">
+                Nuevo trabajo
+              </ButtonAdd>
+            </div>
           ) : undefined
         }
       />

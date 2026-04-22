@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { Date } from "@/components/layout/Date";
 import { MainMenu } from "@/components/navigation/MainMenu";
 import { AppBreadcrumb } from "@/components/ui/Breadcrumb";
+import { MobileActionsProvider, MobileActions } from "@/components/layout/MobileActions";
 import styles from "./AppShell.module.scss";
 
 type Props = {
@@ -18,68 +19,50 @@ type Props = {
 export function AppShell({ children, role, permisos }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
-
-  function closeMenu() {
-    setMenuOpen(false);
-  }
-
   return (
-    <div className={cn("AppShell", styles.shell)}>
-      {/* Top bar — siempre visible */}
-      <header className={styles.topBar}>
-        <Link href="/" aria-label="Ir al dashboard">
-          <Image
-            src="/logo.png"
-            alt="Recticar"
-            width={110}
-            height={36}
-            className={styles.topBarLogo}
-            priority
-          />
-        </Link>
-        <Date className="hidden md:flex" />
-        <button
-          type="button"
-          className={styles.hamburger}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
-        >
-          <span className={styles.hamburgerBar} />
-          <span className={styles.hamburgerBar} />
-          <span className={styles.hamburgerBar} />
-        </button>
-      </header>
+    <MobileActionsProvider
+      onOpenMenu={() => setMenuOpen(true)}
+      menuOpen={menuOpen}
+      setMenuOpen={setMenuOpen}
+      role={role}
+      permisos={permisos}
+    >
+      <div className={cn("AppShell", styles.shell)}>
+        {/* Top bar */}
+        <header className={styles.topBar}>
+          <Link href="/" aria-label="Ir al dashboard">
+            <Image
+              src="/logo.png"
+              alt="Recticar"
+              width={110}
+              height={36}
+              className={styles.topBarLogo}
+              priority
+            />
+          </Link>
+          <Date className="hidden md:flex" />
+        </header>
 
-      {/* Fila: sidebar + contenido */}
-      <div className={styles.body}>
-        {/* Backdrop mobile */}
-        <div
-          className={cn(styles.backdrop, menuOpen && styles.backdropVisible)}
-          onClick={closeMenu}
-          aria-hidden="true"
-        />
+        {/* Fila: sidebar + contenido */}
+        <div className={styles.body}>
+          {/* Sidebar — solo visible en desktop */}
+          <aside className={styles.sidebar} aria-label="Navegación principal">
+            <div className={styles.sidebarInner}>
+              <MainMenu role={role} permisos={permisos} />
+            </div>
+          </aside>
 
-        {/* Sidebar */}
-        <aside
-          className={cn(styles.sidebar, menuOpen && styles.sidebarOpen)}
-          aria-label="Navegación principal"
-        >
-          <div className={styles.sidebarInner}>
-            <MainMenu role={role} permisos={permisos} onClose={closeMenu} />
-          </div>
-        </aside>
+          <main className={styles.main}>
+            <AppBreadcrumb />
+            {children}
+            {/* Espaciado para que el contenido no quede bajo la barra mobile */}
+            <div className={styles.mobileActionsPlaceholder} />
+          </main>
+        </div>
 
-        <main className={styles.main}>
-          <AppBreadcrumb />
-          {children}
-        </main>
+        {/* Barra mobile sticky + MobileMenu */}
+        <MobileActions />
       </div>
-    </div>
+    </MobileActionsProvider>
   );
 }
