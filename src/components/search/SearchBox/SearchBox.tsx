@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { ClienteListItem, TrabajoListItem } from "@/lib/types";
 import { Input } from "@/components/ui/Input";
+import { Icon } from "@/components/ui/Icon";
 import styles from "./SearchBox.module.scss";
 
 export type SearchEntity = "clientes" | "trabajos";
@@ -54,9 +55,10 @@ const searchConfigs: {
 type SearchBoxProps = {
   entity: SearchEntity;
   initialValue: string;
+  inputClassName?: string;
 };
 
-export function SearchBox({ entity, initialValue }: SearchBoxProps) {
+export function SearchBox({ entity, initialValue, inputClassName }: SearchBoxProps) {
   const config = searchConfigs[entity];
   const [query, setQuery] = useState(initialValue);
   const [results, setResults] = useState<SearchItem[]>([]);
@@ -112,22 +114,26 @@ export function SearchBox({ entity, initialValue }: SearchBoxProps) {
 
   return (
     <div ref={containerRef} className={cn("SearchBox", styles.SearchBox)}>
-      <Input
-        type="search"
-        name="q"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        onFocus={() => {
-          if (results.length > 0) {
-            setIsOpen(true);
-          }
-        }}
-        placeholder={config.placeholder}
-        autoComplete="off"
-      />
+      <div className={styles.SearchBoxInputWrap}>
+        <Icon name="search" className={styles.SearchBoxIcon} />
+        <Input
+          type="search"
+          name="q"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onFocus={() => {
+            if (results.length > 0) {
+              setIsOpen(true);
+            }
+          }}
+          placeholder={config.placeholder}
+          autoComplete="off"
+          className={inputClassName}
+        />
+      </div>
 
       {isLoading ? (
-        <p className="mt-2 text-xs text-[var(--text-color-gray)]">
+        <p className={styles.SearchBoxLoading}>
           Buscando coincidencias...
         </p>
       ) : null}

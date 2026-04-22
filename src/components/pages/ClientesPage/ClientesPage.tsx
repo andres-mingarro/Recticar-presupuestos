@@ -8,13 +8,12 @@ import type {
   ClienteListItem,
   ClientePendingTrabajoItem,
 } from "@/lib/types";
-import { SearchForm } from "@/components/search/SearchForm";
+import { SearchBox } from "@/components/search/SearchBox";
 import { Pager } from "@/components/pagination/Pager";
 import { Button } from "@/components/ui/Button";
 import { PaymentBadge, StatusBadge } from "@/components/ui/Badge";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
-import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
 import { Table } from "@/components/ui/Table";
 import { getVehicleLabel } from "@/lib/format";
@@ -99,25 +98,27 @@ export function ClientesPage({
 
   return (
     <div className={cn("ClientesPage", styles.ClientesPage, "space-y-6")}>
-      <Card as="section">
-        <div
-          className={cn(
-            "ClientesPageHeader",
-            styles.ClientesPageHeader
-          )}
+      <Card as="section" className={styles.searchCard}>
+        <form
+          className={cn("ClientesPageSearchForm", styles.searchRow)}
+          action="/clientes"
         >
-          <SearchForm
-            entity="clientes"
-            initialValue={q}
-            className={cn(
-              "ClientesPageSearch",
-              styles.ClientesPageSearch
-            )}
-          />
-          {canEdit ? <Divider className="md:hidden" /> : null}
-          {canEdit && <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>}
-        </div>
+          {/* SearchBox con autocomplete */}
+          <div className={styles.searchInputWrap}>
+            <SearchBox entity="clientes" initialValue={q} inputClassName={styles.searchInput} />
+          </div>
 
+          {/* Botón buscar */}
+          <button type="submit" className={styles.searchBtn}>
+            <Icon name="search" className="h-4 w-4" />
+            <span>Buscar</span>
+          </button>
+
+          {/* Nuevo cliente */}
+          {canEdit && (
+            <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>
+          )}
+        </form>
       </Card>
 
       {errorMessage ? (
@@ -188,7 +189,7 @@ export function ClientesPage({
                     Teléfono
                   </span>
                 </th>
-                <th className="px-4 py-3 font-semibold w-[150px]">
+                <th className="px-4 py-3 font-semibold w-[180px]">
                   <span className="inline-flex items-center gap-2">
                     <Icon name="clipboard" className="h-4 w-4" />
                     Pendientes
@@ -251,16 +252,25 @@ export function ClientesPage({
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openPanel(cliente.id);
-                        }}
-                      >
-                        {(pendingTrabajosByCliente[cliente.id] ?? []).length} Pendientes
-                      </Button>
+                      {(() => {
+                        const count = (pendingTrabajosByCliente[cliente.id] ?? []).length;
+                        return (
+                          <button
+                            type="button"
+                            className={cn(
+                              styles.pendingBadge,
+                              count > 0 ? styles.pendingBadgeActive : styles.pendingBadgeZero
+                            )}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openPanel(cliente.id);
+                            }}
+                          >
+                            {count > 0 && <span className={styles.pendingDot} />}
+                            {count} {count === 1 ? "pendiente" : "pendientes"}
+                          </button>
+                        );
+                      })()}
                     </td>
                   </tr>
                 ))
@@ -308,13 +318,16 @@ export function ClientesPage({
                 styles.ClientesPagePanelHeader
               )}
             >
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                  Pendientes
+              <div className="min-w-0">
+                <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+                  Trabajos pendientes · #{panelClient.numero_cliente}
                 </p>
-                <h3 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
+                <h3 className="mt-1 text-xl font-semibold tracking-tight text-[var(--text-color-defult)] truncate">
                   {panelClient.apellido}, {panelClient.nombre}
                 </h3>
+                <p className="mt-1 text-xs text-[var(--text-color-gray)]">
+                  {panelTrabajos.length} {panelTrabajos.length === 1 ? "trabajo" : "trabajos"} sin finalizar
+                </p>
               </div>
 
               <Button

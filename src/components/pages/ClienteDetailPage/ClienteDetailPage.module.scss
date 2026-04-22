@@ -5,7 +5,7 @@
 /* ─── Header card ─── */
 .headerCard {
   display: grid;
-  gap: 1.75rem;
+  gap: 1.5rem;
 }
 
 .headerTop {
@@ -14,53 +14,62 @@
   gap: 1.25rem;
 }
 
-.headerTitles {
-  flex: 1;
-}
-
-.headerActions {
-  display: flex;
+/* ─── Avatar ─── */
+.avatar {
+  display: none;
+  height: 3.5rem;
+  width: 3.5rem;
+  flex-shrink: 0;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--apricot-light), var(--peach-soft));
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--brown-burnt);
+  box-shadow:
+    0 2px 8px rgba(234, 88, 12, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  user-select: none;
+  letter-spacing: -0.02em;
 }
 
-/* ─── Stats ─── */
+/* ─── Stats pills ─── */
 .stats {
-  align-items: center;
-  gap: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 1rem;
-  padding: 0.4rem 1.1rem;
-  background: var(--color-surface-alt);
-}
-
-.stat {
   display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
 }
 
-.statValue {
-  font-size: var(--font-size-lg);
-  line-height: var(--line-height-lg);
+.statPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+  padding: 0.25rem 0.75rem;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-color-gray);
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.statPillActive {
+  border-color: rgba(234, 88, 12, 0.28);
+  background: linear-gradient(135deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.9));
+  color: var(--color-accent-strong);
+}
+
+.statPillValue {
   font-weight: 700;
   color: var(--text-color-defult);
 }
 
-.statLabel {
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-color-gray);
-}
-
-.statDivider {
-  width: 1px;
-  height: 1.25rem;
-  background: var(--color-border);
+.statPillActiveValue {
+  color: var(--color-accent);
 }
 
 /* ─── Info grid ─── */
@@ -68,6 +77,13 @@
   border: 1px solid var(--color-border);
   border-radius: 1.25rem;
   overflow: hidden;
+  margin-top: 1.5rem;
+  transition: border-color 160ms ease;
+}
+
+.infoGridEditing {
+  border-color: rgba(234, 88, 12, 0.35);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.08);
 }
 
 .infoGridRow {
@@ -86,7 +102,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.85rem 1.25rem;
+  padding: 0.8rem 1.25rem;
+  transition: background 140ms ease;
+
+  &:hover {
+    background: rgba(234, 88, 12, 0.03);
+  }
 
   & + .infoRow {
     border-top: 1px solid var(--color-border);
@@ -99,14 +120,13 @@
   gap: 0.4rem;
   flex-shrink: 0;
   font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
   font-weight: 600;
   color: var(--text-color-gray);
+  min-width: 6rem;
 }
 
 .infoValue {
   font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
   font-weight: 500;
   color: var(--text-color-defult);
   flex: 1;
@@ -117,6 +137,19 @@
   text-align: right;
   display: flex;
   justify-content: flex-end;
+}
+
+/* Input inline dentro del infoRow — se aplica directo al <input> o <select> */
+.infoInput {
+  height: 2rem !important;
+  padding-block: 0 !important;
+  padding-inline: 0.6rem !important;
+  font-size: var(--font-size-sm) !important;
+  border-radius: 0.5rem !important;
+  text-align: right !important;
+  flex: 1;
+  min-width: 0;
+  max-width: 16rem;
 }
 
 .infoEmpty {
@@ -172,16 +205,70 @@
   border: 1px solid var(--color-border);
   padding: 0.2rem 0.65rem;
   font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
   font-weight: 600;
   color: var(--text-color-gray);
   text-decoration: none;
   background: var(--color-surface-alt);
-  transition: border-color 150ms ease, color 150ms ease;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
 
   &:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+    border-color: rgba(37, 158, 68, 0.45);
+    color: #15803d;
+    background: #f0fdf4;
+  }
+}
+
+/* ─── Mail: desktop muestra dirección, mobile muestra "Enviar mail" + tooltip ─── */
+.mailFull {
+  display: none;
+}
+
+.mailShort {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mailTooltip {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  white-space: nowrap;
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.5rem;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 150ms ease, transform 150ms ease;
+  z-index: 10;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 1rem;
+    border: 5px solid transparent;
+    border-top-color: #1e293b;
+  }
+}
+
+.mailShort:hover .mailTooltip,
+.mailShort:focus-within .mailTooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (min-width: 768px) {
+  .mailFull {
+    display: inline;
+  }
+
+  .mailShort {
+    display: none;
   }
 }
 
@@ -211,6 +298,12 @@
 }
 
 /* ─── Desktop ─── */
+@media (min-width: 640px) {
+  .avatar {
+    display: flex;
+  }
+}
+
 @media (min-width: 768px) {
   .headerTop {
     flex-direction: row;
