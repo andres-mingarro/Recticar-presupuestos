@@ -35,9 +35,46 @@ import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { useCobrado } from "@/components/ui/CobradoToggle/CobradoContext";
 import { TrabajoDatosCard } from "@/components/ui/TrabajoDatosCard";
 import { PrintButton } from "./PrintButton";
+import { useMobileActionsRegister } from "@/components/layout/MobileActions";
 import styles from "./TrabajoDetailPage.module.scss";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
+
+function TrabajoMobileActions({
+  formId,
+  trabajoId,
+  dirty,
+  isPending,
+}: {
+  formId: string;
+  trabajoId: number;
+  dirty: boolean;
+  isPending: boolean;
+}) {
+  return (
+    <>
+      <PulsatingButton
+        type="submit"
+        form={formId}
+        disabled={isPending}
+        pulsing={dirty && !isPending}
+        size="sm"
+      >
+        {isPending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
+        {isPending ? "Guardando..." : "Guardar"}
+      </PulsatingButton>
+      <a
+        href={`/api/trabajos/${trabajoId}/pdf`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.1)] text-white text-sm font-semibold"
+      >
+        <Icon name="download" className="h-3.5 w-3.5" />
+        PDF
+      </a>
+    </>
+  );
+}
 
 type TrabajoDetailPageProps = {
   trabajo: TrabajoDetail;
@@ -117,6 +154,16 @@ export function TrabajoDetailPage({
     toast.success(`Trabajo #${trabajo.numero_trabajo} guardado correctamente.`);
   }, [formState.error, formState.values.updatedAt, isPending, trabajo.numero_trabajo]);
 
+  useMobileActionsRegister(
+    <TrabajoMobileActions
+      formId={formId}
+      trabajoId={trabajo.id}
+      dirty={dirty}
+      isPending={isPending}
+    />,
+    [dirty, isPending]
+  );
+
   return (
     <PrioridadProvider initialValue={trabajo.prioridad}>
     <CobradoProvider initialValue={trabajo.cobrado}>
@@ -130,7 +177,7 @@ export function TrabajoDetailPage({
     <div className={cn("TrabajoDetailPage", styles.TrabajoDetailPage, "space-y-5")}>
 
       {/* ── Botón guardar ─────────────────────────────────────────── */}
-      <div className="flex justify-start">
+      <div className="hidden md:flex justify-start">
         <PulsatingButton
           type="submit"
           form={formId}

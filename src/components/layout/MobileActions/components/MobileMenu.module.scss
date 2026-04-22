@@ -1,0 +1,151 @@
+/* ── Backdrop ── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 48;
+  background: var(--color-overlay, rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.backdropVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Panel ── */
+.panel {
+  position: fixed;
+  bottom: 4rem; /* sobre la MobileActions bar */
+  left: 1rem;
+  right: 1rem;
+  z-index: 49;
+  padding: 1.25rem 1rem 1rem;
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(180deg, var(--color-sidebar-gradient-start), var(--color-sidebar-gradient-end)),
+    radial-gradient(circle at top right, var(--color-sidebar-accent-glow), transparent 50%);
+  border: 1px solid var(--color-sidebar-border);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.4);
+  transform: translateY(calc(100% + 5rem));
+  opacity: 0;
+  transition:
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 220ms ease;
+  will-change: transform, opacity;
+}
+
+.panelOpen {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ── Nav ── */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* ── Links ── */
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-sidebar-text);
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.link:hover {
+  background: var(--color-sidebar-surface-hover);
+  color: var(--color-sidebar-text-strong);
+}
+
+.linkActive {
+  background: var(--color-accent);
+  color: white;
+  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.4);
+}
+
+.linkActive:hover {
+  background: var(--color-accent);
+  color: white;
+}
+
+.linkSecondary {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-sidebar-text);
+  opacity: 0.6;
+}
+
+.linkIcon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ── Footer ── */
+.footer {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-sidebar-border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Logout — icono circular pequeño, izquierda */
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-sidebar-border);
+  background: var(--color-sidebar-surface);
+  color: var(--color-sidebar-text);
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.logoutBtn:hover {
+  background: var(--color-sidebar-surface-hover);
+  color: var(--color-sidebar-text-strong);
+}
+
+.configBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0.75rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-sidebar-border);
+  background: var(--color-sidebar-surface);
+  color: var(--color-sidebar-text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.configBtn:hover {
+  background: var(--color-sidebar-surface-hover);
+  color: var(--color-sidebar-text-strong);
+}
+
+.logoutBtnActive {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}

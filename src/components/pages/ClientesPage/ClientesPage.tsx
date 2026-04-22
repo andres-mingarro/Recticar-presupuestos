@@ -18,6 +18,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Table } from "@/components/ui/Table";
 import { getVehicleLabel } from "@/lib/format";
 import { ClienteMobileCard } from "@/components/ui/ClienteMobileCard";
+import { useMobileActionsRegister } from "@/components/layout/MobileActions";
 import styles from "./ClientesPage.module.scss";
 
 type ClientesPageProps = {
@@ -67,6 +68,18 @@ export function ClientesPage({
   const pageEnd = Math.min(currentPage * pageSize, totalClientes);
   const router = useRouter();
   const [panelClientId, setPanelClientId] = useState<number | null>(null);
+
+  useMobileActionsRegister(
+    canEdit ? (
+      <Link
+        href="/clientes/nuevo"
+        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white text-sm font-semibold shadow-sm"
+      >
+        <Icon name="plus" className="h-3.5 w-3.5" />
+        Nuevo cliente
+      </Link>
+    ) : null
+  );
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const panelTrabajos =
     panelClientId !== null ? pendingTrabajosByCliente[panelClientId] ?? [] : [];
@@ -114,9 +127,11 @@ export function ClientesPage({
             <span>Buscar</span>
           </button>
 
-          {/* Nuevo cliente */}
+          {/* Nuevo cliente — solo desktop */}
           {canEdit && (
-            <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>
+            <div className="hidden md:block">
+              <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>
+            </div>
           )}
         </form>
       </Card>

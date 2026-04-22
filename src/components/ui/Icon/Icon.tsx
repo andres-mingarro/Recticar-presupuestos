@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition, SizeProp } from "@fortawesome/fontawesome-svg-core";
 import {
   faArrowRight,
+  faBars,
   faBoxOpen,
   faCalendarDays,
   faCarSide,
@@ -78,7 +79,8 @@ export type IconName =
   | "sackDollar"
   | "sackXmark"
   | "eye"
-  | "eyeSlash";
+  | "eyeSlash"
+  | "menu";
 
 type IconProps = {
   name: IconName;
@@ -123,6 +125,7 @@ const ICONS: Record<IconName, IconDefinition> = {
   sackXmark: faSackXmark,
   eye: faEye,
   eyeSlash: faEyeSlash,
+  menu: faBars,
 };
 
 export function Icon({ name, className, size }: IconProps) {
