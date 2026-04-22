@@ -174,7 +174,7 @@ export function ClienteDetailPage({
       <Card as="section" className={styles.headerCard}>
         <div className={styles.headerTop}>
           {/* Avatar */}
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--apricot-light),var(--peach-soft))] text-xl font-bold text-[var(--brown-burnt)] shadow-sm">
+          <div className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--apricot-light),var(--peach-soft))] text-xl font-bold text-[var(--brown-burnt)] shadow-sm">
             {initials}
           </div>
 
