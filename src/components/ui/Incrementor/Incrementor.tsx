@@ -13,6 +13,8 @@ type IncrementorProps = {
   incrementoSmall?: boolean;
 };
 
+const btnBase = "flex shrink-0 select-none items-center justify-center font-bold text-[var(--text-color-gray)] transition-colors disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer";
+
 export function Incrementor({
   value,
   onIncrement,
@@ -23,42 +25,54 @@ export function Incrementor({
   formatValue = (current) => String(current),
   incrementoSmall = false,
 }: IncrementorProps) {
+  const sm = incrementoSmall;
+
   return (
     <div
       className={cn(
-        "Incrementor flex items-center justify-center",
-        incrementoSmall ? "gap-0.5" : "gap-2",
+        "Incrementor inline-flex items-center overflow-hidden rounded-full border border-[var(--color-border)]",
+        disabled && "opacity-40",
         className
       )}
+      style={{ background: "white" }}
     >
       <button
         type="button"
         onClick={onDecrement}
         disabled={disabled}
+        aria-label="Decrementar"
         className={cn(
-          "flex cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] font-semibold text-[var(--text-color-defult)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40",
-          incrementoSmall ? "h-7 w-7 text-sm" : "h-8 w-8 text-base"
+          btnBase,
+          "border-r border-[var(--color-border)]",
+          sm ? "h-7 w-7 text-sm" : "h-9 w-9 text-base"
         )}
+        style={{ background: "white" }}
       >
-        -
+        −
       </button>
+
       <span
         className={cn(
-          "inline-flex justify-center rounded-full bg-[var(--color-surface-alt)] font-semibold text-[var(--text-color-defult)]",
-          incrementoSmall ? "min-w-[36px] px-1.5 py-0.5 text-sm leading-none" : "min-w-8 px-2 py-1 text-sm",
+          "inline-flex select-none items-center justify-center font-semibold tabular-nums text-[var(--text-color-defult)]",
+          sm ? "min-w-[28px] px-1.5 text-sm" : "min-w-[36px] px-2 text-sm",
           valueClassName
         )}
+        style={{ background: "white" }}
       >
         {formatValue(value)}
       </span>
+
       <button
         type="button"
         onClick={onIncrement}
         disabled={disabled}
+        aria-label="Incrementar"
         className={cn(
-          "flex cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] font-semibold text-[var(--text-color-defult)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40",
-          incrementoSmall ? "h-7 w-7 text-sm" : "h-8 w-8 text-base"
+          btnBase,
+          "border-l border-[var(--color-border)]",
+          sm ? "h-7 w-7 text-sm" : "h-9 w-9 text-base"
         )}
+        style={{ background: "white" }}
       >
         +
       </button>

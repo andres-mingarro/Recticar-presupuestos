@@ -31,9 +31,7 @@ import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Tabs } from "@/components/ui/Tabs";
 import { Incrementor } from "@/components/ui/Incrementor";
 import { EngineIconGlyph, isEngineIconName } from "@/components/ui/EngineIcons";
-import { SeleccionTecnicaWizard } from "@/components/forms/SeleccionTecnicaWizard";
-import { getBrandLogoUrl } from "@/lib/vehicle-logo";
-import Image from "next/image";
+import { VehiculoMobileSelector } from "./VehiculoMobileSelector";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import styles from "./TrabajoForm.module.scss";
@@ -104,22 +102,41 @@ const prioridadCards: Array<{
 function RepuestoGrupoAccordion({
   defaultOpen,
   categoriaNombre,
+  selectedCount,
   children,
 }: {
   defaultOpen: boolean;
   categoriaNombre: string;
+  selectedCount: number;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const hasSelected = selectedCount > 0;
   return (
     <details
       open={open}
       onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
-      className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--gray-20)] p-4")}
+      className={cn(
+        "TrabajoFormAccordion",
+        styles.TrabajoFormAccordion,
+        "rounded-2xl border p-4 transition-colors",
+        hasSelected
+          ? "border-[var(--apricot-light)] bg-[linear-gradient(135deg,#fff7ed,#fff0e1)]"
+          : "border-[var(--color-border)] bg-[var(--gray-20)]"
+      )}
     >
-      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--text-color-defult)]")}>
-        <span>{categoriaNombre}</span>
-        <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
+      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between gap-3")}>
+        <span className={cn("text-sm font-semibold", hasSelected ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-defult)]")}>
+          {categoriaNombre}
+        </span>
+        <span className="flex items-center gap-2">
+          {hasSelected && (
+            <span className="rounded-full bg-[var(--orange-vivid)] px-2 py-0.5 text-[0.65rem] font-bold text-white">
+              {selectedCount}
+            </span>
+          )}
+          <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
+        </span>
       </summary>
       {children}
     </details>
@@ -325,94 +342,29 @@ export function TrabajoForm({
           </h2>
         </div>
 
-        {/* Mobile: wizard */}
-        <div className="md:hidden">
-          {selectedMarca ? (
-            <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
-              {(() => {
-                const logoUrl = getBrandLogoUrl(selectedMarcaNombre ?? "");
-                return logoUrl ? (
-                  <button type="button" onClick={() => openWizard(0)} className="cursor-pointer">
-                    <Image src={logoUrl} alt={selectedMarcaNombre ?? ""} width={150} height={150} className="object-contain" unoptimized />
-                  </button>
-                ) : (
-                  <button type="button" onClick={() => openWizard(0)} className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-3xl font-bold text-[var(--color-accent)]">
-                    {(selectedMarcaNombre ?? "?")[0].toUpperCase()}
-                  </button>
-                );
-              })()}
-              <div className="w-full divide-y divide-[var(--color-border)]">
-                <button
-                  type="button"
-                  onClick={() => openWizard(0)}
-                  className="flex w-full items-center justify-between py-3 text-left"
-                >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-ligth)]">Marca</span>
-                  <span className="text-lg font-bold text-[var(--text-color-defult)]">{selectedMarcaNombre}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openWizard(1)}
-                  className="flex w-full items-center justify-between py-3 text-left"
-                >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-ligth)]">Modelo</span>
-                  <span className="text-base font-semibold text-[var(--text-color-gray)]">{selectedModeloNombre ?? "—"}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openWizard(2)}
-                  className="flex w-full items-center justify-between py-3 text-left"
-                >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-ligth)]">Motor</span>
-                  <span className="text-base font-semibold text-[var(--text-color-gray)]">{selectedMotorNombre ?? "—"}</span>
-                </button>
-              </div>
-            </div>
-          ) : (
-            <Button
-              type="button"
-              variant="secondary"
-              className="w-full"
-              onClick={() => openWizard(0)}
-              icon={<Icon name="car" className="h-4 w-4" />}
-            >
-              Seleccionar vehículo
-            </Button>
-          )}
-          <SeleccionTecnicaWizard
-            marcas={marcas}
-            modelos={modelos}
-            motores={motores}
-            relations={relations}
-            open={wizardOpen}
-            onOpenChange={setWizardOpen}
-            initialStep={wizardInitialStep}
-            initialMarcaId={selectedMarca}
-            initialModeloId={selectedModelo}
-            initialMotorId={selectedMotor}
-            onSelect={(mId, moId, mtId) => {
-              setSelectedMarca(mId);
-              setSelectedModelo(moId);
-              setSelectedMotor(mtId);
-            }}
-          />
-        </div>
-
-        <label className={cn("TrabajoFormField md:hidden", styles.TrabajoFormField)}>
-          <span className="text-sm font-medium text-[var(--text-color-defult)]">
-            Número de serie del motor
-          </span>
-          <Input
-            placeholder="Ej. ABC-1234"
-            value={selectedNumeroSerieMotor}
-            onChange={(event) => setSelectedNumeroSerieMotor(event.target.value)}
-          />
-        </label>
-
-        {/* Hidden inputs para mobile — envían los valores del wizard al form */}
-        <input type="hidden" name="marcaId" value={selectedMarca} className="md:hidden" />
-        <input type="hidden" name="modeloId" value={selectedModelo} className="md:hidden" />
-        <input type="hidden" name="motorId" value={selectedMotor} className="md:hidden" />
+        <VehiculoMobileSelector
+          marcas={marcas}
+          modelos={modelos}
+          motores={motores}
+          relations={relations}
+          selectedMarca={selectedMarca}
+          selectedModelo={selectedModelo}
+          selectedMotor={selectedMotor}
+          selectedMarcaNombre={selectedMarcaNombre}
+          selectedModeloNombre={selectedModeloNombre}
+          selectedMotorNombre={selectedMotorNombre}
+          selectedNumeroSerieMotor={selectedNumeroSerieMotor}
+          wizardOpen={wizardOpen}
+          wizardInitialStep={wizardInitialStep}
+          onOpenWizard={openWizard}
+          onWizardOpenChange={setWizardOpen}
+          onSelect={(mId, moId, mtId) => {
+            setSelectedMarca(mId);
+            setSelectedModelo(moId);
+            setSelectedMotor(mtId);
+          }}
+          onNumeroSerieChange={setSelectedNumeroSerieMotor}
+        />
 
         {/* Campo serie — visible en ambos modos */}
 
@@ -539,28 +491,43 @@ export function TrabajoForm({
 
               <div className={cn("TrabajoFormChecklist", styles.TrabajoFormChecklist)}>
                 {trabajos.map((grupo) => {
-                  const hasSelected = grupo.trabajos.some((t) =>
-                    selectedTrabajoIds.has(t.id)
-                  );
+                  const selectedCount = grupo.trabajos.filter((t) => selectedTrabajoIds.has(t.id)).length;
+                  const hasSelected = selectedCount > 0;
                   return (
                     <details
                       key={grupo.categoriaId}
                       open={hasSelected}
-                      className={cn("TrabajoFormAccordion", styles.TrabajoFormAccordion, "rounded-2xl border border-[var(--color-border)] bg-[var(--gray-20)] p-4")}
+                      className={cn(
+                        "TrabajoFormAccordion",
+                        styles.TrabajoFormAccordion,
+                        "rounded-2xl border p-4 transition-colors",
+                        hasSelected
+                          ? "border-[var(--apricot-light)] bg-[linear-gradient(135deg,#fff7ed,#fff0e1)]"
+                          : "border-[var(--color-border)] bg-[var(--gray-20)]"
+                      )}
                     >
-                      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--text-color-defult)]")}>
-                        <span className="flex items-center gap-2">
+                      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between gap-3")}>
+                        <span className="flex items-center gap-2.5">
                           {isEngineIconName(grupo.categoriaIcono) ? (
                             <EngineIconGlyph
                               name={grupo.categoriaIcono}
-                              className="h-7 w-7 shrink-0 text-[var(--text-color-defult)]"
+                              className={cn("h-6 w-6 shrink-0", hasSelected ? "text-[var(--color-accent)]" : "text-[var(--text-color-gray)]")}
                             />
                           ) : null}
-                          <span>{grupo.categoriaNombre}</span>
+                          <span className={cn("text-sm font-semibold", hasSelected ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-defult)]")}>
+                            {grupo.categoriaNombre}
+                          </span>
                         </span>
-                        <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
+                        <span className="flex items-center gap-2">
+                          {hasSelected && (
+                            <span className="rounded-full bg-[var(--orange-vivid)] px-2 py-0.5 text-[0.65rem] font-bold text-white">
+                              {selectedCount}
+                            </span>
+                          )}
+                          <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
+                        </span>
                       </summary>
-                      <div className="mt-4 grid gap-3 md:grid-cols-2">
+                      <div className="mt-3 grid gap-2 md:grid-cols-2">
                         {grupo.trabajos.map((trabajo) => (
                           <TrabajoItemCard
                             key={trabajo.id}
@@ -572,8 +539,7 @@ export function TrabajoForm({
                                 ? (snapshotTrabajoNombreById.get(trabajo.id) ?? trabajo.nombre)
                                 : trabajo.nombre
                             }
-                          >
-                          </TrabajoItemCard>
+                          />
                         ))}
                       </div>
                     </details>
@@ -595,59 +561,74 @@ export function TrabajoForm({
 
               <div className={cn("TrabajoFormChecklist", styles.TrabajoFormChecklist)}>
                 {repuestos.map((grupo) => {
-                  const hasSelected = grupo.repuestos.some((r) =>
-                    selectedRepuestoIds.has(r.id)
-                  );
+                  const selectedCount = grupo.repuestos.filter((r) => selectedRepuestoIds.has(r.id)).length;
+                  const hasSelected = selectedCount > 0;
                   return (
                     <RepuestoGrupoAccordion
                       key={grupo.categoriaId}
                       defaultOpen={hasSelected}
                       categoriaNombre={grupo.categoriaNombre}
+                      selectedCount={selectedCount}
                     >
-                      <div className="mt-4 grid gap-3">
-                        {grupo.repuestos.map((repuesto) => (
+                      <div className="mt-3 flex flex-col gap-2">
+                        {grupo.repuestos.map((repuesto) => {
+                          const isChecked = selectedRepuestoIds.has(repuesto.id);
+                          const precioUnit = selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0;
+                          const cantidad = selectedRepuestoItems[repuesto.id]?.cantidad ?? 1;
+                          return (
                             <TrabajoItemCard
                               key={repuesto.id}
-                              checked={selectedRepuestoIds.has(repuesto.id)}
+                              checked={isChecked}
                               value={repuesto.id}
                               onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked)}
                               label={
-                                selectedRepuestoIds.has(repuesto.id)
+                                isChecked
                                   ? (snapshotRepuestoNombreById.get(repuesto.id) ?? repuesto.nombre)
                                   : repuesto.nombre
                               }
-                              contentClassName="flex-col gap-2"
-                              checkboxClassName="[--checkbox-size:27px]"
-                              >
-                            <div className="content-trabajo-item-card lg:flex-1 lg:flex w-full items-center gap-2 grid grid-cols-[1fr_auto] lg:grid-cols-[120px_132px_120px]">
-                              <Input
-                                type="number"
-                                min="0"
-                                step="1"
-                                inputMode="numeric"
-                                value={selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0}
-                                disabled={!selectedRepuestoIds.has(repuesto.id)}
-                                onChange={(event) =>
-                                  setPrecioUnitario(repuesto.id, Number(event.target.value))
-                                }
-                                className="text-right border-dark h-8 lg:h-11 lg:min-w-[88px] h-[33px]"
-                              />
-                              <Incrementor
-                                value={selectedRepuestoItems[repuesto.id]?.cantidad ?? 1}
-                                onDecrement={() => decrementCantidad(repuesto.id)}
-                                onIncrement={() => incrementCantidad(repuesto.id)}
-                                disabled={!selectedRepuestoIds.has(repuesto.id)}
-                                className="justify-end lg:justify-center"
-                              />
-                              <span className="col-span-2 lg:col-span-1 lg:min-w-[88px] text-right text-[26px] font-bold text-[#5f2302] lg:text-base lg:text-[var(--text-color-defult)] border-t border-[var(--color-border)] pt-1 mt-0.5 lg:border-0 lg:pt-0 lg:mt-0">
-                                {formatPrice(
-                                  (selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0) *
-                                    (selectedRepuestoItems[repuesto.id]?.cantidad ?? 1)
-                                )}
-                              </span>
-                            </div>
-                          </TrabajoItemCard>
-                        ))}
+                              contentClassName="flex-col gap-2.5"
+                              checkboxClassName="[--checkbox-size:24px]"
+                            >
+                              {/* Controles precio / cantidad / total — fila separada debajo del nombre */}
+                              <div className="flex w-full items-center gap-2 pl-9">
+                                {/* Precio unitario */}
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Precio u.</span>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    inputMode="numeric"
+                                    value={precioUnit}
+                                    disabled={!isChecked}
+                                    onChange={(e) => setPrecioUnitario(repuesto.id, Number(e.target.value))}
+                                    className="h-9 w-[9ch] text-right"
+                                  />
+                                </div>
+                                {/* Cantidad */}
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Cant.</span>
+                                  <Incrementor
+                                    value={cantidad}
+                                    onDecrement={() => decrementCantidad(repuesto.id)}
+                                    onIncrement={() => incrementCantidad(repuesto.id)}
+                                    disabled={!isChecked}
+                                  />
+                                </div>
+                                {/* Total */}
+                                <div className="ml-auto flex flex-col items-end gap-0.5">
+                                  <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Total</span>
+                                  <span className={cn(
+                                    "min-w-[80px] text-right text-base font-bold",
+                                    isChecked ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-gray)]"
+                                  )}>
+                                    {formatPrice(precioUnit * cantidad)}
+                                  </span>
+                                </div>
+                              </div>
+                            </TrabajoItemCard>
+                          );
+                        })}
                       </div>
                     </RepuestoGrupoAccordion>
                   );

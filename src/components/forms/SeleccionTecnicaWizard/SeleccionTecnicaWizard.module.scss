@@ -1,66 +1,116 @@
 .dialogContent {
   height: 85dvh;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ── Step indicator ── */
 .stepIndicator {
   display: flex;
   gap: 6px;
-  margin-bottom: 8px;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-.stepDot {
-  width: 24px;
-  height: 4px;
-  border-radius: 2px;
+.stepPill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  transition: border-color 200ms, background 200ms;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-color-gray);
+  white-space: nowrap;
+}
+
+.stepPillNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   background: var(--color-border);
-  transition: background 200ms;
+  color: var(--text-color-gray);
+  font-size: 0.65rem;
+  font-weight: 700;
+  transition: background 200ms, color 200ms;
+  flex-shrink: 0;
 }
 
-.stepDotActive {
-  background: var(--color-accent);
-}
-
-.stepDotDone {
+.stepPillActive {
+  border-color: var(--color-accent);
   background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+
+  .stepPillNumber {
+    background: var(--color-accent);
+    color: white;
+  }
 }
 
+.stepPillDone {
+  border-color: var(--apricot-light);
+  background: var(--cream-warm);
+  color: var(--brown-burnt);
+
+  .stepPillNumber {
+    background: var(--apricot-light);
+    color: var(--brown-burnt);
+  }
+}
+
+.stepDivider {
+  width: 16px;
+  height: 1px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+/* ── Carousel ── */
 .carousel {
   flex: 1;
   min-height: 0;
 }
 
+/* ── Brand grid ── */
 .brandGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  padding: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px 16px;
 }
 
 .brandCard {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 12px 8px;
+  gap: 6px;
+  padding: 12px 6px 10px;
   border-radius: 16px;
   border: 2px solid var(--color-border);
   background: white;
-  transition: border-color 150ms, background 150ms;
+  transition: border-color 150ms, background 150ms, box-shadow 150ms;
   cursor: pointer;
 
   &:active {
-    background: var(--color-surface-alt);
+    background: var(--cream-warm);
   }
 }
 
 .brandCardSelected {
   border-color: var(--color-accent);
-  background: var(--color-accent-soft);
+  background: linear-gradient(135deg, #fff7ed, #fff0e1);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
 .logoWrapper {
-  width: 80px;
-  height: 60px;
+  width: 64px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,39 +123,41 @@
 }
 
 .logoFallback {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: var(--color-accent-soft);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-accent);
 }
 
 .brandName {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 600;
   text-align: center;
   color: var(--text-color-defult);
   line-height: 1.2;
 }
 
+/* ── List items (modelos / motores) ── */
 .listGrid {
   display: flex;
   flex-direction: column;
-  padding: 12px;
+  padding: 12px 16px;
   gap: 6px;
 }
 
 .listItem {
   display: flex;
   align-items: center;
-  padding: 14px 16px;
+  justify-content: space-between;
+  padding: 13px 14px;
   border-radius: 12px;
-  border: 2px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   background: white;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -113,20 +165,55 @@
   text-align: left;
   transition: border-color 150ms, background 150ms;
   cursor: pointer;
+  gap: 8px;
 
   &:active {
-    background: var(--color-surface-alt);
+    background: var(--cream-warm);
   }
+}
+
+.listItemChevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--text-color-gray);
+  opacity: 0.5;
 }
 
 .listItemSelected {
   border-color: var(--color-accent);
-  background: var(--color-accent-soft);
+  background: linear-gradient(135deg, #fff7ed, #fff0e1);
   color: var(--color-accent-strong);
+  font-weight: 600;
+
+  .listItemChevron {
+    color: var(--color-accent);
+    opacity: 1;
+  }
+}
+
+/* ── Context breadcrumb ── */
+.contextBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-color-gray);
+  flex-wrap: wrap;
+}
+
+.contextItem {
+  color: var(--brown-burnt);
+}
+
+.contextSep {
+  color: var(--color-border);
 }
 
 .emptyMessage {
-  padding: 32px 16px;
+  padding: 40px 16px;
   text-align: center;
   font-size: 0.875rem;
   color: var(--text-color-gray);

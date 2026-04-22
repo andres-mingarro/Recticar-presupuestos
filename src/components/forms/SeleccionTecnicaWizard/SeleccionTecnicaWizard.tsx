@@ -34,14 +34,18 @@ type Props = {
   initialStep?: number;
 };
 
-const STEPS = ["Marca", "Modelo", "Motor"] as const;
+const STEPS = [
+  { label: "Marca", num: "1" },
+  { label: "Modelo", num: "2" },
+  { label: "Motor", num: "3" },
+] as const;
 
 function BrandLogo({ nombre }: { nombre: string }) {
   const url = getBrandLogoUrl(nombre);
   if (url) {
     return (
       <div className={styles.logoWrapper}>
-        <Image src={url} alt={nombre} width={80} height={60} className={styles.logoImg} unoptimized />
+        <Image src={url} alt={nombre} width={64} height={48} className={styles.logoImg} unoptimized />
       </div>
     );
   }
@@ -73,21 +77,16 @@ export function SeleccionTecnicaWizard({
 
   const handleSetApi = useCallback((api: EmblaApi) => {
     setEmblaApi(api);
-    api?.on("select", () => {
-      setStep(api.selectedScrollSnap());
-    });
+    api?.on("select", () => setStep(api.selectedScrollSnap()));
     api?.on("init", () => {
       if (initialStep > 0) api.scrollTo(initialStep, true);
     });
   }, [initialStep]);
 
-  const goTo = useCallback(
-    (nextStep: number) => {
-      setStep(nextStep);
-      emblaApi?.scrollTo(nextStep, true);
-    },
-    [emblaApi]
-  );
+  const goTo = useCallback((nextStep: number) => {
+    setStep(nextStep);
+    emblaApi?.scrollTo(nextStep, true);
+  }, [emblaApi]);
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
@@ -95,7 +94,6 @@ export function SeleccionTecnicaWizard({
       setMarcaId(initialMarcaId);
       setModeloId(initialModeloId);
       setMotorId(initialMotorId);
-      // Esperar a que el dialog termine de animar y embla esté listo
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           emblaApi?.scrollTo(initialStep, true);
@@ -112,10 +110,7 @@ export function SeleccionTecnicaWizard({
   );
 
   const motoresIds = useMemo(
-    () =>
-      relations
-        .filter((r) => String(r.modelo_id) === modeloId)
-        .map((r) => r.motor_id),
+    () => relations.filter((r) => String(r.modelo_id) === modeloId).map((r) => r.motor_id),
     [relations, modeloId]
   );
 
@@ -124,44 +119,55 @@ export function SeleccionTecnicaWizard({
     [motores, motoresIds]
   );
 
-  const handleSelectMarca = (id: string) => {
-    setMarcaId(id);
-    setModeloId("");
-    setMotorId("");
-    goTo(1);
-  };
+  const marcaNombre = useMemo(() => marcas.find((m) => String(m.id) === marcaId)?.nombre, [marcas, marcaId]);
+  const modeloNombre = useMemo(() => modelos.find((m) => String(m.id) === modeloId)?.nombre, [modelos, modeloId]);
 
-  const handleSelectModelo = (id: string) => {
-    setModeloId(id);
-    setMotorId("");
-    goTo(2);
-  };
-
-  const handleSelectMotor = (id: string) => {
-    setMotorId(id);
-    onSelect(marcaId, modeloId, id);
-    onOpenChange(false);
-  };
+  const handleSelectMarca = (id: string) => { setMarcaId(id); setModeloId(""); setMotorId(""); goTo(1); };
+  const handleSelectModelo = (id: string) => { setModeloId(id); setMotorId(""); goTo(2); };
+  const handleSelectMotor = (id: string) => { setMotorId(id); onSelect(marcaId, modeloId, id); onOpenChange(false); };
 
   const canGoBack = step > 0;
-  const canGoNext = step < 2 && (
-    (step === 0 && !!marcaId) ||
-    (step === 1 && !!modeloId)
-  );
+  const canGoNext = step < 2 && ((step === 0 && !!marcaId) || (step === 1 && !!modeloId));
 
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogContent className={styles.dialogContent}>
         <DialogHeader>
+          {/* Step pills */}
           <div className={styles.stepIndicator}>
-            {STEPS.map((label, i) => (
-              <div
-                key={label}
-                className={cn(styles.stepDot, i === step && styles.stepDotActive, i < step && styles.stepDotDone)}
-              />
+            {STEPS.map((s, i) => (
+              <div key={s.label} className="contents">
+                {i > 0 && <div className={styles.stepDivider} />}
+                <div className={cn(
+                  styles.stepPill,
+                  i === step && styles.stepPillActive,
+                  i < step && styles.stepPillDone,
+                )}>
+                  <span className={styles.stepPillNumber}>{s.num}</span>
+                  {s.label}
+                </div>
+              </div>
             ))}
           </div>
-          <DialogTitle>{STEPS[step]}</DialogTitle>
+
+          <DialogTitle>{STEPS[step].label}</DialogTitle>
+
+          {/* Breadcrumb de contexto */}
+          {(step >= 1 && marcaNombre) || (step >= 2 && modeloNombre) ? (
+            <div className={styles.contextBar}>
+              {marcaNombre && (
+                <>
+                  <span className={styles.contextItem}>{marcaNombre}</span>
+                  {step >= 2 && modeloNombre && (
+                    <>
+                      <span className={styles.contextSep}>›</span>
+                      <span className={styles.contextItem}>{modeloNombre}</span>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          ) : null}
         </DialogHeader>
 
         <Carousel setApi={handleSetApi} className={styles.carousel}>
@@ -174,10 +180,7 @@ export function SeleccionTecnicaWizard({
                     key={marca.id}
                     type="button"
                     onClick={() => handleSelectMarca(String(marca.id))}
-                    className={cn(
-                      styles.brandCard,
-                      String(marca.id) === marcaId && styles.brandCardSelected
-                    )}
+                    className={cn(styles.brandCard, String(marca.id) === marcaId && styles.brandCardSelected)}
                   >
                     <BrandLogo nombre={marca.nombre} />
                     <span className={styles.brandName}>{marca.nombre}</span>
@@ -197,12 +200,12 @@ export function SeleccionTecnicaWizard({
                       key={modelo.id}
                       type="button"
                       onClick={() => handleSelectModelo(String(modelo.id))}
-                      className={cn(
-                        styles.listItem,
-                        String(modelo.id) === modeloId && styles.listItemSelected
-                      )}
+                      className={cn(styles.listItem, String(modelo.id) === modeloId && styles.listItemSelected)}
                     >
-                      {modelo.nombre}
+                      <span>{modelo.nombre}</span>
+                      <svg viewBox="0 0 24 24" className={styles.listItemChevron} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                      </svg>
                     </button>
                   ))}
                 </div>
@@ -220,12 +223,12 @@ export function SeleccionTecnicaWizard({
                       key={motor.id}
                       type="button"
                       onClick={() => handleSelectMotor(String(motor.id))}
-                      className={cn(
-                        styles.listItem,
-                        String(motor.id) === motorId && styles.listItemSelected
-                      )}
+                      className={cn(styles.listItem, String(motor.id) === motorId && styles.listItemSelected)}
                     >
-                      {motor.nombre}
+                      <span>{motor.nombre}</span>
+                      <svg viewBox="0 0 24 24" className={styles.listItemChevron} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                      </svg>
                     </button>
                   ))}
                 </div>

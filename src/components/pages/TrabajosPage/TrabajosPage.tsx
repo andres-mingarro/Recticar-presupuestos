@@ -36,13 +36,17 @@ function getEstadoReferenceDate(trabajo: TrabajoListItem) {
   if (trabajo.estado === "presupuesto_entregado") {
     return trabajo.fecha_presupuesto_entregado;
   }
-
   if (trabajo.estado === "aprobado" || trabajo.estado === "finalizado") {
     return trabajo.fecha_aprobacion;
   }
-
   return null;
 }
+
+const PRIORIDAD_ROW_ACCENT: Record<TrabajoPrioridad, string> = {
+  alta: "shadow-[inset_3px_0_0_#e11d48]",
+  normal: "shadow-[inset_3px_0_0_#0284c7]",
+  baja: "shadow-[inset_3px_0_0_#475569]",
+};
 
 type TrabajosPageProps = {
   estado?: TrabajoEstado;
@@ -53,95 +57,68 @@ type TrabajosPageProps = {
   canEdit: boolean;
 };
 
-function CobroIcon({ cobrado }: { cobrado: boolean }) {
-  return (
-    <span
-      className={cn(
-        "CobroIcon",
-        "inline-flex items-center justify-center text-xl",
-        cobrado
-          ? "text-emerald-600"
-          : "text-[var(--text-color-ligth)]"
-      )}
-      aria-label={cobrado ? "Cobrado" : "No cobrado"}
-      title={cobrado ? "Cobrado" : "No cobrado"}
-    >
-      <Icon name={cobrado ? "sackDollar" : "sackXmark"} size="lg" />
-    </span>
-  );
-}
-
 function TrabajoTable({
   title,
   eyebrow,
   trabajos,
   emptyMessage,
   showBusinessDays = true,
+  dimmed = false,
 }: {
   title: string;
   eyebrow: string;
   trabajos: TrabajoListItem[];
   emptyMessage: string;
   showBusinessDays?: boolean;
+  dimmed?: boolean;
 }) {
   const router = useRouter();
 
   return (
-    <div className="space-y-4">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+    <div className="space-y-3">
+      <div className="flex items-baseline gap-3">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">
           {eyebrow}
         </p>
-        <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-          <Icon name="clipboard" className="h-5 w-5" />
+        <h2 className="text-base font-semibold text-[var(--text-color-defult)]">
           {title}
         </h2>
+        <span className="ml-auto text-xs text-[var(--text-color-gray)]">
+          {trabajos.length} {trabajos.length === 1 ? "trabajo" : "trabajos"}
+        </span>
       </div>
 
       <Table>
         <table className="w-full table-auto text-left text-sm">
-          <thead className="bg-[var(--color-surface-alt)] text-[var(--text-color-gray)]">
-            <tr>
-              <th className="w-[56px] px-2 py-3 font-semibold">
-                <span className="inline-flex items-center" aria-label="Número de trabajo" title="Número de trabajo">
-                  #
-                </span>
-              </th>
-              <th className="min-w-[80px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="user" className="h-4 w-4" />Cliente</span></th>
-              <th className="min-w-[90px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="car" className="h-4 w-4" />Detalle</span></th>
-              <th className="w-[96px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="gauge" className="h-4 w-4" />Prioridad</span></th>
-              <th className="w-[64px] px-3 py-3 font-semibold">
-                <span
-                  className="group relative inline-flex items-center"
-                  aria-label="Cobro"
-                  tabIndex={0}
-                >
+          <thead>
+            <tr className="border-b-2 border-[var(--color-accent)] text-[var(--text-color-gray)]">
+              <th className="w-[52px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">#</th>
+              <th className="min-w-[130px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">Cliente</th>
+              <th className="min-w-[160px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">Vehículo</th>
+              <th className="w-[110px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">Estado</th>
+              <th className="w-[52px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">
+                <span className="group relative inline-flex items-center" aria-label="Cobro" tabIndex={0}>
                   <Icon name="sackDollar" size="xl" />
-                  <span
-                    className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 rounded-md bg-[var(--text-color-defult)] px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-[0_10px_24px_rgba(15,23,42,0.18)] transition group-hover:opacity-100 group-focus-visible:opacity-100"
-                    role="tooltip"
-                  >
+                  <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 rounded-md bg-[var(--text-color-defult)] px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-visible:opacity-100" role="tooltip">
                     Cobro
                   </span>
                 </span>
               </th>
-              <th className="w-[96px] px-3 py-3 font-semibold"><span className="inline-flex items-center gap-2"><Icon name="clipboard" className="h-4 w-4" />Estado</span></th>
-              <th className="w-[146px] px-3 py-3 font-semibold">
-                <span className="inline-flex items-center gap-2"><Icon name="calendar" className="h-4 w-4" />Creación / hito</span>
-              </th>
+              <th className="w-[90px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">Prioridad</th>
+              <th className="w-[160px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">Creación → Hito</th>
               {showBusinessDays ? (
-                <th className="w-[96px] px-3 py-3 font-semibold whitespace-nowrap"><span className="inline-flex items-center gap-2"><Icon name="clock" className="h-4 w-4" />Días hábiles</span></th>
+                <th className="w-[80px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-right">Días háb.</th>
               ) : (
-                <th className="w-[96px] px-3 py-3 font-semibold"></th>
+                <th className="w-[80px]" />
               )}
             </tr>
           </thead>
-          <tbody>
+          <tbody className={cn(dimmed && "opacity-60")}>
             {trabajos.length === 0 ? (
               <tr>
                 <td
                   colSpan={8}
-                  className="px-4 py-10 text-center text-[var(--text-color-gray)]"
+                  className="px-4 py-10 text-center text-sm text-[var(--text-color-gray)]"
                 >
                   {emptyMessage}
                 </td>
@@ -150,66 +127,103 @@ function TrabajoTable({
               trabajos.map((trabajo) => (
                 <tr
                   key={trabajo.id}
-                  className="cursor-pointer border-t border-[var(--color-border)] text-[var(--text-color-defult)] transition hover:bg-[var(--color-surface-alt)] focus-within:bg-[var(--color-surface-alt)]"
+                  className={cn(
+                    "cursor-pointer border-t border-[var(--color-border)] transition-colors",
+                    "hover:bg-[var(--cream-warm)]/40 focus-within:bg-[var(--cream-warm)]/40",
+                    PRIORIDAD_ROW_ACCENT[trabajo.prioridad]
+                  )}
                   role="link"
                   tabIndex={0}
                   onClick={() => router.push(`/trabajos/${trabajo.id}`)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
                       router.push(`/trabajos/${trabajo.id}`);
                     }
                   }}
                 >
-                  <td className="w-[56px] px-2 py-4 font-semibold">
-                    #{trabajo.numero_trabajo}
+                  {/* Número */}
+                  <td className="w-[52px] px-3 py-3.5">
+                    <span className="font-bold text-[var(--color-accent)]">#</span>
+                    <span className="font-bold text-[var(--text-color-defult)]">
+                      {trabajo.numero_trabajo}
+                    </span>
                   </td>
-                  <td className="min-w-[80px] px-3 py-4">
+
+                  {/* Cliente */}
+                  <td className="min-w-[130px] px-3 py-3.5">
                     {trabajo.cliente_id ? (
                       <Link
                         href={`/clientes/${trabajo.cliente_id}`}
-                        className="relative z-[1] font-medium text-[var(--color-accent)] underline decoration-[var(--color-accent)] underline-offset-4 transition hover:text-[var(--color-accent-strong)]"
-                        onClick={(event) => event.stopPropagation()}
+                        className="relative z-[1] font-medium text-[var(--color-accent)] underline decoration-[var(--color-accent)]/40 underline-offset-2 transition hover:text-[var(--color-accent-strong)] hover:decoration-[var(--color-accent-strong)]"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        {trabajo.cliente_nombre ?? "Sin cliente asignado"}
+                        {trabajo.cliente_nombre ?? "Sin cliente"}
                       </Link>
                     ) : (
-                      "Sin cliente asignado"
+                      <span className="text-[var(--text-color-gray)]">Sin cliente</span>
                     )}
                   </td>
-                  <td className="min-w-[90px] px-3 py-4">
-                    <div className="space-y-1">
-                      <p className="text-[0.68rem] font-semibold uppercase leading-none text-[var(--text-color-ligth)]">
-                        {trabajo.marca_nombre ?? "Marca sin definir"}
-                      </p>
-                      <p className="font-medium">
-                        {trabajo.modelo_nombre ?? "Modelo sin definir"}
-                      </p>
-                      <p className="text-xs text-[var(--text-color-gray)]">
-                        {trabajo.motor_nombre ?? "Motor sin definir"}
-                      </p>
+
+                  {/* Vehículo — marca · modelo · motor en una línea */}
+                  <td className="min-w-[160px] px-3 py-3.5">
+                    <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                      {trabajo.marca_nombre && (
+                        <span className="text-[0.67rem] font-bold uppercase tracking-widest text-[var(--text-color-gray)]">
+                          {trabajo.marca_nombre}
+                        </span>
+                      )}
+                      <span className="font-medium text-[var(--text-color-defult)]">
+                        {trabajo.modelo_nombre ?? "Sin modelo"}
+                      </span>
+                      {trabajo.motor_nombre && (
+                        <span className="text-xs text-[var(--text-color-gray)]">
+                          · {trabajo.motor_nombre}
+                        </span>
+                      )}
                     </div>
                   </td>
-                  <td className="w-[96px] px-3 py-4">
-                    <PriorityBadge prioridad={trabajo.prioridad} className="w-full justify-center" />
-                  </td>
-                  <td className="w-[64px] px-3 py-4">
-                    <CobroIcon cobrado={trabajo.cobrado} />
-                  </td>
-                  <td className="w-[96px] px-3 py-4">
+
+                  {/* Estado */}
+                  <td className="w-[110px] px-3 py-3.5">
                     <StatusBadge estado={trabajo.estado} compact />
                   </td>
-                  <td className="w-[146px] px-3 py-4">
-                    <div className="inline-flex items-center gap-2 text-[var(--text-color-gray)]">
+
+                  {/* Cobrado */}
+                  <td className="w-[52px] px-3 py-3.5">
+                    <span
+                      className={cn(
+                        "CobroIcon inline-flex items-center justify-center text-xl",
+                        trabajo.cobrado ? "text-emerald-600" : "text-[var(--text-color-ligth)]"
+                      )}
+                      aria-label={trabajo.cobrado ? "Cobrado" : "No cobrado"}
+                      title={trabajo.cobrado ? "Cobrado" : "No cobrado"}
+                    >
+                      <Icon name={trabajo.cobrado ? "sackDollar" : "sackXmark"} size="lg" />
+                    </span>
+                  </td>
+
+                  {/* Prioridad */}
+                  <td className="w-[90px] px-3 py-3.5">
+                    <PriorityBadge prioridad={trabajo.prioridad} />
+                  </td>
+
+                  {/* Fechas */}
+                  <td className="w-[160px] px-3 py-3.5">
+                    <div className="flex flex-col gap-0.5 text-xs text-[var(--text-color-gray)]">
                       <span>{formatDate(trabajo.fecha_creacion)}</span>
-                      <Icon name="arrowRight" className="h-4 w-4" />
-                      <span className="whitespace-nowrap">
-                        {formatDate(getEstadoReferenceDate(trabajo))}
+                      <span className="flex items-center gap-1">
+                        <Icon name="arrowRight" className="h-3 w-3 text-[var(--color-accent)]/60" />
+                        <span className={cn(!getEstadoReferenceDate(trabajo) && "italic opacity-50")}>
+                          {formatDate(getEstadoReferenceDate(trabajo))}
+                        </span>
                       </span>
                     </div>
                   </td>
+
+                  {/* Días hábiles */}
                   {showBusinessDays ? (
-                    <td className="w-[96px] px-3 py-4 text-center">
+                    <td className="w-[80px] px-3 py-3.5 text-right">
                       <BusinessDaysBadge
                         days={
                           trabajo.estado === "finalizado"
@@ -222,7 +236,7 @@ function TrabajoTable({
                       />
                     </td>
                   ) : (
-                    <td className="w-[96px] px-3 py-4"></td>
+                    <td className="w-[80px]" />
                   )}
                 </tr>
               ))
@@ -244,18 +258,20 @@ export function TrabajosPage({
   errorMessage,
   canEdit,
 }: TrabajosPageProps) {
-  const trabajosActivos = trabajos.filter((trabajo) => trabajo.estado !== "finalizado");
-  const trabajosFinalizados = trabajos.filter((trabajo) => trabajo.estado === "finalizado");
+  const trabajosActivos = trabajos.filter((t) => t.estado !== "finalizado");
+  const trabajosFinalizados = trabajos.filter((t) => t.estado === "finalizado");
   const [visibleFinalizados, setVisibleFinalizados] = useState(PAGE_SIZE);
   const finalizadosVisible = trabajosFinalizados.slice(0, visibleFinalizados);
   const hayMas = visibleFinalizados < trabajosFinalizados.length;
+
+  const hayFiltros = estado || prioridad || numeroTrabajo;
 
   return (
     <div className={cn("TrabajosPage", styles.TrabajosPage, "space-y-6")}>
       <PageHeader
         eyebrow="Trabajos"
         title="Listado de trabajos"
-        description="Filtrá trabajos por estado y prioridad. La base ya queda lista para seguir con entrega de presupuesto, aprobación y PDF."
+        description="Filtrá por estado, prioridad o número. La base queda lista para presupuesto, aprobación y PDF."
         actions={
           canEdit ? (
             <ButtonAdd classNameInner="w-full md:w-auto" href="/trabajos/nuevo">
@@ -266,14 +282,15 @@ export function TrabajosPage({
       />
 
       {errorMessage ? (
-        <section className="rounded-[28px] border border-rose-200 bg-rose-50 p-5 text-sm text-rose-700">
+        <section className="rounded-2xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-700">
           Error al consultar la base de datos: {errorMessage}
         </section>
       ) : null}
 
-      <Card as="section" className="space-y-5">
-        <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,140px)_auto_auto]">
-          <Select name="estado" defaultValue={estado ?? ""}>
+      {/* Filtros */}
+      <Card as="section">
+        <form className="flex flex-wrap gap-2">
+          <Select name="estado" defaultValue={estado ?? ""} className="min-w-[160px] flex-1">
             <option value="">Todos los estados</option>
             {TRABAJO_ESTADOS.map((item) => (
               <option key={item} value={item}>
@@ -282,11 +299,11 @@ export function TrabajosPage({
             ))}
           </Select>
 
-          <Select name="prioridad" defaultValue={prioridad ?? ""}>
+          <Select name="prioridad" defaultValue={prioridad ?? ""} className="min-w-[160px] flex-1">
             <option value="">Todas las prioridades</option>
             {TRABAJO_PRIORIDADES.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {item.charAt(0).toUpperCase() + item.slice(1)}
               </option>
             ))}
           </Select>
@@ -297,90 +314,101 @@ export function TrabajosPage({
             min="1"
             placeholder="Nº trabajo"
             defaultValue={numeroTrabajo ?? ""}
-            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--text-color-ligth)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="w-32 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--text-color-ligth)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           />
 
-            <div className="flex gap-3">
-              <Button type="submit" className="w-full md:w-auto" icon={<Icon name="search" className="h-4 w-4" />}>
-                Filtrar
-              </Button>
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              icon={<Icon name="search" className="h-4 w-4" />}
+            >
+              Filtrar
+            </Button>
+            {hayFiltros && (
               <Button
                 as="a"
                 href="/trabajos"
-                variant="secondary"
-                className="w-full md:w-auto"
+                variant="ghost"
                 icon={<Icon name="x" className="h-4 w-4" />}
               >
                 Limpiar
               </Button>
-            </div>
+            )}
+          </div>
         </form>
-
-        <div className="hidden md:block">
-          <TrabajoTable
-            eyebrow="Activos"
-            title="Trabajos activos"
-            trabajos={trabajosActivos}
-            emptyMessage="No hay trabajos abiertos para mostrar."
-          />
-        </div>
-
-        <div className="md:hidden space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">Activos</p>
-          {trabajosActivos.length === 0 ? (
-            <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">No hay trabajos abiertos para mostrar.</p>
-          ) : (
-            trabajosActivos.map((trabajo) => (
-              <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} />
-            ))
-          )}
-        </div>
       </Card>
 
-      <div style={{ filter: "brightness(0.9) grayscale(0.6)" }}><Card as="section" className="space-y-5">
-        <div className="hidden md:block space-y-4">
-          <TrabajoTable
-            eyebrow="Finalizados"
-            title="Trabajos finalizados"
-            trabajos={finalizadosVisible}
-            emptyMessage="No hay trabajos finalizados para mostrar."
-            showBusinessDays={false}
-          />
-          {hayMas && (
-            <Button
-              type="button"
-              variant="secondary"
-              className="w-full"
-              onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
-              icon={<Icon name="chevronDown" className="h-4 w-4" />}
-            >
-              Cargar más finalizados
-            </Button>
-          )}
-        </div>
+      {/* Activos — desktop */}
+      <Card as="section" className="hidden md:block">
+        <TrabajoTable
+          eyebrow="Activos"
+          title="Trabajos activos"
+          trabajos={trabajosActivos}
+          emptyMessage="No hay trabajos activos para mostrar."
+        />
+      </Card>
 
-        <div className="md:hidden space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">Finalizados</p>
-          {finalizadosVisible.length === 0 ? (
-            <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">No hay trabajos finalizados para mostrar.</p>
-          ) : (
-            finalizadosVisible.map((trabajo) => (
-              <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} showBusinessDays={false} />
-            ))
-          )}
-          {hayMas && (
-            <Button
-              type="button"
-              variant="secondary"
-              className="w-full"
-              onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
-              icon={<Icon name="chevronDown" className="h-4 w-4" />}
-            >
-              Cargar más finalizados
-            </Button>
-          )}
-        </div>
-      </Card></div>
+      {/* Activos — mobile */}
+      <Card as="section" className="md:hidden space-y-2">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">Activos</p>
+        {trabajosActivos.length === 0 ? (
+          <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">
+            No hay trabajos activos para mostrar.
+          </p>
+        ) : (
+          trabajosActivos.map((trabajo) => (
+            <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} />
+          ))
+        )}
+      </Card>
+
+      {/* Finalizados — desktop */}
+      <Card as="section" className="hidden md:block space-y-4">
+        <TrabajoTable
+          eyebrow="Finalizados"
+          title="Trabajos finalizados"
+          trabajos={finalizadosVisible}
+          emptyMessage="No hay trabajos finalizados para mostrar."
+          showBusinessDays={false}
+          dimmed
+        />
+        {hayMas && (
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
+            icon={<Icon name="chevronDown" className="h-4 w-4" />}
+          >
+            Cargar más finalizados
+          </Button>
+        )}
+      </Card>
+
+      {/* Finalizados — mobile */}
+      <Card as="section" className="md:hidden space-y-2">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">Finalizados</p>
+        {finalizadosVisible.length === 0 ? (
+          <p className="py-6 text-center text-sm text-[var(--text-color-gray)]">
+            No hay trabajos finalizados para mostrar.
+          </p>
+        ) : (
+          finalizadosVisible.map((trabajo) => (
+            <TrabajoMobileCard key={trabajo.id} trabajo={trabajo} showBusinessDays={false} />
+          ))
+        )}
+        {hayMas && (
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
+            icon={<Icon name="chevronDown" className="h-4 w-4" />}
+          >
+            Cargar más finalizados
+          </Button>
+        )}
+      </Card>
     </div>
   );
 }

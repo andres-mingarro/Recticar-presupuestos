@@ -96,13 +96,11 @@ export function TrabajoDetailPage({
 
   useEffect(() => {
     if (!wasCreated && !wasUpdated) return;
-
     toast.success(
       wasCreated
         ? `Trabajo #${trabajo.numero_trabajo} creado correctamente.`
         : `Trabajo #${trabajo.numero_trabajo} guardado correctamente.`
     );
-
     const url = new URL(window.location.href);
     url.searchParams.delete("created");
     url.searchParams.delete("updated");
@@ -111,12 +109,10 @@ export function TrabajoDetailPage({
 
   useEffect(() => {
     if (isPending) return;
-
     const currentUpdatedAt = formState.values.updatedAt ?? "";
     if (!currentUpdatedAt) return;
     if (formState.error) return;
     if (currentUpdatedAt === lastSuccessfulUpdatedAtRef.current) return;
-
     lastSuccessfulUpdatedAtRef.current = currentUpdatedAt;
     toast.success(`Trabajo #${trabajo.numero_trabajo} guardado correctamente.`);
   }, [formState.error, formState.values.updatedAt, isPending, trabajo.numero_trabajo]);
@@ -131,80 +127,62 @@ export function TrabajoDetailPage({
         cantidad: repuesto.cantidad,
       }))}
     >
-    <div className={cn("TrabajoDetailPage", styles.TrabajoDetailPage, "space-y-6")}>
-      {/* Top bar: back button + save */}
-      <div className="flex flex-wrap  lg:flex-nowrap flex-col gap-3 flex-row sm:items-center">
-        <Button
-          as="a"
-          href="/trabajos"
-          variant="secondary"
-          className="flex-1 lg:flex-none sm:w-auto"
-          icon={<Icon name="chevronLeft" className="h-4 w-4" />}
-        >
-          Volver al listado
-        </Button>
+    <div className={cn("TrabajoDetailPage", styles.TrabajoDetailPage, "space-y-5")}>
 
+      {/* ── Botón guardar ─────────────────────────────────────────── */}
+      <div className="flex justify-start">
         <PulsatingButton
           type="submit"
           form={formId}
           disabled={isPending}
           pulsing={dirty && !isPending}
-          className="flex-1 lg:flex-none  sm:w-auto gap-2"
+          className="gap-2"
         >
           {isPending ? <Spinner className="h-4 w-4" /> : null}
           {isPending ? "Guardando..." : "Guardar trabajo"}
         </PulsatingButton>
-        <div className="block w-full lg:hidden flex flex-col gap-3 flex-row sm:items-center">
-          <Button
-            as="a"
-            href={`/api/trabajos/${trabajo.id}/pdf`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white"
-            icon={<Icon name="download" className="h-4 w-4" />}
-          >
-            DESCARGAR PRESUPUESTO
-          </Button>
-        </div>
       </div>
 
-
-
-      <TrabajosSeleccionProvider initialIds={trabajo.trabajos_ids} initialListaPrecios={(trabajo.lista_precio as 1 | 2 | 3) ?? 1}>
+      <TrabajosSeleccionProvider
+        initialIds={trabajo.trabajos_ids}
+        initialListaPrecios={(trabajo.lista_precio as 1 | 2 | 3) ?? 1}
+      >
       <div className={cn("TrabajoDetailPageContent", styles.TrabajoDetailPageContent)}>
-        <div className={cn("TrabajoDetailPageMain", styles.TrabajoDetailPageMain)}>
-          <Card as="section" className="space-y-5">
-            {/* Title row */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+
+        {/* ── Columna principal ──────────────────────────────────── */}
+        <div className={cn("TrabajoDetailPageMain", styles.TrabajoDetailPageMain, "space-y-4")}>
+
+          {/* Card de controles */}
+          <Card as="section" className="space-y-4">
+            {/* Título */}
+            <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
+                <p className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">
                   Trabajo #{trabajo.numero_trabajo}
                 </p>
-                <div className="mt-1 flex items-center gap-2">
-                  <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-                    {trabajo.cliente_nombre ?? "Sin cliente"}
-                  </h1>
-                  {trabajo.cliente_id ? (
-                    <Button
-                      as="a"
-                      href={`/clientes/${trabajo.cliente_id}`}
-                      variant="secondary"
-                      size="sm"
-                      className="shrink-0"
-                      icon={<Icon name="idCard" className="h-3.5 w-3.5" />}
-                    >
-                      Ficha
-                    </Button>
-                  ) : null}
-                </div>
+                <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-[var(--text-color-defult)] truncate">
+                  {trabajo.cliente_nombre ?? "Sin cliente asignado"}
+                </h1>
               </div>
-              {!trabajo.cliente_id ? (
-                <span className="text-sm text-[var(--text-color-gray)]">Sin cliente asignado</span>
+              {trabajo.cliente_id ? (
+                <Button
+                  as="a"
+                  href={`/clientes/${trabajo.cliente_id}`}
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  icon={<Icon name="idCard" className="h-3.5 w-3.5" />}
+                >
+                  Ficha
+                </Button>
               ) : null}
             </div>
 
-            {/* Cobrado + Prioridad */}
-            <div className="flex gap-3 flex-col md:flex-row" onClickCapture={() => setDirty(true)}>
+            {/* Cobrado + Prioridad en fila */}
+            <div
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+              onClickCapture={() => setDirty(true)}
+            >
               <CobradoToggle form={formId} />
               <PrioridadToggle form={formId} />
             </div>
@@ -221,44 +199,49 @@ export function TrabajoDetailPage({
             </div>
           </Card>
 
+          {/* Formulario */}
           <div onInput={() => setDirty(true)}>
-          <TrabajoForm
-            formId={formId}
-            action={action}
-            initialState={initialState}
-            externalFormAction={formAction}
-            externalState={formState}
-            externalIsPending={isPending}
-            initialClienteLabel={trabajo.cliente_nombre ?? ""}
-            marcas={marcas}
-            modelos={modelos}
-            motores={motores}
-            relations={relations}
-            trabajos={trabajos}
-            repuestos={repuestos}
-            snapshotTrabajos={snapshotTrabajos}
-            snapshotRepuestos={snapshotRepuestos}
-            allowFinalizado
-            showClienteSection={false}
-            showPrioridadSection={false}
-          />
+            <TrabajoForm
+              formId={formId}
+              action={action}
+              initialState={initialState}
+              externalFormAction={formAction}
+              externalState={formState}
+              externalIsPending={isPending}
+              initialClienteLabel={trabajo.cliente_nombre ?? ""}
+              marcas={marcas}
+              modelos={modelos}
+              motores={motores}
+              relations={relations}
+              trabajos={trabajos}
+              repuestos={repuestos}
+              snapshotTrabajos={snapshotTrabajos}
+              snapshotRepuestos={snapshotRepuestos}
+              allowFinalizado
+              showClienteSection={false}
+              showPrioridadSection={false}
+            />
           </div>
         </div>
 
+        {/* ── Sidebar ────────────────────────────────────────────── */}
         <aside className={cn("TrabajoDetailPageSidebar", styles.TrabajoDetailPageSidebar)}>
-          <Card as="section" className="flex flex-col gap-3">
-            <Button
-              as="a"
+
+          {/* PDF + QR */}
+          <Card as="section" className="space-y-3">
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+              Presupuesto
+            </p>
+            <a
               href={`/api/trabajos/${trabajo.id}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full bg-red-600 hover:bg-red-700 focus-visible:ring-red-600 !text-white"
-              icon={<Icon name="download" className="h-4 w-4" />}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300"
             >
-              DESCARGAR PRESUPUESTO
-            </Button>
+              <Icon name="download" className="h-4 w-4" />
+              Descargar PDF
+            </a>
 
-            {/* Etiqueta QR */}
             <div id="etiqueta-qr-print" className={styles.etiquetaWrapper}>
               <div className={styles.etiqueta}>
                 <div
@@ -271,12 +254,12 @@ export function TrabajoDetailPage({
                   <p className={styles.etiquetaCliente}>{trabajo.cliente_nombre ?? "Sin cliente"}</p>
                   {getVehicleLabel([trabajo.marca_nombre, trabajo.modelo_nombre, trabajo.motor_nombre]) ? (
                     <>
-                    <p className={styles.etiquetaVehiculo}>
-                      {getVehicleLabel([trabajo.marca_nombre, trabajo.modelo_nombre])}
-                    </p>
-                    <p className={styles.etiquetaVehiculo}>
-                      {getVehicleLabel([trabajo.motor_nombre])}
-                    </p>
+                      <p className={styles.etiquetaVehiculo}>
+                        {getVehicleLabel([trabajo.marca_nombre, trabajo.modelo_nombre])}
+                      </p>
+                      <p className={styles.etiquetaVehiculo}>
+                        {getVehicleLabel([trabajo.motor_nombre])}
+                      </p>
                     </>
                   ) : null}
                 </div>
@@ -286,33 +269,49 @@ export function TrabajoDetailPage({
             <PrintButton />
           </Card>
 
-            <TrabajoDetailSummaryCard
-              estado={selectedEstado}
-              trabajo={trabajo}
-              trabajos={trabajos}
-              repuestos={repuestos}
-              snapshotTrabajos={snapshotTrabajos}
-              snapshotRepuestos={snapshotRepuestos}
-              refreshSnapshotPricesAction={refreshSnapshotPricesAction}
-            />
+          {/* Datos + resumen */}
+          <TrabajoDetailSummaryCard
+            estado={selectedEstado}
+            trabajo={trabajo}
+            trabajos={trabajos}
+            repuestos={repuestos}
+            snapshotTrabajos={snapshotTrabajos}
+            snapshotRepuestos={snapshotRepuestos}
+            refreshSnapshotPricesAction={refreshSnapshotPricesAction}
+          />
 
+          {/* Cliente */}
           <TrabajoClienteSection
             initialClienteId={initialState.values.clienteId}
             initialClienteLabel={trabajo.cliente_nombre ?? ""}
             formId={formId}
           />
 
-          <section className="rounded-[28px] border border-[var(--color-border)] bg-[linear-gradient(135deg,rgba(255,247,237,0.9),rgba(255,255,255,0.98))] p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+          {/* Reglas de estado */}
+          <Card as="section" className="space-y-3">
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">
               Reglas de estado
             </p>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--text-color-gray)]">
-              <li>`Presupuesto entregado` marca el momento en que el cliente ya recibió el presupuesto.</li>
-              <li>Aprobado requiere cliente asignado y registra la fecha automáticamente.</li>
-              <li>Finalizado mueve el trabajo al historial del cliente.</li>
-              <li>La fecha de aprobación se guarda la primera vez que se aprueba.</li>
+            <ul className="space-y-2 text-sm leading-relaxed text-[var(--text-color-gray)]">
+              <li className="flex gap-2">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--apricot-light)]" />
+                <span><strong className="text-[var(--text-color-defult)]">Presupuesto entregado</strong> — el cliente ya recibió el presupuesto.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--orange-vivid)]" />
+                <span><strong className="text-[var(--text-color-defult)]">Aprobado</strong> — requiere cliente asignado, registra fecha automáticamente.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
+                <span><strong className="text-[var(--text-color-defult)]">Finalizado</strong> — mueve el trabajo al historial del cliente.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-border)]" />
+                <span>La fecha de aprobación se guarda solo la primera vez.</span>
+              </li>
             </ul>
-          </section>
+          </Card>
+
         </aside>
       </div>
       </TrabajosSeleccionProvider>

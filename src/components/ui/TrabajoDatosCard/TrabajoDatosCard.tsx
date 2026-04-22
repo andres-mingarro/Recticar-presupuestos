@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
-import { Icon } from "@/components/ui/Icon";
+import { Icon, type IconName } from "@/components/ui/Icon";
 import { PaymentBadge, PriorityBadge, StatusBadge } from "@/components/ui/Badge";
 import { TrabajosResumen } from "@/components/ui/TrabajosResumen/TrabajosResumen";
 import { formatDate, getVehicleLabel } from "@/lib/format";
@@ -34,6 +34,26 @@ type TrabajoDatosCardProps = {
   ) => Promise<{ error: string | null; success: boolean; updatedCount: number }>;
 };
 
+function DataRow({
+  icon,
+  label,
+  children,
+}: {
+  icon: IconName;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <dt className="flex shrink-0 items-center gap-2 text-xs text-[var(--text-color-gray)]">
+        <Icon name={icon} className="h-3.5 w-3.5 shrink-0" />
+        {label}
+      </dt>
+      <dd className="min-w-0 text-right">{children}</dd>
+    </div>
+  );
+}
+
 export function TrabajoDatosCard({
   estado,
   cobrado,
@@ -54,101 +74,63 @@ export function TrabajoDatosCard({
 
   return (
     <Card as="section" className="space-y-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-        Datos del trabajo
+      <p className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+        Resumen
       </p>
 
-      <dl className="space-y-3 text-sm">
-        <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
-            <Icon name="clipboard" className="h-4 w-4 shrink-0" />
-            Estado
-          </dt>
-          <dd>
-            <StatusBadge estado={estado} compact className="inline-flex w-[130px] justify-center" />
-          </dd>
-        </div>
+      {/* Badges de estado rápido */}
+      <div className="flex flex-wrap gap-2">
+        <StatusBadge estado={estado} compact />
+        <PriorityBadge prioridad={prioridad} />
+        <PaymentBadge cobrado={cobrado} />
+      </div>
 
-        <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
-            <Icon name="check" className="h-4 w-4 shrink-0" />
-            Cobro
-          </dt>
-          <dd>
-            <PaymentBadge cobrado={cobrado} className="inline-flex w-[130px] justify-center" />
-          </dd>
-        </div>
-
-        <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
-            <Icon name="gauge" className="h-4 w-4 shrink-0" />
-            Prioridad
-          </dt>
-          <dd>
-            <PriorityBadge prioridad={prioridad} className="inline-flex w-[130px] justify-center" />
-          </dd>
-        </div>
-
-        <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
-            <Icon name="car" className="h-4 w-4 shrink-0" />
-            Vehículo
-          </dt>
-          <dd className="font-medium text-[var(--text-color-defult)] sm:text-right">
-            {vehicleLabel}
-          </dd>
-        </div>
+      {/* Datos del vehículo y fechas */}
+      <dl className="space-y-2.5 border-t border-[var(--color-border)] pt-3.5 text-sm">
+        {vehicleLabel ? (
+          <DataRow icon="car" label="Vehículo">
+            <span className="font-medium text-[var(--text-color-defult)] text-xs text-right leading-snug">
+              {vehicleLabel}
+            </span>
+          </DataRow>
+        ) : null}
 
         {numeroSerieMotor ? (
-          <div className="flex gap-2 flex-row sm:items-center justify-between">
-            <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
-              <Icon name="hash" className="h-4 w-4 shrink-0" />
-              Serie
-            </dt>
-            <dd className="font-medium text-[var(--text-color-defult)]">
+          <DataRow icon="hash" label="Serie">
+            <span className="font-medium text-[var(--text-color-defult)] text-xs">
               {numeroSerieMotor}
-            </dd>
-          </div>
+            </span>
+          </DataRow>
         ) : null}
 
-        <div className="flex gap-2 flex-row sm:items-center justify-between">
-          <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
-            <Icon name="calendar" className="h-4 w-4 shrink-0" />
-            Creación
-          </dt>
-          <dd className="font-medium text-[var(--text-color-defult)]">
+        <DataRow icon="calendar" label="Creación">
+          <span className="font-medium text-[var(--text-color-defult)] text-xs">
             {formatDate(fechaCreacion)}
-          </dd>
-        </div>
+          </span>
+        </DataRow>
 
         {fechaAprobacion ? (
-          <div className="flex gap-2 flex-row sm:items-center justify-between">
-            <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
-              <Icon name="calendar" className="h-4 w-4 shrink-0" />
-              Aprobación
-            </dt>
-            <dd className="font-medium text-[var(--text-color-defult)]">
+          <DataRow icon="calendar" label="Aprobación">
+            <span className="font-medium text-[var(--text-color-defult)] text-xs">
               {formatDate(fechaAprobacion)}
-            </dd>
-          </div>
+            </span>
+          </DataRow>
         ) : null}
-
-        <div className="space-y-2">
-          <div className="flex gap-2 flex-row sm:items-center justify-between">
-            <dt className="flex items-center gap-2 text-[var(--text-color-gray)]">
-              <Icon name="clipboard" className="h-4 w-4 shrink-0" />
-              Items
-            </dt>
-          </div>
-          <TrabajosResumen
-            trabajos={trabajos}
-            repuestos={repuestos}
-            snapshotTrabajos={snapshotTrabajos}
-            snapshotRepuestos={snapshotRepuestos}
-            refreshSnapshotPricesAction={refreshSnapshotPricesAction}
-          />
-        </div>
       </dl>
+
+      {/* Resumen de ítems */}
+      <div className="space-y-2 border-t border-[var(--color-border)] pt-3.5">
+        <p className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[var(--text-color-gray)]">
+          Ítems del presupuesto
+        </p>
+        <TrabajosResumen
+          trabajos={trabajos}
+          repuestos={repuestos}
+          snapshotTrabajos={snapshotTrabajos}
+          snapshotRepuestos={snapshotRepuestos}
+          refreshSnapshotPricesAction={refreshSnapshotPricesAction}
+        />
+      </div>
     </Card>
   );
 }
