@@ -10,6 +10,8 @@ type MobileActionsContextValue = {
   setMenuOpen: (open: boolean) => void;
   role?: string;
   permisos?: string[];
+  mobileTotal: number | null;
+  setMobileTotal: (total: number | null) => void;
 };
 
 export const MobileActionsContext = createContext<MobileActionsContextValue>({
@@ -18,6 +20,8 @@ export const MobileActionsContext = createContext<MobileActionsContextValue>({
   openMenu: () => {},
   menuOpen: false,
   setMenuOpen: () => {},
+  mobileTotal: null,
+  setMobileTotal: () => {},
 });
 
 export function MobileActionsProvider({
@@ -36,13 +40,14 @@ export function MobileActionsProvider({
   permisos?: string[];
 }) {
   const [actions, setActionsState] = useState<ReactNode>(null);
+  const [mobileTotal, setMobileTotal] = useState<number | null>(null);
 
   const setActions = useCallback((node: ReactNode) => {
     setActionsState(node);
   }, []);
 
   return (
-    <MobileActionsContext.Provider value={{ actions, setActions, openMenu: onOpenMenu, menuOpen, setMenuOpen, role, permisos }}>
+    <MobileActionsContext.Provider value={{ actions, setActions, openMenu: onOpenMenu, menuOpen, setMenuOpen, role, permisos, mobileTotal, setMobileTotal }}>
       {children}
     </MobileActionsContext.Provider>
   );

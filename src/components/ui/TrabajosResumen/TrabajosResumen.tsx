@@ -11,6 +11,7 @@ import { ListPriceBadge } from "@/components/ui/Badge";
 import { formatPrice } from "@/lib/format";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { useIva, IVA_PORCENTAJE } from "@/components/ui/IvaToggle";
+import { useMobileActions } from "@/components/layout/MobileActions/MobileActionsContext";
 
 type TrabajosResumenProps = {
   trabajos: TrabajoAgrupado[];
@@ -153,6 +154,12 @@ export function TrabajosResumen({
   );
 
   const total = totalTrabajos + ivaAmount + totalRepuestos;
+
+  const { setMobileTotal } = useMobileActions();
+  useEffect(() => {
+    setMobileTotal(total);
+    return () => setMobileTotal(null);
+  }, [total, setMobileTotal]);
 
   const snapshotDiffs = useMemo(() => {
     return snapshotTrabajos

@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { PriorityBadge } from "@/components/ui/Badge/Badge";
+import { BusinessDaysDot } from "@/components/ui/BusinessDaysDot";
 import { Card } from "@/components/ui/Card";
 import type { SessionPayload } from "@/lib/auth";
 import type { AppPermiso } from "@/lib/queries/usuarios";
@@ -24,6 +25,8 @@ type HomePageProps = {
   permisos: AppPermiso[];
   stats: DashboardStats;
   trabajosAprobados: TrabajoAprobadoRow[];
+  diasHabilesUmbralVerde: number;
+  diasHabilesUmbralNaranja: number;
   presupuestosVencidos: PresupuestoVencidoRow[];
   motoresMasUsados: MotorConNombre[];
   repuestosMasUsados: RepuestoMasUsadoRow[];
@@ -61,6 +64,8 @@ export function HomePage({
   permisos,
   stats,
   trabajosAprobados,
+  diasHabilesUmbralVerde,
+  diasHabilesUmbralNaranja,
   presupuestosVencidos,
   motoresMasUsados,
   repuestosMasUsados,
@@ -134,7 +139,12 @@ export function HomePage({
                           </span>
                         )}
                       </span>
-                      <span className="shrink-0 text-xs text-[var(--text-color-gray)]">
+                      <span className="inline-flex shrink-0 items-center gap-1.5 text-xs text-[var(--text-color-gray)]">
+                        <BusinessDaysDot
+                          days={t.dias_desde_aprobacion}
+                          verdeHasta={diasHabilesUmbralVerde}
+                          naranjaHasta={diasHabilesUmbralNaranja}
+                        />
                         {t.dias_desde_aprobacion}d
                       </span>
                       <Icon name="chevronRight" size="xs" className="shrink-0 text-[var(--text-color-gray)]" />

@@ -6,12 +6,13 @@ import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import { MobileMenu } from "./components/MobileMenu";
 import { useMobileActions } from "./MobileActionsContext";
+import { formatPrice } from "@/lib/format";
 import styles from "./MobileActions.module.scss";
 
 const SWIPE_THRESHOLD = 40;
 
 export function MobileActions() {
-  const { actions, menuOpen, setMenuOpen, role, permisos } = useMobileActions();
+  const { actions, menuOpen, setMenuOpen, role, permisos, mobileTotal } = useMobileActions();
   const router = useRouter();
   const touchStartY = useRef<number | null>(null);
 
@@ -36,7 +37,11 @@ export function MobileActions() {
         role={role}
         permisos={permisos}
       />
-
+      {/* Barra de total — se desliza desde atrás de la bar */}
+      <div className={cn(styles.totalBar, mobileTotal !== null && !menuOpen && styles.totalBarVisible)}>
+        <span className={styles.totalBarLabel}>Total</span>
+        <span className={styles.totalBarAmount}>{mobileTotal !== null ? formatPrice(mobileTotal) : ""}</span>
+      </div>
       <div
         className={cn("MobileActions", styles.bar)}
         onTouchStart={handleTouchStart}
