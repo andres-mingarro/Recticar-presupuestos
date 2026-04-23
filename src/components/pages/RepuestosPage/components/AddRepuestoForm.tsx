@@ -20,7 +20,7 @@ export function AddRepuestoForm({
       <form
         key={state.resetKey ?? 0}
         action={formAction}
-        className="flex flex-1 items-center gap-3"
+        className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3"
       >
         <input type="hidden" name="categoriaId" value={categoriaId} />
         <input

@@ -19,6 +19,7 @@ import {
 } from "@/components/forms/TrabajoForm";
 import { Button } from "@/components/ui/Button";
 import { CobradoProvider, CobradoToggle } from "@/components/ui/CobradoToggle";
+import { IvaProvider } from "@/components/ui/IvaToggle";
 import { EstadoStepper } from "@/components/ui/EstadoStepper";
 import {
   PrioridadProvider,
@@ -167,6 +168,7 @@ export function TrabajoDetailPage({
   return (
     <PrioridadProvider initialValue={trabajo.prioridad}>
     <CobradoProvider initialValue={trabajo.cobrado}>
+    <IvaProvider initialValue={trabajo.aplica_iva}>
     <RepuestosSeleccionProvider
       initialItems={trabajo.repuestos.map((repuesto) => ({
         repuestoId: Number(repuesto.repuestoId),
@@ -364,6 +366,7 @@ export function TrabajoDetailPage({
       </TrabajosSeleccionProvider>
     </div>
     </RepuestosSeleccionProvider>
+    </IvaProvider>
     </CobradoProvider>
     </PrioridadProvider>
   );

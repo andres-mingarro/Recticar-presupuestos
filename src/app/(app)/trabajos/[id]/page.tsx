@@ -78,6 +78,7 @@ export default async function Page({
       repuestosIds: trabajo.repuestos_ids.map(String),
       repuestos: trabajo.repuestos,
       listaPrecios: (trabajo.lista_precio as 1 | 2 | 3) ?? 1,
+      aplicaIva: trabajo.aplica_iva,
     },
   };
 
@@ -121,6 +122,7 @@ export default async function Page({
         .filter((value): value is string => typeof value === "string"),
       repuestos: parseTrabajoRepuestos(formData),
       listaPrecios: (Number(normalizeString(formData.get("listaPrecios"))) || 1) as 1 | 2 | 3,
+      aplicaIva: formData.get("aplicaIva") !== "false",
     };
 
     if (values.estado === "aprobado" && !values.clienteId) {

@@ -14,7 +14,7 @@ export function AddCategoriaForm({ action }: { action: RepuestosActionFn }) {
       <form
         key={state.resetKey ?? 0}
         action={formAction}
-        className="flex gap-3 rounded-[18px] bg-[var(--color-info-bg)] px-4 py-3"
+        className="flex flex-col gap-2 rounded-[18px] bg-[var(--color-info-bg)] px-4 py-3 sm:flex-row sm:gap-3"
         style={{ border: "2px dashed var(--color-info-border-strong)" }}
       >
         <input

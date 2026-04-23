@@ -33,7 +33,7 @@ export function SortableRepuestoRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "SortableRepuestoRow flex items-center gap-3 px-5 py-3",
+        "SortableRepuestoRow flex items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-5 sm:py-3",
         index % 2 === 1 && "bg-[var(--color-surface-alt)]/40",
         isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
       )}

@@ -139,6 +139,7 @@ Existe en dos variantes: `EstadoStepper` (form mode, clickeable) y `EstadoSteppe
 ### Diálogos
 - **`Dialog`** (`src/components/ui/Dialog/`) — wrapper sobre `@radix-ui/react-dialog`. `DialogContent` acepta `variant="sheet"` (bottom sheet, mobile) o `variant="centered"` (modal centrado, max-width 420px).
 - **`ConfirmDialog`** (`src/components/ui/ConfirmDialog/`) — modal de confirmación centrado. Props: `open`, `onOpenChange`, `title`, `description?`, `confirmLabel`, `cancelLabel`, `onConfirm`, `loading`. Usar siempre en lugar de `window.confirm()`. Para submitear un form oculto tras confirmar: `formRef.current?.requestSubmit()` o `document.getElementById(formId)?.requestSubmit()`.
+- **Doble confirmación para acciones destructivas graves** (ej: eliminar categoría con todos sus repuestos): usar `ConfirmDialog` como primer paso y un `Dialog` custom como segundo paso. El segundo dialog muestra botones grandes **SÍ** / **NO**: NO cierra todo y cancela, SÍ activa el estado `confirmedYes` que habilita el botón final "Eliminar". Patrón implementado en `CategoriaCard`. Estados necesarios: `confirmDelete`, `confirmDelete2`, `confirmedYes`.
 
 ### Badges
 `StatusBadge`, `PriorityBadge`, `PaymentBadge`, `ContactBadge`, `BusinessDaysBadge` en `src/components/ui/Badge/Badge.tsx`.

@@ -17,6 +17,7 @@ import {
 } from "@/components/forms/TrabajoForm";
 import { TrabajosSeleccionProvider } from "@/components/forms/TrabajoForm/TrabajosSeleccionContext";
 import { RepuestosSeleccionProvider } from "@/components/forms/TrabajoForm/RepuestosSeleccionContext";
+import { IvaProvider } from "@/components/ui/IvaToggle";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -82,6 +83,7 @@ export function NuevoTrabajoPage({
           styles.NuevoTrabajoPageContent
         )}
       >
+        <IvaProvider initialValue={initialState.values.aplicaIva ?? true}>
         <TrabajosSeleccionProvider initialIds={[]} initialListaPrecios={initialState.values.listaPrecios}>
           <RepuestosSeleccionProvider initialItems={[]}>
             <>
@@ -142,6 +144,7 @@ export function NuevoTrabajoPage({
             </>
           </RepuestosSeleccionProvider>
         </TrabajosSeleccionProvider>
+        </IvaProvider>
       </div>
     </div>
   );

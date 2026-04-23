@@ -254,7 +254,9 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empres
   const repuestoGroups = groupRepuestosByCategory(repuestos);
   const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio, 0);
   const totalRepuestos = repuestos.reduce((sum, r) => sum + r.total, 0);
-  const totalGeneral = totalTrabajos + totalRepuestos;
+  const aplicaIva = trabajo.aplica_iva;
+  const ivaAmount = aplicaIva ? Math.round(totalTrabajos * 21 / 100) : 0;
+  const totalGeneral = totalTrabajos + ivaAmount + totalRepuestos;
   const companyLocation = buildCompanyLocation(empresa);
 
   const allRows: Array<
@@ -514,10 +516,18 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empres
                 <Text style={styles.subtotalLabel}>Trabajos</Text>
                 <Text style={styles.subtotalValue}>{formatPrecio(totalTrabajos)}</Text>
               </View>
-              <View style={styles.totalsLine}>
-                <Text style={styles.subtotalLabel}>Repuestos</Text>
-                <Text style={styles.subtotalValue}>{formatPrecio(totalRepuestos)}</Text>
-              </View>
+              {aplicaIva && totalTrabajos > 0 && (
+                <View style={styles.totalsLine}>
+                  <Text style={styles.subtotalLabel}>IVA 21% (mano de obra)</Text>
+                  <Text style={styles.subtotalValue}>{formatPrecio(ivaAmount)}</Text>
+                </View>
+              )}
+              {totalRepuestos > 0 && (
+                <View style={styles.totalsLine}>
+                  <Text style={styles.subtotalLabel}>Repuestos</Text>
+                  <Text style={styles.subtotalValue}>{formatPrecio(totalRepuestos)}</Text>
+                </View>
+              )}
               <View style={[styles.totalsLine, styles.totalsLineStrong]}>
                 <Text style={styles.totalLabel}>Total general</Text>
                 <Text style={styles.totalValue}>{formatPrecio(totalGeneral)}</Text>

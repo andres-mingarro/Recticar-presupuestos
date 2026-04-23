@@ -33,6 +33,7 @@ const initialState: TrabajoFormState = {
     repuestosIds: [],
     repuestos: [],
     listaPrecios: 1,
+    aplicaIva: true,
   },
 };
 
@@ -112,6 +113,7 @@ export default async function Page({
         .filter((value): value is string => typeof value === "string"),
       repuestos: parseTrabajoRepuestos(formData),
       listaPrecios: (Number(normalizeString(formData.get("listaPrecios"))) || 1) as 1 | 2 | 3,
+      aplicaIva: formData.get("aplicaIva") !== "false",
     };
 
     if (values.estado === "aprobado" && !values.clienteId) {

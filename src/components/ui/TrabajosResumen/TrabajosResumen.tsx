@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { ListPriceBadge } from "@/components/ui/Badge";
 import { formatPrice } from "@/lib/format";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
+import { useIva, IVA_PORCENTAJE } from "@/components/ui/IvaToggle";
 
 type TrabajosResumenProps = {
   trabajos: TrabajoAgrupado[];
@@ -37,6 +38,7 @@ export function TrabajosResumen({
 }: TrabajosResumenProps) {
   const { selectedIds, listaPrecios } = useTrabajosSeleccion();
   const { selectedItems: selectedRepuestoItems } = useRepuestosSeleccion();
+  const { aplicaIva } = useIva();
   const trabajosById = useMemo(
     () => new Map(trabajos.flatMap((g) => g.trabajos).map((trabajo) => [trabajo.id, trabajo])),
     [trabajos]
@@ -135,12 +137,22 @@ export function TrabajosResumen({
     [repuestos, selectedRepuestoItems, snapshotRepuestos]
   );
 
-  const total = useMemo(
-    () =>
-      selectedTrabajos.reduce((sum, t) => sum + ("precioLista1" in t ? getPrecio(t, listaPrecios) : t.precio), 0) +
-      selectedRepuestos.reduce((sum, r) => sum + r.total, 0),
-    [selectedTrabajos, selectedRepuestos, listaPrecios]
+  const totalTrabajos = useMemo(
+    () => selectedTrabajos.reduce((sum, t) => sum + ("precioLista1" in t ? getPrecio(t, listaPrecios) : t.precio), 0),
+    [selectedTrabajos, listaPrecios]
   );
+
+  const totalRepuestos = useMemo(
+    () => selectedRepuestos.reduce((sum, r) => sum + r.total, 0),
+    [selectedRepuestos]
+  );
+
+  const ivaAmount = useMemo(
+    () => aplicaIva ? Math.round(totalTrabajos * IVA_PORCENTAJE / 100) : 0,
+    [aplicaIva, totalTrabajos]
+  );
+
+  const total = totalTrabajos + ivaAmount + totalRepuestos;
 
   const snapshotDiffs = useMemo(() => {
     return snapshotTrabajos
@@ -238,7 +250,15 @@ export function TrabajosResumen({
           ))}
         </div>
       ) : null}
-      <div className="mt-2 flex items-baseline justify-between gap-2 border-t border-[var(--color-border)] pt-2">
+      {aplicaIva && totalTrabajos > 0 && (
+        <div className="flex items-baseline justify-between gap-2 border-t border-[var(--color-border)] pt-2">
+          <span className="text-[var(--text-color-gray)]">IVA {IVA_PORCENTAJE}% (mano de obra)</span>
+          <span className="shrink-0 font-medium text-[var(--text-color-defult)]">
+            {formatPrice(ivaAmount)}
+          </span>
+        </div>
+      )}
+      <div className="mt-1 flex items-baseline justify-between gap-2 border-t border-[var(--color-border)] pt-2">
         <span className="font-semibold text-[var(--text-color-defult)]">Total</span>
         <span className="shrink-0 font-semibold text-[var(--color-accent)]">
           {formatPrice(total)}

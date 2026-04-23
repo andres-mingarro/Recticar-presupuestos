@@ -270,6 +270,7 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
         p.numero_serie_motor,
         p.observaciones,
         p.lista_precio,
+        p.aplica_iva,
         (
           SELECT array_agg(pt.trabajo_id ORDER BY pt.trabajo_id) FILTER (WHERE pt.trabajo_id IS NOT NULL)
           FROM orden_trabajo_trabajos pt
@@ -355,6 +356,7 @@ export async function updateTrabajo(
             prioridad          = $9::orden_trabajo_prioridad,
             estado             = $10::orden_trabajo_estado,
             lista_precio       = $11,
+            aplica_iva         = $12,
             fecha_presupuesto_entregado = CASE
               WHEN $10::text = 'presupuesto_entregado' AND fecha_presupuesto_entregado IS NULL THEN now()
               WHEN $10::text <> 'presupuesto_entregado' THEN NULL
@@ -364,7 +366,7 @@ export async function updateTrabajo(
               WHEN $10::text = 'aprobado' AND fecha_aprobacion IS NULL THEN now()
               ELSE fecha_aprobacion
             END,
-            observaciones      = $12,
+            observaciones      = $13,
             updated_at         = now()
           WHERE id = $1 AND updated_at = $2::timestamptz
           RETURNING id, updated_at::text AS updated_at
@@ -372,12 +374,12 @@ export async function updateTrabajo(
         del_trabajos AS (
           DELETE FROM orden_trabajo_trabajos
           WHERE orden_trabajo_id = (SELECT id FROM upd)
-            AND trabajo_id != ALL($13::int[])
+            AND trabajo_id != ALL($14::int[])
         ),
         del_repuestos AS (
           DELETE FROM orden_trabajo_repuestos
           WHERE orden_trabajo_id = (SELECT id FROM upd)
-            AND repuesto_id != ALL($14::int[])
+            AND repuesto_id != ALL($15::int[])
         ),
         ins_trabajos AS (
           INSERT INTO orden_trabajo_trabajos (
@@ -389,10 +391,10 @@ export async function updateTrabajo(
           )
           SELECT
             (SELECT id FROM upd),
-            unnest($13::int[]),
-            unnest($17::text[]),
+            unnest($14::int[]),
             unnest($18::text[]),
-            unnest($19::numeric[])
+            unnest($19::text[]),
+            unnest($20::numeric[])
           WHERE (SELECT id FROM upd) IS NOT NULL
           ON CONFLICT (orden_trabajo_id, trabajo_id) DO UPDATE
             SET
@@ -411,11 +413,11 @@ export async function updateTrabajo(
           )
           SELECT
             (SELECT id FROM upd),
-            unnest($14::int[]),
             unnest($15::int[]),
             unnest($16::int[]),
-            unnest($20::text[]),
-            unnest($21::text[])
+            unnest($17::int[]),
+            unnest($21::text[]),
+            unnest($22::text[])
           WHERE (SELECT id FROM upd) IS NOT NULL
           ON CONFLICT (orden_trabajo_id, repuesto_id) DO UPDATE
             SET
@@ -438,6 +440,7 @@ export async function updateTrabajo(
       input.prioridad,
       input.estado,
       input.listaPrecios,
+      input.aplicaIva,
       input.observaciones || null,
       trabajosIds,
       repuestosIds,
@@ -483,7 +486,8 @@ export async function createTrabajo(input: TrabajoFormValues) {
       fecha_presupuesto_entregado,
       fecha_aprobacion,
       observaciones,
-      lista_precio
+      lista_precio,
+      aplica_iva
     )
     VALUES (
       ${clienteId},
@@ -497,7 +501,8 @@ export async function createTrabajo(input: TrabajoFormValues) {
       ${fechaPresupuestoEntregado},
       ${fechaAprobacion},
       ${input.observaciones || null},
-      ${input.listaPrecios}
+      ${input.listaPrecios},
+      ${input.aplicaIva}
     )
     RETURNING id
   `;

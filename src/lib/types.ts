@@ -87,6 +87,7 @@ export type TrabajoDetail = TrabajoListItem & {
   repuestos_ids: number[];
   repuestos: TrabajoRepuestoValue[];
   lista_precio: 1 | 2 | 3;
+  aplica_iva: boolean;
   cliente_dni: string | null;
   cliente_cuit: string | null;
   cliente_telefono: string | null;
@@ -115,6 +116,7 @@ export type TrabajoFormValues = {
   repuestosIds: string[];
   repuestos: TrabajoRepuestoValue[];
   listaPrecios: 1 | 2 | 3;
+  aplicaIva: boolean;
 };
 
 export type Marca = {

@@ -34,6 +34,7 @@ import { EngineIconGlyph, isEngineIconName } from "@/components/ui/EngineIcons";
 import { VehiculoMobileSelector } from "./VehiculoMobileSelector";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
+import { IvaToggle } from "@/components/ui/IvaToggle";
 import styles from "./TrabajoForm.module.scss";
 
 export type TrabajoFormState = {
@@ -489,6 +490,8 @@ export function TrabajoForm({
                 <input type="hidden" name="listaPrecios" value={listaPrecios} />
               </div>
 
+              <IvaToggle form={formId} />
+
               <div className={cn("TrabajoFormChecklist", styles.TrabajoFormChecklist)}>
                 {trabajos.map((grupo) => {
                   const selectedCount = grupo.trabajos.filter((t) => selectedTrabajoIds.has(t.id)).length;
@@ -590,7 +593,7 @@ export function TrabajoForm({
                               checkboxClassName="[--checkbox-size:24px]"
                             >
                               {/* Controles precio / cantidad / total — fila separada debajo del nombre */}
-                              <div className="flex w-full items-center gap-2 pl-9">
+                              <div className="grid w-full grid-cols-[auto_1fr_auto] items-end gap-x-3 gap-y-1 sm:pl-9">
                                 {/* Precio unitario */}
                                 <div className="flex flex-col gap-0.5">
                                   <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Precio u.</span>
@@ -616,10 +619,10 @@ export function TrabajoForm({
                                   />
                                 </div>
                                 {/* Total */}
-                                <div className="ml-auto flex flex-col items-end gap-0.5">
+                                <div className="flex flex-col items-end gap-0.5">
                                   <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Total</span>
                                   <span className={cn(
-                                    "min-w-[80px] text-right text-base font-bold",
+                                    "text-right text-base font-bold",
                                     isChecked ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-gray)]"
                                   )}>
                                     {formatPrice(precioUnit * cantidad)}
