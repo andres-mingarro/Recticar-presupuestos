@@ -1,5 +1,6 @@
 import { getSessionWithPermisos, hasPermission } from "@/lib/permisos";
 import { TrabajosPage } from "@/components/pages/TrabajosPage";
+import { getEmpresaConfig } from "@/lib/queries/empresa";
 import { listTrabajos } from "@/lib/queries/trabajos";
 import { resolveSearchParams } from "@/lib/search-params";
 import {
@@ -44,6 +45,7 @@ export default async function Page({
 
   let errorMessage: string | null = null;
   let trabajos: TrabajoListItem[] = [];
+  const empresa = await getEmpresaConfig();
 
   try {
     trabajos = await listTrabajos({ estado, prioridad, numeroTrabajo });
@@ -58,6 +60,8 @@ export default async function Page({
       prioridad={prioridad}
       numeroTrabajo={numeroTrabajo}
       trabajos={trabajos}
+      diasHabilesUmbralVerde={empresa.diasHabilesUmbralVerde}
+      diasHabilesUmbralNaranja={empresa.diasHabilesUmbralNaranja}
       errorMessage={errorMessage}
       canEdit={canEdit}
     />

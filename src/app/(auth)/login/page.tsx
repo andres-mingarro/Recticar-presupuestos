@@ -62,11 +62,11 @@ export default function LoginPage() {
       <div className="w-full max-w-sm rounded-[28px] border border-white/60 bg-white/80 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.12)] backdrop-blur">
         <div className="mb-8 flex justify-center">
           <Image
-            src="/logo.png"
+            src="/logo.svg"
             alt="Recticar Presupuestos"
             width={180}
             height={60}
-            className="h-12 w-auto"
+            className="h-[70px] w-auto"
             priority
           />
         </div>

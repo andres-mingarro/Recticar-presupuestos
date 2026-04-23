@@ -12,6 +12,8 @@ export type EmpresaConfig = {
   autoEliminarPresupuestosEntregados: boolean;
   mesesRetencionPresupuestoEntregado: number;
   ultimaEjecucionLimpieza: string | null;
+  diasHabilesUmbralVerde: number;
+  diasHabilesUmbralNaranja: number;
   updatedAt: string;
 };
 
@@ -26,6 +28,8 @@ export type EmpresaConfigInput = {
   cuit: string;
   autoEliminarPresupuestosEntregados: boolean;
   mesesRetencionPresupuestoEntregado: number;
+  diasHabilesUmbralVerde: number;
+  diasHabilesUmbralNaranja: number;
 };
 
 const DEFAULT_EMPRESA_CONFIG: EmpresaConfig = {
@@ -40,8 +44,26 @@ const DEFAULT_EMPRESA_CONFIG: EmpresaConfig = {
   autoEliminarPresupuestosEntregados: false,
   mesesRetencionPresupuestoEntregado: 3,
   ultimaEjecucionLimpieza: null,
+  diasHabilesUmbralVerde: 5,
+  diasHabilesUmbralNaranja: 10,
   updatedAt: new Date(0).toISOString(),
 };
+
+export function normalizeBusinessDaysThresholds({
+  verde,
+  naranja,
+}: {
+  verde: number;
+  naranja: number;
+}) {
+  const diasHabilesUmbralVerde = Math.max(0, Math.floor(Number.isFinite(verde) ? verde : 5));
+  const diasHabilesUmbralNaranja = Math.max(
+    diasHabilesUmbralVerde,
+    Math.floor(Number.isFinite(naranja) ? naranja : 10)
+  );
+
+  return { diasHabilesUmbralVerde, diasHabilesUmbralNaranja };
+}
 
 export async function getEmpresaConfig() {
   const rows = await templateRows<{
@@ -56,6 +78,8 @@ export async function getEmpresaConfig() {
     auto_eliminar_presupuestos_entregados: boolean | null;
     meses_retencion_presupuesto_entregado: number | null;
     ultima_ejecucion_limpieza: string | null;
+    dias_habiles_umbral_verde: number | null;
+    dias_habiles_umbral_naranja: number | null;
     updated_at: string;
   }>`
     SELECT
@@ -70,6 +94,8 @@ export async function getEmpresaConfig() {
       auto_eliminar_presupuestos_entregados,
       meses_retencion_presupuesto_entregado,
       ultima_ejecucion_limpieza,
+      dias_habiles_umbral_verde,
+      dias_habiles_umbral_naranja,
       updated_at
     FROM empresa_configuracion
     WHERE id = 1
@@ -78,6 +104,11 @@ export async function getEmpresaConfig() {
 
   const row = rows[0];
   if (!row) return DEFAULT_EMPRESA_CONFIG;
+
+  const businessDaysThresholds = normalizeBusinessDaysThresholds({
+    verde: Number(row.dias_habiles_umbral_verde ?? DEFAULT_EMPRESA_CONFIG.diasHabilesUmbralVerde),
+    naranja: Number(row.dias_habiles_umbral_naranja ?? DEFAULT_EMPRESA_CONFIG.diasHabilesUmbralNaranja),
+  });
 
   return {
     nombre: row.nombre,
@@ -91,11 +122,17 @@ export async function getEmpresaConfig() {
     autoEliminarPresupuestosEntregados: Boolean(row.auto_eliminar_presupuestos_entregados),
     mesesRetencionPresupuestoEntregado: Math.max(1, Number(row.meses_retencion_presupuesto_entregado ?? 3)),
     ultimaEjecucionLimpieza: row.ultima_ejecucion_limpieza,
+    ...businessDaysThresholds,
     updatedAt: row.updated_at,
   } satisfies EmpresaConfig;
 }
 
 export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
+  const businessDaysThresholds = normalizeBusinessDaysThresholds({
+    verde: input.diasHabilesUmbralVerde,
+    naranja: input.diasHabilesUmbralNaranja,
+  });
+
   const rows = await templateRows<{
     nombre: string;
     tagline: string | null;
@@ -108,6 +145,8 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
     auto_eliminar_presupuestos_entregados: boolean;
     meses_retencion_presupuesto_entregado: number;
     ultima_ejecucion_limpieza: string | null;
+    dias_habiles_umbral_verde: number;
+    dias_habiles_umbral_naranja: number;
     updated_at: string;
   }>`
     INSERT INTO empresa_configuracion (
@@ -123,6 +162,8 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
       auto_eliminar_presupuestos_entregados,
       meses_retencion_presupuesto_entregado,
       ultima_ejecucion_limpieza,
+      dias_habiles_umbral_verde,
+      dias_habiles_umbral_naranja,
       updated_at
     )
     VALUES (
@@ -138,6 +179,8 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
       ${input.autoEliminarPresupuestosEntregados},
       ${Math.max(1, input.mesesRetencionPresupuestoEntregado)},
       NULL,
+      ${businessDaysThresholds.diasHabilesUmbralVerde},
+      ${businessDaysThresholds.diasHabilesUmbralNaranja},
       now()
     )
     ON CONFLICT (id) DO UPDATE SET
@@ -151,6 +194,8 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
       cuit = EXCLUDED.cuit,
       auto_eliminar_presupuestos_entregados = EXCLUDED.auto_eliminar_presupuestos_entregados,
       meses_retencion_presupuesto_entregado = EXCLUDED.meses_retencion_presupuesto_entregado,
+      dias_habiles_umbral_verde = EXCLUDED.dias_habiles_umbral_verde,
+      dias_habiles_umbral_naranja = EXCLUDED.dias_habiles_umbral_naranja,
       updated_at = now()
     RETURNING
       nombre,
@@ -164,6 +209,8 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
       auto_eliminar_presupuestos_entregados,
       meses_retencion_presupuesto_entregado,
       ultima_ejecucion_limpieza,
+      dias_habiles_umbral_verde,
+      dias_habiles_umbral_naranja,
       updated_at
   `;
 
@@ -181,6 +228,8 @@ export async function upsertEmpresaConfig(input: EmpresaConfigInput) {
     autoEliminarPresupuestosEntregados: row.auto_eliminar_presupuestos_entregados,
     mesesRetencionPresupuestoEntregado: Number(row.meses_retencion_presupuesto_entregado),
     ultimaEjecucionLimpieza: row.ultima_ejecucion_limpieza,
+    diasHabilesUmbralVerde: row.dias_habiles_umbral_verde,
+    diasHabilesUmbralNaranja: row.dias_habiles_umbral_naranja,
     updatedAt: row.updated_at,
   } satisfies EmpresaConfig;
 }

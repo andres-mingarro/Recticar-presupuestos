@@ -2,30 +2,14 @@
   width: 100%;
 }
 
-.ConfiguracionPageContent {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.ConfiguracionPageMain {
-  min-width: 0;
+.ConfiguracionPageGrid {
   display: grid;
   gap: 1rem;
 }
 
-.ConfiguracionPageSidebar {
-  display: grid;
-  gap: 1rem;
-}
-
-@media (min-width: 1200px) {
-  .ConfiguracionPageContent {
-    grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.75fr);
+@media (min-width: 1024px) {
+  .ConfiguracionPageGrid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.8fr);
     align-items: start;
-  }
-}
-
-@media (min-width: 1024px) and (max-width: 1199px) {
-  .ConfiguracionPageMain {
   }
 }

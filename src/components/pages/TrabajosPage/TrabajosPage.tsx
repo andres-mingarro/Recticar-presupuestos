@@ -13,8 +13,8 @@ import {
   type TrabajoPrioridad,
 } from "@/lib/types";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { BusinessDaysDot } from "@/components/ui/BusinessDaysDot";
 import {
-  BusinessDaysBadge,
   PriorityBadge,
   StatusBadge,
 } from "@/components/ui/Badge";
@@ -54,6 +54,8 @@ type TrabajosPageProps = {
   prioridad?: TrabajoPrioridad;
   numeroTrabajo?: number;
   trabajos: TrabajoListItem[];
+  diasHabilesUmbralVerde: number;
+  diasHabilesUmbralNaranja: number;
   errorMessage: string | null;
   canEdit: boolean;
 };
@@ -63,6 +65,8 @@ function TrabajoTable({
   eyebrow,
   trabajos,
   emptyMessage,
+  diasHabilesUmbralVerde,
+  diasHabilesUmbralNaranja,
   showBusinessDays = true,
   dimmed = false,
 }: {
@@ -70,6 +74,8 @@ function TrabajoTable({
   eyebrow: string;
   trabajos: TrabajoListItem[];
   emptyMessage: string;
+  diasHabilesUmbralVerde: number;
+  diasHabilesUmbralNaranja: number;
   showBusinessDays?: boolean;
   dimmed?: boolean;
 }) {
@@ -106,7 +112,7 @@ function TrabajoTable({
                 </span>
               </th>
               <th className="w-[90px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">Prioridad</th>
-              <th className="w-[160px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">Creación → Hito</th>
+              <th className="w-[205px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">Creación → Aprob.</th>
               {showBusinessDays ? (
                 <th className="w-[80px] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-right">Días háb.</th>
               ) : (
@@ -210,14 +216,12 @@ function TrabajoTable({
                   </td>
 
                   {/* Fechas */}
-                  <td className="w-[160px] px-3 py-3.5">
-                    <div className="flex flex-col gap-0.5 text-xs text-[var(--text-color-gray)]">
+                  <td className="w-[205px] px-3 py-3.5">
+                    <div className="flex items-center gap-1.5 text-xs text-[var(--text-color-gray)]">
                       <span>{formatDate(trabajo.fecha_creacion)}</span>
-                      <span className="flex items-center gap-1">
-                        <Icon name="arrowRight" className="h-3 w-3 text-[var(--color-accent)]/60" />
-                        <span className={cn(!getEstadoReferenceDate(trabajo) && "italic opacity-50")}>
-                          {formatDate(getEstadoReferenceDate(trabajo))}
-                        </span>
+                      <Icon name="arrowRight" className="h-3 w-3 shrink-0 text-[var(--color-accent)]/60" />
+                      <span className={cn(!getEstadoReferenceDate(trabajo) && "italic opacity-50")}>
+                        {formatDate(getEstadoReferenceDate(trabajo))}
                       </span>
                     </div>
                   </td>
@@ -225,16 +229,25 @@ function TrabajoTable({
                   {/* Días hábiles */}
                   {showBusinessDays ? (
                     <td className="w-[80px] px-3 py-3.5 text-right">
-                      <BusinessDaysBadge
-                        days={
+                      {(() => {
+                        const days =
                           trabajo.estado === "finalizado"
                             ? getBusinessDaysBetween(
                                 trabajo.fecha_creacion,
                                 trabajo.fecha_aprobacion ?? trabajo.fecha_creacion
                               )
-                            : getBusinessDaysSince(trabajo.fecha_creacion)
-                        }
-                      />
+                            : getBusinessDaysSince(trabajo.fecha_creacion);
+                        return (
+                          <span className="inline-flex items-center justify-end gap-1.5">
+                            <BusinessDaysDot
+                              days={days}
+                              verdeHasta={diasHabilesUmbralVerde}
+                              naranjaHasta={diasHabilesUmbralNaranja}
+                            />
+                            <span className="text-sm font-bold tabular-nums text-[var(--text-color-defult)]">{days}</span>
+                          </span>
+                        );
+                      })()}
                     </td>
                   ) : (
                     <td className="w-[80px]" />
@@ -256,6 +269,8 @@ export function TrabajosPage({
   prioridad,
   numeroTrabajo,
   trabajos,
+  diasHabilesUmbralVerde,
+  diasHabilesUmbralNaranja,
   errorMessage,
   canEdit,
 }: TrabajosPageProps) {
@@ -360,6 +375,8 @@ export function TrabajosPage({
           title="Trabajos activos"
           trabajos={trabajosActivos}
           emptyMessage="No hay trabajos activos para mostrar."
+          diasHabilesUmbralVerde={diasHabilesUmbralVerde}
+          diasHabilesUmbralNaranja={diasHabilesUmbralNaranja}
         />
       </Card>
 
@@ -384,6 +401,8 @@ export function TrabajosPage({
           title="Trabajos finalizados"
           trabajos={finalizadosVisible}
           emptyMessage="No hay trabajos finalizados para mostrar."
+          diasHabilesUmbralVerde={diasHabilesUmbralVerde}
+          diasHabilesUmbralNaranja={diasHabilesUmbralNaranja}
           showBusinessDays={false}
           dimmed
         />

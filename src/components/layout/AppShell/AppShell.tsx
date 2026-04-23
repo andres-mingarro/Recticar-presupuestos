@@ -32,7 +32,7 @@ export function AppShell({ children, role, permisos }: Props) {
         <header className={styles.topBar}>
           <Link href="/" aria-label="Ir al dashboard">
             <Image
-              src="/logo.png"
+              src="/logo.svg"
               alt="Recticar"
               width={110}
               height={36}
