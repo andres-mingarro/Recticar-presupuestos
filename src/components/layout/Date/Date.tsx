@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import styles from "./Date.module.scss";

@@ -28,10 +28,20 @@ type RepuestoCatalogSnapshot = {
   repuestoNombreSnapshot: string;
 };
 
+type VehicleSnapshot = {
+  marcaNombreSnapshot: string | null;
+  modeloNombreSnapshot: string | null;
+  motorNombreSnapshot: string | null;
+};
+
 type TrabajoListRow = Omit<
   TrabajoListItem,
   "marca_nombre" | "modelo_nombre" | "motor_nombre"
->;
+> & {
+  marca_nombre_snapshot: string | null;
+  modelo_nombre_snapshot: string | null;
+  motor_nombre_snapshot: string | null;
+};
 
 type TrabajoDetailRow = Omit<
   TrabajoDetail,
@@ -39,6 +49,9 @@ type TrabajoDetailRow = Omit<
 > & {
   trabajos_ids: number[] | null;
   repuestos_ids: number[] | null;
+  marca_nombre_snapshot: string | null;
+  modelo_nombre_snapshot: string | null;
+  motor_nombre_snapshot: string | null;
 };
 
 function normalizeLegacyTrabajoEstado<T extends {
@@ -98,6 +111,30 @@ async function getTrabajoCatalogSnapshots(
   }));
 }
 
+async function getVehicleSnapshots(
+  marcaId: number | null,
+  modeloId: number | null,
+  motorId: number | null
+): Promise<VehicleSnapshot> {
+  const [marcas, modelos, motores] = await Promise.all([
+    marcaId ? listMarcas() : Promise.resolve([]),
+    modeloId ? listModelos() : Promise.resolve([]),
+    motorId ? listMotores() : Promise.resolve([]),
+  ]);
+
+  const marcaNombreSnapshot = marcaId
+    ? (marcas.find((m) => m.id === marcaId)?.nombre ?? null)
+    : null;
+  const modeloNombreSnapshot = modeloId
+    ? (modelos.find((m) => m.id === modeloId)?.nombre ?? null)
+    : null;
+  const motorNombreSnapshot = motorId
+    ? (motores.find((m) => m.id === motorId)?.nombre ?? null)
+    : null;
+
+  return { marcaNombreSnapshot, modeloNombreSnapshot, motorNombreSnapshot };
+}
+
 async function getRepuestoCatalogSnapshots(
   repuestosIds: number[]
 ): Promise<RepuestoCatalogSnapshot[]> {
@@ -154,60 +191,47 @@ export async function listTrabajos(filters: TrabajoFilters = {}) {
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  const [rows, [marcas, modelos, motores]] = await Promise.all([
-    queryRows<TrabajoListRow>(
-      `
-        SELECT
-          p.id,
-          p.numero_trabajo,
-          p.cobrado,
-          p.estado,
-          p.prioridad,
-          p.fecha_creacion,
-          p.fecha_presupuesto_entregado,
-          p.fecha_aprobacion,
-          p.cliente_id,
-          p.marca_id,
-          p.modelo_id,
-          p.motor_id,
-          CASE
-            WHEN c.id IS NULL THEN NULL
-            ELSE concat(c.apellido, ', ', c.nombre)
-          END AS cliente_nombre,
-          p.numero_serie_motor
-        FROM ordenes_trabajo p
-        LEFT JOIN clientes c ON c.id = p.cliente_id
-        ${whereClause}
-        ORDER BY
-          CASE
-            WHEN p.prioridad = 'alta' THEN 1
-            WHEN p.prioridad = 'normal' THEN 2
-            ELSE 3
-          END,
-          p.fecha_creacion ASC,
-          p.numero_trabajo ASC
-      `,
-      params
-    ),
-    Promise.all([listMarcas(), listModelos(), listMotores()]),
-  ]);
+  const rows = await queryRows<TrabajoListRow>(
+    `
+      SELECT
+        p.id,
+        p.numero_trabajo,
+        p.cobrado,
+        p.estado,
+        p.prioridad,
+        p.fecha_creacion,
+        p.fecha_presupuesto_entregado,
+        p.fecha_aprobacion,
+        p.cliente_id,
+        p.marca_id,
+        p.modelo_id,
+        p.motor_id,
+        p.marca_nombre_snapshot,
+        p.modelo_nombre_snapshot,
+        p.motor_nombre_snapshot,
+        CASE
+          WHEN c.id IS NULL THEN NULL
+          ELSE concat(c.apellido, ', ', c.nombre)
+        END AS cliente_nombre,
+        p.numero_serie_motor
+      FROM ordenes_trabajo p
+      LEFT JOIN clientes c ON c.id = p.cliente_id
+      ${whereClause}
+      ORDER BY
+        CASE
+          WHEN p.prioridad = 'alta' THEN 1
+          WHEN p.prioridad = 'normal' THEN 2
+          ELSE 3
+        END,
+        p.fecha_creacion ASC,
+        p.numero_trabajo ASC
+    `,
+    params
+  );
 
   if (rows.length === 0) return [] as TrabajoListItem[];
 
-  const marcasById = new Map(marcas.map((m) => [m.id, m.nombre]));
-  const modelosById = new Map(modelos.map((m) => [m.id, m.nombre]));
-  const motoresById = new Map(motores.map((m) => [m.id, m.nombre]));
-
-  return rows.map((item) => {
-    const normalizedItem = normalizeLegacyTrabajoEstado(item);
-
-    return {
-      ...normalizedItem,
-      marca_nombre: normalizedItem.marca_id ? (marcasById.get(normalizedItem.marca_id) ?? null) : null,
-      modelo_nombre: normalizedItem.modelo_id ? (modelosById.get(normalizedItem.modelo_id) ?? null) : null,
-      motor_nombre: normalizedItem.motor_id ? (motoresById.get(normalizedItem.motor_id) ?? null) : null,
-    };
-  });
+  return hydrateTechnicalLabels(rows.map(normalizeLegacyTrabajoEstado));
 }
 
 export async function getTrabajoById(id: number) {
@@ -226,6 +250,9 @@ export async function getTrabajoById(id: number) {
         p.marca_id,
         p.modelo_id,
         p.motor_id,
+        p.marca_nombre_snapshot,
+        p.modelo_nombre_snapshot,
+        p.motor_nombre_snapshot,
         CASE
           WHEN c.id IS NULL THEN NULL
           ELSE concat(c.apellido, ', ', c.nombre)
@@ -260,6 +287,9 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
         p.marca_id,
         p.modelo_id,
         p.motor_id,
+        p.marca_nombre_snapshot,
+        p.modelo_nombre_snapshot,
+        p.motor_nombre_snapshot,
         CASE
           WHEN c.id IS NULL THEN NULL
           ELSE concat(c.apellido, ', ', c.nombre)
@@ -336,7 +366,10 @@ export async function updateTrabajo(
   const modeloId = input.modeloId ? Number(input.modeloId) : null;
   const motorId = input.motorId ? Number(input.motorId) : null;
   const trabajosIds = input.trabajosIds.map(Number);
-  const trabajoSnapshots = await getTrabajoCatalogSnapshots(trabajosIds, input.listaPrecios);
+  const [trabajoSnapshots, vehicleSnapshot] = await Promise.all([
+    getTrabajoCatalogSnapshots(trabajosIds, input.listaPrecios),
+    getVehicleSnapshots(marcaId, modeloId, motorId),
+  ]);
   const repuestosIds = input.repuestos.map((r) => Number(r.repuestoId));
   const repuestoSnapshots = await getRepuestoCatalogSnapshots(repuestosIds);
   const precios = input.repuestos.map((r) => r.precioUnitario);
@@ -347,16 +380,19 @@ export async function updateTrabajo(
       WITH
         upd AS (
           UPDATE ordenes_trabajo SET
-            cliente_id         = $3,
-            marca_id           = $4,
-            modelo_id          = $5,
-            motor_id           = $6,
-            numero_serie_motor = $7,
-            cobrado            = $8,
-            prioridad          = $9::orden_trabajo_prioridad,
-            estado             = $10::orden_trabajo_estado,
-            lista_precio       = $11,
-            aplica_iva         = $12,
+            cliente_id              = $3,
+            marca_id                = $4,
+            modelo_id               = $5,
+            motor_id                = $6,
+            marca_nombre_snapshot   = $23,
+            modelo_nombre_snapshot  = $24,
+            motor_nombre_snapshot   = $25,
+            numero_serie_motor      = $7,
+            cobrado                 = $8,
+            prioridad               = $9::orden_trabajo_prioridad,
+            estado                  = $10::orden_trabajo_estado,
+            lista_precio            = $11,
+            aplica_iva              = $12,
             fecha_presupuesto_entregado = CASE
               WHEN $10::text = 'presupuesto_entregado' AND fecha_presupuesto_entregado IS NULL THEN now()
               WHEN $10::text <> 'presupuesto_entregado' THEN NULL
@@ -451,6 +487,9 @@ export async function updateTrabajo(
       trabajoSnapshots.map((item) => item.precioSnapshot),
       repuestoSnapshots.map((item) => item.categoriaNombreSnapshot),
       repuestoSnapshots.map((item) => item.repuestoNombreSnapshot),
+      vehicleSnapshot.marcaNombreSnapshot,
+      vehicleSnapshot.modeloNombreSnapshot,
+      vehicleSnapshot.motorNombreSnapshot,
     ]
   );
 
@@ -465,7 +504,10 @@ export async function createTrabajo(input: TrabajoFormValues) {
   const modeloId = input.modeloId ? Number(input.modeloId) : null;
   const motorId = input.motorId ? Number(input.motorId) : null;
   const trabajosIds = input.trabajosIds.map(Number);
-  const trabajoSnapshots = await getTrabajoCatalogSnapshots(trabajosIds, input.listaPrecios);
+  const [trabajoSnapshots, vehicleSnapshot] = await Promise.all([
+    getTrabajoCatalogSnapshots(trabajosIds, input.listaPrecios),
+    getVehicleSnapshots(marcaId, modeloId, motorId),
+  ]);
   const repuestosIds = input.repuestos.map((r) => Number(r.repuestoId));
   const repuestoSnapshots = await getRepuestoCatalogSnapshots(repuestosIds);
   const fechaAprobacion =
@@ -479,6 +521,9 @@ export async function createTrabajo(input: TrabajoFormValues) {
       marca_id,
       modelo_id,
       motor_id,
+      marca_nombre_snapshot,
+      modelo_nombre_snapshot,
+      motor_nombre_snapshot,
       numero_serie_motor,
       cobrado,
       prioridad,
@@ -494,6 +539,9 @@ export async function createTrabajo(input: TrabajoFormValues) {
       ${marcaId},
       ${modeloId},
       ${motorId},
+      ${vehicleSnapshot.marcaNombreSnapshot},
+      ${vehicleSnapshot.modeloNombreSnapshot},
+      ${vehicleSnapshot.motorNombreSnapshot},
       ${input.numeroSerieMotor},
       ${input.cobrado},
       ${input.prioridad},
@@ -647,6 +695,28 @@ export async function refreshTrabajoSnapshotPrices(id: number) {
     [id]
   );
 
+  // Refresh vehicle snapshots from technical DB
+  const trabajoRow = await queryRows<{
+    marca_id: number | null;
+    modelo_id: number | null;
+    motor_id: number | null;
+  }>(
+    `SELECT marca_id, modelo_id, motor_id FROM ordenes_trabajo WHERE id = $1`,
+    [id]
+  );
+  if (trabajoRow[0]) {
+    const { marca_id, modelo_id, motor_id } = trabajoRow[0];
+    const vs = await getVehicleSnapshots(marca_id, modelo_id, motor_id);
+    await queryRows(
+      `UPDATE ordenes_trabajo SET
+        marca_nombre_snapshot  = $2,
+        modelo_nombre_snapshot = $3,
+        motor_nombre_snapshot  = $4
+       WHERE id = $1`,
+      [id, vs.marcaNombreSnapshot, vs.modeloNombreSnapshot, vs.motorNombreSnapshot]
+    );
+  }
+
   return rows[0]?.updated_count ?? 0;
 }
 
@@ -666,6 +736,9 @@ export async function listTrabajosByCliente(clienteId: number) {
         p.marca_id,
         p.modelo_id,
         p.motor_id,
+        p.marca_nombre_snapshot,
+        p.modelo_nombre_snapshot,
+        p.motor_nombre_snapshot,
         CASE
           WHEN c.id IS NULL THEN NULL
           ELSE concat(c.apellido, ', ', c.nombre)

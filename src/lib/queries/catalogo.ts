@@ -66,6 +66,9 @@ type TechnicalRef = {
   marca_id: number | null;
   modelo_id: number | null;
   motor_id: number | null;
+  marca_nombre_snapshot?: string | null;
+  modelo_nombre_snapshot?: string | null;
+  motor_nombre_snapshot?: string | null;
 };
 
 export async function hydrateTechnicalLabels<T extends TechnicalRef>(items: T[]) {
@@ -79,21 +82,37 @@ export async function hydrateTechnicalLabels<T extends TechnicalRef>(items: T[])
     >;
   }
 
-  const [marcas, modelos, motores] = await Promise.all([
-    listMarcas(),
-    listModelos(),
-    listMotores(),
-  ]);
+  // Only hit the technical DB for items that don't have all snapshots
+  const needsLookup = items.some(
+    (item) =>
+      (item.marca_id && !item.marca_nombre_snapshot) ||
+      (item.modelo_id && !item.modelo_nombre_snapshot) ||
+      (item.motor_id && !item.motor_nombre_snapshot)
+  );
 
-  const marcasById = new Map(marcas.map((marca) => [marca.id, marca.nombre]));
-  const modelosById = new Map(modelos.map((modelo) => [modelo.id, modelo.nombre]));
-  const motoresById = new Map(motores.map((motor) => [motor.id, motor.nombre]));
+  let marcasById = new Map<number, string>();
+  let modelosById = new Map<number, string>();
+  let motoresById = new Map<number, string>();
+
+  if (needsLookup) {
+    const [marcas, modelos, motores] = await Promise.all([
+      listMarcas(),
+      listModelos(),
+      listMotores(),
+    ]);
+    marcasById = new Map(marcas.map((m) => [m.id, m.nombre]));
+    modelosById = new Map(modelos.map((m) => [m.id, m.nombre]));
+    motoresById = new Map(motores.map((m) => [m.id, m.nombre]));
+  }
 
   return items.map((item) => ({
     ...item,
-    marca_nombre: item.marca_id ? marcasById.get(item.marca_id) ?? null : null,
-    modelo_nombre: item.modelo_id ? modelosById.get(item.modelo_id) ?? null : null,
-    motor_nombre: item.motor_id ? motoresById.get(item.motor_id) ?? null : null,
+    marca_nombre: item.marca_nombre_snapshot
+      ?? (item.marca_id ? marcasById.get(item.marca_id) ?? null : null),
+    modelo_nombre: item.modelo_nombre_snapshot
+      ?? (item.modelo_id ? modelosById.get(item.modelo_id) ?? null : null),
+    motor_nombre: item.motor_nombre_snapshot
+      ?? (item.motor_id ? motoresById.get(item.motor_id) ?? null : null),
   }));
 }
 
