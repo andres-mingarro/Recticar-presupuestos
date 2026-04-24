@@ -132,7 +132,7 @@ export function ClientesPage({
     }
 
     function handleScroll() {
-      setIsSearchCardDocked(scrollContainer.scrollTop >= 62);
+      setIsSearchCardDocked(scrollContainer!.scrollTop >= 62);
     }
 
     handleScroll();
