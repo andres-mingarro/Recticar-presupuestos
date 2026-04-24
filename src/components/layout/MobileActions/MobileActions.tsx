@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
+import { HamburgerButton } from "@/components/layout/HamburgerButton";
 import { MobileMenu } from "./components/MobileMenu";
 import { useMobileActions } from "./MobileActionsContext";
 import { formatPrice } from "@/lib/format";
@@ -63,14 +64,11 @@ export function MobileActions() {
         </div>
 
         {/* Menú hamburguesa — siempre a la derecha */}
-        <button
-          type="button"
-          className={styles.btnMenu}
+        <HamburgerButton
+          type="mobileActions"
           onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Abrir menú"
-        >
-          <Icon name="menu" className="h-5 w-5" />
-        </button>
+          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+        />
       </div>
     </>
   );

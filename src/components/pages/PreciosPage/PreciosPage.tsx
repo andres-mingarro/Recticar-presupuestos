@@ -333,7 +333,7 @@ function CategoriaCard({
   }
 
   return (
-    <Card as="section" className=" HeaderTable space-y-0 overflow-hidden p-0">
+    <Card as="section" className=" HeaderTable space-y-0 overflow-hidden !p-0">
       {/* Save form — hidden anchor, inputs reference it via form={formId} */}
       <form id={formId} action={saveFormAction} className="hidden">
         <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
@@ -342,7 +342,7 @@ function CategoriaCard({
 
       {/* ── Toolbar ── */}
       {/* ── Toolbar mobile: 2 filas / desktop: 1 fila ── */}
-      <div className="toolbar flex flex-col border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] md:flex-row md:items-center md:gap-2 md:px-3 md:py-2">
+      <div className="toolbar flex flex-col border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] md:flex-row md:items-center sm:gap-2 sm:px-8 sm:py-5">
 
         {/* Fila 1 (mobile) / izquierda (desktop): ícono + nombre + contador */}
         <div className="flex items-center gap-2 px-3 py-2 md:min-w-0 md:flex-1 md:p-0">

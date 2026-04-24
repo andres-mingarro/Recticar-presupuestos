@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { cn } from "@/lib/cn";
 import type {
   ClienteListItem,
@@ -67,7 +67,11 @@ export function ClientesPage({
   const pageStart = totalClientes === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const pageEnd = Math.min(currentPage * pageSize, totalClientes);
   const router = useRouter();
+  const [isPendingNavigation, startTransition] = useTransition();
   const [panelClientId, setPanelClientId] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState(q);
+  const [isSearchCardDocked, setIsSearchCardDocked] = useState(false);
+  const submittedQueryRef = useRef(q);
 
   useMobileActionsRegister(
     canEdit ? (
@@ -86,6 +90,11 @@ export function ClientesPage({
   const panelClient = clientes.find((cliente) => cliente.id === panelClientId) ?? null;
 
   useEffect(() => {
+    setSearchQuery(q);
+    submittedQueryRef.current = q;
+  }, [q]);
+
+  useEffect(() => {
     if (panelClientId === null) {
       return;
     }
@@ -96,6 +105,43 @@ export function ClientesPage({
 
     return () => window.cancelAnimationFrame(frame);
   }, [panelClientId]);
+
+  useEffect(() => {
+    const normalizedQuery = searchQuery.trim();
+
+    if (normalizedQuery === submittedQueryRef.current) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      const nextHref = buildClientesHref(normalizedQuery, 1);
+      submittedQueryRef.current = normalizedQuery;
+      startTransition(() => {
+        router.replace(nextHref);
+      });
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [router, searchQuery]);
+
+  useEffect(() => {
+    const scrollContainer = document.querySelector(".AppMain");
+
+    if (!(scrollContainer instanceof HTMLElement)) {
+      return;
+    }
+
+    function handleScroll() {
+      setIsSearchCardDocked(scrollContainer.scrollTop >= 62);
+    }
+
+    handleScroll();
+    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   function openPanel(clienteId: number) {
     setPanelClientId(clienteId);
@@ -111,21 +157,28 @@ export function ClientesPage({
 
   return (
     <div className={cn("ClientesPage", styles.ClientesPage, "space-y-6")}>
-      <Card as="section" className={styles.searchCard}>
-        <form
-          className={cn("ClientesPageSearchForm", styles.searchRow)}
-          action="/clientes"
-        >
-          {/* SearchBox con autocomplete */}
+      <Card
+        as="section"
+        className={cn(
+          "search-card-conteiner sticky top-[-17px] z-10 px-5 py-4",
+          styles.searchCardContainer,
+          isSearchCardDocked && styles.searchCardContainerDocked
+        )}
+      >
+        <div className={cn("ClientesPageSearchForm", styles.searchRow)}>
           <div className={styles.searchInputWrap}>
-            <SearchBox entity="clientes" initialValue={q} inputClassName={styles.searchInput} />
+            <SearchBox
+              entity="clientes"
+              initialValue={q}
+              inputClassName={styles.searchInput}
+              onQueryChange={setSearchQuery}
+            />
           </div>
-
-          {/* Botón buscar */}
-          <button type="submit" className={styles.searchBtn}>
-            <Icon name="search" className="h-4 w-4" />
-            <span>Buscar</span>
-          </button>
+          {isPendingNavigation ? (
+            <div className="flex h-11 items-center text-sm text-[var(--text-color-gray)]">
+              Buscando...
+            </div>
+          ) : null}
 
           {/* Nuevo cliente — solo desktop */}
           {canEdit && (
@@ -133,7 +186,7 @@ export function ClientesPage({
               <ButtonAdd href="/clientes/nuevo">Nuevo cliente</ButtonAdd>
             </div>
           )}
-        </form>
+        </div>
       </Card>
 
       {errorMessage ? (

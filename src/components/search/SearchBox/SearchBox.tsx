@@ -56,15 +56,29 @@ type SearchBoxProps = {
   entity: SearchEntity;
   initialValue: string;
   inputClassName?: string;
+  onQueryChange?: (query: string) => void;
 };
 
-export function SearchBox({ entity, initialValue, inputClassName }: SearchBoxProps) {
+export function SearchBox({
+  entity,
+  initialValue,
+  inputClassName,
+  onQueryChange,
+}: SearchBoxProps) {
   const config = searchConfigs[entity];
   const [query, setQuery] = useState(initialValue);
   const [results, setResults] = useState<SearchItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setQuery(initialValue);
+  }, [initialValue]);
+
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
 
   useEffect(() => {
     const controller = new AbortController();

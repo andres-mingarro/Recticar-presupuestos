@@ -593,7 +593,7 @@ export function TrabajoForm({
                               checkboxClassName="[--checkbox-size:24px]"
                             >
                               {/* Controles precio / cantidad / total — fila separada debajo del nombre */}
-                              <div className="grid w-full grid-cols-[auto_1fr_auto] items-end gap-x-3 gap-y-1 sm:pl-9">
+                              <div className="grid w-full grid-cols-[1fr_auto_auto] items-end gap-x-3 gap-y-1 sm:pl-9">
                                 {/* Precio unitario */}
                                 <div className="flex flex-col gap-0.5">
                                   <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Precio u.</span>
