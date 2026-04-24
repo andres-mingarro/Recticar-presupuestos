@@ -1,15 +1,22 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import styles from "./Date.module.scss";
 
 export function Date({ className }: { className?: string }) {
-  const formattedDate = new Intl.DateTimeFormat("es-AR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new globalThis.Date());
+  const [formattedDate, setFormattedDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFormattedDate(
+      new Intl.DateTimeFormat("es-AR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(new globalThis.Date())
+    );
+  }, []);
 
   return (
     <div className={cn("Date", styles.date, "flex items-center justify-center", className)}>

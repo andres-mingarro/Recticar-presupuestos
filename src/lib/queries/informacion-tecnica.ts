@@ -326,10 +326,8 @@ export async function updateTechnicalMotor(id: number, nombre: string, cilindrad
 }
 
 export async function deleteTechnicalMotor(id: number) {
-  await templateRowsFromTechnical`
-    DELETE FROM motores
-    WHERE id = ${id}
-  `;
+  await templateRowsFromTechnical`DELETE FROM vehiculos WHERE motor_id = ${id}`;
+  await templateRowsFromTechnical`DELETE FROM motores WHERE id = ${id}`;
 }
 
 export async function createTechnicalVehiculo(modeloId: number, motorId: number) {
