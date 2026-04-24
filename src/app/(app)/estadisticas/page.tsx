@@ -4,6 +4,7 @@ import {
   getCobradosMensuales,
   getResumenAnual,
 } from "@/lib/queries/estadisticas";
+import { listHistorialAjustes, getAcumuladoAjustes } from "@/lib/queries/ajustes";
 import { EstadisticasPage } from "@/components/pages/EstadisticasPage";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +18,11 @@ export default async function Page({
 
   const params = await searchParams;
 
-  const [aniosDisponibles, resumenAnual] = await Promise.all([
+  const [aniosDisponibles, resumenAnual, historialAjustes, acumuladoAjustes] = await Promise.all([
     getAniosConCobrados(),
     getResumenAnual(),
+    listHistorialAjustes(50),
+    getAcumuladoAjustes(),
   ]);
 
   const anioActual = new Date().getFullYear();
@@ -35,6 +38,8 @@ export default async function Page({
       aniosDisponibles={aniosDisponibles}
       datosMensuales={datosMensuales}
       resumenAnual={resumenAnual}
+      historialAjustes={historialAjustes}
+      acumuladoAjustes={acumuladoAjustes}
     />
   );
 }

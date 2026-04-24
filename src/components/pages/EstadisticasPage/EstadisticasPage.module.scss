@@ -237,3 +237,145 @@
   font-size: 0.85rem;
   color: var(--text-color-gray);
 }
+
+/* ── Precios section ─────────────────────── */
+
+.preciosCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.preciosHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Acumulado cards */
+
+.acumuladoRow {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.acumuladoCard {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.875rem 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-alt, #f8f9fa);
+}
+
+.acumuladoLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-color-gray);
+}
+
+.acumuladoValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--text-color-defult);
+}
+
+.acumuladoPos {
+  color: #16a34a;
+}
+
+.acumuladoNeg {
+  color: #dc2626;
+}
+
+.acumuladoSub {
+  font-size: 0.65rem;
+  color: var(--text-color-gray);
+}
+
+/* Historial table */
+
+.historialTable {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+}
+
+.historialHeaderRow {
+  display: grid;
+  grid-template-columns: 110px 1fr repeat(3, 72px);
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-color-gray);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 0.2rem;
+  min-width: 480px;
+}
+
+.historialRow {
+  display: grid;
+  grid-template-columns: 110px 1fr repeat(3, 72px);
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 0.5rem;
+  border-radius: 8px;
+  transition: background 0.12s;
+  min-width: 480px;
+
+  &:hover {
+    background: var(--color-surface-alt, #f8f9fa);
+  }
+}
+
+.historialFecha {
+  font-size: 0.8rem;
+  color: var(--text-color-gray);
+  white-space: nowrap;
+}
+
+.historialCategoria {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color-defult);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.colCenter {
+  text-align: center;
+}
+
+.historialPct {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-color-gray);
+}
+
+.pctPos {
+  color: #16a34a;
+}
+
+.pctNeg {
+  color: #dc2626;
+}
+
+.pctZero {
+  font-weight: 400;
+  color: var(--text-color-gray);
+  opacity: 0.5;
+}

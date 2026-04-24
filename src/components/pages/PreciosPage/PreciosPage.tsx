@@ -338,6 +338,9 @@ function CategoriaCard({
       <form id={formId} action={saveFormAction} className="hidden">
         <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
         <input type="hidden" name="icono" value={categoriaIcono ?? ""} />
+        <input type="hidden" name="ajuste_lista_1" value={ajustesPorcentaje[1]} />
+        <input type="hidden" name="ajuste_lista_2" value={ajustesPorcentaje[2]} />
+        <input type="hidden" name="ajuste_lista_3" value={ajustesPorcentaje[3]} />
       </form>
 
       {/* ── Toolbar ── */}

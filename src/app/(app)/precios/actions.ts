@@ -13,6 +13,7 @@ import {
   updateTrabajoNombres,
   updateTrabajoPrecios,
 } from "@/lib/queries/catalogo";
+import { registrarAjuste } from "@/lib/queries/ajustes";
 
 export type CatalogActionState = { error: string | null; resetKey?: number; success?: boolean };
 
@@ -61,6 +62,9 @@ export async function updateCategoriaTrabajos(
   }
 
   const nombreCategoria = normalize(formData, "nombre");
+  const ajusteLista1 = Number(normalize(formData, "ajuste_lista_1")) || 0;
+  const ajusteLista2 = Number(normalize(formData, "ajuste_lista_2")) || 0;
+  const ajusteLista3 = Number(normalize(formData, "ajuste_lista_3")) || 0;
 
   try {
     if (!Number.isNaN(categoriaId)) {
@@ -69,6 +73,9 @@ export async function updateCategoriaTrabajos(
     }
     if (nombreUpdates.length > 0) await updateTrabajoNombres(nombreUpdates);
     if (precioUpdates.size > 0) await updateTrabajoPrecios(Array.from(precioUpdates.values()));
+    if ((ajusteLista1 !== 0 || ajusteLista2 !== 0 || ajusteLista3 !== 0) && nombreCategoria) {
+      await registrarAjuste(categoriaId, nombreCategoria, ajusteLista1, ajusteLista2, ajusteLista3);
+    }
   } catch {
     return { error: "No se pudieron guardar los cambios. Probá nuevamente." };
   }
