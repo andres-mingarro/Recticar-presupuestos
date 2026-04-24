@@ -9,7 +9,7 @@ import styles from "./MainMenu.module.scss";
 type MenuItem = {
   href: string;
   label: string;
-  icon: "gauge" | "user" | "clipboard" | "tag" | "package";
+  icon: "gauge" | "user" | "clipboard" | "tag" | "package" | "chartBar";
   exact: boolean;
   requiredPermiso?: string;
   superAdminOnly?: boolean;
@@ -19,6 +19,7 @@ const allItems: MenuItem[] = [
   { href: "/", label: "Dashboard", icon: "gauge", exact: true },
   { href: "/clientes", label: "Clientes", icon: "user", exact: false, requiredPermiso: "clientes.acceso" },
   { href: "/trabajos", label: "Trabajos", icon: "clipboard", exact: false, requiredPermiso: "trabajos.ver" },
+  { href: "/estadisticas", label: "Estadísticas", icon: "chartBar", exact: false, requiredPermiso: "trabajos.ver" },
   { href: "/precios", label: "Precios", icon: "tag", exact: false, superAdminOnly: true },
   { href: "/repuestos", label: "Repuestos", icon: "package", exact: false, superAdminOnly: true },
 ];
