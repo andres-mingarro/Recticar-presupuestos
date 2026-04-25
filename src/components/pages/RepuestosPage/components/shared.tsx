@@ -1,6 +1,7 @@
 "use client";
 
 import type { RepuestosActionState } from "@/app/(app)/repuestos/actions";
+import { FormErrorMessage } from "@/components/ui/FormErrorMessage";
 
 export type RepuestosActionFn = (
   state: RepuestosActionState,
@@ -28,8 +29,5 @@ export function AddFooter({ children }: { children: React.ReactNode }) {
 }
 
 export function RowError({ error }: { error: string | null | undefined }) {
-  if (!error) return null;
-  return (
-    <p className="px-5 py-2 text-xs text-[var(--color-danger-text)]">{error}</p>
-  );
+  return <FormErrorMessage error={error} className="px-5 py-2" />;
 }

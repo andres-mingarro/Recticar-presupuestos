@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
+import { FormErrorMessage } from "@/components/ui/FormErrorMessage";
 import type { TrabajoPrioridad } from "@/lib/types";
 import { usePrioridad } from "./PrioridadContext";
 
@@ -77,9 +78,7 @@ export function PrioridadSelector({ action }: PrioridadSelectorProps) {
           );
         })}
       </div>
-      {state.error ? (
-        <p className="text-xs text-[var(--color-danger-text)]">{state.error}</p>
-      ) : null}
+      <FormErrorMessage error={state.error} />
     </div>
   );
 }

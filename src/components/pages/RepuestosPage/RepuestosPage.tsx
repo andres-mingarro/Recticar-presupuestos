@@ -1,10 +1,10 @@
 "use client";
 
 import type { RepuestosActionState } from "@/app/(app)/repuestos/actions";
+import { AddCategoriaForm } from "@/components/forms/AddCategoriaForm";
 import type { RepuestoAgrupado } from "@/lib/types";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { CategoriaCard } from "./components/CategoriaCard";
-import { AddCategoriaForm } from "./components/AddCategoriaForm";
 
 type RepuestosPageProps = {
   repuestos: RepuestoAgrupado[];
