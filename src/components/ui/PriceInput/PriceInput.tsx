@@ -33,11 +33,12 @@ type Props = {
 export function PriceInput({ value, onChange, disabled, className, placeholder, style }: Props) {
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const safeValue = Number.isFinite(value) ? value : 0;
 
   // En foco: mostrar solo el número sin formato para editar fácil
   const displayValue = focused
-    ? value === 0 ? "" : String(value)
-    : formatDisplay(value);
+    ? safeValue === 0 ? "" : String(safeValue)
+    : formatDisplay(safeValue);
 
   const handleFocus = useCallback(() => {
     setFocused(true);

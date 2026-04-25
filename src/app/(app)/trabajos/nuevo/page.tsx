@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { NuevoTrabajoPage } from "@/components/pages/NuevoTrabajoPage";
 import type { TrabajoFormState } from "@/components/forms/TrabajoForm";
 import { requirePermission } from "@/lib/permisos";
@@ -131,6 +132,9 @@ export default async function Page({
         values,
       };
     }
+
+    revalidatePath("/repuestos");
+    revalidatePath(`/trabajos/${trabajoId}`);
 
     redirect(`/trabajos/${trabajoId}?created=1`);
   }

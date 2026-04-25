@@ -16,6 +16,7 @@ import {
   TrabajoClienteSection,
   TrabajoForm,
   type TrabajoFormState,
+  type TrabajoFormSummary,
 } from "@/components/forms/TrabajoForm";
 import { Button } from "@/components/ui/Button";
 import { CobradoProvider, CobradoToggle } from "@/components/ui/CobradoToggle";
@@ -119,9 +120,21 @@ export function TrabajoDetailPage({
   refreshSnapshotPricesAction,
 }: TrabajoDetailPageProps) {
   const formId = `trabajo-form-${trabajo.id}`;
+  const repuestosCatalogoById = new Map(
+    repuestos.flatMap((grupo) => grupo.repuestos).map((repuesto) => [repuesto.id, repuesto])
+  );
   const [formState, formAction, isPending] = useActionState(action, initialState);
   const [dirty, setDirty] = useState(false);
   const [selectedEstado, setSelectedEstado] = useState(trabajo.estado);
+  const [summary, setSummary] = useState<TrabajoFormSummary>({
+    clienteLabel: trabajo.cliente_nombre ?? "",
+    marcaNombre: trabajo.marca_nombre,
+    modeloNombre: trabajo.modelo_nombre,
+    motorNombre: trabajo.motor_nombre,
+    numeroSerieMotor: trabajo.numero_serie_motor ?? "",
+    prioridad: trabajo.prioridad,
+    estado: trabajo.estado,
+  });
   const lastSuccessfulUpdatedAtRef = useRef(initialState.values.updatedAt ?? "");
 
   useEffect(() => {
@@ -170,11 +183,21 @@ export function TrabajoDetailPage({
     <CobradoProvider initialValue={trabajo.cobrado}>
     <IvaProvider initialValue={trabajo.aplica_iva}>
     <RepuestosSeleccionProvider
-      initialItems={trabajo.repuestos.map((repuesto) => ({
-        repuestoId: Number(repuesto.repuestoId),
-        precioUnitario: repuesto.precioUnitario,
-        cantidad: repuesto.cantidad,
-      }))}
+      initialItems={trabajo.repuestos.map((repuesto) => {
+        const repuestoId = Number(repuesto.repuestoId);
+        const repuestoCatalogo = repuestosCatalogoById.get(repuestoId);
+
+        return {
+          repuestoId,
+          precioUnitario: repuesto.precioUnitario,
+          cantidad: repuesto.cantidad,
+          // Usar precio del snapshot guardado; el catálogo solo sirve de fallback si no hay valor previo
+          precioStock: repuesto.precioStock > 0 ? repuesto.precioStock : (repuestoCatalogo?.precioStock ?? 0),
+          // Usar cantidadStock del snapshot guardado — el recálculo visual para mostrar "Hay en stock"
+          // lo hace la UI al render, pero el valor que se envía al servidor debe ser el del snapshot
+          cantidadStock: repuesto.cantidadStock ?? 0,
+        };
+      })}
     >
     <div className={cn("TrabajoDetailPage", styles.TrabajoDetailPage, "space-y-5")}>
 
@@ -269,6 +292,7 @@ export function TrabajoDetailPage({
               allowFinalizado
               showClienteSection={false}
               showPrioridadSection={false}
+              onSummaryChange={setSummary}
             />
           </div>
         </div>
@@ -301,13 +325,13 @@ export function TrabajoDetailPage({
                 <div className={styles.etiquetaInfo}>
                   <p className={styles.etiquetaNumero}>#{trabajo.numero_trabajo}</p>
                   <p className={styles.etiquetaCliente}>{trabajo.cliente_nombre ?? "Sin cliente"}</p>
-                  {getVehicleLabel([trabajo.marca_nombre, trabajo.modelo_nombre, trabajo.motor_nombre]) ? (
+                  {getVehicleLabel([summary.marcaNombre, summary.modeloNombre, summary.motorNombre]) ? (
                     <>
                       <p className={styles.etiquetaVehiculo}>
-                        {getVehicleLabel([trabajo.marca_nombre, trabajo.modelo_nombre])}
+                        {getVehicleLabel([summary.marcaNombre, summary.modeloNombre])}
                       </p>
                       <p className={styles.etiquetaVehiculo}>
-                        {getVehicleLabel([trabajo.motor_nombre])}
+                        {getVehicleLabel([summary.motorNombre])}
                       </p>
                     </>
                   ) : null}
@@ -320,8 +344,9 @@ export function TrabajoDetailPage({
 
           {/* Datos + resumen */}
           <TrabajoDetailSummaryCard
-            estado={selectedEstado}
+            estado={summary.estado}
             trabajo={trabajo}
+            summary={summary}
             trabajos={trabajos}
             repuestos={repuestos}
             snapshotTrabajos={snapshotTrabajos}
@@ -375,6 +400,7 @@ export function TrabajoDetailPage({
 function TrabajoDetailSummaryCard({
   estado,
   trabajo,
+  summary,
   trabajos,
   repuestos,
   snapshotTrabajos,
@@ -383,6 +409,7 @@ function TrabajoDetailSummaryCard({
 }: {
   estado: TrabajoDetail["estado"];
   trabajo: TrabajoDetail;
+  summary: TrabajoFormSummary;
   trabajos: TrabajoAgrupado[];
   repuestos: RepuestoAgrupado[];
   snapshotTrabajos: TrabajoDetalleItem[];
@@ -400,10 +427,10 @@ function TrabajoDetailSummaryCard({
       estado={estado}
       cobrado={cobrado}
       prioridad={prioridad}
-      marcaNombre={trabajo.marca_nombre}
-      modeloNombre={trabajo.modelo_nombre}
-      motorNombre={trabajo.motor_nombre}
-      numeroSerieMotor={trabajo.numero_serie_motor}
+      marcaNombre={summary.marcaNombre}
+      modeloNombre={summary.modeloNombre}
+      motorNombre={summary.motorNombre}
+      numeroSerieMotor={summary.numeroSerieMotor}
       fechaCreacion={trabajo.fecha_creacion}
       fechaAprobacion={trabajo.fecha_aprobacion}
       trabajos={trabajos}

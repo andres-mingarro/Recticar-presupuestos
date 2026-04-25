@@ -141,6 +141,9 @@ export default async function Page({
       };
     }
 
+    revalidatePath("/repuestos");
+    revalidatePath(`/trabajos/${trabajoId}`);
+
     return {
       error: null,
       values: { ...values, updatedAt: result.updatedAt },

@@ -1,7 +1,17 @@
 .dialogContent {
   height: 85dvh;
+  width: min(100%, 440px);
+  max-width: 440px;
   display: flex;
   flex-direction: column;
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
 }
 
 /* ── Step indicator ── */

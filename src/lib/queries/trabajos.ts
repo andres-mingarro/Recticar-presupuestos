@@ -34,6 +34,11 @@ type VehicleSnapshot = {
   motorNombreSnapshot: string | null;
 };
 
+type TrabajoStockSnapshot = {
+  estado: TrabajoEstado;
+  repuestos: TrabajoRepuestoValue[];
+};
+
 type TrabajoListRow = Omit<
   TrabajoListItem,
   "marca_nombre" | "modelo_nombre" | "motor_nombre"
@@ -68,6 +73,106 @@ function normalizeLegacyTrabajoEstado<T extends {
     estado: "presupuesto_entregado",
     fecha_presupuesto_entregado: row.fecha_presupuesto_entregado ?? row.fecha_creacion,
   };
+}
+
+async function getTrabajoStockSnapshot(
+  id: number,
+  updatedAt?: string
+): Promise<TrabajoStockSnapshot | null> {
+  const trabajoRows = await queryRows<{
+    estado: TrabajoEstado;
+  }>(
+    `
+      SELECT estado
+      FROM ordenes_trabajo
+      WHERE id = $1
+      ${updatedAt ? "AND updated_at = $2::timestamptz" : ""}
+    `,
+    updatedAt ? [id, updatedAt] : [id]
+  );
+
+  const trabajo = trabajoRows[0];
+  if (!trabajo) return null;
+
+  const repuestoRows = await queryRows<{
+    repuesto_id: number;
+    precio: number;
+    cantidad: number;
+    precio_stock: number;
+    cantidad_stock: number;
+  }>(
+    `
+      SELECT
+        repuesto_id,
+        precio,
+        cantidad,
+        precio_stock,
+        cantidad_stock
+      FROM orden_trabajo_repuestos
+      WHERE orden_trabajo_id = $1
+        AND repuesto_id IS NOT NULL
+    `,
+    [id]
+  );
+
+  return {
+    estado: trabajo.estado,
+    repuestos: repuestoRows.map((row) => ({
+      repuestoId: String(row.repuesto_id),
+      precioUnitario: Number(row.precio),
+      cantidad: Number(row.cantidad),
+      precioStock: Number(row.precio_stock),
+      cantidadStock: Number(row.cantidad_stock),
+    })),
+  };
+}
+
+async function applyTrabajoStockAdjustment(
+  previous: TrabajoStockSnapshot | null,
+  next: Pick<TrabajoFormValues, "estado" | "repuestos">
+) {
+  const previousApplied = new Map<number, number>();
+  const nextApplied = new Map<number, number>();
+
+  if (previous?.estado === "aprobado") {
+    for (const repuesto of previous.repuestos) {
+      previousApplied.set(Number(repuesto.repuestoId), Math.max(0, repuesto.cantidadStock));
+    }
+  }
+
+  if (next.estado === "aprobado") {
+    for (const repuesto of next.repuestos) {
+      nextApplied.set(Number(repuesto.repuestoId), Math.max(0, repuesto.cantidadStock));
+    }
+  }
+
+  const allIds = new Set([...previousApplied.keys(), ...nextApplied.keys()]);
+  const deltas = Array.from(allIds)
+    .map((repuestoId) => ({
+      repuestoId,
+      delta: (previousApplied.get(repuestoId) ?? 0) - (nextApplied.get(repuestoId) ?? 0),
+    }))
+    .filter((item) => item.delta !== 0);
+
+  if (deltas.length === 0) return;
+
+  await queryRows(
+    `
+      UPDATE repuestos AS r
+      SET stock_cantidad = GREATEST(0, r.stock_cantidad + v.delta)
+      FROM (
+        SELECT
+          unnest($1::int[]) AS repuesto_id,
+          unnest($2::int[]) AS delta
+      ) AS v
+      WHERE r.id = v.repuesto_id
+        AND r.stock_habilitado = true
+    `,
+    [
+      deltas.map((item) => item.repuestoId),
+      deltas.map((item) => item.delta),
+    ]
+  );
 }
 
 async function getTrabajoCatalogSnapshots(
@@ -369,6 +474,9 @@ export async function updateTrabajo(
 ): Promise<{ updatedAt: string } | "conflict"> {
   if (!input.updatedAt) return "conflict";
 
+  const previousStockSnapshot = await getTrabajoStockSnapshot(id, input.updatedAt);
+  if (!previousStockSnapshot) return "conflict";
+
   const clienteId = input.clienteId ? Number(input.clienteId) : null;
   const marcaId = input.marcaId ? Number(input.marcaId) : null;
   const modeloId = input.modeloId ? Number(input.modeloId) : null;
@@ -530,9 +638,13 @@ export async function updateTrabajo(
     ]
   );
 
-  return rows[0]?.id
-    ? { updatedAt: rows[0].updated_at }
-    : "conflict";
+  if (!rows[0]?.id) {
+    return "conflict";
+  }
+
+  await applyTrabajoStockAdjustment(previousStockSnapshot, input);
+
+  return { updatedAt: rows[0].updated_at };
 }
 
 export async function createTrabajo(input: TrabajoFormValues) {
@@ -673,6 +785,8 @@ export async function createTrabajo(input: TrabajoFormValues) {
       ]
     );
   }
+
+  await applyTrabajoStockAdjustment(null, input);
 
   return trabajoId;
 }
