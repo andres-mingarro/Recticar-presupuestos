@@ -5,9 +5,11 @@ export const TRABAJO_ESTADO_LABELS: Record<TrabajoEstado, string> = {
   presupuesto_entregado: "Presupuesto entregado",
   aprobado: "Presupuesto aceptado",
   finalizado: "Trabajo finalizado",
+  /** @deprecated valor legacy en DB, normalizado a presupuesto_entregado al leer */
   pendiente: "Presupuesto entregado",
 };
 
+/** @deprecated "pendiente" es un valor legacy en DB; siempre se normaliza a "presupuesto_entregado" al leer */
 export type TrabajoEstado = ((typeof TRABAJO_ESTADOS)[number]) | "pendiente";
 export type TrabajoPrioridad = (typeof TRABAJO_PRIORIDADES)[number];
 
@@ -97,8 +99,12 @@ export type ClienteTrabajoItem = TrabajoListItem;
 
 export type TrabajoRepuestoValue = {
   repuestoId: string;
+  // precio = precio unitario del proveedor (unidades que no salen del stock del taller)
   precioUnitario: number;
   cantidad: number;
+  // stock del taller: precio_stock * cantidad_stock + precioUnitario * (cantidad - cantidad_stock)
+  precioStock: number;
+  cantidadStock: number;
 };
 
 export type TrabajoFormValues = {
@@ -190,5 +196,9 @@ export type RepuestoAgrupado = {
     id: number;
     nombre: string;
     precio: number;
+    stockHabilitado: boolean;
+    stockCantidad: number;
+    // precio del stock del taller, definido en el catálogo de repuestos
+    precioStock: number;
   }>;
 };

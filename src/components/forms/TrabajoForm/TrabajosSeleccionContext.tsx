@@ -39,13 +39,8 @@ export function TrabajosSeleccionProvider({
   );
 }
 
-const noop = () => {};
-
 export function useTrabajosSeleccion(): TrabajosSeleccionContextValue {
-  return useContext(TrabajosSeleccionContext) ?? {
-    selectedIds: new Set(),
-    toggle: noop,
-    listaPrecios: 1,
-    setListaPrecios: noop,
-  };
+  const ctx = useContext(TrabajosSeleccionContext);
+  if (!ctx) throw new Error("useTrabajosSeleccion must be used inside TrabajosSeleccionProvider");
+  return ctx;
 }

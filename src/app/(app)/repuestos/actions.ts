@@ -9,6 +9,7 @@ import {
   renameCategoriaRepuesto,
   reorderRepuestos,
   updateRepuestoNombres,
+  updateRepuestoStock,
 } from "@/lib/queries/repuestos";
 
 export type RepuestosActionState = {
@@ -27,17 +28,31 @@ export async function updateCategoriaRepuestos(
   formData: FormData
 ): Promise<RepuestosActionState> {
   const nombreUpdates: Array<{ id: number; nombre: string }> = [];
+  const stockUpdates: Array<{ id: number; stockHabilitado: boolean; stockCantidad: number; precioStock: number }> = [];
+  const repuestoIds = new Set<number>();
 
-  for (const [key, value] of formData.entries()) {
+  for (const [key] of formData.entries()) {
     if (key.startsWith("nombre_")) {
       const id = Number(key.replace("nombre_", ""));
-      const nombre = typeof value === "string" ? value.trim() : "";
-      if (!Number.isNaN(id) && nombre) nombreUpdates.push({ id, nombre });
+      if (!Number.isNaN(id)) repuestoIds.add(id);
     }
+  }
+
+  for (const id of repuestoIds) {
+    const nombre = typeof formData.get(`nombre_${id}`) === "string"
+      ? (formData.get(`nombre_${id}`) as string).trim()
+      : "";
+    if (nombre) nombreUpdates.push({ id, nombre });
+
+    const stockHabilitado = formData.get(`stock_habilitado_${id}`) === "true";
+    const stockCantidad = Math.max(0, Math.trunc(Number(formData.get(`stock_cantidad_${id}`)) || 0));
+    const precioStock = Math.max(0, Math.trunc(Number(formData.get(`precio_stock_${id}`)) || 0));
+    stockUpdates.push({ id, stockHabilitado, stockCantidad, precioStock });
   }
 
   try {
     if (nombreUpdates.length > 0) await updateRepuestoNombres(nombreUpdates);
+    if (stockUpdates.length > 0) await updateRepuestoStock(stockUpdates);
   } catch {
     return { error: "No se pudieron guardar los cambios. Probá nuevamente." };
   }

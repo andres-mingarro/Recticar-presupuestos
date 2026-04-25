@@ -1,4 +1,4 @@
-import { queryRows, templateRows } from "@/lib/db";
+import { precioListaColName, queryRows, templateRows } from "@/lib/db";
 import { hydrateTechnicalLabels, listMarcas, listModelos, listMotores } from "@/lib/queries/catalogo";
 import type {
   TrabajoDetail,
@@ -32,6 +32,11 @@ type VehicleSnapshot = {
   marcaNombreSnapshot: string | null;
   modeloNombreSnapshot: string | null;
   motorNombreSnapshot: string | null;
+};
+
+type TrabajoStockSnapshot = {
+  estado: TrabajoEstado;
+  repuestos: TrabajoRepuestoValue[];
 };
 
 type TrabajoListRow = Omit<
@@ -70,14 +75,113 @@ function normalizeLegacyTrabajoEstado<T extends {
   };
 }
 
+async function getTrabajoStockSnapshot(
+  id: number,
+  updatedAt?: string
+): Promise<TrabajoStockSnapshot | null> {
+  const trabajoRows = await queryRows<{
+    estado: TrabajoEstado;
+  }>(
+    `
+      SELECT estado
+      FROM ordenes_trabajo
+      WHERE id = $1
+      ${updatedAt ? "AND updated_at = $2::timestamptz" : ""}
+    `,
+    updatedAt ? [id, updatedAt] : [id]
+  );
+
+  const trabajo = trabajoRows[0];
+  if (!trabajo) return null;
+
+  const repuestoRows = await queryRows<{
+    repuesto_id: number;
+    precio: number;
+    cantidad: number;
+    precio_stock: number;
+    cantidad_stock: number;
+  }>(
+    `
+      SELECT
+        repuesto_id,
+        precio,
+        cantidad,
+        precio_stock,
+        cantidad_stock
+      FROM orden_trabajo_repuestos
+      WHERE orden_trabajo_id = $1
+        AND repuesto_id IS NOT NULL
+    `,
+    [id]
+  );
+
+  return {
+    estado: trabajo.estado,
+    repuestos: repuestoRows.map((row) => ({
+      repuestoId: String(row.repuesto_id),
+      precioUnitario: Number(row.precio),
+      cantidad: Number(row.cantidad),
+      precioStock: Number(row.precio_stock),
+      cantidadStock: Number(row.cantidad_stock),
+    })),
+  };
+}
+
+async function applyTrabajoStockAdjustment(
+  previous: TrabajoStockSnapshot | null,
+  next: Pick<TrabajoFormValues, "estado" | "repuestos">
+) {
+  const previousApplied = new Map<number, number>();
+  const nextApplied = new Map<number, number>();
+
+  if (previous?.estado === "aprobado") {
+    for (const repuesto of previous.repuestos) {
+      previousApplied.set(Number(repuesto.repuestoId), Math.max(0, repuesto.cantidadStock));
+    }
+  }
+
+  if (next.estado === "aprobado") {
+    for (const repuesto of next.repuestos) {
+      nextApplied.set(Number(repuesto.repuestoId), Math.max(0, repuesto.cantidadStock));
+    }
+  }
+
+  const allIds = new Set([...previousApplied.keys(), ...nextApplied.keys()]);
+  const deltas = Array.from(allIds)
+    .map((repuestoId) => ({
+      repuestoId,
+      delta: (previousApplied.get(repuestoId) ?? 0) - (nextApplied.get(repuestoId) ?? 0),
+    }))
+    .filter((item) => item.delta !== 0);
+
+  if (deltas.length === 0) return;
+
+  await queryRows(
+    `
+      UPDATE repuestos AS r
+      SET stock_cantidad = GREATEST(0, r.stock_cantidad + v.delta)
+      FROM (
+        SELECT
+          unnest($1::int[]) AS repuesto_id,
+          unnest($2::int[]) AS delta
+      ) AS v
+      WHERE r.id = v.repuesto_id
+        AND r.stock_habilitado = true
+    `,
+    [
+      deltas.map((item) => item.repuestoId),
+      deltas.map((item) => item.delta),
+    ]
+  );
+}
+
 async function getTrabajoCatalogSnapshots(
   trabajosIds: number[],
   listaPrecios: 1 | 2 | 3
 ): Promise<TrabajoCatalogSnapshot[]> {
   if (trabajosIds.length === 0) return [];
 
-  const precioCol =
-    listaPrecios === 3 ? "t.precio_lista_3" : listaPrecios === 2 ? "t.precio_lista_2" : "t.precio_lista_1";
+  const precioCol = precioListaColName(listaPrecios);
 
   const rows = await queryRows<{
     trabajo_id: number;
@@ -114,7 +218,9 @@ async function getTrabajoCatalogSnapshots(
 async function getVehicleSnapshots(
   marcaId: number | null,
   modeloId: number | null,
-  motorId: number | null
+  motorId: number | null,
+  // fallbacks: snapshots existentes en DB, usados cuando el id ya no existe en el catálogo técnico
+  fallback?: { marcaNombre: string | null; modeloNombre: string | null; motorNombre: string | null }
 ): Promise<VehicleSnapshot> {
   const [marcas, modelos, motores] = await Promise.all([
     marcaId ? listMarcas() : Promise.resolve([]),
@@ -123,13 +229,13 @@ async function getVehicleSnapshots(
   ]);
 
   const marcaNombreSnapshot = marcaId
-    ? (marcas.find((m) => m.id === marcaId)?.nombre ?? null)
+    ? (marcas.find((m) => m.id === marcaId)?.nombre ?? fallback?.marcaNombre ?? null)
     : null;
   const modeloNombreSnapshot = modeloId
-    ? (modelos.find((m) => m.id === modeloId)?.nombre ?? null)
+    ? (modelos.find((m) => m.id === modeloId)?.nombre ?? fallback?.modeloNombre ?? null)
     : null;
   const motorNombreSnapshot = motorId
-    ? (motores.find((m) => m.id === motorId)?.nombre ?? null)
+    ? (motores.find((m) => m.id === motorId)?.nombre ?? fallback?.motorNombre ?? null)
     : null;
 
   return { marcaNombreSnapshot, modeloNombreSnapshot, motorNombreSnapshot };
@@ -326,12 +432,16 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
     repuesto_id: number;
     precio: number;
     cantidad: number;
+    precio_stock: number;
+    cantidad_stock: number;
   }>(
     `
       SELECT
         pr.repuesto_id,
         pr.precio,
-        pr.cantidad
+        pr.cantidad,
+        pr.precio_stock,
+        pr.cantidad_stock
       FROM orden_trabajo_repuestos pr
       WHERE pr.orden_trabajo_id = $1
         AND pr.repuesto_id IS NOT NULL
@@ -349,6 +459,8 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
         repuestoId: String(item.repuesto_id),
         precioUnitario: Number(item.precio),
         cantidad: Number(item.cantidad),
+        precioStock: Number(item.precio_stock),
+        cantidadStock: Number(item.cantidad_stock),
       })) satisfies TrabajoRepuestoValue[],
     },
   ]);
@@ -361,19 +473,43 @@ export async function updateTrabajo(
 ): Promise<{ updatedAt: string } | "conflict"> {
   if (!input.updatedAt) return "conflict";
 
+  const previousStockSnapshot = await getTrabajoStockSnapshot(id, input.updatedAt);
+  if (!previousStockSnapshot) return "conflict";
+
   const clienteId = input.clienteId ? Number(input.clienteId) : null;
   const marcaId = input.marcaId ? Number(input.marcaId) : null;
   const modeloId = input.modeloId ? Number(input.modeloId) : null;
   const motorId = input.motorId ? Number(input.motorId) : null;
   const trabajosIds = input.trabajosIds.map(Number);
+
+  // Leer snapshot actual para usarlo como fallback si marca/modelo/motor ya no existen en el catálogo técnico
+  const currentSnapshot = await queryRows<{
+    marca_nombre_snapshot: string | null;
+    modelo_nombre_snapshot: string | null;
+    motor_nombre_snapshot: string | null;
+  }>(
+    `SELECT marca_nombre_snapshot, modelo_nombre_snapshot, motor_nombre_snapshot
+     FROM ordenes_trabajo WHERE id = $1`,
+    [id]
+  );
+  const snapshotFallback = currentSnapshot[0]
+    ? {
+        marcaNombre: currentSnapshot[0].marca_nombre_snapshot,
+        modeloNombre: currentSnapshot[0].modelo_nombre_snapshot,
+        motorNombre: currentSnapshot[0].motor_nombre_snapshot,
+      }
+    : undefined;
+
   const [trabajoSnapshots, vehicleSnapshot] = await Promise.all([
     getTrabajoCatalogSnapshots(trabajosIds, input.listaPrecios),
-    getVehicleSnapshots(marcaId, modeloId, motorId),
+    getVehicleSnapshots(marcaId, modeloId, motorId, snapshotFallback),
   ]);
   const repuestosIds = input.repuestos.map((r) => Number(r.repuestoId));
   const repuestoSnapshots = await getRepuestoCatalogSnapshots(repuestosIds);
   const precios = input.repuestos.map((r) => r.precioUnitario);
   const cantidades = input.repuestos.map((r) => r.cantidad);
+  const preciosStock = input.repuestos.map((r) => r.precioStock);
+  const cantidadesStock = input.repuestos.map((r) => r.cantidadStock);
 
   const rows = await queryRows<{ id: number; updated_at: string }>(
     `
@@ -384,9 +520,9 @@ export async function updateTrabajo(
             marca_id                = $4,
             modelo_id               = $5,
             motor_id                = $6,
-            marca_nombre_snapshot   = $23,
-            modelo_nombre_snapshot  = $24,
-            motor_nombre_snapshot   = $25,
+            marca_nombre_snapshot   = $25,
+            modelo_nombre_snapshot  = $26,
+            motor_nombre_snapshot   = $27,
             numero_serie_motor      = $7,
             cobrado                 = $8,
             prioridad               = $9::orden_trabajo_prioridad,
@@ -444,6 +580,8 @@ export async function updateTrabajo(
             repuesto_id,
             precio,
             cantidad,
+            precio_stock,
+            cantidad_stock,
             categoria_nombre_snapshot,
             repuesto_nombre_snapshot
           )
@@ -452,6 +590,8 @@ export async function updateTrabajo(
             unnest($15::int[]),
             unnest($16::int[]),
             unnest($17::int[]),
+            unnest($23::int[]),
+            unnest($24::int[]),
             unnest($21::text[]),
             unnest($22::text[])
           WHERE (SELECT id FROM upd) IS NOT NULL
@@ -459,6 +599,8 @@ export async function updateTrabajo(
             SET
               precio = EXCLUDED.precio,
               cantidad = EXCLUDED.cantidad,
+              precio_stock = EXCLUDED.precio_stock,
+              cantidad_stock = EXCLUDED.cantidad_stock,
               categoria_nombre_snapshot = EXCLUDED.categoria_nombre_snapshot,
               repuesto_nombre_snapshot = EXCLUDED.repuesto_nombre_snapshot
         )
@@ -487,15 +629,21 @@ export async function updateTrabajo(
       trabajoSnapshots.map((item) => item.precioSnapshot),
       repuestoSnapshots.map((item) => item.categoriaNombreSnapshot),
       repuestoSnapshots.map((item) => item.repuestoNombreSnapshot),
+      preciosStock,
+      cantidadesStock,
       vehicleSnapshot.marcaNombreSnapshot,
       vehicleSnapshot.modeloNombreSnapshot,
       vehicleSnapshot.motorNombreSnapshot,
     ]
   );
 
-  return rows[0]?.id
-    ? { updatedAt: rows[0].updated_at }
-    : "conflict";
+  if (!rows[0]?.id) {
+    return "conflict";
+  }
+
+  await applyTrabajoStockAdjustment(previousStockSnapshot, input);
+
+  return { updatedAt: rows[0].updated_at };
 }
 
 export async function createTrabajo(input: TrabajoFormValues) {
@@ -601,6 +749,8 @@ export async function createTrabajo(input: TrabajoFormValues) {
           repuesto_id,
           precio,
           cantidad,
+          precio_stock,
+          cantidad_stock,
           categoria_nombre_snapshot,
           repuesto_nombre_snapshot
         )
@@ -609,12 +759,16 @@ export async function createTrabajo(input: TrabajoFormValues) {
           unnest($2::int[]),
           unnest($3::int[]),
           unnest($4::int[]),
+          unnest($7::int[]),
+          unnest($8::int[]),
           unnest($5::text[]),
           unnest($6::text[])
         ON CONFLICT (orden_trabajo_id, repuesto_id) DO UPDATE
           SET
             precio = EXCLUDED.precio,
             cantidad = EXCLUDED.cantidad,
+            precio_stock = EXCLUDED.precio_stock,
+            cantidad_stock = EXCLUDED.cantidad_stock,
             categoria_nombre_snapshot = EXCLUDED.categoria_nombre_snapshot,
             repuesto_nombre_snapshot = EXCLUDED.repuesto_nombre_snapshot
       `,
@@ -625,9 +779,13 @@ export async function createTrabajo(input: TrabajoFormValues) {
         input.repuestos.map((repuesto) => repuesto.cantidad),
         repuestoSnapshots.map((item) => item.categoriaNombreSnapshot),
         repuestoSnapshots.map((item) => item.repuestoNombreSnapshot),
+        input.repuestos.map((repuesto) => repuesto.precioStock),
+        input.repuestos.map((repuesto) => repuesto.cantidadStock),
       ]
     );
   }
+
+  await applyTrabajoStockAdjustment(null, input);
 
   return trabajoId;
 }
@@ -749,11 +907,10 @@ export async function listTrabajosByCliente(clienteId: number) {
       WHERE p.cliente_id = $1
       ORDER BY
         CASE
-          WHEN p.estado = 'presupuesto_entregado' THEN 1
+          WHEN p.estado IN ('presupuesto_entregado', 'pendiente') THEN 1
           WHEN p.estado = 'aprobado' THEN 2
           WHEN p.estado = 'finalizado' THEN 3
-          WHEN p.estado = 'pendiente' THEN 4
-          ELSE 5
+          ELSE 4
         END,
         p.numero_trabajo DESC
     `,

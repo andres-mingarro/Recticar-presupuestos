@@ -131,7 +131,7 @@ export function SeleccionTecnicaWizard({
 
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
-      <DialogContent className={styles.dialogContent}>
+      <DialogContent variant="centered" className={styles.dialogContent}>
         <DialogHeader>
           {/* Step pills */}
           <div className={styles.stepIndicator}>

@@ -8,6 +8,8 @@ export type RepuestoDetalleItem = {
   repuestoNombre: string;
   precioUnitario: number;
   cantidad: number;
+  precioStock: number;
+  cantidadStock: number;
   total: number;
 };
 
@@ -18,13 +20,19 @@ export async function listRepuestosAgrupados() {
     repuesto_id: number | null;
     repuesto_nombre: string | null;
     repuesto_precio: number | null;
+    stock_habilitado: boolean | null;
+    stock_cantidad: number | null;
+    precio_stock: number | null;
   }>`
     SELECT
       c.id AS categoria_id,
       c.nombre AS categoria_nombre,
       r.id AS repuesto_id,
       r.nombre AS repuesto_nombre,
-      r.precio AS repuesto_precio
+      r.precio AS repuesto_precio,
+      r.stock_habilitado AS stock_habilitado,
+      r.stock_cantidad AS stock_cantidad,
+      r.precio_stock AS precio_stock
     FROM categorias_repuesto c
     LEFT JOIN repuestos r ON r.categoria_id = c.id
     ORDER BY c.nombre ASC, r.orden ASC, r.id ASC
@@ -41,6 +49,9 @@ export async function listRepuestosAgrupados() {
           id: row.repuesto_id,
           nombre: row.repuesto_nombre!,
           precio: Number(row.repuesto_precio),
+          stockHabilitado: row.stock_habilitado ?? false,
+          stockCantidad: Number(row.stock_cantidad ?? 0),
+          precioStock: Number(row.precio_stock ?? 0),
         });
       }
       continue;
@@ -56,6 +67,9 @@ export async function listRepuestosAgrupados() {
                 id: row.repuesto_id,
                 nombre: row.repuesto_nombre!,
                 precio: Number(row.repuesto_precio),
+                stockHabilitado: row.stock_habilitado ?? false,
+                stockCantidad: Number(row.stock_cantidad ?? 0),
+                precioStock: Number(row.precio_stock ?? 0),
               },
             ]
           : [],
@@ -133,6 +147,20 @@ export async function reorderRepuestos(orderedIds: number[]) {
   `);
 }
 
+export async function updateRepuestoStock(
+  updates: Array<{ id: number; stockHabilitado: boolean; stockCantidad: number; precioStock: number }>
+) {
+  for (const { id, stockHabilitado, stockCantidad, precioStock } of updates) {
+    await templateRows`
+      UPDATE repuestos
+      SET stock_habilitado = ${stockHabilitado},
+          stock_cantidad = ${stockCantidad},
+          precio_stock = ${precioStock}
+      WHERE id = ${id}
+    `;
+  }
+}
+
 export async function deleteRepuesto(id: number) {
   await templateRows`DELETE FROM repuestos WHERE id = ${id}`;
 }
@@ -145,6 +173,8 @@ export async function getRepuestosDetalleByTrabajo(trabajoId: number) {
     repuesto_nombre: string;
     precio_unitario: number;
     cantidad: number;
+    precio_stock: number;
+    cantidad_stock: number;
   }>(
     `
       SELECT
@@ -153,7 +183,9 @@ export async function getRepuestosDetalleByTrabajo(trabajoId: number) {
         pr.repuesto_id AS repuesto_id,
         COALESCE(pr.repuesto_nombre_snapshot, r.nombre) AS repuesto_nombre,
         pr.precio AS precio_unitario,
-        pr.cantidad AS cantidad
+        pr.cantidad AS cantidad,
+        COALESCE(pr.precio_stock, 0) AS precio_stock,
+        COALESCE(pr.cantidad_stock, 0) AS cantidad_stock
       FROM orden_trabajo_repuestos pr
       LEFT JOIN repuestos r ON r.id = pr.repuesto_id
       LEFT JOIN categorias_repuesto c ON c.id = r.categoria_id
@@ -163,13 +195,24 @@ export async function getRepuestosDetalleByTrabajo(trabajoId: number) {
     [trabajoId]
   );
 
-  return rows.map((row) => ({
-    categoriaId: row.categoria_id,
-    categoriaNombre: row.categoria_nombre,
-    repuestoId: row.repuesto_id,
-    repuestoNombre: row.repuesto_nombre,
-    precioUnitario: Number(row.precio_unitario),
-    cantidad: Number(row.cantidad),
-    total: Number(row.precio_unitario) * Number(row.cantidad),
-  }));
+  return rows.map((row) => {
+    const precioUnitario = Number(row.precio_unitario);
+    const cantidad = Number(row.cantidad);
+    const precioStock = Number(row.precio_stock);
+    const cantidadStock = Number(row.cantidad_stock);
+    const cantidadProveedor = Math.max(0, cantidad - cantidadStock);
+    const total = precioStock * cantidadStock + precioUnitario * cantidadProveedor;
+
+    return {
+      categoriaId: row.categoria_id,
+      categoriaNombre: row.categoria_nombre,
+      repuestoId: row.repuesto_id,
+      repuestoNombre: row.repuesto_nombre,
+      precioUnitario,
+      cantidad,
+      precioStock,
+      cantidadStock,
+      total,
+    };
+  });
 }

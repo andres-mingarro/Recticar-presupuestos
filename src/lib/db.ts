@@ -131,3 +131,10 @@ export async function queryRowsFromTechnical<T extends Record<string, unknown>>(
     );
   }
 }
+
+/** Fuente de verdad única para el nombre de columna SQL de lista de precios en la tabla trabajos (alias t). */
+export function precioListaColName(lista: 1 | 2 | 3): string {
+  if (lista === 3) return "t.precio_lista_3";
+  if (lista === 2) return "t.precio_lista_2";
+  return "t.precio_lista_1";
+}

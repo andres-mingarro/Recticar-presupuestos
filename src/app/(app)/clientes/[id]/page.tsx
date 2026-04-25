@@ -42,7 +42,6 @@ export default async function Page({
 
   const trabajosVigentes = trabajos.filter(
     (trabajo) =>
-      trabajo.estado === "pendiente" ||
       trabajo.estado === "presupuesto_entregado" ||
       trabajo.estado === "aprobado"
   );
