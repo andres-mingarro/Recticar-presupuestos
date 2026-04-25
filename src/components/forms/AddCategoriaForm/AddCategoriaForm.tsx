@@ -9,25 +9,26 @@ import { Spinner } from "@/components/ui/Spinner";
 type AddCategoriaFormState = {
   error: string | null;
   resetKey?: number;
+  [key: string]: unknown;
 };
 
-type AddCategoriaFormProps<TState extends AddCategoriaFormState> = {
-  action: (state: TState, formData: FormData) => Promise<TState>;
+type AddCategoriaFormProps = {
+  action: (state: AddCategoriaFormState, formData: FormData) => Promise<AddCategoriaFormState>;
   placeholder?: string;
   submitLabel?: string;
   pendingLabel?: string;
 };
 
-export function AddCategoriaForm<TState extends AddCategoriaFormState>({
+export function AddCategoriaForm({
   action,
   placeholder = "Nombre de la nueva categoría…",
   submitLabel = "Nueva categoría",
   pendingLabel = "Creando…",
-}: AddCategoriaFormProps<TState>) {
+}: AddCategoriaFormProps) {
   const [state, formAction, isPending] = useActionState(action, {
     error: null,
     resetKey: 0,
-  } as TState);
+  });
 
   return (
     <div className="AddCategoriaForm space-y-2">
