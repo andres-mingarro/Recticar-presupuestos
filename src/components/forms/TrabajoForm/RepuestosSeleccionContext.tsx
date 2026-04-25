@@ -3,15 +3,22 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
 export type RepuestoSeleccionItem = {
+  // precio = precio unitario del proveedor (unidades que no salen del stock del taller)
   precioUnitario: number;
   cantidad: number;
+  // precio del stock del taller por unidad
+  precioStock: number;
+  // cuántas unidades salen del stock del taller (0 si no hay stock habilitado o no alcanza)
+  cantidadStock: number;
 };
 
 type RepuestosSeleccionContextValue = {
   selectedIds: Set<number>;
   selectedItems: Record<number, RepuestoSeleccionItem>;
-  toggle: (id: number, checked: boolean) => void;
+  // precioStockCatalogo: precio del stock definido en el catálogo, se pasa al hacer toggle
+  toggle: (id: number, checked: boolean, precioStockCatalogo?: number) => void;
   setPrecioUnitario: (id: number, precio: number) => void;
+  setPrecioStock: (id: number, precio: number) => void;
   incrementCantidad: (id: number) => void;
   decrementCantidad: (id: number) => void;
 };
@@ -22,7 +29,13 @@ export function RepuestosSeleccionProvider({
   initialItems,
   children,
 }: {
-  initialItems: Array<{ repuestoId: number; precioUnitario: number; cantidad: number }>;
+  initialItems: Array<{
+    repuestoId: number;
+    precioUnitario: number;
+    cantidad: number;
+    precioStock: number;
+    cantidadStock: number;
+  }>;
   children: ReactNode;
 }) {
   const [selectedItems, setSelectedItems] = useState<Record<number, RepuestoSeleccionItem>>(() =>
@@ -32,6 +45,8 @@ export function RepuestosSeleccionProvider({
         {
           precioUnitario: item.precioUnitario,
           cantidad: item.cantidad,
+          precioStock: item.precioStock,
+          cantidadStock: item.cantidadStock,
         },
       ])
     )
@@ -42,15 +57,20 @@ export function RepuestosSeleccionProvider({
     [selectedItems]
   );
 
-  function toggle(id: number, checked: boolean) {
+  function toggle(id: number, checked: boolean, precioStockCatalogo = 0) {
     setSelectedItems((prev) => {
       if (checked) {
         return {
           ...prev,
-          [id]: prev[id] ?? { precioUnitario: 0, cantidad: 1 },
+          [id]: prev[id] ?? {
+            precioUnitario: 0,
+            cantidad: 1,
+            // inicializar con el precio del catálogo al seleccionar por primera vez
+            precioStock: precioStockCatalogo,
+            cantidadStock: 0,
+          },
         };
       }
-
       const next = { ...prev };
       delete next[id];
       return next;
@@ -61,8 +81,21 @@ export function RepuestosSeleccionProvider({
     setSelectedItems((prev) => ({
       ...prev,
       [id]: {
+        ...prev[id],
         precioUnitario: Number.isFinite(precio) && precio >= 0 ? precio : 0,
         cantidad: prev[id]?.cantidad ?? 1,
+        precioStock: prev[id]?.precioStock ?? 0,
+        cantidadStock: prev[id]?.cantidadStock ?? 0,
+      },
+    }));
+  }
+
+  function setPrecioStock(id: number, precio: number) {
+    setSelectedItems((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        precioStock: Number.isFinite(precio) && precio >= 0 ? precio : 0,
       },
     }));
   }
@@ -71,8 +104,11 @@ export function RepuestosSeleccionProvider({
     setSelectedItems((prev) => ({
       ...prev,
       [id]: {
+        ...prev[id],
         precioUnitario: prev[id]?.precioUnitario ?? 0,
         cantidad: (prev[id]?.cantidad ?? 1) + 1,
+        precioStock: prev[id]?.precioStock ?? 0,
+        cantidadStock: prev[id]?.cantidadStock ?? 0,
       },
     }));
   }
@@ -81,32 +117,34 @@ export function RepuestosSeleccionProvider({
     setSelectedItems((prev) => ({
       ...prev,
       [id]: {
+        ...prev[id],
         precioUnitario: prev[id]?.precioUnitario ?? 0,
         cantidad: Math.max(1, (prev[id]?.cantidad ?? 1) - 1),
+        precioStock: prev[id]?.precioStock ?? 0,
+        cantidadStock: prev[id]?.cantidadStock ?? 0,
       },
     }));
   }
 
   return (
     <RepuestosSeleccionContext.Provider
-      value={{ selectedIds, selectedItems, toggle, setPrecioUnitario, incrementCantidad, decrementCantidad }}
+      value={{ selectedIds, selectedItems, toggle, setPrecioUnitario, setPrecioStock, incrementCantidad, decrementCantidad }}
     >
       {children}
     </RepuestosSeleccionContext.Provider>
   );
 }
 
-const noopToggle: RepuestosSeleccionContextValue["toggle"] = () => {};
-const noopSetPrecio: RepuestosSeleccionContextValue["setPrecioUnitario"] = () => {};
-const noopCantidad: RepuestosSeleccionContextValue["incrementCantidad"] = () => {};
+const noop = () => {};
 
 export function useRepuestosSeleccion(): RepuestosSeleccionContextValue {
   return useContext(RepuestosSeleccionContext) ?? {
     selectedIds: new Set(),
     selectedItems: {},
-    toggle: noopToggle,
-    setPrecioUnitario: noopSetPrecio,
-    incrementCantidad: noopCantidad,
-    decrementCantidad: noopCantidad,
+    toggle: noop,
+    setPrecioUnitario: noop,
+    setPrecioStock: noop,
+    incrementCantidad: noop,
+    decrementCantidad: noop,
   };
 }

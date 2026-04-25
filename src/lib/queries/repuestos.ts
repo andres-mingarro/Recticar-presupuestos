@@ -18,13 +18,19 @@ export async function listRepuestosAgrupados() {
     repuesto_id: number | null;
     repuesto_nombre: string | null;
     repuesto_precio: number | null;
+    stock_habilitado: boolean | null;
+    stock_cantidad: number | null;
+    precio_stock: number | null;
   }>`
     SELECT
       c.id AS categoria_id,
       c.nombre AS categoria_nombre,
       r.id AS repuesto_id,
       r.nombre AS repuesto_nombre,
-      r.precio AS repuesto_precio
+      r.precio AS repuesto_precio,
+      r.stock_habilitado AS stock_habilitado,
+      r.stock_cantidad AS stock_cantidad,
+      r.precio_stock AS precio_stock
     FROM categorias_repuesto c
     LEFT JOIN repuestos r ON r.categoria_id = c.id
     ORDER BY c.nombre ASC, r.orden ASC, r.id ASC
@@ -41,6 +47,9 @@ export async function listRepuestosAgrupados() {
           id: row.repuesto_id,
           nombre: row.repuesto_nombre!,
           precio: Number(row.repuesto_precio),
+          stockHabilitado: row.stock_habilitado ?? false,
+          stockCantidad: Number(row.stock_cantidad ?? 0),
+          precioStock: Number(row.precio_stock ?? 0),
         });
       }
       continue;
@@ -56,6 +65,9 @@ export async function listRepuestosAgrupados() {
                 id: row.repuesto_id,
                 nombre: row.repuesto_nombre!,
                 precio: Number(row.repuesto_precio),
+                stockHabilitado: row.stock_habilitado ?? false,
+                stockCantidad: Number(row.stock_cantidad ?? 0),
+                precioStock: Number(row.precio_stock ?? 0),
               },
             ]
           : [],
@@ -131,6 +143,20 @@ export async function reorderRepuestos(orderedIds: number[]) {
     FROM (VALUES ${valuesSql}) AS v(id, orden)
     WHERE r.id = v.id
   `);
+}
+
+export async function updateRepuestoStock(
+  updates: Array<{ id: number; stockHabilitado: boolean; stockCantidad: number; precioStock: number }>
+) {
+  for (const { id, stockHabilitado, stockCantidad, precioStock } of updates) {
+    await templateRows`
+      UPDATE repuestos
+      SET stock_habilitado = ${stockHabilitado},
+          stock_cantidad = ${stockCantidad},
+          precio_stock = ${precioStock}
+      WHERE id = ${id}
+    `;
+  }
 }
 
 export async function deleteRepuesto(id: number) {

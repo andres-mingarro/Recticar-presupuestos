@@ -22,6 +22,7 @@ import { Card } from "@/components/ui/Card";
 import { EstadoStepper } from "@/components/ui/EstadoStepper";
 import { Icon } from "@/components/ui/Icon";
 import { Input } from "@/components/ui/Input";
+import { PriceInput } from "@/components/ui/PriceInput";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { ClienteAutocomplete } from "@/components/search/ClienteAutocomplete";
@@ -303,20 +304,28 @@ export function TrabajoForm({
       id={formId}
       action={formAction}
       onInput={() => setDirty(true)}
-      onClickCapture={() => setDirty(true)}
+      onChangeCapture={() => setDirty(true)}
       className={cn("TrabajoForm", styles.TrabajoForm, "mb-12 space-y-6")}
     >
       <input type="hidden" name="updatedAt" value={state.values.updatedAt ?? ""} />
       {Array.from(selectedTrabajoIds).map((id) => (
         <input key={`trabajo-hidden-${id}`} type="hidden" name="trabajosIds" value={id} />
       ))}
-      {Object.entries(selectedRepuestoItems).map(([id, item]) => (
-        <div key={`repuesto-hidden-${id}`}>
-          <input type="hidden" name="repuestosIds" value={id} />
-          <input type="hidden" name={`repuestoPrecio_${id}`} value={item.precioUnitario} />
-          <input type="hidden" name={`repuestoCantidad_${id}`} value={item.cantidad} />
-        </div>
-      ))}
+      {Object.entries(selectedRepuestoItems).map(([id, item]) => {
+        // Calcular cantidadStock efectiva desde el catálogo
+        const repuestoInfo = repuestos.flatMap((g) => g.repuestos).find((r) => r.id === Number(id));
+        const stockDisponible = repuestoInfo?.stockHabilitado ? repuestoInfo.stockCantidad : 0;
+        const cantidadStockEfectiva = Math.min(item.cantidad, stockDisponible);
+        return (
+          <div key={`repuesto-hidden-${id}`}>
+            <input type="hidden" name="repuestosIds" value={id} />
+            <input type="hidden" name={`repuestoPrecio_${id}`} value={item.precioUnitario} />
+            <input type="hidden" name={`repuestoCantidad_${id}`} value={item.cantidad} />
+            <input type="hidden" name={`repuestoPrecioStock_${id}`} value={item.precioStock} />
+            <input type="hidden" name={`repuestoCantidadStock_${id}`} value={cantidadStockEfectiva} />
+          </div>
+        );
+      })}
 
       {showClienteSection ? (
         <TrabajoClienteSection
@@ -578,12 +587,24 @@ export function TrabajoForm({
                           const isChecked = selectedRepuestoIds.has(repuesto.id);
                           const precioUnit = selectedRepuestoItems[repuesto.id]?.precioUnitario ?? 0;
                           const cantidad = selectedRepuestoItems[repuesto.id]?.cantidad ?? 1;
+                          // precio_stock viene del catálogo, se inicializa al seleccionar
+                          const precioStockUnit = selectedRepuestoItems[repuesto.id]?.precioStock ?? repuesto.precioStock;
+
+                          const cantStockDisponible = repuesto.stockHabilitado ? repuesto.stockCantidad : 0;
+                          const cantDesdeStock = Math.min(cantidad, cantStockDisponible);
+                          const cantFaltante = Math.max(0, cantidad - cantStockDisponible);
+
+                          // total = precio_stock * cant_stock + precio_proveedor * cant_faltante
+                          const total = repuesto.stockHabilitado
+                            ? precioStockUnit * cantDesdeStock + precioUnit * cantFaltante
+                            : precioUnit * cantidad;
+
                           return (
                             <TrabajoItemCard
                               key={repuesto.id}
                               checked={isChecked}
                               value={repuesto.id}
-                              onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked)}
+                              onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked, repuesto.precioStock)}
                               label={
                                 isChecked
                                   ? (snapshotRepuestoNombreById.get(repuesto.id) ?? repuesto.nombre)
@@ -592,42 +613,73 @@ export function TrabajoForm({
                               contentClassName="flex-col gap-2.5"
                               checkboxClassName="[--checkbox-size:24px]"
                             >
-                              {/* Controles precio / cantidad / total — fila separada debajo del nombre */}
-                              <div className="grid w-full grid-cols-[1fr_auto_auto] items-end gap-x-3 gap-y-1 sm:pl-9">
-                                {/* Precio unitario */}
-                                <div className="flex flex-col gap-0.5">
-                                  <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Precio u.</span>
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    step="1"
-                                    inputMode="numeric"
-                                    value={precioUnit}
-                                    disabled={!isChecked}
-                                    onChange={(e) => setPrecioUnitario(repuesto.id, Number(e.target.value))}
-                                    className="h-9 w-[9ch] text-right"
-                                  />
+                              <div className="sm:pl-9 flex flex-col gap-2.5 w-full">
+                                {/* Info stock */}
+                                {repuesto.stockHabilitado && (
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {cantFaltante === 0 ? (
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[0.65rem] font-semibold text-emerald-700">
+                                        stock: {cantStockDisponible - cantDesdeStock} restantes · {formatPrice(precioStockUnit)} c/u
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[0.65rem] font-semibold text-orange-700">
+                                        faltan {cantFaltante} — a conseguir
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Fila principal: precio (proveedor si hay stock) / cantidad / total */}
+                                <div className="grid w-full grid-cols-[1fr_auto_auto] items-end gap-x-3">
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">
+                                      {repuesto.stockHabilitado && cantFaltante > 0 ? "Precio proveedor" : repuesto.stockHabilitado ? "—" : "Precio u."}
+                                    </span>
+                                    {/* Input precio proveedor: solo cuando hay unidades faltantes o sin stock */}
+                                    {(!repuesto.stockHabilitado || cantFaltante > 0) ? (
+                                      <PriceInput
+                                        value={precioUnit}
+                                        disabled={!isChecked}
+                                        onChange={(v) => setPrecioUnitario(repuesto.id, v)}
+                                        className="h-9 w-[12ch]"
+                                      />
+                                    ) : (
+                                      <span className="flex h-9 items-center text-sm text-[var(--text-color-gray)]">
+                                        {formatPrice(precioStockUnit * cantDesdeStock)}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Cant.</span>
+                                    <Incrementor
+                                      value={cantidad}
+                                      onDecrement={() => decrementCantidad(repuesto.id)}
+                                      onIncrement={() => incrementCantidad(repuesto.id)}
+                                      disabled={!isChecked}
+                                    />
+                                  </div>
+                                  <div className="flex flex-col items-end gap-0.5">
+                                    <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Total</span>
+                                    <span className={cn(
+                                      "text-right text-base font-bold",
+                                      isChecked ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-gray)]"
+                                    )}>
+                                      {formatPrice(total)}
+                                    </span>
+                                  </div>
                                 </div>
-                                {/* Cantidad */}
-                                <div className="flex flex-col gap-0.5">
-                                  <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Cant.</span>
-                                  <Incrementor
-                                    value={cantidad}
-                                    onDecrement={() => decrementCantidad(repuesto.id)}
-                                    onIncrement={() => incrementCantidad(repuesto.id)}
-                                    disabled={!isChecked}
-                                  />
-                                </div>
-                                {/* Total */}
-                                <div className="flex flex-col items-end gap-0.5">
-                                  <span className="text-[0.62rem] font-semibold uppercase tracking-wide text-[var(--text-color-gray)]">Total</span>
-                                  <span className={cn(
-                                    "text-right text-base font-bold",
-                                    isChecked ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-gray)]"
-                                  )}>
-                                    {formatPrice(precioUnit * cantidad)}
-                                  </span>
-                                </div>
+
+                                {/* Desglose cuando hay faltantes */}
+                                {repuesto.stockHabilitado && isChecked && cantFaltante > 0 && (
+                                  <div className="flex flex-wrap gap-3 text-xs">
+                                    <span className="text-emerald-700 font-semibold">
+                                      Stock: {formatPrice(precioStockUnit * cantDesdeStock)} ({cantDesdeStock} u.)
+                                    </span>
+                                    <span className="text-orange-600 font-semibold">
+                                      Proveedor: {formatPrice(precioUnit * cantFaltante)} ({cantFaltante} u.)
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             </TrabajoItemCard>
                           );

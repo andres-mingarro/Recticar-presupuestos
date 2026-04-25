@@ -97,8 +97,12 @@ export type ClienteTrabajoItem = TrabajoListItem;
 
 export type TrabajoRepuestoValue = {
   repuestoId: string;
+  // precio = precio unitario del proveedor (unidades que no salen del stock del taller)
   precioUnitario: number;
   cantidad: number;
+  // stock del taller: precio_stock * cantidad_stock + precioUnitario * (cantidad - cantidad_stock)
+  precioStock: number;
+  cantidadStock: number;
 };
 
 export type TrabajoFormValues = {
@@ -190,5 +194,9 @@ export type RepuestoAgrupado = {
     id: number;
     nombre: string;
     precio: number;
+    stockHabilitado: boolean;
+    stockCantidad: number;
+    // precio del stock del taller, definido en el catálogo de repuestos
+    precioStock: number;
   }>;
 };
