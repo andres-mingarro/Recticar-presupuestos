@@ -132,22 +132,26 @@ export default async function Page({
       };
     }
 
-    const result = await updateTrabajo(trabajoId, values);
+    try {
+      const result = await updateTrabajo(trabajoId, values);
 
-    if (result === "conflict") {
+      if (result === "conflict") {
+        return {
+          error: "Otro usuario modificó este trabajo. Recargá la página para ver los últimos cambios antes de guardar.",
+          values,
+        };
+      }
+
+      revalidatePath("/repuestos");
+      revalidatePath(`/trabajos/${trabajoId}`);
+
       return {
-        error: "Otro usuario modificó este trabajo. Recargá la página para ver los últimos cambios antes de guardar.",
-        values,
+        error: null,
+        values: { ...values, updatedAt: result.updatedAt },
       };
+    } catch {
+      return { error: "No se pudieron guardar los cambios. Intentá nuevamente.", values };
     }
-
-    revalidatePath("/repuestos");
-    revalidatePath(`/trabajos/${trabajoId}`);
-
-    return {
-      error: null,
-      values: { ...values, updatedAt: result.updatedAt },
-    };
   }
 
   async function refreshSnapshotPricesAction(
@@ -158,14 +162,13 @@ export default async function Page({
     void _prevState;
     void _formData;
 
-    const updatedCount = await refreshTrabajoSnapshotPrices(trabajoId);
-    revalidatePath(`/trabajos/${trabajoId}`);
-
-    return {
-      error: null,
-      success: true,
-      updatedCount,
-    };
+    try {
+      const updatedCount = await refreshTrabajoSnapshotPrices(trabajoId);
+      revalidatePath(`/trabajos/${trabajoId}`);
+      return { error: null, success: true, updatedCount };
+    } catch {
+      return { error: "No se pudieron actualizar los precios. Intentá nuevamente.", success: false, updatedCount: 0 };
+    }
   }
 
   return (

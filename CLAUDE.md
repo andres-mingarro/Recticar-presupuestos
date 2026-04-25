@@ -1,5 +1,7 @@
 @AGENTS.md
 
+> **Antes de tocar datos, estado o queries:** leer `docs/criterios-datos.md`. Contiene los patrones obligatorios del proyecto y un checklist de validación.
+
 ---
 
 ## Estado actual del proyecto
@@ -42,7 +44,11 @@ App interna para gestión de trabajos de rectificación de motores. Empleados lo
 ### Formularios y guardado
 - **Los cambios siempre se guardan con un único botón "Guardar"**. No hay auto-save ni acciones individuales por widget dentro del detalle de trabajo.
 - Los widgets fuera del `<form>` (toggles de cobrado, prioridad, estado) usan `<input type="hidden" name="..." form={formId} />` para enviar su valor al formulario correcto.
-- `useActionState` se levanta al componente padre cuando el padre necesita acceso a `isPending` (ej: `TrabajoDetailPage`).
+- `useActionState` se levanta al componente padre cuando el padre necesita acceso a `isPending`. El hook **nunca** se llama dos veces para la misma acción — el resultado se pasa hacia abajo como props directas.
+
+### Server actions
+- Todas las server actions deben estar envueltas en `try/catch` y retornar `{ error, values }` — nunca dejar que una falla de DB explote con un error global no manejado.
+- `redirect()` lanza una excepción internamente en Next.js — **no poner dentro de `try/catch`**.
 
 ### Paleta de colores
 Variables CSS definidas en `src/scss/globals.css`:
@@ -83,7 +89,7 @@ Variables CSS definidas en `src/scss/globals.css`:
 PrioridadProvider
   CobradoProvider
     RepuestosSeleccionProvider
-      TrabajoDetailPage
+      TrabajoDetailPage  ← llama useActionState(action, initialState)
         [Top bar]  ← PulsatingButton type="submit" form={formId}
         TrabajosSeleccionProvider
           [TrabajoDetailPageMain]
@@ -92,7 +98,7 @@ PrioridadProvider
               PrioridadToggle  (form={formId}, onClickCapture → dirty)
               EstadoStepper    (form={formId}, onClickCapture → dirty)
             div[onInput → dirty]
-              TrabajoForm       (externalFormAction, externalState, externalIsPending)
+              TrabajoForm       (formAction, state, isPending como props directas)
           [TrabajoDetailPageSidebar]
             Card (PDF + QR etiqueta con id="etiqueta-qr-print" + PrintButton)
             TrabajoDatosCard    (lee CobradoContext + PrioridadContext reactivamente)
@@ -100,8 +106,8 @@ PrioridadProvider
             Card (Reglas de estado)
 ```
 
-### Pattern de external state en TrabajoForm
-`TrabajoForm` acepta props opcionales `externalFormAction`, `externalState`, `externalIsPending`. Cuando se proveen, los usa en lugar de llamar a `useActionState` internamente (aunque el hook interno siempre se llama por reglas de React). Esto permite que `TrabajoDetailPage` controle `isPending` para el botón top bar.
+### Pattern de props en TrabajoForm
+`TrabajoForm` recibe `formAction`, `state` e `isPending` como props directas — **no llama `useActionState` internamente**. El padre (`TrabajoDetailPage` o `NuevoTrabajoPage`) es quien llama `useActionState(action, initialState)` y pasa los resultados hacia abajo. Nunca duplicar el hook para la misma acción.
 
 ### Providers de contexto
 | Provider | Context | Toggle | Badge |
@@ -110,6 +116,8 @@ PrioridadProvider
 | `PrioridadProvider` | `PrioridadContext` | `PrioridadToggle` | `PrioridadBadge` |
 | `TrabajosSeleccionProvider` | `TrabajosSeleccionContext` | checkboxes en TrabajoForm | `TrabajosResumen` |
 | `RepuestosSeleccionProvider` | `RepuestosSeleccionContext` | inputs en TrabajoForm | resumen en sidebar |
+
+**Todos los hooks de contexto lanzan error si se usan fuera de su Provider** (`useTrabajosSeleccion`, `useRepuestosSeleccion`, `useCobrado`, `usePrioridad`). El patrón de noop silencioso está eliminado.
 
 ### Trabajos — detalles
 - `TrabajoForm` usa `TrabajoItemCard` y `CheckboxBeauti` para los ítems de trabajos y repuestos.
@@ -126,7 +134,7 @@ PrioridadProvider
 - **Criterio de variantes en tablas/filas editables**: guardar → `PulsatingButton` con estilo borde gris/bg blanco (igual a `saveRowBtnCls` en `shared.tsx`); cancelar → `outline-ghost` con icono X; borrar → `outline-ghost` con icono papelera + `ConfirmDialog`.
 - `ButtonGroup<T>` — selector multi-opción (Lista 1/2/3, prioridad en nuevo trabajo). Props: `options`, `value`, `onChange`, `activeTone` por opción.
 - **`PulsatingButton`** — usa `Button` internamente, agrega anillo pulsante cuando `pulsing={true}`. Prop `pulseStyle?: "pulse" | "ripple"` (no usar `variant` para el estilo de pulso — conflicta con la variante de Button). Acepta todas las props de `Button`.
-- `Incrementor` — ajuste porcentual, usado en `/precios`.
+- `Incrementor` — ajuste porcentual, usado en `/precios`. Cada click suma/resta **0.1%**. El porcentaje acumulado se aplica siempre sobre el precio **original de la DB** (no sobre el draft del click anterior) para evitar el efecto de redondeo compuesto que bloquea valores pequeños. Los precios resultantes son siempre enteros (`Math.round`).
 
 ### EstadoStepper
 Tres estados con gradientes de color progresivos:
@@ -135,6 +143,8 @@ Tres estados con gradientes de color progresivos:
 - `finalizado` → "Trabajo finalizado" (gradiente verde)
 
 Existe en dos variantes: `EstadoStepper` (form mode, clickeable) y `EstadoStepperDisplay` (read-only).
+
+> **Nota sobre `pendiente`**: el valor `pendiente` existe en el enum de PostgreSQL como estado legacy. En la app **siempre se normaliza a `presupuesto_entregado`** al leer (via `normalizeLegacyTrabajoEstado` en `queries/trabajos.ts`). El tipo `TrabajoEstado` incluye `"pendiente"` marcado como `@deprecated`. No agregar nueva lógica de negocio para `pendiente`.
 
 ### Diálogos
 - **`Dialog`** (`src/components/ui/Dialog/`) — wrapper sobre `@radix-ui/react-dialog`. `DialogContent` acepta `variant="sheet"` (bottom sheet, mobile) o `variant="centered"` (modal centrado, max-width 420px).
@@ -184,7 +194,7 @@ El botón `PrintButton` llama a `window.print()`.
 | `src/lib/pdf/PresupuestoPdf.tsx` | Componente PDF con `@react-pdf/renderer` |
 | `src/app/api/trabajos/[id]/pdf/route.ts` | Route handler PDF (tiene `@ts-expect-error` por React 19 — no tocar) |
 | `src/lib/types.ts` | Todos los tipos: `TrabajoEstado`, `TrabajoDetail`, `TrabajoAgrupado`, etc. |
-| `src/lib/db.ts` | `queryRows<T>(sql, params)` — cliente PostgreSQL |
+| `src/lib/db.ts` | `queryRows<T>(sql, params)` — cliente PostgreSQL. También exporta `precioListaColName(lista)` — fuente de verdad única para el nombre de columna SQL de listas de precios en la tabla `trabajos` (alias `t`) |
 | `src/middleware.ts` | Auth JWT con `jose`; roles: `admin`, `superuser`, `operador` |
 
 ---
@@ -194,9 +204,10 @@ El botón `PrintButton` llama a `window.print()`.
 - ORM: ninguno. SQL directo con `queryRows<T>()`.
 - Migraciones en `migrations/` (numeradas). Aplicar con `npm run db:migrate`.
 - Tipos enum en PostgreSQL: `trabajo_estado` (`pendiente`, `aprobado`, `finalizado`), `trabajo_prioridad` (`baja`, `normal`, `alta`).
-- El valor `entregado` existe en el enum (migración 011) pero no se usa en la UI.
+- El valor `pendiente` en `trabajo_estado` es legacy — normalizado a `presupuesto_entregado` al leer. El valor `entregado` existe en el enum (migración 011) pero no se usa en la UI.
 - Migración 014: agrega `precio` y `cantidad` a `trabajo_repuestos`.
 - Al agregar estados nuevos: revisar consistencia entre enum DB, labels del stepper y filtros/listados.
+- Columnas de lista de precios en `trabajos`: `precio_lista_1`, `precio_lista_2`, `precio_lista_3`. Usar siempre `precioListaColName(lista)` de `src/lib/db.ts` para construir el nombre de columna en queries — no hardcodear el string.
 
 ### Scripts útiles
 ```
@@ -211,7 +222,8 @@ npm run db:seed:dev      # crea 15 clientes fake y 15 trabajos fake
 
 - `export const dynamic = "force-dynamic"` en todas las pages que leen datos de la DB.
 - Server actions definidas inline en los page files con `"use server"`.
-- `redirect()` de Next.js lanza una excepción internamente — no poner dentro de `try/catch`.
+- `redirect()` de Next.js lanza una excepción internamente — **no poner dentro de `try/catch`**.
+- Todas las server actions deben envolver la lógica de DB en `try/catch` y retornar `{ error: string | null, values }` — nunca dejar explotar un error de Neon sin capturar.
 - En WSL2 con archivos en Linux FS nativo, el HMR funciona sin `WATCHPACK_POLLING`.
 - `src/middleware.ts` (no en raíz) por la estructura con `src/`.
 - Variables de entorno en `.env.local`: `DATABASE_URL`, `TECHNICAL_DATABASE_URL`, `NEXT_PUBLIC_BASE_URL`.

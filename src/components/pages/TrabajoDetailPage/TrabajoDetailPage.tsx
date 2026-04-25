@@ -142,10 +142,6 @@ export function TrabajoDetailPage({
   }, [isPending]);
 
   useEffect(() => {
-    setSelectedEstado(formState.values.estado);
-  }, [formState.values.estado]);
-
-  useEffect(() => {
     if (!wasCreated && !wasUpdated) return;
     toast.success(
       wasCreated
@@ -275,11 +271,9 @@ export function TrabajoDetailPage({
           <div onInput={() => setDirty(true)}>
             <TrabajoForm
               formId={formId}
-              action={action}
-              initialState={initialState}
-              externalFormAction={formAction}
-              externalState={formState}
-              externalIsPending={isPending}
+              formAction={formAction}
+              state={formState}
+              isPending={isPending}
               initialClienteLabel={trabajo.cliente_nombre ?? ""}
               marcas={marcas}
               modelos={modelos}

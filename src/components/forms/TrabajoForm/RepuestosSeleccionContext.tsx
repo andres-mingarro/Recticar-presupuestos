@@ -135,16 +135,8 @@ export function RepuestosSeleccionProvider({
   );
 }
 
-const noop = () => {};
-
 export function useRepuestosSeleccion(): RepuestosSeleccionContextValue {
-  return useContext(RepuestosSeleccionContext) ?? {
-    selectedIds: new Set(),
-    selectedItems: {},
-    toggle: noop,
-    setPrecioUnitario: noop,
-    setPrecioStock: noop,
-    incrementCantidad: noop,
-    decrementCantidad: noop,
-  };
+  const ctx = useContext(RepuestosSeleccionContext);
+  if (!ctx) throw new Error("useRepuestosSeleccion must be used inside RepuestosSeleccionProvider");
+  return ctx;
 }

@@ -301,7 +301,8 @@ function CategoriaCard({
   }
 
   function applyListaAdjustment(lista: 1 | 2 | 3, delta: number) {
-    const factor = 1 + delta / 100;
+    const newTotal = Math.round((ajustesPorcentaje[lista] + delta) * 10) / 10;
+    const factor = 1 + newTotal / 100;
 
     setPrecioDrafts((prev) => {
       const next = { ...prev };
@@ -316,10 +317,10 @@ function CategoriaCard({
         next[trabajo.id] = {
           ...current,
           ...(lista === 1
-            ? { precioLista1: Math.max(0, Math.round(current.precioLista1 * factor)) }
+            ? { precioLista1: Math.max(0, Math.round(trabajo.precioLista1 * factor)) }
             : lista === 2
-              ? { precioLista2: Math.max(0, Math.round(current.precioLista2 * factor)) }
-              : { precioLista3: Math.max(0, Math.round(current.precioLista3 * factor)) }),
+              ? { precioLista2: Math.max(0, Math.round(trabajo.precioLista2 * factor)) }
+              : { precioLista3: Math.max(0, Math.round(trabajo.precioLista3 * factor)) }),
         };
       }
 
@@ -328,7 +329,7 @@ function CategoriaCard({
 
     setAjustesPorcentaje((prev) => ({
       ...prev,
-      [lista]: prev[lista] + delta,
+      [lista]: newTotal,
     }));
   }
 
@@ -482,10 +483,10 @@ function CategoriaCard({
                       <Incrementor
                         incrementoSmall
                         value={ajustesPorcentaje[lista as 1 | 2 | 3]}
-                        onDecrement={() => applyListaAdjustment(lista as 1 | 2 | 3, -1)}
-                        onIncrement={() => applyListaAdjustment(lista as 1 | 2 | 3, 1)}
+                        onDecrement={() => applyListaAdjustment(lista as 1 | 2 | 3, -0.1)}
+                        onIncrement={() => applyListaAdjustment(lista as 1 | 2 | 3, 0.1)}
                         valueClassName="min-w-0"
-                        formatValue={(value) => `${value > 0 ? "+" : ""}${value}%`}
+                        formatValue={(value) => `${value > 0 ? "+" : ""}${value.toFixed(1)}%`}
                       />
                     </div>
                   ))}

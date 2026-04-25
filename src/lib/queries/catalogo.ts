@@ -1,4 +1,5 @@
 import {
+  precioListaColName,
   queryRows,
   queryRowsFromTechnical,
   templateRows,
@@ -297,7 +298,7 @@ export type TrabajoDetalleItem = {
 };
 
 export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecios: 1 | 2 | 3 = 1) {
-  const precioCol = listaPrecios === 3 ? "t.precio_lista_3" : listaPrecios === 2 ? "t.precio_lista_2" : "t.precio_lista_1";
+  const precioCol = precioListaColName(listaPrecios);
 
   const rows = await queryRows<{
     categoria_id: number | null;

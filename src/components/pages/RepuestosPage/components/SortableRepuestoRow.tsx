@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import type { RepuestoAgrupado } from "@/lib/types";
 import { cn } from "@/lib/cn";
+import { formatPrice } from "@/lib/format";
 import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
 import { PriceInput } from "@/components/ui/PriceInput";
 import { fieldCls, readCls, type RepuestosActionFn } from "./shared";
@@ -120,9 +121,18 @@ export function SortableRepuestoRow({
           </>
         ) : (
           repuesto.stockHabilitado && (
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[0.65rem] font-semibold text-emerald-700">
-              stock: {repuesto.stockCantidad}
-            </span>
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-baseline gap-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5">
+                <span className="text-sm font-bold text-[var(--text-color-defult)]">{repuesto.stockCantidad}</span>
+                <span className="text-sm font-medium text-[var(--text-color-gray)]">en stock</span>
+              </div>
+              {repuesto.precioStock > 0 && (
+                <div className="inline-flex items-baseline gap-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5">
+                  <span className="text-sm font-bold text-[var(--text-color-defult)]">{formatPrice(repuesto.precioStock)}</span>
+                  <span className="text-sm font-medium text-[var(--text-color-gray)]">c/u</span>
+                </div>
+              )}
+            </div>
           )
         )}
       </div>

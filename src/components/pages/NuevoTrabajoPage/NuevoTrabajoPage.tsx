@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { cn } from "@/lib/cn";
 import type {
   Marca,
@@ -50,6 +50,7 @@ export function NuevoTrabajoPage({
   trabajos,
   repuestos,
 }: NuevoTrabajoPageProps) {
+  const [state, formAction, isPending] = useActionState(action, initialState);
   const createdAt = useMemo(() => new Date().toISOString(), []);
   const [summary, setSummary] = useState<TrabajoFormSummary>({
     clienteLabel: initialClienteLabel,
@@ -88,8 +89,9 @@ export function NuevoTrabajoPage({
           <RepuestosSeleccionProvider initialItems={[]}>
             <>
               <TrabajoForm
-                action={action}
-                initialState={initialState}
+                formAction={formAction}
+                state={state}
+                isPending={isPending}
                 initialClienteLabel={initialClienteLabel}
                 marcas={marcas}
                 modelos={modelos}

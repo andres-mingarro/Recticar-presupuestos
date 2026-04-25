@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { useActionState } from "react";
 import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
 import type {
@@ -52,11 +51,9 @@ export type TrabajoFormSummary = {
 };
 
 type TrabajoFormProps = {
-  action: (
-    state: TrabajoFormState,
-    formData: FormData
-  ) => Promise<TrabajoFormState>;
-  initialState: TrabajoFormState;
+  formAction: (payload: FormData) => void;
+  state: TrabajoFormState;
+  isPending: boolean;
   initialClienteLabel?: string;
   marcas: Marca[];
   modelos: Modelo[];
@@ -71,9 +68,6 @@ type TrabajoFormProps = {
   showClienteSection?: boolean;
   showPrioridadSection?: boolean;
   showActions?: boolean;
-  externalFormAction?: (payload: FormData) => void;
-  externalState?: TrabajoFormState;
-  externalIsPending?: boolean;
   onSummaryChange?: (summary: TrabajoFormSummary) => void;
 };
 
@@ -144,8 +138,9 @@ function RepuestoGrupoAccordion({
 }
 
 export function TrabajoForm({
-  action,
-  initialState,
+  formAction,
+  state,
+  isPending,
   initialClienteLabel = "",
   marcas,
   modelos,
@@ -160,15 +155,8 @@ export function TrabajoForm({
   showClienteSection = true,
   showPrioridadSection = true,
   showActions = true,
-  externalFormAction,
-  externalState,
-  externalIsPending,
   onSummaryChange,
 }: TrabajoFormProps) {
-  const [internalState, internalFormAction, internalIsPending] = useActionState(action, initialState);
-  const state = externalState ?? internalState;
-  const formAction = externalFormAction ?? internalFormAction;
-  const isPending = externalIsPending ?? internalIsPending;
   const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
@@ -188,14 +176,14 @@ export function TrabajoForm({
     incrementCantidad,
     decrementCantidad,
   } = useRepuestosSeleccion();
-  const [selectedMarca, setSelectedMarca] = useState(initialState.values.marcaId ?? "");
-  const [selectedModelo, setSelectedModelo] = useState(initialState.values.modeloId ?? "");
-  const [selectedMotor, setSelectedMotor] = useState(initialState.values.motorId ?? "");
+  const [selectedMarca, setSelectedMarca] = useState(state.values.marcaId ?? "");
+  const [selectedModelo, setSelectedModelo] = useState(state.values.modeloId ?? "");
+  const [selectedMotor, setSelectedMotor] = useState(state.values.motorId ?? "");
   const [selectedNumeroSerieMotor, setSelectedNumeroSerieMotor] = useState(
-    initialState.values.numeroSerieMotor ?? ""
+    state.values.numeroSerieMotor ?? ""
   );
-  const [selectedPrioridad, setSelectedPrioridad] = useState(initialState.values.prioridad);
-  const [selectedEstado, setSelectedEstado] = useState(initialState.values.estado);
+  const [selectedPrioridad, setSelectedPrioridad] = useState(state.values.prioridad);
+  const [selectedEstado, setSelectedEstado] = useState(state.values.estado);
   const [selectedClienteLabel, setSelectedClienteLabel] = useState(initialClienteLabel);
   const [selectedItemsTab, setSelectedItemsTab] = useState<"trabajos" | "repuestos">("trabajos");
   const [wizardOpen, setWizardOpen] = useState(false);

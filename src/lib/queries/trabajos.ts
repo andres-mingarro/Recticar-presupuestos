@@ -1,4 +1,4 @@
-import { queryRows, templateRows } from "@/lib/db";
+import { precioListaColName, queryRows, templateRows } from "@/lib/db";
 import { hydrateTechnicalLabels, listMarcas, listModelos, listMotores } from "@/lib/queries/catalogo";
 import type {
   TrabajoDetail,
@@ -181,8 +181,7 @@ async function getTrabajoCatalogSnapshots(
 ): Promise<TrabajoCatalogSnapshot[]> {
   if (trabajosIds.length === 0) return [];
 
-  const precioCol =
-    listaPrecios === 3 ? "t.precio_lista_3" : listaPrecios === 2 ? "t.precio_lista_2" : "t.precio_lista_1";
+  const precioCol = precioListaColName(listaPrecios);
 
   const rows = await queryRows<{
     trabajo_id: number;
@@ -908,11 +907,10 @@ export async function listTrabajosByCliente(clienteId: number) {
       WHERE p.cliente_id = $1
       ORDER BY
         CASE
-          WHEN p.estado = 'presupuesto_entregado' THEN 1
+          WHEN p.estado IN ('presupuesto_entregado', 'pendiente') THEN 1
           WHEN p.estado = 'aprobado' THEN 2
           WHEN p.estado = 'finalizado' THEN 3
-          WHEN p.estado = 'pendiente' THEN 4
-          ELSE 5
+          ELSE 4
         END,
         p.numero_trabajo DESC
     `,

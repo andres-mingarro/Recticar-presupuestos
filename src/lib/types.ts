@@ -5,9 +5,11 @@ export const TRABAJO_ESTADO_LABELS: Record<TrabajoEstado, string> = {
   presupuesto_entregado: "Presupuesto entregado",
   aprobado: "Presupuesto aceptado",
   finalizado: "Trabajo finalizado",
+  /** @deprecated valor legacy en DB, normalizado a presupuesto_entregado al leer */
   pendiente: "Presupuesto entregado",
 };
 
+/** @deprecated "pendiente" es un valor legacy en DB; siempre se normaliza a "presupuesto_entregado" al leer */
 export type TrabajoEstado = ((typeof TRABAJO_ESTADOS)[number]) | "pendiente";
 export type TrabajoPrioridad = (typeof TRABAJO_PRIORIDADES)[number];
 
