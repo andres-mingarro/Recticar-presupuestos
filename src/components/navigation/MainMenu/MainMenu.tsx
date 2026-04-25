@@ -9,7 +9,7 @@ import styles from "./MainMenu.module.scss";
 type MenuItem = {
   href: string;
   label: string;
-  icon: "gauge" | "user" | "clipboard" | "tag" | "package";
+  icon: "gauge" | "user" | "clipboard" | "tag" | "package" | "chartBar";
   exact: boolean;
   requiredPermiso?: string;
   superAdminOnly?: boolean;

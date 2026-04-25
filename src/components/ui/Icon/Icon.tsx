@@ -6,6 +6,7 @@ import {
   faBoxOpen,
   faCalendarDays,
   faCarSide,
+  faChartBar,
   faCheck,
   faChevronDown,
   faChevronLeft,
@@ -80,7 +81,8 @@ export type IconName =
   | "sackXmark"
   | "eye"
   | "eyeSlash"
-  | "menu";
+  | "menu"
+  | "chartBar";
 
 type IconProps = {
   name: IconName;
@@ -92,6 +94,7 @@ const ICONS: Record<IconName, IconDefinition> = {
   plus: faPlus,
   search: faMagnifyingGlass,
   x: faXmark,
+  chartBar: faChartBar,
   chevronLeft: faChevronLeft,
   chevronRight: faChevronRight,
   chevronDown: faChevronDown,
