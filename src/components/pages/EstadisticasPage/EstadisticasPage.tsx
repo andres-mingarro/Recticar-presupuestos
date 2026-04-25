@@ -5,9 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { formatDate } from "@/lib/format";
 import type { CobradoMensualRow, CobradoAnualRow } from "@/lib/queries/estadisticas";
-import type { AjusteListaPreciosRow, AcumuladoAjustes } from "@/lib/queries/ajustes";
+import type { AjusteListaPreciosRow } from "@/lib/queries/ajustes";
 import styles from "./EstadisticasPage.module.scss";
 
 const MESES_ABREV = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
@@ -18,14 +17,18 @@ type Props = {
   datosMensuales: CobradoMensualRow[];
   resumenAnual: CobradoAnualRow[];
   historialAjustes: AjusteListaPreciosRow[];
-  acumuladoAjustes: AcumuladoAjustes;
 };
+
+function formatMonto(value: number) {
+  if (value === 0) return null;
+  return `$${new Intl.NumberFormat("es-AR").format(value)}`;
+}
 
 function BarChart({ datosMensuales }: { datosMensuales: CobradoMensualRow[] }) {
   const meses = MESES_ABREV.map((label, i) => {
     const mes = i + 1;
     const dato = datosMensuales.find((d) => d.mes === mes);
-    return { label, mes, cantidad: dato?.cantidad ?? 0 };
+    return { label, mes, cantidad: dato?.cantidad ?? 0, total: dato?.total ?? 0 };
   });
 
   const maxCantidad = Math.max(...meses.map((m) => m.cantidad), 1);
@@ -40,25 +43,35 @@ function BarChart({ datosMensuales }: { datosMensuales: CobradoMensualRow[] }) {
   }
 
   return (
-    <div className={styles.chartWrapper}>
-      <div className={styles.barChart}>
-        {meses.map((m) => {
-          const heightPct = m.cantidad > 0 ? Math.max((m.cantidad / maxCantidad) * 100, 6) : 0;
-          return (
-            <div key={m.mes} className={styles.barCol}>
-              <span className={cn(styles.barValue, m.cantidad === 0 && styles.barValueHidden)}>
-                {m.cantidad}
-              </span>
-              <div className={styles.barTrack}>
-                <div
-                  className={styles.bar}
-                  style={{ height: `${heightPct}%` }}
-                />
+    <div className={styles.chartContainer}>
+      {/* Fila de cantidades — fuera del scroll */}
+      <div className={styles.cantidadRow}>
+        {meses.map((m) => (
+          <div key={m.mes} className={styles.cantidadCell}>
+            <span className={cn(styles.barValue, m.cantidad === 0 && styles.barValueHidden)}>
+              {m.cantidad}
+            </span>
+          </div>
+        ))}
+      </div>
+      {/* Barras con scroll horizontal si hace falta */}
+      <div className={styles.chartWrapper}>
+        <div className={styles.barChart}>
+          {meses.map((m) => {
+            const heightPct = m.cantidad > 0 ? Math.max((m.cantidad / maxCantidad) * 100, 6) : 0;
+            const monto = formatMonto(m.total);
+            return (
+              <div key={m.mes} className={styles.barCol}>
+                <div className={styles.barTrack}>
+                  <div className={styles.bar} style={{ height: `${heightPct}%` }}>
+                    {monto && <span className={styles.barMonto}>{monto}</span>}
+                  </div>
+                </div>
+                <span className={styles.barLabel}>{m.label}</span>
               </div>
-              <span className={styles.barLabel}>{m.label}</span>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -75,10 +88,10 @@ export function EstadisticasPage({
   datosMensuales,
   resumenAnual,
   historialAjustes,
-  acumuladoAjustes,
 }: Props) {
   const searchParams = useSearchParams();
   const totalAnio = datosMensuales.reduce((acc, m) => acc + m.cantidad, 0);
+  const totalFacturadoAnio = datosMensuales.reduce((acc, m) => acc + m.total, 0);
   const aniosParaMostrar = aniosDisponibles.length > 0 ? aniosDisponibles : [anioSeleccionado];
 
   function buildAnoUrl(anio: number) {
@@ -100,10 +113,10 @@ export function EstadisticasPage({
       {/* ── Cobrados ── */}
       <div className={styles.grid}>
         <Card className={styles.chartCard}>
-          <div className={styles.chartHeader}>
-            <div className={styles.chartTitleGroup}>
-              <h2 className={styles.cardTitle}>Trabajos cobrados</h2>
-              <span className={styles.chartSubtitle}>Registro mensual</span>
+          <div className="mb-4 border-b border-[var(--color-border)] pb-3 flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <p className="mb-0.5 text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">Mensual</p>
+              <h2 className="text-base font-semibold text-[var(--text-color-defult)]">Trabajos cobrados</h2>
             </div>
             <div className={styles.yearSelector}>
               {aniosParaMostrar.map((anio) => (
@@ -121,13 +134,21 @@ export function EstadisticasPage({
           <div className={styles.chartTotalRow}>
             <span className={styles.chartTotal}>{totalAnio}</span>
             <span className={styles.chartTotalLabel}>cobrados en {anioSeleccionado}</span>
+            {totalFacturadoAnio > 0 && (
+              <span className={styles.chartTotalMonto}>
+                {new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(totalFacturadoAnio)}
+              </span>
+            )}
           </div>
 
           <BarChart datosMensuales={datosMensuales} />
         </Card>
 
         <Card className={styles.summaryCard}>
-          <h2 className={styles.cardTitle}>Resumen anual</h2>
+          <div className="mb-4 border-b border-[var(--color-border)] pb-3">
+            <p className="mb-0.5 text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">Histórico</p>
+            <h2 className="text-base font-semibold text-[var(--text-color-defult)]">Resumen anual</h2>
+          </div>
           {resumenAnual.length === 0 ? (
             <p className={styles.emptyText}>Sin datos</p>
           ) : (
@@ -135,6 +156,7 @@ export function EstadisticasPage({
               <div className={styles.summaryHeaderRow}>
                 <span>Año</span>
                 <span>Cobrados</span>
+                <span>Total</span>
               </div>
               {resumenAnual.map((row) => (
                 <Link
@@ -144,6 +166,9 @@ export function EstadisticasPage({
                 >
                   <span className={styles.summaryAnio}>{row.anio}</span>
                   <span className={styles.summaryCantidad}>{row.cantidad}</span>
+                  <span className={styles.summaryTotal}>
+                    {row.total > 0 ? new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(row.total) : "—"}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -153,68 +178,52 @@ export function EstadisticasPage({
 
       {/* ── Historial de precios ── */}
       <Card className={styles.preciosCard}>
-        <div className={styles.preciosHeader}>
-          <div>
-            <h2 className={styles.cardTitle}>Variación de lista de precios</h2>
-            <span className={styles.chartSubtitle}>Ajustes porcentuales registrados por categoría</span>
-          </div>
+        <div className="mb-4 border-b border-[var(--color-border)] pb-3">
+          <p className="mb-0.5 text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">Precios</p>
+          <h2 className="text-base font-semibold text-[var(--text-color-defult)]">Variación de lista de precios</h2>
+          <p className="mt-1 text-sm leading-5 text-[var(--text-color-gray)]">Ajustes porcentuales registrados por categoría</p>
         </div>
 
-        {/* Acumulado por lista */}
-        <div className={styles.acumuladoRow}>
-          {([1, 2, 3] as const).map((lista) => {
-            const val = lista === 1
-              ? acumuladoAjustes.total_lista_1
-              : lista === 2
-              ? acumuladoAjustes.total_lista_2
-              : acumuladoAjustes.total_lista_3;
-            const isPos = val > 0;
-            const isNeg = val < 0;
-            return (
-              <div key={lista} className={styles.acumuladoCard}>
-                <span className={styles.acumuladoLabel}>Lista {lista}</span>
-                <span className={cn(
-                  styles.acumuladoValue,
-                  isPos && styles.acumuladoPos,
-                  isNeg && styles.acumuladoNeg,
-                )}>
-                  {tieneAjustes ? formatPct(val) : "—"}
-                </span>
-                <span className={styles.acumuladoSub}>acumulado</span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Historial */}
+        {/* Tabla por categoría */}
         {!tieneAjustes ? (
           <p className={styles.emptyText}>
             Sin registros aún. Los ajustes se guardan automáticamente cuando aplicás un porcentaje en la pantalla de Precios.
           </p>
         ) : (
           <div className={styles.historialTable}>
+            {/* Header grupos Lista */}
             <div className={styles.historialHeaderRow}>
-              <span>Fecha</span>
-              <span>Categoría</span>
-              <span className={styles.colCenter}>Lista 1</span>
-              <span className={styles.colCenter}>Lista 2</span>
-              <span className={styles.colCenter}>Lista 3</span>
+              <span />
+              {([1, 2, 3] as const).map((n) => (
+                <div key={n} className={cn(styles.listaHeaderGroup, styles[`listaHeaderGroup${n}`])}>
+                  <span className={styles.listaHeaderLabel}>Lista {n}</span>
+                  <div className={styles.listaSubHeaders}>
+                    <span>Mes</span>
+                    <span>Este año</span>
+                    <span>12 meses</span>
+                  </div>
+                </div>
+              ))}
             </div>
-            {historialAjustes.map((row) => (
-              <div key={row.id} className={styles.historialRow}>
-                <span className={styles.historialFecha}>
-                  {formatDate(row.fecha)}
-                </span>
+            {historialAjustes.map((row, rowIdx) => (
+              <div key={row.categoria_id} className={cn(styles.historialRow, rowIdx % 2 === 0 && styles.historialRowAlt)}>
                 <span className={styles.historialCategoria}>{row.categoria_nombre}</span>
-                <span className={cn(styles.colCenter, styles.historialPct, row.ajuste_lista_1 > 0 && styles.pctPos, row.ajuste_lista_1 < 0 && styles.pctNeg)}>
-                  {row.ajuste_lista_1 !== 0 ? formatPct(row.ajuste_lista_1) : <span className={styles.pctZero}>—</span>}
-                </span>
-                <span className={cn(styles.colCenter, styles.historialPct, row.ajuste_lista_2 > 0 && styles.pctPos, row.ajuste_lista_2 < 0 && styles.pctNeg)}>
-                  {row.ajuste_lista_2 !== 0 ? formatPct(row.ajuste_lista_2) : <span className={styles.pctZero}>—</span>}
-                </span>
-                <span className={cn(styles.colCenter, styles.historialPct, row.ajuste_lista_3 > 0 && styles.pctPos, row.ajuste_lista_3 < 0 && styles.pctNeg)}>
-                  {row.ajuste_lista_3 !== 0 ? formatPct(row.ajuste_lista_3) : <span className={styles.pctZero}>—</span>}
-                </span>
+                {([
+                  [row.mes_lista_1, row.anio_lista_1, row.doce_meses_lista_1],
+                  [row.mes_lista_2, row.anio_lista_2, row.doce_meses_lista_2],
+                  [row.mes_lista_3, row.anio_lista_3, row.doce_meses_lista_3],
+                ] as [number, number, number][]).map((periodos, li) => (
+                  <div key={li} className={styles.listaCellGroup}>
+                    {periodos.map((val, pi) => (
+                      <span
+                        key={pi}
+                        className={cn(styles.historialPct, val > 0 && styles.pctPos, val < 0 && styles.pctNeg)}
+                      >
+                        {val !== 0 ? formatPct(val) : <span className={styles.pctZero}>—</span>}
+                      </span>
+                    ))}
+                  </div>
+                ))}
               </div>
             ))}
           </div>

@@ -1,13 +1,17 @@
 import { queryRows } from "@/lib/db";
 
 export type AjusteListaPreciosRow = {
-  id: number;
-  fecha: string;
   categoria_id: number;
   categoria_nombre: string;
-  ajuste_lista_1: number;
-  ajuste_lista_2: number;
-  ajuste_lista_3: number;
+  mes_lista_1: number;
+  mes_lista_2: number;
+  mes_lista_3: number;
+  anio_lista_1: number;
+  anio_lista_2: number;
+  anio_lista_3: number;
+  doce_meses_lista_1: number;
+  doce_meses_lista_2: number;
+  doce_meses_lista_3: number;
 };
 
 export type AcumuladoAjustes = {
@@ -35,23 +39,24 @@ export async function registrarAjuste(
   );
 }
 
-export async function listHistorialAjustes(limit = 50): Promise<AjusteListaPreciosRow[]> {
-  return queryRows<AjusteListaPreciosRow>(
-    `
-      SELECT
-        id,
-        fecha,
-        categoria_id,
-        categoria_nombre,
-        ajuste_lista_1::float AS ajuste_lista_1,
-        ajuste_lista_2::float AS ajuste_lista_2,
-        ajuste_lista_3::float AS ajuste_lista_3
-      FROM ajustes_lista_precios
-      ORDER BY fecha DESC
-      LIMIT $1
-    `,
-    [limit]
-  );
+export async function listHistorialAjustes(): Promise<AjusteListaPreciosRow[]> {
+  return queryRows<AjusteListaPreciosRow>(`
+    SELECT
+      categoria_id,
+      categoria_nombre,
+      ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2)::float AS mes_lista_1,
+      ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2)::float AS mes_lista_2,
+      ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2)::float AS mes_lista_3,
+      ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2)::float AS anio_lista_1,
+      ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2)::float AS anio_lista_2,
+      ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2)::float AS anio_lista_3,
+      ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2)::float AS doce_meses_lista_1,
+      ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2)::float AS doce_meses_lista_2,
+      ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2)::float AS doce_meses_lista_3
+    FROM ajustes_lista_precios
+    GROUP BY categoria_id, categoria_nombre
+    ORDER BY categoria_nombre ASC
+  `);
 }
 
 export async function getAcumuladoAjustes(): Promise<AcumuladoAjustes> {

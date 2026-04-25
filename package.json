@@ -11,7 +11,10 @@
     "db:migrate:technical": "node scripts/run-technical-migrations.mjs",
     "cleanup:test": "node scripts/test-trabajos-cleanup.mjs",
     "db:seed:dev": "node scripts/seed-dev-data.mjs",
-    "db:reset:dev": "node scripts/reset-dev-data.mjs"
+    "db:seed:estadisticas": "node scripts/seed-estadisticas-dev.mjs",
+    "db:reset:dev": "node scripts/reset-dev-data.mjs",
+    "db-update": "node scripts/db-update.mjs",
+    "db-content": "node scripts/db-content.mjs"
   },
   "dependencies": {
     "@avto-dev/vehicle-logotypes": "^2.11.1",

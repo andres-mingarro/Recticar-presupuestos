@@ -1,10 +1,11 @@
-import { requirePermission } from "@/lib/permisos";
+import { redirect } from "next/navigation";
+import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
 import {
   getAniosConCobrados,
   getCobradosMensuales,
   getResumenAnual,
 } from "@/lib/queries/estadisticas";
-import { listHistorialAjustes, getAcumuladoAjustes } from "@/lib/queries/ajustes";
+import { listHistorialAjustes } from "@/lib/queries/ajustes";
 import { EstadisticasPage } from "@/components/pages/EstadisticasPage";
 
 export const dynamic = "force-dynamic";
@@ -14,15 +15,15 @@ export default async function Page({
 }: {
   searchParams: Promise<{ año?: string }>;
 }) {
-  await requirePermission("trabajos.ver");
+  const { session } = await getSessionWithPermisos();
+  if (!isSuperAdmin(session)) redirect("/");
 
   const params = await searchParams;
 
-  const [aniosDisponibles, resumenAnual, historialAjustes, acumuladoAjustes] = await Promise.all([
+  const [aniosDisponibles, resumenAnual, historialAjustes] = await Promise.all([
     getAniosConCobrados(),
     getResumenAnual(),
-    listHistorialAjustes(50),
-    getAcumuladoAjustes(),
+    listHistorialAjustes(),
   ]);
 
   const anioActual = new Date().getFullYear();
@@ -39,7 +40,6 @@ export default async function Page({
       datosMensuales={datosMensuales}
       resumenAnual={resumenAnual}
       historialAjustes={historialAjustes}
-      acumuladoAjustes={acumuladoAjustes}
     />
   );
 }

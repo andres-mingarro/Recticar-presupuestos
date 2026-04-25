@@ -17,6 +17,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   precios: "Precios",
   repuestos: "Repuestos",
   "informacion-tecnica": "Información técnica",
+  estadisticas: "Estadísticas",
   configuracion: "Configuración",
   admin: "Admin",
   usuarios: "Usuarios",
@@ -27,6 +28,7 @@ const SEGMENT_LABELS: Record<string, string> = {
 const VIRTUAL_PARENTS: Record<string, { label: string; href: string }> = {
   "/informacion-tecnica": { label: "Configuración", href: "/configuracion" },
   "/admin/usuarios": { label: "Configuración", href: "/configuracion" },
+  "/estadisticas": { label: "Configuración", href: "/configuracion" },
 };
 
 function labelForSegment(segment: string): string {
