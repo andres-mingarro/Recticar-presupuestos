@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { toast } from "sonner";
+import { AddCategoriaForm } from "@/components/forms/AddCategoriaForm";
 import type { TrabajoAgrupado } from "@/lib/types";
 import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { cn } from "@/lib/cn";
@@ -545,41 +546,6 @@ function CategoriaCard({
         onSelect={setCategoriaIcono}
       />
     </Card>
-  );
-}
-
-// ─── Add category ─────────────────────────────────────────────────────────────
-
-function AddCategoriaForm({
-  action,
-}: {
-  action: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
-}) {
-  const [state, formAction, isPending] = useActionState(action, { error: null, resetKey: 0 });
-
-  return (
-    <div className="space-y-2">
-      <form key={state.resetKey ?? 0} action={formAction} className="flex gap-3 rounded-[18px] bg-[var(--color-info-bg)] px-4 py-3" style={{ border: "2px dashed var(--color-info-border-strong)" }}>
-        <input
-          type="text"
-          name="nombre"
-          placeholder="Nombre de la nueva categoría…"
-          required
-          className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-4 py-2 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40"
-        />
-        <button
-          type="submit"
-          disabled={isPending}
-          className={buttonStyles({ className: "gap-2 !text-white bg-[var(--color-info-text)] uppercase hover:bg-[var(--color-info-text-strong)]" })}
-        >
-          {isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
-          {isPending ? "Creando…" : "Nueva categoría"}
-        </button>
-      </form>
-      {state.error && (
-        <p className="text-sm text-[var(--color-danger-text)]">{state.error}</p>
-      )}
-    </div>
   );
 }
 

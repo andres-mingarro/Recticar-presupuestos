@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { FormErrorMessage } from "@/components/ui/FormErrorMessage";
 import { Icon } from "@/components/ui/Icon";
 import { Spinner } from "@/components/ui/Spinner";
 
@@ -52,9 +53,7 @@ export function DeleteItemForm({
           formRef.current?.requestSubmit();
         }}
       />
-      {state.error && (
-        <p className="mt-1 text-xs text-[var(--color-danger-text)]">{state.error}</p>
-      )}
+      <FormErrorMessage error={state.error} className="mt-1" />
     </div>
   );
 }
