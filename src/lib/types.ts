@@ -1,3 +1,5 @@
+import type { PreciosLista, ListaPrecio } from "@/lib/db";
+
 export const TRABAJO_ESTADOS = ["presupuesto_entregado", "aprobado", "finalizado"] as const;
 export const TRABAJO_PRIORIDADES = ["baja", "normal", "alta"] as const;
 
@@ -88,7 +90,7 @@ export type TrabajoDetail = TrabajoListItem & {
   trabajos_ids: number[];
   repuestos_ids: number[];
   repuestos: TrabajoRepuestoValue[];
-  lista_precio: 1 | 2 | 3;
+  lista_precio: ListaPrecio;
   aplica_iva: boolean;
   cliente_dni: string | null;
   cliente_cuit: string | null;
@@ -121,7 +123,7 @@ export type TrabajoFormValues = {
   trabajosIds: string[];
   repuestosIds: string[];
   repuestos: TrabajoRepuestoValue[];
-  listaPrecios: 1 | 2 | 3;
+  listaPrecios: ListaPrecio;
   aplicaIva: boolean;
 };
 
@@ -183,10 +185,7 @@ export type TrabajoAgrupado = {
     id: number;
     nombre: string;
     precio: number;
-    precioLista1: number;
-    precioLista2: number;
-    precioLista3: number;
-  }>;
+  } & PreciosLista>;
 };
 
 export type RepuestoAgrupado = {

@@ -4,6 +4,7 @@ import {
   queryRowsFromTechnical,
   templateRows,
   templateRowsFromTechnical,
+  type ListaPrecio,
 } from "@/lib/db";
 import type {
   Marca,
@@ -157,6 +158,8 @@ export async function listTrabajosAgrupados() {
     trabajo_precio_lista_1: number | null;
     trabajo_precio_lista_2: number | null;
     trabajo_precio_lista_3: number | null;
+    trabajo_precio_lista_4: number | null;
+    trabajo_precio_lista_5: number | null;
   }>`
     SELECT
       c.id AS categoria_id,
@@ -167,7 +170,9 @@ export async function listTrabajosAgrupados() {
       t.precio AS trabajo_precio,
       t.precio_lista_1 AS trabajo_precio_lista_1,
       t.precio_lista_2 AS trabajo_precio_lista_2,
-      t.precio_lista_3 AS trabajo_precio_lista_3
+      t.precio_lista_3 AS trabajo_precio_lista_3,
+      t.precio_lista_4 AS trabajo_precio_lista_4,
+      t.precio_lista_5 AS trabajo_precio_lista_5
     FROM categorias_trabajo c
     LEFT JOIN trabajos t ON t.categoria_id = c.id
     ORDER BY c.nombre ASC, t.orden ASC, t.id ASC
@@ -187,6 +192,8 @@ export async function listTrabajosAgrupados() {
           precioLista1: Number(row.trabajo_precio_lista_1),
           precioLista2: Number(row.trabajo_precio_lista_2),
           precioLista3: Number(row.trabajo_precio_lista_3),
+          precioLista4: Number(row.trabajo_precio_lista_4),
+          precioLista5: Number(row.trabajo_precio_lista_5),
         });
       }
       continue;
@@ -205,6 +212,8 @@ export async function listTrabajosAgrupados() {
               precioLista1: Number(row.trabajo_precio_lista_1),
               precioLista2: Number(row.trabajo_precio_lista_2),
               precioLista3: Number(row.trabajo_precio_lista_3),
+              precioLista4: Number(row.trabajo_precio_lista_4),
+              precioLista5: Number(row.trabajo_precio_lista_5),
             }]
           : [],
     });
@@ -248,11 +257,15 @@ export async function createTrabajo(categoriaId: number, nombre: string) {
       precio_lista_1,
       precio_lista_2,
       precio_lista_3,
+      precio_lista_4,
+      precio_lista_5,
       orden
     )
     VALUES (
       ${categoriaId},
       ${nombre},
+      0,
+      0,
       0,
       0,
       0,
@@ -297,7 +310,7 @@ export type TrabajoDetalleItem = {
   precio: number;
 };
 
-export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecios: 1 | 2 | 3 = 1) {
+export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecios: ListaPrecio = 1) {
   const precioCol = precioListaColName(listaPrecios);
 
   const rows = await queryRows<{
@@ -338,6 +351,8 @@ export async function updateTrabajoPrecios(
     precioLista1: number;
     precioLista2: number;
     precioLista3: number;
+    precioLista4: number;
+    precioLista5: number;
   }>
 ) {
   if (updates.length === 0) return;
@@ -345,7 +360,7 @@ export async function updateTrabajoPrecios(
   const valuesSql = updates
     .map(
       (u) =>
-        `(${u.id}::integer, ${u.precioLista1}::numeric, ${u.precioLista2}::numeric, ${u.precioLista3}::numeric)`
+        `(${u.id}::integer, ${u.precioLista1}::numeric, ${u.precioLista2}::numeric, ${u.precioLista3}::numeric, ${u.precioLista4}::numeric, ${u.precioLista5}::numeric)`
     )
     .join(", ");
 
@@ -355,8 +370,10 @@ export async function updateTrabajoPrecios(
       precio = v.precio_lista_1,
       precio_lista_1 = v.precio_lista_1,
       precio_lista_2 = v.precio_lista_2,
-      precio_lista_3 = v.precio_lista_3
-    FROM (VALUES ${valuesSql}) AS v(id, precio_lista_1, precio_lista_2, precio_lista_3)
+      precio_lista_3 = v.precio_lista_3,
+      precio_lista_4 = v.precio_lista_4,
+      precio_lista_5 = v.precio_lista_5
+    FROM (VALUES ${valuesSql}) AS v(id, precio_lista_1, precio_lista_2, precio_lista_3, precio_lista_4, precio_lista_5)
     WHERE t.id = v.id
   `);
 }

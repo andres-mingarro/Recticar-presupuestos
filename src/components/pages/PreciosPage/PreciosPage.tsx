@@ -8,11 +8,11 @@ import { AddCategoriaForm } from "@/components/forms/AddCategoriaForm";
 import type { TrabajoAgrupado } from "@/lib/types";
 import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { cn } from "@/lib/cn";
+import { LISTAS_PRECIOS, type ListaPrecio, type PreciosLista } from "@/lib/db";
 import { formatPrice } from "@/lib/format";
 import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button, buttonStyles } from "@/components/ui/Button";
-import { ListPriceBadge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EngineIcons, EngineIconGlyph, isEngineIconName, type EngineIconName } from "@/components/ui/EngineIcons";
 import { Icon } from "@/components/ui/Icon";
@@ -25,6 +25,15 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 // ─── Category card ────────────────────────────────────────────────────────────
 
 type Trabajo = TrabajoAgrupado["trabajos"][number];
+
+const emptyAjustes = (): Record<ListaPrecio, number> =>
+  Object.fromEntries(LISTAS_PRECIOS.map((n) => [n, 0])) as Record<ListaPrecio, number>;
+
+const emptyPrecios = (): PreciosLista =>
+  Object.fromEntries(LISTAS_PRECIOS.map((n) => [`precioLista${n}`, 0])) as PreciosLista;
+
+const extractPrecios = (t: PreciosLista): PreciosLista =>
+  Object.fromEntries(LISTAS_PRECIOS.map((n) => [`precioLista${n}`, t[`precioLista${n}`]])) as PreciosLista;
 
 function formatPrecio(value: number | null | undefined) {
   return formatPrice(value ?? 0);
@@ -62,7 +71,6 @@ function DragHandle(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
 
 function SortableTrabajoRow({
   trabajo,
-  index,
   isEditing,
   formId,
   preciosDraft,
@@ -70,52 +78,55 @@ function SortableTrabajoRow({
   deleteTrabajoAction,
 }: {
   trabajo: Trabajo;
-  index: number;
   isEditing: boolean;
   formId: string;
-  preciosDraft?: { precioLista1: number; precioLista2: number; precioLista3: number };
-  onPrecioChange: (trabajoId: number, lista: 1 | 2 | 3, value: number) => void;
+  preciosDraft?: PreciosLista;
+  onPrecioChange: (trabajoId: number, lista: ListaPrecio, value: number) => void;
   deleteTrabajoAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: trabajo.id });
 
   const style = { transform: CSS.Transform.toString(transform), transition };
-  const precios = [
-    preciosDraft?.precioLista1 ?? trabajo.precioLista1,
-    preciosDraft?.precioLista2 ?? trabajo.precioLista2,
-    preciosDraft?.precioLista3 ?? trabajo.precioLista3,
-  ];
-  const names = ["precio_lista_1", "precio_lista_2", "precio_lista_3"];
-  const mobileListLabels = ["Precios lista 1", "Precios lista 2", "Precios lista 3"];
+  const precios = LISTAS_PRECIOS.map((n) => preciosDraft?.[`precioLista${n}`] ?? trabajo[`precioLista${n}`]);
+  const names = LISTAS_PRECIOS.map((n) => `precio_lista_${n}`);
+  const mobileListLabels = LISTAS_PRECIOS.map((n) => `Precios lista ${n}`);
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        "precios-item-row flex flex-col md:flex-row items-start md:items-center gap-3 px-5 py-3",
-        index % 2 === 1 && "bg-[var(--color-surface-alt)]/40",
+        "precios-item-row flex flex-col border-b border-[var(--color-border)]/80 md:flex-row md:items-stretch",
         isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
       )}
     >
-      <div className="precios-item-row-header flex w-full gap-2">
-        <DragHandle {...attributes} {...listeners} />
-        <input
-          form={formId}
-          type="text"
-          name={`nombre_${trabajo.id}`}
-          defaultValue={trabajo.nombre}
-          disabled={!isEditing}
-          tabIndex={isEditing ? -1 : undefined}
-          required
-          className={cn(
-            "flex-1 w-full rounded-lg px-2 py-1 text-sm text-[var(--text-color-defult)] transition",
-            isEditing
-              ? "border border-[var(--color-border)] bg-[var(--color-surface)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
-              : "border border-transparent bg-transparent font-medium"
+      <div className="precios-item-row-header flex flex-1 items-start gap-2 px-4 py-3 md:items-center md:px-5">
+        <div className="mt-1 md:mt-0">
+          <DragHandle {...attributes} {...listeners} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <input
+            form={formId}
+            type="text"
+            name={`nombre_${trabajo.id}`}
+            defaultValue={trabajo.nombre}
+            disabled={!isEditing}
+            tabIndex={isEditing ? -1 : undefined}
+            required
+            className={cn(
+              "flex-1 w-full rounded-lg px-2 py-1 text-sm text-[var(--text-color-defult)] transition",
+              isEditing
+                ? "border border-[var(--color-border)] bg-[var(--color-surface)] focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                : "border border-transparent bg-transparent text-[15px] font-medium leading-6 md:text-sm"
+            )}
+          />
+          {!isEditing && (
+            <p className="mt-0.5 pl-2 text-[0.7rem] font-medium uppercase tracking-[0.14em] text-[var(--text-color-gray)] md:hidden">
+              Valores por lista
+            </p>
           )}
-        />
+        </div>
         {isEditing && (
           <div className="md:hidden">
             <DeleteItemForm
@@ -127,15 +138,16 @@ function SortableTrabajoRow({
           </div>
         )}
       </div>
-      <div className="precios-item-row-footer w-full md:w-auto">
-        <div className="flex flex-col md:flex-row w-full  md:w-auto items-hrink-0 items-end md:items-center gap-2">
+
+      <div className="precios-item-row-footer md:hidden border-t border-[var(--color-border)]/50 bg-[var(--color-surface-alt)]/20 px-4 py-2">
+        <div className="divide-y divide-[var(--color-border)]/50">
           {precios.map((precio, i) =>
             isEditing ? (
-              <div key={i} className="flex w-full items-center justify-between gap-3 md:w-auto">
-                <span className="text-sm font-medium text-[var(--text-color-gray)] md:hidden">
+              <div key={i} className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
+                <span className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--text-color-gray)]">
                   {mobileListLabels[i]}
                 </span>
-                <div className="relative">
+                <div className="w-[132px]">
                   <input
                     form={formId}
                     type="hidden"
@@ -149,41 +161,91 @@ function SortableTrabajoRow({
                     onChange={(event) =>
                       onPrecioChange(
                         trabajo.id,
-                        (i + 1) as 1 | 2 | 3,
+                        (i + 1) as ListaPrecio,
                         parsePrecioInput(event.target.value)
                       )
                     }
-                    className="w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                    className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-right text-sm font-medium tabular-nums text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
                   />
                 </div>
               </div>
             ) : (
-              <div key={i} className="flex w-full items-center justify-between gap-3 md:w-auto">
-                <span className="text-sm font-medium text-[var(--text-color-gray)] md:hidden">
+              <div key={i} className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
+                <span className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--text-color-gray)]">
                   {mobileListLabels[i]}
                 </span>
-                <ListPriceBadge
-                  lista={(i + 1) as 1 | 2 | 3}
-                  value={formatPrecio(precio)}
-                  hideLabelOnMobile
-                />
+                <span className="tabular-nums text-[15px] font-semibold text-right text-[var(--text-color-defult)]">
+                  {formatPrecio(precio)}
+                </span>
               </div>
             )
           )}
         </div>
       </div>
 
-      {isEditing && (
-        <div className="hidden md:block">
+      <div className="hidden md:flex precios-item-row-footer md:flex-row items-end md:items-stretch gap-2 md:gap-0">
+        {precios.map((precio, i) =>
+          isEditing ? (
+            <div
+              key={i}
+              className={cn(
+                "flex w-full items-center justify-between gap-3 md:w-28 md:flex-col md:justify-center md:items-center",
+                i % 2 === 1 && "md:bg-black/[0.03]"
+              )}
+            >
+              <span className="text-sm font-medium text-[var(--text-color-gray)] md:hidden">
+                {mobileListLabels[i]}
+              </span>
+              <div className="relative px-1 ">
+                <input
+                  form={formId}
+                  type="hidden"
+                  name={`${names[i]}_${trabajo.id}`}
+                  value={precio ?? 0}
+                />
+                <input
+                  type="text"
+                  value={formatPrecioInput(precio ?? 0)}
+                  inputMode="numeric"
+                  onChange={(event) =>
+                    onPrecioChange(
+                      trabajo.id,
+                      (i + 1) as ListaPrecio,
+                      parsePrecioInput(event.target.value)
+                    )
+                  }
+                  className="w-28 md:w-25 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-right text-sm font-medium text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                />
+              </div>
+            </div>
+          ) : (
+            <div
+              key={i}
+              className={cn(
+                "flex w-full items-center justify-between gap-3 md:w-28 md:justify-end md:items-center md:px-3",
+                i % 2 === 1 && "md:bg-black/[0.03]"
+              )}
+            >
+              <span className="text-sm font-medium text-[var(--text-color-gray)] md:hidden">
+                {mobileListLabels[i]}
+              </span>
+              <span className="tabular-nums text-sm font-medium text-right text-[var(--text-color-defult)]">
+                {formatPrecio(precio)}
+              </span>
+            </div>
+          )
+        )}
+      </div>
+      <div className="hidden w-[70] items-center justify-center md:flex">
+        {isEditing && (
           <DeleteItemForm
             itemId={trabajo.id}
             idFieldName="trabajoId"
             title="Eliminar trabajo"
             action={deleteTrabajoAction}
           />
-        </div>
-      )}
-
+        )}
+      </div>
     </div>
   );
 }
@@ -209,17 +271,11 @@ function CategoriaCard({
   const deleteFormRef = useRef<HTMLFormElement>(null);
   const [engineIconsOpen, setEngineIconsOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [ajustesPorcentaje, setAjustesPorcentaje] = useState<Record<1 | 2 | 3, number>>({
-    1: 0,
-    2: 0,
-    3: 0,
-  });
+  const [ajustesPorcentaje, setAjustesPorcentaje] = useState<Record<ListaPrecio, number>>(emptyAjustes);
   const [categoriaIcono, setCategoriaIcono] = useState<EngineIconName | null>(
     isEngineIconName(grupo.categoriaIcono) ? grupo.categoriaIcono : null
   );
-  const [precioDrafts, setPrecioDrafts] = useState<
-    Record<number, { precioLista1: number; precioLista2: number; precioLista3: number }>
-  >({});
+  const [precioDrafts, setPrecioDrafts] = useState<Record<number, PreciosLista>>({});
 
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteCategoriaAction, { error: null });
   const [addState, addFormAction, addPending] = useActionState(createTrabajoAction, { error: null, resetKey: 0 });
@@ -240,19 +296,8 @@ function CategoriaCard({
   }, [saveState.success, grupo.categoriaId, grupo.categoriaNombre]);
 
   useEffect(() => {
-    setPrecioDrafts(
-      Object.fromEntries(
-        grupo.trabajos.map((trabajo) => [
-          trabajo.id,
-          {
-            precioLista1: trabajo.precioLista1,
-            precioLista2: trabajo.precioLista2,
-            precioLista3: trabajo.precioLista3,
-          },
-        ])
-      )
-    );
-    setAjustesPorcentaje({ 1: 0, 2: 0, 3: 0 });
+    setPrecioDrafts(Object.fromEntries(grupo.trabajos.map((t) => [t.id, extractPrecios(t)])));
+    setAjustesPorcentaje(emptyAjustes());
     setCategoriaIcono(isEngineIconName(grupo.categoriaIcono) ? grupo.categoriaIcono : null);
   }, [grupo]);
 
@@ -262,67 +307,31 @@ function CategoriaCard({
     setIsEditing(false);
     setResetKey((k) => k + 1);
     setCategoriaIcono(isEngineIconName(grupo.categoriaIcono) ? grupo.categoriaIcono : null);
-    setPrecioDrafts(
-      Object.fromEntries(
-        grupo.trabajos.map((trabajo) => [
-          trabajo.id,
-          {
-            precioLista1: trabajo.precioLista1,
-            precioLista2: trabajo.precioLista2,
-            precioLista3: trabajo.precioLista3,
-          },
-        ])
-      )
-    );
-    setAjustesPorcentaje({ 1: 0, 2: 0, 3: 0 });
+    setPrecioDrafts(Object.fromEntries(grupo.trabajos.map((t) => [t.id, extractPrecios(t)])));
+    setAjustesPorcentaje(emptyAjustes());
   }
 
-  function handlePrecioChange(trabajoId: number, lista: 1 | 2 | 3, value: number) {
+  function handlePrecioChange(trabajoId: number, lista: ListaPrecio, value: number) {
     const precio = Number.isFinite(value) && value >= 0 ? Math.round(value) : 0;
+    const key = `precioLista${lista}` as keyof PreciosLista;
 
-    setPrecioDrafts((prev) => {
-      const current = prev[trabajoId] ?? {
-        precioLista1: 0,
-        precioLista2: 0,
-        precioLista3: 0,
-      };
-
-      return {
-        ...prev,
-        [trabajoId]: {
-          ...current,
-          ...(lista === 1
-            ? { precioLista1: precio }
-            : lista === 2
-              ? { precioLista2: precio }
-              : { precioLista3: precio }),
-        },
-      };
-    });
+    setPrecioDrafts((prev) => ({
+      ...prev,
+      [trabajoId]: { ...(prev[trabajoId] ?? emptyPrecios()), [key]: precio },
+    }));
   }
 
-  function applyListaAdjustment(lista: 1 | 2 | 3, delta: number) {
+  function applyListaAdjustment(lista: ListaPrecio, delta: number) {
     const newTotal = Math.round((ajustesPorcentaje[lista] + delta) * 10) / 10;
     const factor = 1 + newTotal / 100;
+    const key = `precioLista${lista}` as keyof PreciosLista;
 
     setPrecioDrafts((prev) => {
       const next = { ...prev };
 
       for (const trabajo of grupo.trabajos) {
-        const current = next[trabajo.id] ?? {
-          precioLista1: trabajo.precioLista1,
-          precioLista2: trabajo.precioLista2,
-          precioLista3: trabajo.precioLista3,
-        };
-
-        next[trabajo.id] = {
-          ...current,
-          ...(lista === 1
-            ? { precioLista1: Math.max(0, Math.round(trabajo.precioLista1 * factor)) }
-            : lista === 2
-              ? { precioLista2: Math.max(0, Math.round(trabajo.precioLista2 * factor)) }
-              : { precioLista3: Math.max(0, Math.round(trabajo.precioLista3 * factor)) }),
-        };
+        const current = next[trabajo.id] ?? extractPrecios(trabajo);
+        next[trabajo.id] = { ...current, [key]: Math.max(0, Math.round(trabajo[key] * factor)) };
       }
 
       return next;
@@ -340,9 +349,9 @@ function CategoriaCard({
       <form id={formId} action={saveFormAction} className="hidden">
         <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
         <input type="hidden" name="icono" value={categoriaIcono ?? ""} />
-        <input type="hidden" name="ajuste_lista_1" value={ajustesPorcentaje[1]} />
-        <input type="hidden" name="ajuste_lista_2" value={ajustesPorcentaje[2]} />
-        <input type="hidden" name="ajuste_lista_3" value={ajustesPorcentaje[3]} />
+        {LISTAS_PRECIOS.map((n) => (
+          <input key={n} type="hidden" name={`ajuste_lista_${n}`} value={ajustesPorcentaje[n]} />
+        ))}
       </form>
 
       {/* ── Toolbar ── */}
@@ -471,35 +480,49 @@ function CategoriaCard({
           onReorder={reorderTrabajosAction}
           renderHeader={
             isEditing ? (
-              <div className="adjust-values flex flex-col gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-5 py-2 md:flex-row md:items-center md:gap-3 md:py-1.5">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)] md:flex-1">
+              <div className="adjust-values flex flex-col border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] md:flex-row md:items-stretch">
+                <span className="flex items-center px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)] md:flex-1 md:py-0">
                   Ajuste porcentual por lista
                 </span>
-                <div className="flex flex-wrap gap-3 md:shrink-0 md:flex-nowrap md:gap-2">
-                  {[1, 2, 3].map((lista) => (
-                    <div key={lista} className="flex items-center gap-2 md:w-28 md:flex-col md:gap-1">
+                <div className="flex flex-wrap gap-3 px-5 pb-2 md:shrink-0 md:flex-nowrap md:gap-0 md:px-0 md:py-0">
+                  {LISTAS_PRECIOS.map((n, i) => (
+                    <div key={n} className={cn("flex w-full items-center justify-between gap-3 md:w-28 md:flex-col md:justify-center md:items-center md:py-2", i % 2 === 1 && "md:bg-black/[0.03]")}>
                       <span className="w-14 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)] md:w-auto md:text-center">
-                        Lista {lista}
+                        Lista {n}
                       </span>
                       <Incrementor
                         incrementoSmall
-                        value={ajustesPorcentaje[lista as 1 | 2 | 3]}
-                        onDecrement={() => applyListaAdjustment(lista as 1 | 2 | 3, -0.1)}
-                        onIncrement={() => applyListaAdjustment(lista as 1 | 2 | 3, 0.1)}
+                        value={ajustesPorcentaje[n]}
+                        onDecrement={() => applyListaAdjustment(n, -0.1)}
+                        onIncrement={() => applyListaAdjustment(n, 0.1)}
                         valueClassName="min-w-0"
                         formatValue={(value) => `${value > 0 ? "+" : ""}${value.toFixed(1)}%`}
                       />
                     </div>
                   ))}
                 </div>
+                <div className="w-[70] flex items-center justify-center"></div>
               </div>
-            ) : null
+            ) : (
+              <div className="hidden md:flex items-stretch border-b border-[var(--color-border)] bg-[var(--color-surface-alt)]/40">
+                <div className="flex-1 px-5 py-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">Trabajo</span>
+                </div>
+                <div className="flex shrink-0">
+                  {LISTAS_PRECIOS.map((n, i) => (
+                    <div key={n} className={cn("w-28 px-1 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]", i % 2 === 1 && "bg-black/[0.03]")}>
+                      Lista {n}
+                    </div>
+                  ))}
+                </div>
+                <div className="w-[70] flex items-center justify-center"></div>
+              </div>
+            )
           }
-          renderItem={(trabajo, index) => (
+          renderItem={(trabajo) => (
             <SortableTrabajoRow
               key={trabajo.id}
               trabajo={trabajo}
-              index={index}
               isEditing={isEditing}
               formId={formId}
               preciosDraft={precioDrafts[trabajo.id]}

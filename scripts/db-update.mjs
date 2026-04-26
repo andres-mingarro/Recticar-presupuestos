@@ -79,10 +79,14 @@ async function main() {
   console.log("\n¿A cuál entorno?");
   console.log("  1. dev");
   console.log("  2. prod");
+  console.log("  0. Salir");
 
   const opcion = await ask("\nOpción: ");
 
-  if (opcion === "1") {
+  if (opcion === "0") {
+    console.log("Saliendo.");
+    process.exit(0);
+  } else if (opcion === "1") {
     const url = process.env.DEV_DATABASE_URL;
     if (!url) throw new Error("DEV_DATABASE_URL no está definida en .env.local");
     await runMigrations(url, "dev");

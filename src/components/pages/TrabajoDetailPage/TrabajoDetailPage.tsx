@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
+import type { ListaPrecio } from "@/lib/db";
 import type {
   Marca,
   Modelo,
@@ -18,6 +19,7 @@ import {
   type TrabajoFormState,
   type TrabajoFormSummary,
 } from "@/components/forms/TrabajoForm";
+import { useRepuestosSeleccion } from "@/components/forms/TrabajoForm/RepuestosSeleccionContext";
 import { Button } from "@/components/ui/Button";
 import { CobradoProvider, CobradoToggle } from "@/components/ui/CobradoToggle";
 import { IvaProvider } from "@/components/ui/IvaToggle";
@@ -101,6 +103,41 @@ type TrabajoDetailPageProps = {
     formData: FormData
   ) => Promise<{ error: string | null; success: boolean; updatedCount: number }>;
 };
+
+function RepuestosSync({
+  formState,
+  repuestosCatalogoById,
+}: {
+  formState: TrabajoFormState;
+  repuestosCatalogoById: Map<number, { precioStock: number }>;
+}) {
+  const { resetItems } = useRepuestosSeleccion();
+  const lastUpdatedAtRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const updatedAt = formState.values.updatedAt ?? null;
+    if (!updatedAt) return;
+    if (formState.error) return;
+    if (updatedAt === lastUpdatedAtRef.current) return;
+    lastUpdatedAtRef.current = updatedAt;
+
+    resetItems(
+      formState.values.repuestos.map((r) => {
+        const repuestoId = Number(r.repuestoId);
+        const catalogo = repuestosCatalogoById.get(repuestoId);
+        return {
+          repuestoId,
+          precioUnitario: r.precioUnitario,
+          cantidad: r.cantidad,
+          precioStock: r.precioStock > 0 ? r.precioStock : (catalogo?.precioStock ?? 0),
+          cantidadStock: r.cantidadStock ?? 0,
+        };
+      })
+    );
+  }, [formState.values.updatedAt, formState.values.repuestos, formState.error, resetItems, repuestosCatalogoById]);
+
+  return null;
+}
 
 export function TrabajoDetailPage({
   trabajo,
@@ -187,14 +224,12 @@ export function TrabajoDetailPage({
           repuestoId,
           precioUnitario: repuesto.precioUnitario,
           cantidad: repuesto.cantidad,
-          // Usar precio del snapshot guardado; el catálogo solo sirve de fallback si no hay valor previo
           precioStock: repuesto.precioStock > 0 ? repuesto.precioStock : (repuestoCatalogo?.precioStock ?? 0),
-          // Usar cantidadStock del snapshot guardado — el recálculo visual para mostrar "Hay en stock"
-          // lo hace la UI al render, pero el valor que se envía al servidor debe ser el del snapshot
           cantidadStock: repuesto.cantidadStock ?? 0,
         };
       })}
     >
+    <RepuestosSync formState={formState} repuestosCatalogoById={repuestosCatalogoById} />
     <div className={cn("TrabajoDetailPage", styles.TrabajoDetailPage, "space-y-5")}>
 
       {/* ── Botón guardar ─────────────────────────────────────────── */}
@@ -213,7 +248,7 @@ export function TrabajoDetailPage({
 
       <TrabajosSeleccionProvider
         initialIds={trabajo.trabajos_ids}
-        initialListaPrecios={(trabajo.lista_precio as 1 | 2 | 3) ?? 1}
+        initialListaPrecios={(trabajo.lista_precio as ListaPrecio) ?? 1}
       >
       <div className={cn("TrabajoDetailPageContent", styles.TrabajoDetailPageContent)}>
 

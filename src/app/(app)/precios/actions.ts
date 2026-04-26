@@ -14,6 +14,7 @@ import {
   updateTrabajoPrecios,
 } from "@/lib/queries/catalogo";
 import { registrarAjuste } from "@/lib/queries/ajustes";
+import { LISTAS_PRECIOS, type PreciosLista } from "@/lib/db";
 
 export type CatalogActionState = { error: string | null; resetKey?: number; success?: boolean };
 
@@ -30,10 +31,7 @@ export async function updateCategoriaTrabajos(
   const iconoRaw = normalize(formData, "icono");
   const icono = iconoRaw || null;
   const nombreUpdates: Array<{ id: number; nombre: string }> = [];
-  const precioUpdates = new Map<
-    number,
-    { id: number; precioLista1: number; precioLista2: number; precioLista3: number }
-  >();
+  const precioUpdates = new Map<number, { id: number } & PreciosLista>();
 
   for (const [key, value] of formData.entries()) {
     if (key.startsWith("nombre_")) {
@@ -50,21 +48,20 @@ export async function updateCategoriaTrabajos(
         continue;
       }
 
-      const current =
-        precioUpdates.get(id) ?? { id, precioLista1: 0, precioLista2: 0, precioLista3: 0 };
+      const current = precioUpdates.get(id) ?? ({
+        id,
+        ...Object.fromEntries(LISTAS_PRECIOS.map((n) => [`precioLista${n}`, 0])),
+      } as { id: number } & PreciosLista);
 
-      if (lista === "1") current.precioLista1 = precio;
-      if (lista === "2") current.precioLista2 = precio;
-      if (lista === "3") current.precioLista3 = precio;
+      const precioKey = `precioLista${lista}` as keyof PreciosLista;
+      if (precioKey in current) (current as Record<string, number>)[precioKey] = precio;
 
       precioUpdates.set(id, current);
     }
   }
 
   const nombreCategoria = normalize(formData, "nombre");
-  const ajusteLista1 = Number(normalize(formData, "ajuste_lista_1")) || 0;
-  const ajusteLista2 = Number(normalize(formData, "ajuste_lista_2")) || 0;
-  const ajusteLista3 = Number(normalize(formData, "ajuste_lista_3")) || 0;
+  const ajustes = LISTAS_PRECIOS.map((n) => Number(normalize(formData, `ajuste_lista_${n}`)) || 0) as [number, number, number, number, number];
 
   try {
     if (!Number.isNaN(categoriaId)) {
@@ -73,8 +70,8 @@ export async function updateCategoriaTrabajos(
     }
     if (nombreUpdates.length > 0) await updateTrabajoNombres(nombreUpdates);
     if (precioUpdates.size > 0) await updateTrabajoPrecios(Array.from(precioUpdates.values()));
-    if ((ajusteLista1 !== 0 || ajusteLista2 !== 0 || ajusteLista3 !== 0) && nombreCategoria) {
-      await registrarAjuste(categoriaId, nombreCategoria, ajusteLista1, ajusteLista2, ajusteLista3);
+    if (ajustes.some((a) => a !== 0) && nombreCategoria) {
+      await registrarAjuste(categoriaId, nombreCategoria, ...ajustes);
     }
   } catch {
     return { error: "No se pudieron guardar los cambios. Probá nuevamente." };

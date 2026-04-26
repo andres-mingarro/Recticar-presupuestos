@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
 import { TRABAJO_ESTADO_LABELS, type TrabajoEstado, type TrabajoPrioridad } from "@/lib/types";
+import type { ListaPrecio } from "@/lib/db";
 import { Icon } from "@/components/ui/Icon";
 import styles from "./Badge.module.scss";
 
@@ -311,16 +312,18 @@ export function ListPriceBadge({
   hideLabelOnMobile = false,
   className,
 }: {
-  lista: 1 | 2 | 3;
+  lista: ListaPrecio;
   value?: string;
   label?: string;
   hideLabelOnMobile?: boolean;
   className?: string;
 }) {
-  const tones: Record<1 | 2 | 3, string> = {
+  const tones: Record<ListaPrecio, string> = {
     1: "border-[var(--color-neutral-border)] bg-[var(--color-neutral-bg)] text-[var(--color-neutral-text-strong)]",
     2: "border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]",
     3: "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success-text-strong)]",
+    4: "border-[var(--color-info-border)] bg-[var(--color-info-bg)] text-[var(--color-info-text)]",
+    5: "border-[var(--orange-vivid)]/40 bg-[var(--peach-soft)]/30 text-[var(--brown-burnt)]",
   };
 
   return (

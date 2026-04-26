@@ -132,9 +132,19 @@ export async function queryRowsFromTechnical<T extends Record<string, unknown>>(
   }
 }
 
-/** Fuente de verdad única para el nombre de columna SQL de lista de precios en la tabla trabajos (alias t). */
-export function precioListaColName(lista: 1 | 2 | 3): string {
-  if (lista === 3) return "t.precio_lista_3";
-  if (lista === 2) return "t.precio_lista_2";
-  return "t.precio_lista_1";
+/** Fuente de verdad: cuántas listas de precios existen. Agregar una lista = cambiar solo este array. */
+export const LISTAS_PRECIOS = [1, 2, 3, 4, 5] as const;
+export type ListaPrecio = (typeof LISTAS_PRECIOS)[number];
+
+/** Tipo que tiene precioLista1..N derivado de LISTAS_PRECIOS. */
+export type PreciosLista = { [K in ListaPrecio as `precioLista${K}`]: number };
+
+/** Lee precioListaN de un objeto que implementa PreciosLista. */
+export function getPrecioLista(t: PreciosLista, lista: ListaPrecio): number {
+  return t[`precioLista${lista}`];
+}
+
+/** Nombre de columna SQL para la tabla trabajos (alias t). */
+export function precioListaColName(lista: ListaPrecio): string {
+  return `t.precio_lista_${lista}`;
 }

@@ -71,7 +71,7 @@ export function PriceInput({ value, onChange, disabled, className, placeholder, 
       placeholder={placeholder ?? "$ 0"}
       style={style}
       className={cn(
-        "PriceInput h-9 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 text-right text-sm text-[var(--text-color-defult)] outline-none transition placeholder:text-[var(--text-color-ligth)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)] disabled:opacity-50",
+        "PriceInput h-9 w-[120] rounded-xl border border-[var(--color-border)] bg-white px-3 text-right text-sm text-[var(--text-color-defult)] outline-none transition placeholder:text-[var(--text-color-ligth)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)] disabled:opacity-50",
         className
       )}
     />

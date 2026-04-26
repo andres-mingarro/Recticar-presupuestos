@@ -152,8 +152,9 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
 ```
 
 **Reglas específicas:**
-- Si una expresión SQL se usa en más de un archivo, se extrae a un helper en `db.ts` o `queries/`. Ejemplo: `precioListaColName(lista: 1 | 2 | 3)` en `src/lib/db.ts`.
+- Si una expresión SQL se usa en más de un archivo, se extrae a un helper en `db.ts` o `queries/`.
 - Nunca hardcodear strings de columnas SQL en más de un lugar.
+- **Listas de precios:** toda la lógica derivada del número de listas parte de `LISTAS_PRECIOS` en `src/lib/db.ts`. Para construir nombres de columna SQL: `precioListaColName(lista)`. Para leer el precio de un objeto JS: `getPrecioLista(t, lista)`. El tipo de una lista válida es `ListaPrecio`. El tipo de un objeto con todos los precios es `PreciosLista`. Nunca hardcodear `1 | 2 | 3 | 4 | 5` — si se agrega una lista nueva, solo se modifica el array `LISTAS_PRECIOS` y se crea la migración SQL.
 - La normalización de datos legacy (como `pendiente` → `presupuesto_entregado`) se hace **en la capa de query**, no en los componentes.
 
 ```tsx
@@ -203,23 +204,24 @@ type MiTrabajo = { id: number; estado: string; ... };  // ← duplicado
 
 ```tsx
 // Correcto
-function applyAdjustment(lista: 1 | 2 | 3, delta: number) {
+function applyAdjustment(lista: ListaPrecio, delta: number) {
   const newTotal = Math.round((ajustesPorcentaje[lista] + delta) * 10) / 10;
   const factor = 1 + newTotal / 100;
+  const key = `precioLista${lista}` as keyof PreciosLista;
 
   setPrecioDrafts((prev) => {
     for (const trabajo of grupo.trabajos) {
-      // ← usa trabajo.precioLista1 (original de DB), no el draft redondeado
-      next[trabajo.id].precioLista1 = Math.round(trabajo.precioLista1 * factor);
+      // ← usa trabajo[key] (original de DB), no el draft redondeado
+      next[trabajo.id] = { ...current, [key]: Math.round(trabajo[key] * factor) };
     }
   });
 }
 
 // Incorrecto — efecto trampa de redondeo
-function applyAdjustment(lista: 1 | 2 | 3, delta: number) {
+function applyAdjustment(lista: ListaPrecio, delta: number) {
   const factor = 1 + delta / 100;
-  // ← usa current.precioLista1 (draft ya redondeado): 10 * 1.01 = 10.1 → 10 → atascado
-  next[id].precioLista1 = Math.round(current.precioLista1 * factor);
+  // ← usa current[key] (draft ya redondeado): 10 * 1.01 = 10.1 → 10 → atascado
+  next[id] = { ...current, [key]: Math.round(current[key] * factor) };
 }
 ```
 
@@ -244,3 +246,4 @@ Antes de tocar cualquier archivo de datos o estado, responder estas preguntas:
 5. **¿Mi server action no tiene `try/catch`?** → agregarlo.
 6. **¿Mi hook de contexto retorna un noop si no hay Provider?** → cambiar a `throw new Error(...)`.
 7. **¿Estoy aplicando un porcentaje sobre un valor ya redondeado en un loop?** → aplicar sobre el original.
+8. **¿Estoy hardcodeando `1 | 2 | 3 | 4 | 5` o una lista de N listas de precios?** → usar `LISTAS_PRECIOS`, `ListaPrecio` y `PreciosLista` de `src/lib/db.ts`.

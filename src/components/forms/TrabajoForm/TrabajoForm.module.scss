@@ -22,16 +22,28 @@
   gap: 1rem;
 }
 
+.TrabajoFormRepuestoBodyWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms ease;
+  overflow: hidden;
+}
+
+.TrabajoFormRepuestoBodyWrapOpen {
+  grid-template-rows: 1fr;
+}
+
 .TrabajoFormRepuestoBody {
   display: grid;
   gap: 0.55rem;
+  min-height: 0;
 }
 
 .TrabajoFormRepuestoRow {
-  display: grid;
-  grid-template-columns: auto auto auto auto auto auto;
   align-items: center;
-  gap: 0.7rem;
+  gap: 2rem;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .TrabajoFormRepuestoField {
@@ -44,6 +56,7 @@
 .TrabajoFormRepuestoFieldTotal {
   justify-items: end;
   text-align: right;
+  flex: 1;
 }
 
 .TrabajoFormRepuestoFieldLabel {
@@ -98,8 +111,19 @@
   color: var(--text-color-gray);
 }
 
-.TrabajoFormAccordion[open] .TrabajoFormAccordionChevron {
-  transform: rotate(180deg);
+.TrabajoFormAccordionBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms ease;
+  overflow: hidden;
+}
+
+.TrabajoFormAccordionBodyOpen {
+  grid-template-rows: 1fr;
+}
+
+.TrabajoFormAccordionInner {
+  min-height: 0;
 }
 
 @media (max-width: 767px) {
@@ -124,19 +148,39 @@
   }
 
   .TrabajoFormRepuestoRow {
-    grid-template-columns: 1fr;
-    align-items: stretch;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
     gap: 0.55rem;
+    flex-direction: column;
+    display: grid;
+  }
+
+  .TrabajoFormRepuestoFieldCantidad,
+  .TrabajoFormRepuestoFieldPrecio,
+  .TrabajoFormRepuestoFieldTotal {
+    //grid-column: 1 / -1;
   }
 
   .TrabajoFormRepuestoField,
   .TrabajoFormRepuestoFieldTotal {
-    justify-items: stretch;
+    justify-items: start;
     text-align: left;
+  }
+
+  .TrabajoFormRepuestoFieldTotal {
+    grid-column: 3 / -1;
+    justify-items: end;
+    height: 100%;
   }
 
   .TrabajoFormRepuestoTotalValue {
     font-size: 1rem;
+  }
+
+  .TrabajoFormRepuestoFieldLabel {
+    align-items: center;
+    height: 25px;
+    line-height: 13px;
   }
 }
 

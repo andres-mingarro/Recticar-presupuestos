@@ -37,6 +37,7 @@ export function DialogContent({
         className={cn("Dialog", variant === "centered" ? styles.contentCentered : styles.content, className)}
         aria-describedby={undefined}
       >
+        <RadixDialog.Title className="sr-only">Diálogo</RadixDialog.Title>
         {children}
         <RadixDialog.Close className={styles.closeButton} aria-label="Cerrar">
           <Icon name="x" className="h-5 w-5" />

@@ -1,12 +1,13 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
+import type { ListaPrecio } from "@/lib/db";
 
 type TrabajosSeleccionContextValue = {
   selectedIds: Set<number>;
   toggle: (id: number, checked: boolean) => void;
-  listaPrecios: 1 | 2 | 3;
-  setListaPrecios: (lista: 1 | 2 | 3) => void;
+  listaPrecios: ListaPrecio;
+  setListaPrecios: (lista: ListaPrecio) => void;
 };
 
 const TrabajosSeleccionContext = createContext<TrabajosSeleccionContextValue | null>(null);
@@ -17,11 +18,11 @@ export function TrabajosSeleccionProvider({
   children,
 }: {
   initialIds: number[];
-  initialListaPrecios?: 1 | 2 | 3;
+  initialListaPrecios?: ListaPrecio;
   children: ReactNode;
 }) {
   const [selectedIds, setSelectedIds] = useState(() => new Set(initialIds));
-  const [listaPrecios, setListaPrecios] = useState<1 | 2 | 3>(initialListaPrecios);
+  const [listaPrecios, setListaPrecios] = useState<ListaPrecio>(initialListaPrecios);
 
   function toggle(id: number, checked: boolean) {
     setSelectedIds((prev) => {
