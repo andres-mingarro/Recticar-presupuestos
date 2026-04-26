@@ -1,3 +1,5 @@
+@use "sass:map";
+
 .EstadisticasPage {
   container-type: inline-size;
 }
@@ -369,9 +371,9 @@ $lista-colors: (
 @each $n, $colors in $lista-colors {
   .listaHeaderGroup#{$n} {
     .listaHeaderLabel {
-      background: map-get($colors, bg);
-      color: map-get($colors, text);
-      border-bottom: 1px solid map-get($colors, border);
+      background: map.get($colors, bg);
+      color: map.get($colors, text);
+      border-bottom: 1px solid map.get($colors, border);
     }
   }
 }
