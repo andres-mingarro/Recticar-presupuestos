@@ -4,7 +4,7 @@ export function DragHandle(props: React.ButtonHTMLAttributes<HTMLButtonElement>)
       type="button"
       tabIndex={-1}
       aria-label="Reordenar"
-      className="cursor-grab touch-none text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)] active:cursor-grabbing"
+      className="DragHandle drag-handle-button flex items-center justify-center cursor-grab touch-none text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)] active:cursor-grabbing"
       {...props}
     >
       <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" stroke="none">

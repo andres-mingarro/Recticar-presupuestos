@@ -9,7 +9,8 @@ import { formatPrice } from "@/lib/format";
 import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
 import { PriceInput } from "@/components/ui/PriceInput";
 import { fieldCls, readCls, type RepuestosActionFn } from "./shared";
-import { DragHandle } from "./DragHandle";
+import { DragHandle } from "@/components/ui/DragHandle";
+import { Switch } from "@/components/ui/Switch";
 
 type Repuesto = RepuestoAgrupado["repuestos"][number];
 
@@ -95,29 +96,12 @@ export function SortableRepuestoRow({
                 placeholder="$ Precio"
               />
             </div>
-            <label className="flex cursor-pointer items-center gap-2">
-              <input
-                form={formId}
-                type="checkbox"
-                name={`stock_habilitado_${repuesto.id}`}
-                value="true"
-                checked={stockHabilitado}
-                onChange={(e) => setStockHabilitado(e.target.checked)}
-                className="sr-only"
-              />
-              <span
-                className={cn(
-                  "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200",
-                  stockHabilitado ? "bg-[var(--color-accent)]" : "bg-[var(--color-border)]"
-                )}
-              >
-                <span className={cn(
-                  "pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transition-transform duration-200",
-                  stockHabilitado ? "translate-x-4" : "translate-x-0"
-                )} />
-              </span>
-              <span className="whitespace-nowrap text-xs font-medium text-[var(--text-color-gray)]">En stock</span>
-            </label>
+            <input form={formId} type="hidden" name={`stock_habilitado_${repuesto.id}`} value={stockHabilitado ? "true" : ""} />
+            <Switch
+              checked={stockHabilitado}
+              onChange={setStockHabilitado}
+              label="En stock"
+            />
           </>
         ) : (
           repuesto.stockHabilitado && (

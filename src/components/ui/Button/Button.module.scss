@@ -1,5 +1,298 @@
 .Button {
   display: inline-flex;
+  position: relative;
+  isolation: isolate;
+  transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+
+  // El ::after lleva el gradiente de la variante hover y se anima con opacity
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  &[data-hover-variant]:not(:disabled):hover::after {
+    opacity: 1;
+  }
+
+  // Gradiente del ::after según data-hover-variant
+  &[data-hover-variant="primary"]::after        { background: linear-gradient(135deg, var(--orange-vivid), var(--color-accent)); }
+  &[data-hover-variant="secondary"]::after      { background: linear-gradient(135deg, var(--cream-warm), var(--peach-soft)); }
+  &[data-hover-variant="ghost"]::after          { background: var(--color-surface-alt); }
+  &[data-hover-variant="dark"]::after           { background: linear-gradient(135deg, #475569, #1e293b); }
+  &[data-hover-variant="warm"]::after           { background: linear-gradient(135deg, var(--apricot-light), var(--orange-vivid)); }
+  &[data-hover-variant="burnt"]::after          { background: linear-gradient(135deg, var(--color-accent), var(--brown-burnt)); }
+  &[data-hover-variant="outline"]::after        { background: var(--color-accent-soft); }
+  &[data-hover-variant="outline-warm"]::after   { background: color-mix(in srgb, var(--peach-soft) 40%, transparent); }
+  &[data-hover-variant="outline-dark"]::after   { background: #f1f5f9; }
+  &[data-hover-variant="outline-ghost"]::after  { background: transparent; }
+  &[data-hover-variant="danger-ghost"]::after   { background: var(--color-danger-bg); }
+  &[data-hover-variant="danger"]::after         { background: linear-gradient(135deg, #f87171, #dc2626); }
+  &[data-hover-variant="warning"]::after        { background: linear-gradient(135deg, #fbbf24, #d97706); }
+  &[data-hover-variant="info"]::after           { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+  &[data-hover-variant="success"]::after        { background: linear-gradient(135deg, #4ade80, #16a34a); }
+  &[data-hover-variant="outline-danger"]::after { background: #fef2f2; }
+  &[data-hover-variant="outline-warning"]::after{ background: #fffbeb; }
+  &[data-hover-variant="outline-info"]::after   { background: #eff6ff; }
+  &[data-hover-variant="outline-success"]::after{ background: #f0fdf4; }
+
+  // ── Variantes base ─────────────────────────────────────────────────────────
+
+  &[data-variant="primary"] {
+    background: linear-gradient(135deg, var(--orange-vivid), var(--color-accent));
+    color: white;
+    box-shadow: 0 2px 8px var(--color-accent-soft);
+    --focus-ring: var(--color-accent);
+  }
+  &[data-variant="secondary"] {
+    border: 1px solid var(--color-border);
+    background: linear-gradient(135deg, var(--cream-warm), var(--peach-soft));
+    color: var(--brown-burnt);
+    --focus-ring: var(--color-accent);
+  }
+  &[data-variant="ghost"] {
+    background: transparent;
+    color: var(--text-color-gray);
+    --focus-ring: var(--color-accent);
+  }
+  &[data-variant="dark"] {
+    background: linear-gradient(135deg, #475569, #1e293b);
+    color: white;
+    --focus-ring: #334155;
+  }
+  &[data-variant="warm"] {
+    background: linear-gradient(135deg, var(--apricot-light), var(--orange-vivid));
+    color: white;
+    --focus-ring: var(--orange-vivid);
+  }
+  &[data-variant="burnt"] {
+    background: linear-gradient(135deg, var(--color-accent), var(--brown-burnt));
+    color: white;
+    --focus-ring: var(--brown-burnt);
+  }
+  &[data-variant="outline"] {
+    border: 1px solid var(--color-accent);
+    background: transparent;
+    color: var(--color-accent);
+    --focus-ring: var(--color-accent);
+  }
+  &[data-variant="outline-warm"] {
+    border: 1px solid var(--brown-burnt);
+    background: transparent;
+    color: var(--brown-burnt);
+    --focus-ring: var(--brown-burnt);
+  }
+  &[data-variant="outline-dark"] {
+    border: 1px solid #475569;
+    background: transparent;
+    color: #475569;
+    --focus-ring: #64748b;
+  }
+  &[data-variant="outline-ghost"] {
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--text-color-gray);
+    --focus-ring: var(--color-accent);
+  }
+  &[data-variant="danger-ghost"] {
+    background: transparent;
+    color: var(--text-color-gray);
+    --focus-ring: var(--color-danger-text);
+  }
+  &[data-variant="link"] {
+    height: auto;
+    padding-inline: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--color-accent);
+    --focus-ring: var(--color-accent);
+  }
+  &[data-variant="danger"] {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    color: white;
+    box-shadow: 0 2px 8px #fca5a5;
+    --focus-ring: #dc2626;
+  }
+  &[data-variant="warning"] {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+    color: white;
+    box-shadow: 0 2px 8px #fde68a;
+    --focus-ring: #d97706;
+  }
+  &[data-variant="info"] {
+    background: linear-gradient(135deg, #60a5fa, #2563eb);
+    color: white;
+    box-shadow: 0 2px 8px #bfdbfe;
+    --focus-ring: #2563eb;
+  }
+  &[data-variant="success"] {
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    color: white;
+    box-shadow: 0 2px 8px #bbf7d0;
+    --focus-ring: #16a34a;
+  }
+  &[data-variant="outline-danger"] {
+    border: 1px solid #dc2626;
+    background: transparent;
+    color: #dc2626;
+    --focus-ring: #dc2626;
+  }
+  &[data-variant="outline-warning"] {
+    border: 1px solid #d97706;
+    background: transparent;
+    color: #d97706;
+    --focus-ring: #d97706;
+  }
+  &[data-variant="outline-info"] {
+    border: 1px solid #2563eb;
+    background: transparent;
+    color: #2563eb;
+    --focus-ring: #2563eb;
+  }
+  &[data-variant="outline-success"] {
+    border: 1px solid #16a34a;
+    background: transparent;
+    color: #16a34a;
+    --focus-ring: #16a34a;
+  }
+
+  // ── Hover por variante base (sin variantOnHover) ────────────────────────────
+
+  &:not([data-hover-variant]):not(:disabled) {
+    &[data-variant="primary"]:hover         { filter: brightness(1.05); }
+    &[data-variant="secondary"]:hover       { filter: brightness(0.95); }
+    &[data-variant="ghost"]:hover           { background: var(--color-surface-alt); }
+    &[data-variant="dark"]:hover            { filter: brightness(1.1); }
+    &[data-variant="warm"]:hover            { filter: brightness(1.05); }
+    &[data-variant="burnt"]:hover           { filter: brightness(1.1); }
+    &[data-variant="outline"]:hover         { background: var(--color-accent-soft); }
+    &[data-variant="outline-warm"]:hover    { background: color-mix(in srgb, var(--peach-soft) 40%, transparent); }
+    &[data-variant="outline-dark"]:hover    { background: #f1f5f9; }
+    &[data-variant="outline-ghost"]:hover   { border-color: var(--color-accent); color: var(--color-accent); }
+    &[data-variant="danger-ghost"]:hover    { background: var(--color-danger-bg); color: var(--color-danger-text); }
+    &[data-variant="link"]:hover            { color: var(--color-accent-strong); text-decoration-color: var(--color-accent-strong); }
+    &[data-variant="danger"]:hover          { filter: brightness(1.05); }
+    &[data-variant="warning"]:hover         { filter: brightness(1.05); }
+    &[data-variant="info"]:hover            { filter: brightness(1.05); }
+    &[data-variant="success"]:hover         { filter: brightness(1.05); }
+    &[data-variant="outline-danger"]:hover  { background: #fef2f2; }
+    &[data-variant="outline-warning"]:hover { background: #fffbeb; }
+    &[data-variant="outline-info"]:hover    { background: #eff6ff; }
+    &[data-variant="outline-success"]:hover { background: #f0fdf4; }
+  }
+
+  // ── variantOnHover: cambia a otra variante completa en hover ───────────────
+
+  &[data-hover-variant]:not(:disabled):hover {
+    box-shadow: none;
+    border-color: transparent;
+    filter: none;
+  }
+  &[data-hover-variant="primary"]:not(:disabled):hover {
+    background: linear-gradient(135deg, var(--orange-vivid), var(--color-accent));
+    color: white;
+    box-shadow: 0 2px 8px var(--color-accent-soft);
+  }
+  &[data-hover-variant="secondary"]:not(:disabled):hover {
+    background: linear-gradient(135deg, var(--cream-warm), var(--peach-soft));
+    color: var(--brown-burnt);
+    border-color: var(--color-border);
+  }
+  &[data-hover-variant="ghost"]:not(:disabled):hover {
+    background: var(--color-surface-alt);
+    color: var(--text-color-gray);
+  }
+  &[data-hover-variant="dark"]:not(:disabled):hover {
+    background: linear-gradient(135deg, #475569, #1e293b);
+    color: white;
+  }
+  &[data-hover-variant="warm"]:not(:disabled):hover {
+    background: linear-gradient(135deg, var(--apricot-light), var(--orange-vivid));
+    color: white;
+  }
+  &[data-hover-variant="burnt"]:not(:disabled):hover {
+    background: linear-gradient(135deg, var(--color-accent), var(--brown-burnt));
+    color: white;
+  }
+  &[data-hover-variant="outline"]:not(:disabled):hover {
+    border: 1px solid var(--color-accent);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+  &[data-hover-variant="outline-warm"]:not(:disabled):hover {
+    border: 1px solid var(--brown-burnt);
+    background: color-mix(in srgb, var(--peach-soft) 40%, transparent);
+    color: var(--brown-burnt);
+  }
+  &[data-hover-variant="outline-dark"]:not(:disabled):hover {
+    border: 1px solid #475569;
+    background: #f1f5f9;
+    color: #475569;
+  }
+  &[data-hover-variant="outline-ghost"]:not(:disabled):hover {
+    border: 1px solid var(--color-accent);
+    background: transparent;
+    color: var(--color-accent);
+  }
+  &[data-hover-variant="danger-ghost"]:not(:disabled):hover {
+    background: var(--color-danger-bg);
+    color: var(--color-danger-text);
+  }
+  &[data-hover-variant="danger"]:not(:disabled):hover {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    color: white;
+    box-shadow: 0 2px 8px #fca5a5;
+  }
+  &[data-hover-variant="warning"]:not(:disabled):hover {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+    color: white;
+    box-shadow: 0 2px 8px #fde68a;
+  }
+  &[data-hover-variant="info"]:not(:disabled):hover {
+    background: linear-gradient(135deg, #60a5fa, #2563eb);
+    color: white;
+    box-shadow: 0 2px 8px #bfdbfe;
+  }
+  &[data-hover-variant="success"]:not(:disabled):hover {
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    color: white;
+    box-shadow: 0 2px 8px #bbf7d0;
+  }
+  &[data-hover-variant="outline-danger"]:not(:disabled):hover {
+    border: 1px solid #dc2626;
+    background: #fef2f2;
+    color: #dc2626;
+  }
+  &[data-hover-variant="outline-warning"]:not(:disabled):hover {
+    border: 1px solid #d97706;
+    background: #fffbeb;
+    color: #d97706;
+  }
+  &[data-hover-variant="outline-info"]:not(:disabled):hover {
+    border: 1px solid #2563eb;
+    background: #eff6ff;
+    color: #2563eb;
+  }
+  &[data-hover-variant="outline-success"]:not(:disabled):hover {
+    border: 1px solid #16a34a;
+    background: #f0fdf4;
+    color: #16a34a;
+  }
+
+  // ── Focus ring ──────────────────────────────────────────────────────────────
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--focus-ring, var(--color-accent));
+  }
 }
 
 .ButtonIcon {

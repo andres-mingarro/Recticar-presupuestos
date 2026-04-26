@@ -18,9 +18,9 @@ import { EngineIcons, EngineIconGlyph, isEngineIconName, type EngineIconName } f
 import { Icon } from "@/components/ui/Icon";
 import { SortableList } from "@/components/sortable/SortableList";
 import { Spinner } from "@/components/ui/Spinner";
+import { DragHandle } from "@/components/ui/DragHandle";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Incrementor } from "@/components/ui/Incrementor";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 // ─── Category card ────────────────────────────────────────────────────────────
 
@@ -48,26 +48,6 @@ function parsePrecioInput(value: string) {
   return digits ? Number(digits) : 0;
 }
 
-function DragHandle(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button
-      type="button"
-      tabIndex={-1}
-      aria-label="Reordenar"
-      className="cursor-grab touch-none text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)] active:cursor-grabbing"
-      {...props}
-    >
-      <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" stroke="none">
-        <circle cx="9" cy="6" r="1.5" />
-        <circle cx="15" cy="6" r="1.5" />
-        <circle cx="9" cy="12" r="1.5" />
-        <circle cx="15" cy="12" r="1.5" />
-        <circle cx="9" cy="18" r="1.5" />
-        <circle cx="15" cy="18" r="1.5" />
-      </svg>
-    </button>
-  );
-}
 
 function SortableTrabajoRow({
   trabajo,
@@ -101,11 +81,14 @@ function SortableTrabajoRow({
         isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
       )}
     >
-      <div className="precios-item-row-header flex flex-1 items-start gap-2 px-4 py-3 md:items-center md:px-5">
-        <div className="mt-1 md:mt-0">
-          <DragHandle {...attributes} {...listeners} />
-        </div>
+      <div className="precios-item-row-header flex flex-1 items-start gap-2 px-4 md:px-3 py-3 md:items-center ">
+        {isEditing && (
+          <div className="mt-1 md:mt-0">
+            <DragHandle {...attributes} {...listeners} />
+          </div>
+        )}
         <div className="min-w-0 flex-1">
+          {/* nombre del  */}
           <input
             form={formId}
             type="text"
@@ -268,16 +251,13 @@ function CategoriaCard({
   const [isEditing, setIsEditing] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const lastToastKeyRef = useRef<string | null>(null);
-  const deleteFormRef = useRef<HTMLFormElement>(null);
   const [engineIconsOpen, setEngineIconsOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ajustesPorcentaje, setAjustesPorcentaje] = useState<Record<ListaPrecio, number>>(emptyAjustes);
   const [categoriaIcono, setCategoriaIcono] = useState<EngineIconName | null>(
     isEngineIconName(grupo.categoriaIcono) ? grupo.categoriaIcono : null
   );
   const [precioDrafts, setPrecioDrafts] = useState<Record<number, PreciosLista>>({});
 
-  const [deleteState, deleteFormAction, deletePending] = useActionState(deleteCategoriaAction, { error: null });
   const [addState, addFormAction, addPending] = useActionState(createTrabajoAction, { error: null, resetKey: 0 });
   const [saveState, saveFormAction, savePending] = useActionState(updateCategoriaAction, { error: null });
 
@@ -421,29 +401,14 @@ function CategoriaCard({
               >
                 Cancelar
               </Button>
-              <form ref={deleteFormRef} action={deleteFormAction}>
-                <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={deletePending}
-                  title="Eliminar categoría"
-                  className="rounded-lg p-1.5 text-[var(--text-color-gray)] transition hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger-text)] disabled:opacity-40"
-                  onClick={() => setDeleteDialogOpen(true)}
-                  icon={<Icon name="trash" className="h-4 w-4" />}
-                />
-              </form>
-              <ConfirmDialog
-                open={deleteDialogOpen}
-                onOpenChange={setDeleteDialogOpen}
-                title="¿Eliminar categoría?"
-                description={`Vas a eliminar "${grupo.categoriaNombre}" y todos sus trabajos. Esta acción no se puede deshacer.`}
-                confirmLabel="Eliminar categoría"
-                loading={deletePending}
-                onConfirm={() => {
-                  setDeleteDialogOpen(false);
-                  deleteFormRef.current?.requestSubmit();
-                }}
+              <DeleteItemForm
+                itemId={grupo.categoriaId}
+                idFieldName="categoriaId"
+                title="Eliminar categoría"
+                confirmDescription={`Se eliminarán todos los trabajos de "${grupo.categoriaNombre}". Esta acción no se puede deshacer.`}
+                doubleConfirm
+                doubleConfirmDescription={`Esta acción borrará la categoría "${grupo.categoriaNombre}" y todos sus trabajos. No se puede deshacer.`}
+                action={deleteCategoriaAction}
               />
             </>
           ) : (
@@ -461,9 +426,9 @@ function CategoriaCard({
       </div>
 
       {/* Errores */}
-      {(deleteState.error || saveState.error) && (
+      {saveState.error && (
         <p className="px-5 py-2 text-xs text-[var(--color-danger-text)]">
-          {deleteState.error ?? saveState.error}
+          {saveState.error}
         </p>
       )}
 
