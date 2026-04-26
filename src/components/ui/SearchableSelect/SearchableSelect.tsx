@@ -178,7 +178,7 @@ export function SearchableSelect({
 
       {!loading && open && query.length > 0 && results.length === 0 && (
         <div className={cn("absolute z-50 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--text-color-gray)] shadow-lg", dropdownPos)}>
-          Sin resultados para "{query}"
+          Sin resultados para &ldquo;{query}&rdquo;
         </div>
       )}
     </div>

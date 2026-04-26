@@ -4,7 +4,7 @@ import { useActionState, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoAgrupado, TrabajoAgrupado } from "@/lib/types";
-import { getPrecioLista, type ListaPrecio } from "@/lib/db";
+import { getPrecioLista } from "@/lib/db";
 import { useTrabajosSeleccion } from "@/components/forms/TrabajoForm/TrabajosSeleccionContext";
 import { useRepuestosSeleccion } from "@/components/forms/TrabajoForm/RepuestosSeleccionContext";
 import { Button } from "@/components/ui/Button";
@@ -49,8 +49,14 @@ export function TrabajosResumen({
   // Tras un refresh exitoso, descartar los snapshots del server y usar precios actuales del catálogo.
   // revalidatePath actualiza el server, pero las props del client component no se refrescan
   // hasta la próxima navegación — por eso lo limpiamos localmente.
-  const activeSnapshotTrabajos = refreshState.success ? [] : snapshotTrabajos;
-  const activeSnapshotRepuestos = refreshState.success ? [] : snapshotRepuestos;
+  const activeSnapshotTrabajos = useMemo(
+    () => (refreshState.success ? [] : snapshotTrabajos),
+    [refreshState.success, snapshotTrabajos]
+  );
+  const activeSnapshotRepuestos = useMemo(
+    () => (refreshState.success ? [] : snapshotRepuestos),
+    [refreshState.success, snapshotRepuestos]
+  );
 
   const selectedTrabajos = useMemo(
     () => {
