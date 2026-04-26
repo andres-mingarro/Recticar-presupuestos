@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
 import { Icon } from "@/components/ui/Icon";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { SearchBar } from "./SearchBar";
 import { buildSectionHref } from "./buildSectionHref";
 
 const SECTION_LABELS: Record<TechnicalSection, string> = {
@@ -75,32 +75,7 @@ export function HeaderTable({
 
         {/* Row 2: búsqueda + paginación */}
         <div className="flex items-center gap-2 border-t border-[var(--color-border)] px-3 py-2">
-          {/* Search */}
-          <form className="flex min-w-0 flex-1 items-center gap-1.5">
-            <input type="hidden" name="section" value={section} />
-            <input
-              type="text"
-              name="q"
-              defaultValue={q}
-              placeholder={`Buscar…`}
-              className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
-            />
-            <Button type="submit" size="sm" className="shrink-0" icon={<Icon name="search" className="h-4 w-4" />}>
-              <span className="hidden sm:inline">Buscar</span>
-            </Button>
-            {q && (
-              <Button
-                as="a"
-                href={buildSectionHref(section, "")}
-                variant="secondary"
-                size="sm"
-                className="shrink-0"
-                icon={<Icon name="x" className="h-4 w-4" />}
-              >
-                <span className="hidden sm:inline">Limpiar</span>
-              </Button>
-            )}
-          </form>
+          <SearchBar section={section} q={q} />
 
           {(totalPages > 1 || currentPage > 1) && (
             <>

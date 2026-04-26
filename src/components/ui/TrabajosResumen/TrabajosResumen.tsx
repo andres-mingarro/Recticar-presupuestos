@@ -46,13 +46,19 @@ export function TrabajosResumen({
   );
   const lastRefreshToastRef = useRef<string | null>(null);
 
+  // Tras un refresh exitoso, descartar los snapshots del server y usar precios actuales del catálogo.
+  // revalidatePath actualiza el server, pero las props del client component no se refrescan
+  // hasta la próxima navegación — por eso lo limpiamos localmente.
+  const activeSnapshotTrabajos = refreshState.success ? [] : snapshotTrabajos;
+  const activeSnapshotRepuestos = refreshState.success ? [] : snapshotRepuestos;
+
   const selectedTrabajos = useMemo(
     () => {
-      if (snapshotTrabajos.length === 0) {
+      if (activeSnapshotTrabajos.length === 0) {
         return trabajos.flatMap((g) => g.trabajos).filter((t) => selectedIds.has(t.id));
       }
 
-      const snapshotSelected = snapshotTrabajos.filter((item) =>
+      const snapshotSelected = activeSnapshotTrabajos.filter((item) =>
         item.trabajoId === null || selectedIds.has(item.trabajoId)
       );
       const snapshotIds = new Set(
@@ -66,12 +72,12 @@ export function TrabajosResumen({
 
       return [...snapshotSelected, ...currentOnlySelected];
     },
-    [snapshotTrabajos, trabajos, selectedIds]
+    [activeSnapshotTrabajos, trabajos, selectedIds]
   );
 
   const selectedRepuestos = useMemo(
     () => {
-      if (snapshotRepuestos.length === 0) {
+      if (activeSnapshotRepuestos.length === 0) {
         const repuestosById = new Map(
           repuestos.flatMap((g) => g.repuestos).map((repuesto) => [repuesto.id, repuesto])
         );
@@ -92,7 +98,7 @@ export function TrabajosResumen({
       const repuestosById = new Map(
         repuestos.flatMap((g) => g.repuestos).map((repuesto) => [repuesto.id, repuesto])
       );
-      const snapshotSelected = snapshotRepuestos.filter((item) =>
+      const snapshotSelected = activeSnapshotRepuestos.filter((item) =>
         item.repuestoId === null || selectedRepuestoItems[item.repuestoId] !== undefined
       );
       const snapshotIds = new Set(
@@ -131,7 +137,7 @@ export function TrabajosResumen({
 
       return [...snapshotRows, ...currentOnlyRows];
     },
-    [repuestos, selectedRepuestoItems, snapshotRepuestos]
+    [repuestos, selectedRepuestoItems, activeSnapshotRepuestos]
   );
 
   const totalTrabajos = useMemo(
@@ -158,7 +164,7 @@ export function TrabajosResumen({
   }, [total, setMobileTotal]);
 
   const snapshotDiffs = useMemo(() => {
-    return snapshotTrabajos
+    return activeSnapshotTrabajos
       .filter((item) => item.trabajoId === null || selectedIds.has(item.trabajoId))
       .map((item) => {
         const current = item.trabajoId !== null ? trabajosById.get(item.trabajoId) : undefined;
@@ -185,7 +191,7 @@ export function TrabajosResumen({
         };
       })
       .filter((item): item is NonNullable<typeof item> => item !== null);
-  }, [snapshotTrabajos, selectedIds, trabajosById, listaPrecios]);
+  }, [activeSnapshotTrabajos, selectedIds, trabajosById, listaPrecios]);
 
   useEffect(() => {
     if (!refreshState.success) return;
@@ -228,8 +234,8 @@ export function TrabajosResumen({
           <div className="pt-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">
             Trabajos
           </div>
-          {selectedTrabajos.map((t) => (
-            <div key={"trabajoId" in t ? (t.trabajoId ?? `${t.categoriaNombre}-${t.trabajoNombre}`) : t.id} className="flex items-baseline justify-between gap-2">
+          {selectedTrabajos.map((t, i) => (
+            <div key={i} className="flex items-baseline justify-between gap-2">
               <span className="text-[var(--text-color-gray)]">{"trabajoNombre" in t ? t.trabajoNombre : t.nombre}</span>
               <span className="shrink-0 font-medium text-[var(--text-color-defult)]">
                 {formatPrice("precioLista1" in t ? getPrecioLista(t, listaPrecios) : t.precio)}
@@ -277,8 +283,8 @@ export function TrabajosResumen({
             Este resumen usa los valores históricos guardados. {snapshotDiffs.length === 1 ? "Hay 1 item" : `Hay ${snapshotDiffs.length} items`} con diferencia frente al catálogo actual.
           </p>
           <div className="mt-1.5 space-y-1">
-            {snapshotDiffs.slice(0, 3).map((item) => (
-              <p key={`${item.nombre}-${item.snapshotPrecio}`}>
+            {snapshotDiffs.slice(0, 3).map((item, i) => (
+              <p key={i}>
                 {item.nombre}: {item.missing ? "ya no existe en catálogo" : `${formatPrice(item.snapshotPrecio)} vs. ${formatPrice(item.currentPrecio ?? 0)}`}
               </p>
             ))}

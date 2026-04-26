@@ -23,6 +23,10 @@ import { Card } from "@/components/ui/Card";
 import { EstadoStepper } from "@/components/ui/EstadoStepper";
 import { PrioridadProvider, PrioridadToggle, usePrioridad } from "@/components/ui/PrioridadSelector";
 import { TrabajoDatosCard } from "@/components/ui/TrabajoDatosCard";
+import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { Spinner } from "@/components/ui/Spinner";
+import { Icon } from "@/components/ui/Icon";
+import { useMobileActionsRegister } from "@/components/layout/MobileActions";
 import styles from "./NuevoTrabajoPage.module.scss";
 
 type NuevoTrabajoPageProps = {
@@ -152,6 +156,20 @@ function NuevoTrabajoPageContent({
   setSummary: (summary: TrabajoFormSummary) => void;
 }) {
   const { prioridad } = usePrioridad();
+
+  useMobileActionsRegister(
+    <PulsatingButton
+      type="submit"
+      form={formId}
+      disabled={isPending}
+      pulsing={!isPending}
+      size="sm"
+    >
+      {isPending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
+      {isPending ? "Creando..." : "Crear trabajo"}
+    </PulsatingButton>,
+    [isPending]
+  );
 
   return (
     <>

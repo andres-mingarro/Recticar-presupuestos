@@ -215,7 +215,7 @@ export function InformacionTecnicaPage({
         }
         createForm={
           canEdit ? (
-            <AddModeloForm marcas={marcas} action={createModeloAction} />
+            <AddModeloForm action={createModeloAction} />
           ) : undefined
         }
       >
@@ -289,11 +289,7 @@ export function InformacionTecnicaPage({
         }
         createForm={
           canEdit && vehiculosTab === "visible" ? (
-            <AddVehiculoForm
-              modelos={modelos}
-              motores={motores}
-              action={createVehiculoAction}
-            />
+            <AddVehiculoForm action={createVehiculoAction} />
           ) : undefined
         }
         tabsSlot={

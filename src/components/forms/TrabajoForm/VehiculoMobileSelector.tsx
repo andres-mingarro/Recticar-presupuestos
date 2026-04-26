@@ -130,19 +130,14 @@ export function VehiculoMobileSelector({
           </div>
         </div>
       ) : (
-        <div className="inline-flex w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5">
-          <button
-            type="button"
-            onClick={() => onOpenWizard(0)}
-            className="inline-flex flex-1 items-center justify-between gap-2 rounded-xl border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)] transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]"
-          >
-            <span className="flex items-center gap-2 uppercase tracking-wider">
-              <Icon name="car" className="h-4 w-4 shrink-0" />
-              Seleccionar vehículo
-            </span>
-            <Icon name="chevronDown" className="h-4 w-4 opacity-80" />
-          </button>
-        </div>
+        <Button
+          type="button"
+          variant="hero"
+          onClick={() => onOpenWizard(0)}
+          icon={<Icon name="car" className="h-10 w-10" />}
+        >
+          Seleccionar vehículo
+        </Button>
       )}
 
       {/* Serie del motor */}

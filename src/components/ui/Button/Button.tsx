@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from "reac
 import { cn } from "@/lib/cn";
 import styles from "./Button.module.scss";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "dark" | "warm" | "burnt" | "outline" | "outline-warm" | "outline-dark" | "outline-ghost" | "danger-ghost" | "link" | "danger" | "warning" | "info" | "success" | "outline-danger" | "outline-warning" | "outline-info" | "outline-success";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "dark" | "warm" | "burnt" | "outline" | "outline-warm" | "outline-dark" | "outline-ghost" | "danger-ghost" | "link" | "danger" | "warning" | "info" | "success" | "outline-danger" | "outline-warning" | "outline-info" | "outline-success" | "hero";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export function buttonStyles({
