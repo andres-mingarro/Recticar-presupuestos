@@ -28,17 +28,26 @@ async function main() {
   console.log("\n¿Qué querés hacer?");
   console.log("  1. Crear contenido dummy");
   console.log("  2. Borrar contenido dummy");
+  console.log("  0. Salir");
 
   const opcion = await ask("\nOpción: ");
 
-  if (opcion === "1") {
+  if (opcion === "0") {
+    console.log("Saliendo.");
+    process.exit(0);
+  } else if (opcion === "1") {
     console.log("\n¿Qué contenido querés crear?");
     console.log("  1. Datos generales (clientes + trabajos)");
     console.log("  2. Estadísticas (2 años de órdenes cobradas + ajustes de precios)");
     console.log("  3. Todo");
+    console.log("  0. Salir");
 
     const sub = await ask("\nOpción: ");
 
+    if (sub === "0") {
+      console.log("Saliendo.");
+      process.exit(0);
+    }
     if (sub === "1" || sub === "3") run("scripts/seed-dev-data.mjs");
     if (sub === "2" || sub === "3") run("scripts/seed-estadisticas-dev.mjs");
     if (!["1", "2", "3"].includes(sub)) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { LISTAS_PRECIOS } from "@/lib/db";
 import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
 import type {
@@ -33,6 +34,7 @@ import { VehiculoMobileSelector } from "./VehiculoMobileSelector";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { IvaToggle } from "@/components/ui/IvaToggle";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import styles from "./TrabajoForm.module.scss";
 
 export type TrabajoFormState = {
@@ -65,6 +67,8 @@ type TrabajoFormProps = {
   snapshotRepuestos?: RepuestoDetalleItem[];
   allowFinalizado?: boolean;
   formId?: string;
+  prioridadValue?: TrabajoPrioridad;
+  estadoValue?: TrabajoFormValues["estado"];
   showClienteSection?: boolean;
   showPrioridadSection?: boolean;
   showActions?: boolean;
@@ -93,6 +97,63 @@ const prioridadCards: Array<{
   },
 ];
 
+function GrupoAccordion({
+  defaultOpen,
+  summary,
+  selectedCount,
+  hasSelected,
+  children,
+}: {
+  defaultOpen: boolean;
+  summary: ReactNode;
+  selectedCount: number;
+  hasSelected: boolean;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div
+      className={cn(
+        "TrabajoFormAccordion",
+        styles.TrabajoFormAccordion,
+        "rounded-2xl border p-4 transition-colors",
+        hasSelected
+          ? "border-[var(--apricot-light)] bg-[linear-gradient(135deg,#fff7ed,#fff0e1)]"
+          : "border-[var(--color-border)] bg-[var(--gray-20)]"
+      )}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex w-full cursor-pointer items-center justify-between gap-3")}
+      >
+        {summary}
+        <span className="flex items-center gap-2">
+          {selectedCount > 0 && (
+            <span className="rounded-full bg-[var(--orange-vivid)] px-2 py-0.5 text-[0.65rem] font-bold text-white">
+              {selectedCount}
+            </span>
+          )}
+          <Icon
+            name="chevronDown"
+            className={cn(
+              "TrabajoFormAccordionChevron",
+              styles.TrabajoFormAccordionChevron,
+              "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200",
+              open && "rotate-180"
+            )}
+          />
+        </span>
+      </button>
+      <div className={cn(styles.TrabajoFormAccordionBody, open && styles.TrabajoFormAccordionBodyOpen)}>
+        <div className={cn(styles.TrabajoFormAccordionInner, "pt-3")}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RepuestoGrupoAccordion({
   defaultOpen,
   categoriaNombre,
@@ -104,36 +165,20 @@ function RepuestoGrupoAccordion({
   selectedCount: number;
   children: ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
   const hasSelected = selectedCount > 0;
   return (
-    <details
-      open={open}
-      onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
-      className={cn(
-        "TrabajoFormAccordion",
-        styles.TrabajoFormAccordion,
-        "rounded-2xl border p-4 transition-colors",
-        hasSelected
-          ? "border-[var(--apricot-light)] bg-[linear-gradient(135deg,#fff7ed,#fff0e1)]"
-          : "border-[var(--color-border)] bg-[var(--gray-20)]"
-      )}
-    >
-      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between gap-3")}>
+    <GrupoAccordion
+      defaultOpen={defaultOpen}
+      selectedCount={selectedCount}
+      hasSelected={hasSelected}
+      summary={
         <span className={cn("text-sm font-semibold", hasSelected ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-defult)]")}>
           {categoriaNombre}
         </span>
-        <span className="flex items-center gap-2">
-          {hasSelected && (
-            <span className="rounded-full bg-[var(--orange-vivid)] px-2 py-0.5 text-[0.65rem] font-bold text-white">
-              {selectedCount}
-            </span>
-          )}
-          <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
-        </span>
-      </summary>
+      }
+    >
       {children}
-    </details>
+    </GrupoAccordion>
   );
 }
 
@@ -152,6 +197,8 @@ export function TrabajoForm({
   snapshotRepuestos = [],
   allowFinalizado = false,
   formId,
+  prioridadValue,
+  estadoValue,
   showClienteSection = true,
   showPrioridadSection = true,
   showActions = true,
@@ -187,6 +234,7 @@ export function TrabajoForm({
   const [selectedClienteLabel, setSelectedClienteLabel] = useState(initialClienteLabel);
   const [selectedItemsTab, setSelectedItemsTab] = useState<"trabajos" | "repuestos">("trabajos");
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [listaDialogOpen, setListaDialogOpen] = useState(false);
   const [wizardInitialStep, setWizardInitialStep] = useState(0);
 
   const openWizard = (step: number) => {
@@ -224,6 +272,8 @@ export function TrabajoForm({
     () => marcas.find((marca) => String(marca.id) === selectedMarca)?.nombre ?? null,
     [marcas, selectedMarca]
   );
+  const effectivePrioridad = prioridadValue ?? selectedPrioridad;
+  const effectiveEstado = estadoValue ?? selectedEstado;
 
   const selectedModeloNombre = useMemo(
     () => modelos.find((modelo) => String(modelo.id) === selectedModelo)?.nombre ?? null,
@@ -263,8 +313,8 @@ export function TrabajoForm({
       modeloNombre: selectedModeloNombre,
       motorNombre: selectedMotorNombre,
       numeroSerieMotor: selectedNumeroSerieMotor,
-      prioridad: selectedPrioridad,
-      estado: selectedEstado,
+      prioridad: effectivePrioridad,
+      estado: effectiveEstado,
     });
   }, [
     onSummaryChange,
@@ -273,8 +323,8 @@ export function TrabajoForm({
     selectedModeloNombre,
     selectedMotorNombre,
     selectedNumeroSerieMotor,
-    selectedPrioridad,
-    selectedEstado,
+    effectivePrioridad,
+    effectiveEstado,
   ]);
 
   return (
@@ -292,10 +342,10 @@ export function TrabajoForm({
       {Object.entries(selectedRepuestoItems).map(([id, item]) => {
         const repuestoInfo = repuestos.flatMap((g) => g.repuestos).find((r) => r.id === Number(id));
         const stockDisponible = repuestoInfo?.stockHabilitado ? repuestoInfo.stockCantidad : 0;
-        // Para repuestos ya comprometidos (item.cantidadStock > 0), el stock del catálogo ya fue
-        // descontado por este trabajo, así que sumamos lo comprometido al disponible actual para
-        // calcular cuánto puede salir del stock en total.
-        const stockEfectivo = stockDisponible + item.cantidadStock;
+        // Solo se suma la cantidad comprometida si el trabajo ya está aprobado/finalizado,
+        // porque en esos estados el catálogo ya fue decrementado por este trabajo.
+        const yaDescontado = effectiveEstado === "aprobado" || effectiveEstado === "finalizado";
+        const stockEfectivo = stockDisponible + (yaDescontado ? item.cantidadStock : 0);
         const cantidadStock = Math.min(item.cantidad, stockEfectivo);
         return (
           <div key={`repuesto-hidden-${id}`}>
@@ -391,18 +441,74 @@ export function TrabajoForm({
                 </h2>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-[var(--text-color-defult)]">Lista de precios</span>
-                <ButtonGroup
-                  options={[
-                    { value: 1, label: "Lista 1", icon: "clipboardList" },
-                    { value: 2, label: "Lista 2", icon: "clipboardList" },
-                    { value: 3, label: "Lista 3", icon: "clipboardList" },
-                  ]}
-                  value={listaPrecios}
-                  onChange={setListaPrecios}
-                />
+              <div className="rounded-2xl border border-[var(--apricot-light)]/60 bg-[linear-gradient(135deg,var(--cream-warm)/40,var(--peach-soft)/30)] p-3 flex flex-col gap-2.5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--brown-burnt)]/70">Lista de precios</span>
+
+                {/* Mobile: botón con estilo ButtonGroup */}
+                <div className="md:hidden inline-flex w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setListaDialogOpen(true)}
+                    className="inline-flex flex-1 items-center justify-between gap-2 rounded-xl border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)] transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]"
+                  >
+                    <span className="flex items-center gap-2 uppercase tracking-wider">
+                      <Icon name="clipboardList" className="h-4 w-4 shrink-0" />
+                      Lista {listaPrecios}
+                    </span>
+                    <Icon name="chevronDown" className="h-4 w-4 opacity-80" />
+                  </button>
+                </div>
+
+                {/* Desktop: ButtonGroup */}
+                <div className="hidden md:block w-full">
+                  <ButtonGroup
+                    options={LISTAS_PRECIOS.map((n) => ({ value: n, label: `Lista ${n}`, icon: "clipboardList" as const }))}
+                    value={listaPrecios}
+                    onChange={setListaPrecios}
+                    className="w-full"
+                  />
+                </div>
+
                 <input type="hidden" name="listaPrecios" value={listaPrecios} />
+
+                {/* Modal centrado mobile */}
+                <Dialog open={listaDialogOpen} onOpenChange={setListaDialogOpen}>
+                  <DialogContent variant="centered">
+                    <div className="rounded-t-[20px] bg-[linear-gradient(135deg,var(--cream-warm),rgba(255,255,255,0.95))] border-b border-[rgba(234,88,12,0.12)] pl-6 pr-14 pt-6 pb-4">
+                      <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+                        Lista de precios
+                      </p>
+                      <h3 className="mt-1 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
+                        Lista {listaPrecios} activa
+                      </h3>
+                      <p className="mt-1 text-xs text-[var(--text-color-gray)]">
+                        Seleccioná la lista activa
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 overflow-y-auto p-4">
+                      {LISTAS_PRECIOS.map((n) => {
+                        const isActive = n === listaPrecios;
+                        return (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => { setListaPrecios(n); setListaDialogOpen(false); }}
+                            className={cn(
+                              "flex items-center gap-3 w-full rounded-xl px-4 py-4 text-left text-sm font-semibold transition-all",
+                              isActive
+                                ? "bg-[linear-gradient(135deg,var(--orange-vivid),var(--apricot-light))] text-white shadow-sm"
+                                : "border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--text-color-defult)] hover:bg-[var(--color-surface-alt)]"
+                            )}
+                          >
+                            <Icon name="clipboardList" className="h-5 w-5 shrink-0" />
+                            <span className="flex-1">Lista {n}</span>
+                            {isActive && <Icon name="check" className="h-4 w-4" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <IvaToggle form={formId} />
@@ -412,19 +518,12 @@ export function TrabajoForm({
                   const selectedCount = grupo.trabajos.filter((t) => selectedTrabajoIds.has(t.id)).length;
                   const hasSelected = selectedCount > 0;
                   return (
-                    <details
+                    <GrupoAccordion
                       key={grupo.categoriaId}
-                      open={hasSelected}
-                      className={cn(
-                        "TrabajoFormAccordion",
-                        styles.TrabajoFormAccordion,
-                        "rounded-2xl border p-4 transition-colors",
-                        hasSelected
-                          ? "border-[var(--apricot-light)] bg-[linear-gradient(135deg,#fff7ed,#fff0e1)]"
-                          : "border-[var(--color-border)] bg-[var(--gray-20)]"
-                      )}
-                    >
-                      <summary className={cn("TrabajoFormAccordionSummary", styles.TrabajoFormAccordionSummary, "flex cursor-pointer list-none items-center justify-between gap-3")}>
+                      defaultOpen={hasSelected}
+                      selectedCount={selectedCount}
+                      hasSelected={hasSelected}
+                      summary={
                         <span className="flex items-center gap-2.5">
                           {isEngineIconName(grupo.categoriaIcono) ? (
                             <EngineIconGlyph
@@ -436,15 +535,8 @@ export function TrabajoForm({
                             {grupo.categoriaNombre}
                           </span>
                         </span>
-                        <span className="flex items-center gap-2">
-                          {hasSelected && (
-                            <span className="rounded-full bg-[var(--orange-vivid)] px-2 py-0.5 text-[0.65rem] font-bold text-white">
-                              {selectedCount}
-                            </span>
-                          )}
-                          <Icon name="chevronDown" className={cn("TrabajoFormAccordionChevron", styles.TrabajoFormAccordionChevron, "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200")} />
-                        </span>
-                      </summary>
+                      }
+                    >
                       <div className="mt-3 grid gap-2 md:grid-cols-2">
                         {grupo.trabajos.map((trabajo) => (
                           <TrabajoItemCard
@@ -460,7 +552,7 @@ export function TrabajoForm({
                           />
                         ))}
                       </div>
-                    </details>
+                    </GrupoAccordion>
                   );
                 })}
               </div>
@@ -497,10 +589,13 @@ export function TrabajoForm({
                           const precioStockUnit = selectedRepuestoItems[repuesto.id]?.precioStock ?? repuesto.precioStock;
 
                           const cantidadStockComprometida = selectedRepuestoItems[repuesto.id]?.cantidadStock ?? 0;
-                          // El stock visible suma el disponible en catálogo más lo que este trabajo ya comprometió
-                          // (porque ese stock ya fue descontado del catálogo por este mismo trabajo)
+                          // Solo se suma la cantidad comprometida al stock del catálogo si el trabajo está
+                          // aprobado o finalizado — en esos estados el catálogo ya fue decrementado por este trabajo.
+                          // En pendiente/presupuesto_entregado el catálogo todavía tiene el stock completo.
+                          const estadoActual = selectedEstado;
+                          const stockFueDescontado = estadoActual === "aprobado" || estadoActual === "finalizado";
                           const cantStockDisponible = repuesto.stockHabilitado
-                            ? repuesto.stockCantidad + cantidadStockComprometida
+                            ? repuesto.stockCantidad + (stockFueDescontado ? cantidadStockComprometida : 0)
                             : 0;
                           const cantDesdeStock = Math.min(cantidad, cantStockDisponible);
                           const cantFaltante = Math.max(0, cantidad - cantStockDisponible);
@@ -529,10 +624,10 @@ export function TrabajoForm({
                               contentClassName="flex-col gap-2.5"
                               checkboxClassName="[--checkbox-size:24px]"
                             >
-                              <div className={cn("w-full sm:pl-9", styles.TrabajoFormRepuestoBody)}>
+                              <div className={cn("w-full sm:pl-9", styles.TrabajoFormRepuestoBodyWrap, isChecked && styles.TrabajoFormRepuestoBodyWrapOpen)}><div className={cn(styles.TrabajoFormRepuestoBody)}>
                                 <div className={styles.TrabajoFormRepuestoRow}>
-                                  <div className={styles.TrabajoFormRepuestoField}>
-                                    <span className={styles.TrabajoFormRepuestoFieldLabel}>Necesitas</span>
+                                  <div className={cn(styles.TrabajoFormRepuestoField, styles.TrabajoFormRepuestoFieldCantidad)}>
+                                    <span className={styles.TrabajoFormRepuestoFieldLabel}>Cantidad</span>
                                     <Incrementor
                                       value={cantidad}
                                       onDecrement={() => decrementCantidad(repuesto.id)}
@@ -546,16 +641,9 @@ export function TrabajoForm({
                                   {repuesto.stockHabilitado && (
                                     <>
                                       <div className={styles.TrabajoFormRepuestoField}>
-                                        <span className={styles.TrabajoFormRepuestoFieldLabel}>Hay en stock</span>
+                                        <span className={styles.TrabajoFormRepuestoFieldLabel}>Stock restante</span>
                                         <span className={cn(styles.TrabajoFormRepuestoFieldValue, styles.TrabajoFormRepuestoFieldValueStock)}>
-                                          {cantStockDisponible}
-                                        </span>
-                                      </div>
-
-                                      <div className={styles.TrabajoFormRepuestoField}>
-                                        <span className={styles.TrabajoFormRepuestoFieldLabel}>Se usa del stock</span>
-                                        <span className={cn(styles.TrabajoFormRepuestoFieldValue, styles.TrabajoFormRepuestoFieldValueStock)}>
-                                          {cantDesdeStock}
+                                          {stockRestante}
                                         </span>
                                       </div>
 
@@ -573,7 +661,7 @@ export function TrabajoForm({
                                     </>
                                   )}
 
-                                  <div className={styles.TrabajoFormRepuestoField}>
+                                  <div className={cn(styles.TrabajoFormRepuestoField, styles.TrabajoFormRepuestoFieldPrecio)}>
                                     <span className={styles.TrabajoFormRepuestoFieldLabel}>
                                       {repuesto.stockHabilitado ? "Precio proveedor" : "Precio unitario"}
                                     </span>
@@ -610,8 +698,8 @@ export function TrabajoForm({
                                   <div className={styles.TrabajoFormRepuestoBreakdown}>
                                     <span className={styles.TrabajoFormRepuestoBreakdownHint}>
                                       {requiereProveedor
-                                        ? `Necesitas ${cantidad} unidades: ${cantDesdeStock} salen del stock y ${cantFaltante} hay que comprarlas al proveedor.`
-                                        : `Necesitas ${cantidad} unidades y se cubren completas con stock. Quedan ${stockRestante} unidades disponibles.`}
+                                        ? `${cantidad} unidades: ${cantDesdeStock} salen del stock y ${cantFaltante} hay que comprarlas al proveedor.`
+                                        : `${cantidad} unidades cubiertas con stock. Quedan ${stockRestante} unidades disponibles.`}
                                     </span>
                                     {(usaStock || requiereProveedor) && (
                                       <span className={styles.TrabajoFormRepuestoBreakdownHint}>
@@ -631,7 +719,7 @@ export function TrabajoForm({
                                     </span>
                                   </div>
                                 )}
-                              </div>
+                              </div></div>
                             </TrabajoItemCard>
                           );
                         })}
@@ -664,15 +752,15 @@ export function TrabajoForm({
 
           <ButtonGroup
             options={prioridadCards}
-            value={selectedPrioridad}
+            value={effectivePrioridad}
             onChange={setSelectedPrioridad}
           />
-          <input type="hidden" name="prioridad" value={selectedPrioridad} />
+          <input type="hidden" name="prioridad" value={effectivePrioridad} />
 
           <EstadoStepper
             name="estado"
             initialValue={state.values.estado}
-            value={selectedEstado}
+            value={effectiveEstado}
             onChange={setSelectedEstado}
             allowFinalizado={allowFinalizado}
           />

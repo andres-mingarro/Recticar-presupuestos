@@ -4,6 +4,7 @@ import { useActionState, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoAgrupado, TrabajoAgrupado } from "@/lib/types";
+import { getPrecioLista, type ListaPrecio } from "@/lib/db";
 import { useTrabajosSeleccion } from "@/components/forms/TrabajoForm/TrabajosSeleccionContext";
 import { useRepuestosSeleccion } from "@/components/forms/TrabajoForm/RepuestosSeleccionContext";
 import { Button } from "@/components/ui/Button";
@@ -24,11 +25,6 @@ type TrabajosResumenProps = {
   ) => Promise<{ error: string | null; success: boolean; updatedCount: number }>;
 };
 
-function getPrecio(t: TrabajoAgrupado["trabajos"][number], lista: 1 | 2 | 3) {
-  if (lista === 2) return t.precioLista2;
-  if (lista === 3) return t.precioLista3;
-  return t.precioLista1;
-}
 
 export function TrabajosResumen({
   trabajos,
@@ -139,7 +135,7 @@ export function TrabajosResumen({
   );
 
   const totalTrabajos = useMemo(
-    () => selectedTrabajos.reduce((sum, t) => sum + ("precioLista1" in t ? getPrecio(t, listaPrecios) : t.precio), 0),
+    () => selectedTrabajos.reduce((sum, t) => sum + ("precioLista1" in t ? getPrecioLista(t, listaPrecios) : t.precio), 0),
     [selectedTrabajos, listaPrecios]
   );
 
@@ -176,7 +172,7 @@ export function TrabajosResumen({
           };
         }
 
-        const currentPrecio = getPrecio(current, listaPrecios);
+        const currentPrecio = getPrecioLista(current, listaPrecios);
         if (currentPrecio === item.precio) {
           return null;
         }
@@ -236,7 +232,7 @@ export function TrabajosResumen({
             <div key={"trabajoId" in t ? (t.trabajoId ?? `${t.categoriaNombre}-${t.trabajoNombre}`) : t.id} className="flex items-baseline justify-between gap-2">
               <span className="text-[var(--text-color-gray)]">{"trabajoNombre" in t ? t.trabajoNombre : t.nombre}</span>
               <span className="shrink-0 font-medium text-[var(--text-color-defult)]">
-                {formatPrice("precioLista1" in t ? getPrecio(t, listaPrecios) : t.precio)}
+                {formatPrice("precioLista1" in t ? getPrecioLista(t, listaPrecios) : t.precio)}
               </span>
             </div>
           ))}

@@ -132,7 +132,7 @@ PrioridadProvider
 - **`Button`** (`src/components/ui/Button/Button.tsx`) — componente único para todos los botones. Variantes: `primary`, `secondary`, `ghost`, `dark`, `warm`, `burnt`, `outline`, `outline-warm`, `outline-dark`, `outline-ghost`, `danger-ghost`, `link`. Tamaños: `sm`, `md`, `lg`. Props: `icon` (izquierda), `iconRight`, `as="a"` + `href` para renderizar como `<a>`. Exporta también `buttonStyles()` para casos donde solo se necesita la className (ej: sobre `<Link>` de Next.js).
 - **No usar `<button>` nativo ni clases hardcodeadas** — siempre usar `<Button>` con la variante correspondiente.
 - **Criterio de variantes en tablas/filas editables**: guardar → `PulsatingButton` con estilo borde gris/bg blanco (igual a `saveRowBtnCls` en `shared.tsx`); cancelar → `outline-ghost` con icono X; borrar → `outline-ghost` con icono papelera + `ConfirmDialog`.
-- `ButtonGroup<T>` — selector multi-opción (Lista 1/2/3, prioridad en nuevo trabajo). Props: `options`, `value`, `onChange`, `activeTone` por opción.
+- `ButtonGroup<T>` — selector multi-opción (Lista 1–5, prioridad en nuevo trabajo). Props: `options`, `value`, `onChange`, `activeTone` por opción. Las opciones de lista de precios se generan con `LISTAS_PRECIOS.map(n => ({ value: n, label: \`Lista ${n}\`, icon: "clipboardList" as const }))`.
 - **`PulsatingButton`** — usa `Button` internamente, agrega anillo pulsante cuando `pulsing={true}`. Prop `pulseStyle?: "pulse" | "ripple"` (no usar `variant` para el estilo de pulso — conflicta con la variante de Button). Acepta todas las props de `Button`.
 - `Incrementor` — ajuste porcentual, usado en `/precios`. Cada click suma/resta **0.1%**. El porcentaje acumulado se aplica siempre sobre el precio **original de la DB** (no sobre el draft del click anterior) para evitar el efecto de redondeo compuesto que bloquea valores pequeños. Los precios resultantes son siempre enteros (`Math.round`).
 
@@ -194,7 +194,7 @@ El botón `PrintButton` llama a `window.print()`.
 | `src/lib/pdf/PresupuestoPdf.tsx` | Componente PDF con `@react-pdf/renderer` |
 | `src/app/api/trabajos/[id]/pdf/route.ts` | Route handler PDF (tiene `@ts-expect-error` por React 19 — no tocar) |
 | `src/lib/types.ts` | Todos los tipos: `TrabajoEstado`, `TrabajoDetail`, `TrabajoAgrupado`, etc. |
-| `src/lib/db.ts` | `queryRows<T>(sql, params)` — cliente PostgreSQL. También exporta `precioListaColName(lista)` — fuente de verdad única para el nombre de columna SQL de listas de precios en la tabla `trabajos` (alias `t`) |
+| `src/lib/db.ts` | `queryRows<T>(sql, params)` — cliente PostgreSQL. También exporta `LISTAS_PRECIOS`, `ListaPrecio`, `PreciosLista`, `getPrecioLista()` y `precioListaColName()` — fuente de verdad única para todo lo relacionado a listas de precios |
 | `src/middleware.ts` | Auth JWT con `jose`; roles: `admin`, `superuser`, `operador` |
 
 ---
@@ -207,7 +207,8 @@ El botón `PrintButton` llama a `window.print()`.
 - El valor `pendiente` en `trabajo_estado` es legacy — normalizado a `presupuesto_entregado` al leer. El valor `entregado` existe en el enum (migración 011) pero no se usa en la UI.
 - Migración 014: agrega `precio` y `cantidad` a `trabajo_repuestos`.
 - Al agregar estados nuevos: revisar consistencia entre enum DB, labels del stepper y filtros/listados.
-- Columnas de lista de precios en `trabajos`: `precio_lista_1`, `precio_lista_2`, `precio_lista_3`. Usar siempre `precioListaColName(lista)` de `src/lib/db.ts` para construir el nombre de columna en queries — no hardcodear el string.
+- Columnas de lista de precios en `trabajos`: `precio_lista_1` … `precio_lista_5` (migración 031). **Para agregar una lista nueva:** solo cambiar `LISTAS_PRECIOS` en `src/lib/db.ts` y agregar la columna en una migración — el resto del código (tipos, UI, queries, forms) se deriva automáticamente.
+- Usar siempre `precioListaColName(lista)` de `src/lib/db.ts` para construir el nombre de columna SQL. Usar `getPrecioLista(t, lista)` para leer el precio de un objeto JS. Nunca hardcodear `1 | 2 | 3 | 4 | 5` — usar el tipo `ListaPrecio` importado de `src/lib/db.ts`.
 
 ### Scripts útiles
 ```

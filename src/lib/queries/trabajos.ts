@@ -1,4 +1,4 @@
-import { precioListaColName, queryRows, templateRows } from "@/lib/db";
+import { precioListaColName, queryRows, templateRows, type ListaPrecio } from "@/lib/db";
 import { hydrateTechnicalLabels, listMarcas, listModelos, listMotores } from "@/lib/queries/catalogo";
 import type {
   TrabajoDetail,
@@ -177,7 +177,7 @@ async function applyTrabajoStockAdjustment(
 
 async function getTrabajoCatalogSnapshots(
   trabajosIds: number[],
-  listaPrecios: 1 | 2 | 3
+  listaPrecios: ListaPrecio
 ): Promise<TrabajoCatalogSnapshot[]> {
   if (trabajosIds.length === 0) return [];
 
@@ -800,6 +800,8 @@ export async function refreshTrabajoSnapshotPrices(id: number) {
           c.nombre AS categoria_nombre_snapshot,
           t.nombre AS trabajo_nombre_snapshot,
           CASE ot.lista_precio
+            WHEN 5 THEN t.precio_lista_5
+            WHEN 4 THEN t.precio_lista_4
             WHEN 3 THEN t.precio_lista_3
             WHEN 2 THEN t.precio_lista_2
             ELSE t.precio_lista_1

@@ -32,8 +32,7 @@ export function TrabajoItemCard({
   const hasChildren = Boolean(children);
 
   return (
-    <label
-      htmlFor={inputId}
+    <div
       className={cn(
         "TrabajoItemCard rounded-xl px-4 py-3 text-sm",
         styles.TrabajoItemCard,
@@ -42,26 +41,26 @@ export function TrabajoItemCard({
       )}
     >
       <div className={cn("flex flex-col gap-2", styles.TrabajoItemCardContent, contentClassName)}>
-        {/* Checkbox + nombre — siempre en su propia fila */}
-        <div className={cn(
-          "flex items-center gap-3",
-          !hasChildren && "justify-between"
-        )}>
+        {/* Checkbox + nombre — solo esta fila es clickeable */}
+        <div className={cn("flex items-center gap-3 header-card cursor-pointer", !hasChildren && "justify-between")}>
           <CheckboxBeauti
             {...inputProps}
             id={inputId}
             value={value}
             checked={checked}
             onChange={(event) => onCheckedChange(event.target.checked)}
-            className={cn("gap-0 shrink-0", checkboxClassName)}
+            className={cn("cursor-pointer gap-0 shrink-0 ", checkboxClassName)}
           />
-          <span className="min-w-0 flex-1 text-base font-medium capitalize leading-snug">
+          <label
+            htmlFor={inputId}
+            className="cursor-pointer min-w-0 flex-1 text-base font-medium capitalize leading-snug"
+          >
             {label}
-          </span>
+          </label>
         </div>
         {/* Controles opcionales debajo */}
         {children}
       </div>
-    </label>
+    </div>
   );
 }
