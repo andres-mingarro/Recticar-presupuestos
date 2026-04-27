@@ -50,7 +50,13 @@ export async function updateCategoriaRepuestos(
     stockUpdates.push({ id, stockHabilitado, stockCantidad, precioStock });
   }
 
+  const categoriaId = Number(formData.get("categoriaId"));
+  const categoriaNombre = normalize(formData, "nombre");
+
   try {
+    if (!Number.isNaN(categoriaId) && categoriaNombre) {
+      await renameCategoriaRepuesto(categoriaId, categoriaNombre);
+    }
     if (nombreUpdates.length > 0) await updateRepuestoNombres(nombreUpdates);
     if (stockUpdates.length > 0) await updateRepuestoStock(stockUpdates);
   } catch {

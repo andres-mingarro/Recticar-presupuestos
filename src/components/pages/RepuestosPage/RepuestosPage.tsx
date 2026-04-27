@@ -9,7 +9,6 @@ import { CategoriaCard } from "./components/CategoriaCard";
 type RepuestosPageProps = {
   repuestos: RepuestoAgrupado[];
   createCategoriaAction: (state: RepuestosActionState, formData: FormData) => Promise<RepuestosActionState>;
-  renameCategoriaAction: (state: RepuestosActionState, formData: FormData) => Promise<RepuestosActionState>;
   deleteCategoriaAction: (state: RepuestosActionState, formData: FormData) => Promise<RepuestosActionState>;
   createRepuestoAction: (state: RepuestosActionState, formData: FormData) => Promise<RepuestosActionState>;
   deleteRepuestoAction: (state: RepuestosActionState, formData: FormData) => Promise<RepuestosActionState>;
@@ -20,7 +19,6 @@ type RepuestosPageProps = {
 export function RepuestosPage({
   repuestos,
   createCategoriaAction,
-  renameCategoriaAction,
   deleteCategoriaAction,
   createRepuestoAction,
   deleteRepuestoAction,
@@ -42,7 +40,6 @@ export function RepuestosPage({
           <CategoriaCard
             key={grupo.categoriaId}
             grupo={grupo}
-            renameCategoriaAction={renameCategoriaAction}
             deleteCategoriaAction={deleteCategoriaAction}
             createRepuestoAction={createRepuestoAction}
             deleteRepuestoAction={deleteRepuestoAction}

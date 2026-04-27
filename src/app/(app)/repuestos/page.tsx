@@ -5,7 +5,6 @@ import {
   createRepuestoAction,
   deleteCategoriaRepuestoAction,
   deleteRepuestoAction,
-  renameCategoriaRepuestoAction,
   reorderRepuestosAction,
   updateCategoriaRepuestos,
 } from "./actions";
@@ -17,7 +16,6 @@ export default async function Page() {
     <RepuestosPage
       repuestos={repuestos}
       createCategoriaAction={createCategoriaRepuestoAction}
-      renameCategoriaAction={renameCategoriaRepuestoAction}
       deleteCategoriaAction={deleteCategoriaRepuestoAction}
       createRepuestoAction={createRepuestoAction}
       deleteRepuestoAction={deleteRepuestoAction}

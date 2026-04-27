@@ -16,7 +16,6 @@ import { AddRepuestoForm } from "./AddRepuestoForm";
 
 export function CategoriaCard({
   grupo,
-  renameCategoriaAction,
   deleteCategoriaAction,
   createRepuestoAction,
   deleteRepuestoAction,
@@ -24,7 +23,6 @@ export function CategoriaCard({
   updateCategoriaAction,
 }: {
   grupo: RepuestoAgrupado;
-  renameCategoriaAction: RepuestosActionFn;
   deleteCategoriaAction: RepuestosActionFn;
   createRepuestoAction: RepuestosActionFn;
   deleteRepuestoAction: RepuestosActionFn;
