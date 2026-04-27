@@ -18,6 +18,7 @@ export async function listMarcas() {
   return templateRowsFromTechnical<Marca>`
     SELECT id, nombre
     FROM marcas
+    WHERE hidden = false
     ORDER BY nombre ASC
   `;
 }
