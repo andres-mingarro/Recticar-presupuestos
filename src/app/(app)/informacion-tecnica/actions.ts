@@ -85,7 +85,7 @@ export async function deleteMarcaAction(
   try {
     await deleteTechnicalMarca(id);
   } catch {
-    return { error: "No se pudo eliminar la marca. Revisá si tiene modelos asociados." };
+    return { error: "No se pudo eliminar la marca." };
   }
 
   revalidateTechnicalPages();

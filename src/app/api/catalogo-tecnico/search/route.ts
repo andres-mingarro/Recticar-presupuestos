@@ -45,6 +45,7 @@ export async function GET(request: Request) {
       results: rows.map((r) => ({
         value: r.id,
         label: (r.marca_nombre ? `${r.marca_nombre} / ` : "") + r.nombre,
+        searchValue: r.nombre,
       })),
     });
   }

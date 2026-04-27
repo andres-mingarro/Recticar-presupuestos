@@ -279,6 +279,14 @@ export async function updateTechnicalMarca(id: number, nombre: string, hidden?: 
 
 export async function deleteTechnicalMarca(id: number) {
   await templateRowsFromTechnical`
+    DELETE FROM vehiculos
+    WHERE modelo_id IN (SELECT id FROM modelos WHERE marca_id = ${id})
+  `;
+  await templateRowsFromTechnical`
+    DELETE FROM modelos
+    WHERE marca_id = ${id}
+  `;
+  await templateRowsFromTechnical`
     DELETE FROM marcas
     WHERE id = ${id}
   `;

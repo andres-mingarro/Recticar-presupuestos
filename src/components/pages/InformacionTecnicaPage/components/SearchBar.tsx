@@ -7,6 +7,8 @@ import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { buildSectionHref } from "./buildSectionHref";
 
+type Suggestion = { label: string; searchValue: string };
+
 type SearchBarProps = {
   section: TechnicalSection;
   q: string;
@@ -15,7 +17,7 @@ type SearchBarProps = {
 export function SearchBar({ section, q }: SearchBarProps) {
   const router = useRouter();
   const [value, setValue] = useState(q);
-  const [results, setResults] = useState<string[]>([]);
+  const [results, setResults] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,9 +43,9 @@ export function SearchBar({ section, q }: SearchBarProps) {
     item?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, open]);
 
-  function navigate(q: string) {
+  function navigate(searchValue: string) {
     setOpen(false);
-    router.push(buildSectionHref(section, q));
+    router.push(buildSectionHref(section, searchValue));
   }
 
   function fetchSuggestions(q: string) {
@@ -56,10 +58,13 @@ export function SearchBar({ section, q }: SearchBarProps) {
           `/api/catalogo-tecnico/search?type=${section === "vehiculos" ? "modelos" : section}&q=${encodeURIComponent(q)}`
         );
         const data = await res.json();
-        const labels: string[] = (data.results ?? []).map((r: { label: string }) => r.label);
-        setResults(labels);
+        const suggestions: Suggestion[] = (data.results ?? []).map((r: { label: string; searchValue?: string }) => ({
+          label: r.label,
+          searchValue: r.searchValue ?? r.label,
+        }));
+        setResults(suggestions);
         setActiveIndex(0);
-        setOpen(labels.length > 0);
+        setOpen(suggestions.length > 0);
       } catch {
         setResults([]);
       }
@@ -82,8 +87,8 @@ export function SearchBar({ section, q }: SearchBarProps) {
     } else if (e.key === "Enter") {
       e.preventDefault();
       if (open && results[activeIndex]) {
-        setValue(results[activeIndex]);
-        navigate(results[activeIndex]);
+        setValue(results[activeIndex].label);
+        navigate(results[activeIndex].searchValue);
       } else {
         navigate(value);
       }
@@ -119,13 +124,13 @@ export function SearchBar({ section, q }: SearchBarProps) {
             role="listbox"
             className="absolute left-0 top-full z-50 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-[var(--color-border)] bg-white py-1 shadow-lg"
           >
-            {results.map((label, i) => (
+            {results.map((suggestion, i) => (
               <li
                 key={i}
                 id={`${listId}-${i}`}
                 role="option"
                 aria-selected={i === activeIndex}
-                onPointerDown={(e) => { e.preventDefault(); setValue(label); navigate(label); }}
+                onPointerDown={(e) => { e.preventDefault(); setValue(suggestion.label); navigate(suggestion.searchValue); }}
                 onPointerEnter={() => setActiveIndex(i)}
                 className={
                   i === activeIndex
@@ -133,7 +138,7 @@ export function SearchBar({ section, q }: SearchBarProps) {
                     : "cursor-pointer px-3 py-2 text-sm text-[var(--text-color-defult)] hover:bg-[var(--color-surface)]"
                 }
               >
-                {label}
+                {suggestion.label}
               </li>
             ))}
           </ul>
