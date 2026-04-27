@@ -77,11 +77,11 @@ function SortableTrabajoRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "precios-item-row flex flex-col border-b border-[var(--color-border)]/80 md:flex-row md:items-stretch",
+        "precios-item-row border-b-2 md:border-b-0 border-b-[var(--orange-vivid)] last:border-b-0 flex flex-col border-b border-[var(--color-border)]/80 md:flex-row md:items-stretch",
         isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
       )}
     >
-      <div className="precios-item-row-header flex flex-1 items-start gap-2 px-4 md:px-3 py-3 md:items-center ">
+      <div className="precios-item-row-header bg-[var(--gray-30)] md:bg-transparent border-b-[var(--orange-vivid)] flex flex-1 items-start gap-2 px-4 md:px-3 py-3 md:items-center ">
         {isEditing && (
           <div className="mt-1 md:mt-0">
             <DragHandle {...attributes} {...listeners} />
@@ -336,7 +336,7 @@ function CategoriaCard({
 
       {/* ── Toolbar ── */}
       {/* ── Toolbar mobile: 2 filas / desktop: 1 fila ── */}
-      <div className="toolbar flex flex-col border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] md:flex-row md:items-center sm:gap-2 sm:px-8 sm:py-5">
+      <div className="toolbar flex flex-col justify-center md:flex-row md:items-center sm:gap-2 border-b border-[var(--color-border)]  bg-[var(--gray-40)] pt-2 md:px-8 md:py-5">
 
         {/* Fila 1 (mobile) / izquierda (desktop): ícono + nombre + contador */}
         <div className="flex items-center gap-2 px-3 py-2 md:min-w-0 md:flex-1 md:p-0">
@@ -387,7 +387,7 @@ function CategoriaCard({
                 size="sm"
                 pulsing={!savePending}
                 disabled={savePending}
-                className="flex items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
+                className="flex flex-1 items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
               >
                 {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
                 {savePending ? "Guardando…" : "Guardar"}
@@ -415,7 +415,8 @@ function CategoriaCard({
             <Button
               type="button"
               size="sm"
-              variant="ghost"
+              variant="dark"
+              className="w-full md:w-auto"
               onClick={() => setIsEditing(true)}
               icon={<Icon name="edit" className="h-3.5 w-3.5" />}
             >

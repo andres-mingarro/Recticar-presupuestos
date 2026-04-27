@@ -52,10 +52,10 @@ export function CategoriaCard({
       </form>
 
       {/* Header */}
-      <div className="flex flex-col gap-1.5 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 pb-2 pt-4 sm:flex-row sm:items-center sm:gap-2 sm:px-8 sm:py-5">
+      <div className="toolbar flex flex-col justify-center md:flex-row md:items-center sm:gap-2 border-b border-[var(--color-border)]  bg-[var(--gray-40)] pt-2 md:px-8 md:py-5">
 
         {/* Fila 1 (siempre): icono + nombre/input */}
-        <div className="flex min-w-0 flex-1 items-center gap-1.5">
+        <div className="flex items-center gap-2 px-3 py-2 md:min-w-0 md:flex-1 md:p-0">
           <Icon name="package" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
           {isEditing ? (
             <input
@@ -67,17 +67,20 @@ export function CategoriaCard({
               className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
             />
           ) : (
+            <>
             <span className="text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
               {grupo.categoriaNombre}
             </span>
+             <span className="rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
+              {grupo.repuestos.length} {grupo.repuestos.length === 1 ? "repuesto" : "repuestos"}
+            </span>
+            </>
           )}
         </div>
 
         {/* Fila 2 en mobile (misma fila en desktop): badge + acciones */}
-        <div className="flex items-center justify-between gap-2 sm:shrink-0 sm:justify-end">
-          <span className="rounded-full bg-[var(--color-border)] px-2 py-0.5 text-xs font-medium text-[var(--text-color-gray)]">
-            {grupo.repuestos.length} {grupo.repuestos.length === 1 ? "repuesto" : "repuestos"}
-          </span>
+        <div className="flex items-center gap-1.5 border-t border-[var(--color-border)] px-3 py-2 md:shrink-0 md:border-t-0 md:p-0">
+         
           <Divider orientation="vertical" className="h-5" />
           {isEditing ? (
             <div className="flex items-center gap-1.5">
@@ -87,15 +90,15 @@ export function CategoriaCard({
                 size="sm"
                 pulsing={!savePending}
                 disabled={savePending}
-                className="inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap rounded-lg border border-[var(--color-border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:opacity-40 sm:px-3"
+                className="flex flex-1 items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
               >
-                {savePending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
                 {savePending ? "Guardando…" : "Guardar"}
               </PulsatingButton>
               <Button
                 type="button"
                 size="sm"
-                variant="outline-ghost"
+                 variant="outline-dark"
                 onClick={handleCancel}
                 icon={<Icon name="x" className="h-3.5 w-3.5" />}
               >
@@ -115,11 +118,12 @@ export function CategoriaCard({
             <Button
               type="button"
               size="sm"
-              variant="outline-ghost"
+              variant="dark"
+              className="w-full md:w-auto"
               onClick={() => setIsEditing(true)}
               icon={<Icon name="edit" className="h-3.5 w-3.5" />}
             >
-              <span className="hidden sm:inline">Editar categoría</span>
+              <span>Editar categoría</span>
             </Button>
           )}
         </div>
