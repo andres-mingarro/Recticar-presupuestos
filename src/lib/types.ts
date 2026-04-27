@@ -88,6 +88,7 @@ export type TrabajoDetail = TrabajoListItem & {
   updated_at: string;
   observaciones: string | null;
   trabajos_ids: number[];
+  trabajos_cantidades: Record<number, number>;
   repuestos_ids: number[];
   repuestos: TrabajoRepuestoValue[];
   lista_precio: ListaPrecio;
@@ -121,6 +122,7 @@ export type TrabajoFormValues = {
   estado: TrabajoEstado;
   observaciones: string;
   trabajosIds: string[];
+  trabajosCantidades: Record<string, number>;
   repuestosIds: string[];
   repuestos: TrabajoRepuestoValue[];
   listaPrecios: ListaPrecio;

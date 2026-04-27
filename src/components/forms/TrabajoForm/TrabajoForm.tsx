@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { LISTAS_PRECIOS } from "@/lib/db";
+import { LISTAS_PRECIOS, getPrecioLista } from "@/lib/db";
 import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
 import type {
@@ -72,6 +72,7 @@ type TrabajoFormProps = {
   showClienteSection?: boolean;
   showPrioridadSection?: boolean;
   showActions?: boolean;
+  showCantidad?: boolean;
   onSummaryChange?: (summary: TrabajoFormSummary) => void;
 };
 
@@ -202,6 +203,7 @@ export function TrabajoForm({
   showClienteSection = true,
   showPrioridadSection = true,
   showActions = true,
+  showCantidad = false,
   onSummaryChange,
 }: TrabajoFormProps) {
   const [dirty, setDirty] = useState(false);
@@ -211,7 +213,10 @@ export function TrabajoForm({
   }, [isPending]);
   const {
     selectedIds: selectedTrabajoIds,
+    cantidades: trabajoCantidades,
     toggle: toggleTrabajo,
+    incrementCantidad: incrementTrabajoCantidad,
+    decrementCantidad: decrementTrabajoCantidad,
     listaPrecios,
     setListaPrecios,
   } = useTrabajosSeleccion();
@@ -337,7 +342,10 @@ export function TrabajoForm({
     >
       <input type="hidden" name="updatedAt" value={state.values.updatedAt ?? ""} />
       {Array.from(selectedTrabajoIds).map((id) => (
-        <input key={`trabajo-hidden-${id}`} type="hidden" name="trabajosIds" value={id} />
+        <div key={`trabajo-hidden-${id}`}>
+          <input type="hidden" name="trabajosIds" value={id} />
+          <input type="hidden" name={`trabajoCantidad_${id}`} value={trabajoCantidades[id] ?? 1} />
+        </div>
       ))}
       {Object.entries(selectedRepuestoItems).map(([id, item]) => {
         const repuestoInfo = repuestos.flatMap((g) => g.repuestos).find((r) => r.id === Number(id));
@@ -537,20 +545,35 @@ export function TrabajoForm({
                         </span>
                       }
                     >
-                      <div className="mt-3 grid gap-2 md:grid-cols-2">
-                        {grupo.trabajos.map((trabajo) => (
-                          <TrabajoItemCard
-                            key={trabajo.id}
-                            checked={selectedTrabajoIds.has(trabajo.id)}
-                            value={trabajo.id}
-                            onCheckedChange={(checked) => toggleTrabajo(trabajo.id, checked)}
-                            label={
-                              selectedTrabajoIds.has(trabajo.id)
-                                ? (snapshotTrabajoNombreById.get(trabajo.id) ?? trabajo.nombre)
-                                : trabajo.nombre
-                            }
-                          />
-                        ))}
+                      <div className="mt-3 grid gap-2">
+                        {grupo.trabajos.map((trabajo) => {
+                          const isChecked = selectedTrabajoIds.has(trabajo.id);
+                          const precioUnit = getPrecioLista(trabajo, listaPrecios);
+                          const cantidad = trabajoCantidades[trabajo.id] ?? 1;
+                          const total = precioUnit * cantidad;
+                          return (
+                            <TrabajoItemCard
+                              key={trabajo.id}
+                              checked={isChecked}
+                              value={trabajo.id}
+                              onCheckedChange={(checked) => toggleTrabajo(trabajo.id, checked)}
+                              label={
+                                isChecked
+                                  ? (snapshotTrabajoNombreById.get(trabajo.id) ?? trabajo.nombre)
+                                  : trabajo.nombre
+                              }
+                              precioLabel={showCantidad ? (cantidad > 1 ? `x${cantidad} ${formatPrice(total)}` : formatPrice(precioUnit)) : undefined}
+                            >
+                              {showCantidad && isChecked && (
+                                <Incrementor
+                                  value={cantidad}
+                                  onIncrement={() => incrementTrabajoCantidad(trabajo.id)}
+                                  onDecrement={() => decrementTrabajoCantidad(trabajo.id)}
+                                />
+                              )}
+                            </TrabajoItemCard>
+                          );
+                        })}
                       </div>
                     </GrupoAccordion>
                   );

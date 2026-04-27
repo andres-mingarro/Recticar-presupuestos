@@ -408,11 +408,6 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
         p.lista_precio,
         p.aplica_iva,
         (
-          SELECT array_agg(pt.trabajo_id ORDER BY pt.trabajo_id) FILTER (WHERE pt.trabajo_id IS NOT NULL)
-          FROM orden_trabajo_trabajos pt
-          WHERE pt.orden_trabajo_id = p.id
-        ) AS trabajos_ids,
-        (
           SELECT array_agg(pr.repuesto_id ORDER BY pr.repuesto_id) FILTER (WHERE pr.repuesto_id IS NOT NULL)
           FROM orden_trabajo_repuestos pr
           WHERE pr.orden_trabajo_id = p.id
@@ -427,6 +422,17 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
 
   const row = rows[0];
   if (!row) return null;
+
+  const trabajosRows = await queryRows<{ trabajo_id: number; cantidad: number }>(
+    `
+      SELECT pt.trabajo_id, pt.cantidad
+      FROM orden_trabajo_trabajos pt
+      WHERE pt.orden_trabajo_id = $1
+        AND pt.trabajo_id IS NOT NULL
+      ORDER BY pt.trabajo_id ASC
+    `,
+    [id]
+  );
 
   const repuestos = await queryRows<{
     repuesto_id: number;
@@ -453,7 +459,8 @@ export async function getTrabajoDetailById(id: number): Promise<TrabajoDetail | 
   const hydrated = await hydrateTechnicalLabels([
     {
       ...normalizeLegacyTrabajoEstado(row),
-      trabajos_ids: row.trabajos_ids ?? [],
+      trabajos_ids: trabajosRows.map((r) => r.trabajo_id),
+      trabajos_cantidades: Object.fromEntries(trabajosRows.map((r) => [r.trabajo_id, Number(r.cantidad)])),
       repuestos_ids: row.repuestos_ids ?? [],
       repuestos: repuestos.map((item) => ({
         repuestoId: String(item.repuesto_id),
@@ -510,6 +517,7 @@ export async function updateTrabajo(
   const cantidades = input.repuestos.map((r) => r.cantidad);
   const preciosStock = input.repuestos.map((r) => r.precioStock);
   const cantidadesStock = input.repuestos.map((r) => r.cantidadStock);
+  const trabajosCantidades = trabajosIds.map((id) => input.trabajosCantidades[String(id)] ?? 1);
 
   const rows = await queryRows<{ id: number; updated_at: string }>(
     `
@@ -559,20 +567,23 @@ export async function updateTrabajo(
             trabajo_id,
             categoria_nombre_snapshot,
             trabajo_nombre_snapshot,
-            precio_snapshot
+            precio_snapshot,
+            cantidad
           )
           SELECT
             (SELECT id FROM upd),
             unnest($14::int[]),
             unnest($18::text[]),
             unnest($19::text[]),
-            unnest($20::numeric[])
+            unnest($20::numeric[]),
+            unnest($28::int[])
           WHERE (SELECT id FROM upd) IS NOT NULL
           ON CONFLICT (orden_trabajo_id, trabajo_id) DO UPDATE
             SET
               categoria_nombre_snapshot = EXCLUDED.categoria_nombre_snapshot,
               trabajo_nombre_snapshot = EXCLUDED.trabajo_nombre_snapshot,
-              precio_snapshot = EXCLUDED.precio_snapshot
+              precio_snapshot = EXCLUDED.precio_snapshot,
+              cantidad = EXCLUDED.cantidad
         ),
         ins_repuestos AS (
           INSERT INTO orden_trabajo_repuestos (
@@ -634,6 +645,7 @@ export async function updateTrabajo(
       vehicleSnapshot.marcaNombreSnapshot,
       vehicleSnapshot.modeloNombreSnapshot,
       vehicleSnapshot.motorNombreSnapshot,
+      trabajosCantidades,
     ]
   );
 
@@ -710,6 +722,7 @@ export async function createTrabajo(input: TrabajoFormValues) {
   }
 
   if (trabajoSnapshots.length > 0) {
+    const cantidadesCreate = trabajoSnapshots.map((item) => input.trabajosCantidades[String(item.trabajoId)] ?? 1);
     await queryRows(
       `
         INSERT INTO orden_trabajo_trabajos (
@@ -717,19 +730,22 @@ export async function createTrabajo(input: TrabajoFormValues) {
           trabajo_id,
           categoria_nombre_snapshot,
           trabajo_nombre_snapshot,
-          precio_snapshot
+          precio_snapshot,
+          cantidad
         )
         SELECT
           $1,
           unnest($2::int[]),
           unnest($3::text[]),
           unnest($4::text[]),
-          unnest($5::numeric[])
+          unnest($5::numeric[]),
+          unnest($6::int[])
         ON CONFLICT (orden_trabajo_id, trabajo_id) DO UPDATE
           SET
             categoria_nombre_snapshot = EXCLUDED.categoria_nombre_snapshot,
             trabajo_nombre_snapshot = EXCLUDED.trabajo_nombre_snapshot,
-            precio_snapshot = EXCLUDED.precio_snapshot
+            precio_snapshot = EXCLUDED.precio_snapshot,
+            cantidad = EXCLUDED.cantidad
       `,
       [
         trabajoId,
@@ -737,6 +753,7 @@ export async function createTrabajo(input: TrabajoFormValues) {
         trabajoSnapshots.map((item) => item.categoriaNombreSnapshot),
         trabajoSnapshots.map((item) => item.trabajoNombreSnapshot),
         trabajoSnapshots.map((item) => item.precioSnapshot),
+        cantidadesCreate,
       ]
     );
   }

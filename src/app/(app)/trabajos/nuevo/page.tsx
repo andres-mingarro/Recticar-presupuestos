@@ -31,6 +31,7 @@ const initialState: TrabajoFormState = {
     estado: "presupuesto_entregado",
     observaciones: "",
     trabajosIds: [],
+    trabajosCantidades: {},
     repuestosIds: [],
     repuestos: [],
     listaPrecios: 1,
@@ -109,6 +110,12 @@ export default async function Page({
       trabajosIds: formData
         .getAll("trabajosIds")
         .filter((value): value is string => typeof value === "string"),
+      trabajosCantidades: Object.fromEntries(
+        formData
+          .getAll("trabajosIds")
+          .filter((v): v is string => typeof v === "string")
+          .map((id) => [id, Number(formData.get(`trabajoCantidad_${id}`)) || 1])
+      ),
       repuestosIds: formData
         .getAll("repuestosIds")
         .filter((value): value is string => typeof value === "string"),

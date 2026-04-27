@@ -205,6 +205,7 @@ function NuevoTrabajoPageContent({
           prioridadValue={prioridad}
           estadoValue={selectedEstado}
           showPrioridadSection={false}
+          showCantidad
           onSummaryChange={setSummary}
         />
       </div>

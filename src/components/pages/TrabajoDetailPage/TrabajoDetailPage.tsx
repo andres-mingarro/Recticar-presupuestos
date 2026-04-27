@@ -248,6 +248,7 @@ export function TrabajoDetailPage({
 
       <TrabajosSeleccionProvider
         initialIds={trabajo.trabajos_ids}
+        initialCantidades={trabajo.trabajos_cantidades}
         initialListaPrecios={(trabajo.lista_precio as ListaPrecio) ?? 1}
       >
       <div className={cn("TrabajoDetailPageContent", styles.TrabajoDetailPageContent)}>
@@ -321,6 +322,7 @@ export function TrabajoDetailPage({
               allowFinalizado
               showClienteSection={false}
               showPrioridadSection={false}
+              showCantidad
               onSummaryChange={setSummary}
             />
           </div>

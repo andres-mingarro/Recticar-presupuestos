@@ -27,7 +27,8 @@ App interna para gestión de trabajos de rectificación de motores. Empleados lo
 - `DATABASE_URL` → base principal: clientes, trabajos, trabajos, usuarios
 - `TECHNICAL_DATABASE_URL` → catálogo técnico externo usado en "Selección técnica" (marcas, modelos, motores, vehículos). Si no está definida, hace fallback a `DATABASE_URL`.
 - La base principal **no depende por FK** de marcas/modelos/motores para guardar trabajos.
-- Tablas esperadas en la base técnica: `marcas(id, nombre)`, `modelos(id, nombre, marca_id)`, `motores(id, nombre, cilindrada)`, `vehiculos(id, modelo_id, motor_id)`.
+- Tablas esperadas en la base técnica: `marcas(id, nombre, hidden)`, `modelos(id, nombre, marca_id)`, `motores(id, nombre, cilindrada)`, `vehiculos(id, modelo_id, motor_id, hidden)`.
+- `marcas.hidden` y `vehiculos.hidden` controlan visibilidad: las marcas ocultas no aparecen en el wizard de nuevo trabajo ni en el selector de edición (filtradas en `listMarcas()` con `WHERE hidden = false`). Las marcas ocultas se administran desde `/informacion-tecnica`.
 
 ---
 
@@ -131,7 +132,7 @@ PrioridadProvider
 ### Botones
 - **`Button`** (`src/components/ui/Button/Button.tsx`) — componente único para todos los botones. Variantes: `primary`, `secondary`, `ghost`, `dark`, `warm`, `burnt`, `outline`, `outline-warm`, `outline-dark`, `outline-ghost`, `danger-ghost`, `link`. Tamaños: `sm`, `md`, `lg`. Props: `icon` (izquierda), `iconRight`, `as="a"` + `href` para renderizar como `<a>`. Exporta también `buttonStyles()` para casos donde solo se necesita la className (ej: sobre `<Link>` de Next.js).
 - **No usar `<button>` nativo ni clases hardcodeadas** — siempre usar `<Button>` con la variante correspondiente.
-- **Criterio de variantes en tablas/filas editables**: guardar → `PulsatingButton` con estilo borde gris/bg blanco (igual a `saveRowBtnCls` en `shared.tsx`); cancelar → `outline-ghost` con icono X; borrar → `outline-ghost` con icono papelera + `ConfirmDialog`.
+- **Criterio de variantes en tablas/filas editables**: guardar → `PulsatingButton` con estilo borde gris/bg blanco (igual a `saveRowBtnCls` en `shared.tsx`); cancelar → `outline-ghost` con icono X; borrar → usar `DeleteItemForm` (no `DeleteButton` de `shared.tsx`).
 - `ButtonGroup<T>` — selector multi-opción (Lista 1–5, prioridad en nuevo trabajo). Props: `options`, `value`, `onChange`, `activeTone` por opción. Las opciones de lista de precios se generan con `LISTAS_PRECIOS.map(n => ({ value: n, label: \`Lista ${n}\`, icon: "clipboardList" as const }))`.
 - **`PulsatingButton`** — usa `Button` internamente, agrega anillo pulsante cuando `pulsing={true}`. Prop `pulseStyle?: "pulse" | "ripple"` (no usar `variant` para el estilo de pulso — conflicta con la variante de Button). Acepta todas las props de `Button`.
 - `Incrementor` — ajuste porcentual, usado en `/precios`. Cada click suma/resta **0.1%**. El porcentaje acumulado se aplica siempre sobre el precio **original de la DB** (no sobre el draft del click anterior) para evitar el efecto de redondeo compuesto que bloquea valores pequeños. Los precios resultantes son siempre enteros (`Math.round`).
@@ -149,7 +150,11 @@ Existe en dos variantes: `EstadoStepper` (form mode, clickeable) y `EstadoSteppe
 ### Diálogos
 - **`Dialog`** (`src/components/ui/Dialog/`) — wrapper sobre `@radix-ui/react-dialog`. `DialogContent` acepta `variant="sheet"` (bottom sheet, mobile) o `variant="centered"` (modal centrado, max-width 420px).
 - **`ConfirmDialog`** (`src/components/ui/ConfirmDialog/`) — modal de confirmación centrado. Props: `open`, `onOpenChange`, `title`, `description?`, `confirmLabel`, `cancelLabel`, `onConfirm`, `loading`. Usar siempre en lugar de `window.confirm()`. Para submitear un form oculto tras confirmar: `formRef.current?.requestSubmit()` o `document.getElementById(formId)?.requestSubmit()`.
-- **Doble confirmación para acciones destructivas graves** (ej: eliminar categoría con todos sus repuestos): usar `ConfirmDialog` como primer paso y un `Dialog` custom como segundo paso. El segundo dialog muestra botones grandes **SÍ** / **NO**: NO cierra todo y cancela, SÍ activa el estado `confirmedYes` que habilita el botón final "Eliminar". Patrón implementado en `CategoriaCard`. Estados necesarios: `confirmDelete`, `confirmDelete2`, `confirmedYes`.
+- **Doble confirmación para acciones destructivas graves** (ej: eliminar una entidad que arrastra hijos en cascada): usar `DeleteItemForm` con `doubleConfirm={true}` y `doubleConfirmDescription`. El flujo tiene dos pasos:
+  1. `ConfirmDialog` (primer paso): describe el impacto, botón "Continuar".
+  2. `Dialog centered` (segundo paso): texto de advertencia fuerte + botones grandes **NO** / **SÍ**. NO cierra todo. SÍ cambia `confirmedYes` a `true`, lo que habilita el botón final **Eliminar** (variant `dark`, icono papelera). Solo ese último click ejecuta la acción.
+- El componente `DeleteItemForm` (`src/components/forms/DeleteItemForm/DeleteItemForm.tsx`) centraliza toda esta lógica — **no reimplementar el patrón a mano**. Props: `itemId`, `idFieldName`, `action`, `title`, `confirmDescription`, `doubleConfirm`, `doubleConfirmDescription`.
+- **Importante**: `DeleteItemForm` tiene su propio `<form>` interno. Nunca renderizarlo dentro de otro `<form>` — viola HTML y causa hydration error. Si el botón de borrar está en la misma fila que un form de edición, poner los campos del form de edición en un `<form id="...">` vacío y vincular los inputs/botones con `form={id}`, dejando `DeleteItemForm` fuera del form.
 
 ### Badges
 `StatusBadge`, `PriorityBadge`, `PaymentBadge`, `ContactBadge`, `BusinessDaysBadge` en `src/components/ui/Badge/Badge.tsx`.
@@ -182,7 +187,7 @@ El botón `PrintButton` llama a `window.print()`.
 | `src/components/pages/TrabajoDetailPage/TrabajoDetailPage.tsx` | Client component principal, orquesta el estado |
 | `src/components/forms/TrabajoForm/TrabajoForm.tsx` | Form de edición (trabajos, vehículo, observaciones) |
 | `src/components/forms/ClienteForm/ClienteForm.tsx` | Form de cliente (nuevo y edición) |
-| `src/components/forms/DeleteItemForm/DeleteItemForm.tsx` | Botón borrar genérico con `ConfirmDialog` integrado; prop `confirmDescription` opcional |
+| `src/components/forms/DeleteItemForm/DeleteItemForm.tsx` | Botón borrar genérico con `ConfirmDialog` integrado; soporta doble confirmación con `doubleConfirm` + `doubleConfirmDescription` |
 | `src/components/ui/Button/Button.tsx` | Componente Button + `buttonStyles()` + tipos `ButtonVariant`, `ButtonSize` |
 | `src/components/ui/Dialog/Dialog.tsx` | Dialog base (sheet / centered) sobre `@radix-ui/react-dialog` |
 | `src/components/ui/ConfirmDialog/ConfirmDialog.tsx` | Modal de confirmación reutilizable |

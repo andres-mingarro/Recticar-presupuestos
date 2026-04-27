@@ -309,6 +309,7 @@ export type TrabajoDetalleItem = {
   trabajoId: number | null;
   trabajoNombre: string;
   precio: number;
+  cantidad: number;
 };
 
 export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecios: ListaPrecio = 1) {
@@ -320,6 +321,7 @@ export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecio
     trabajo_id: number | null;
     trabajo_nombre: string;
     precio: number;
+    cantidad: number;
   }>(
     `
       SELECT
@@ -327,7 +329,8 @@ export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecio
         COALESCE(pt.categoria_nombre_snapshot, c.nombre) AS categoria_nombre,
         pt.trabajo_id AS trabajo_id,
         COALESCE(pt.trabajo_nombre_snapshot, t.nombre) AS trabajo_nombre,
-        COALESCE(pt.precio_snapshot, ${precioCol}) AS precio
+        COALESCE(pt.precio_snapshot, ${precioCol}) AS precio,
+        pt.cantidad
       FROM orden_trabajo_trabajos pt
       LEFT JOIN trabajos t ON t.id = pt.trabajo_id
       LEFT JOIN categorias_trabajo c ON c.id = t.categoria_id
@@ -343,6 +346,7 @@ export async function getTrabajosDetalleByTrabajo(trabajoId: number, listaPrecio
     trabajoId: row.trabajo_id,
     trabajoNombre: row.trabajo_nombre,
     precio: Number(row.precio),
+    cantidad: Number(row.cantidad),
   }));
 }
 

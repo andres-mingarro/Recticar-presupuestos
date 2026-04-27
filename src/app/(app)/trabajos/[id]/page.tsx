@@ -75,6 +75,9 @@ export default async function Page({
       estado: trabajo.estado,
       observaciones: trabajo.observaciones ?? "",
       trabajosIds: trabajo.trabajos_ids.map(String),
+      trabajosCantidades: Object.fromEntries(
+        trabajo.trabajos_ids.map((id) => [String(id), trabajo.trabajos_cantidades[id] ?? 1])
+      ),
       repuestosIds: trabajo.repuestos_ids.map(String),
       repuestos: trabajo.repuestos,
       listaPrecios: (trabajo.lista_precio as 1 | 2 | 3) ?? 1,
@@ -117,6 +120,12 @@ export default async function Page({
       trabajosIds: formData
         .getAll("trabajosIds")
         .filter((value): value is string => typeof value === "string"),
+      trabajosCantidades: Object.fromEntries(
+        formData
+          .getAll("trabajosIds")
+          .filter((v): v is string => typeof v === "string")
+          .map((id) => [id, Number(formData.get(`trabajoCantidad_${id}`)) || 1])
+      ),
       repuestosIds: formData
         .getAll("repuestosIds")
         .filter((value): value is string => typeof value === "string"),

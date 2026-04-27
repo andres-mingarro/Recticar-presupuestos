@@ -33,7 +33,7 @@ export function TrabajosResumen({
   snapshotRepuestos = [],
   refreshSnapshotPricesAction,
 }: TrabajosResumenProps) {
-  const { selectedIds, listaPrecios } = useTrabajosSeleccion();
+  const { selectedIds, cantidades: trabajoCantidades, listaPrecios } = useTrabajosSeleccion();
   const { selectedItems: selectedRepuestoItems } = useRepuestosSeleccion();
   const { aplicaIva } = useIva();
   const trabajosById = useMemo(
@@ -147,8 +147,13 @@ export function TrabajosResumen({
   );
 
   const totalTrabajos = useMemo(
-    () => selectedTrabajos.reduce((sum, t) => sum + ("precioLista1" in t ? getPrecioLista(t, listaPrecios) : t.precio), 0),
-    [selectedTrabajos, listaPrecios]
+    () => selectedTrabajos.reduce((sum, t) => {
+      const precio = "precioLista1" in t ? getPrecioLista(t, listaPrecios) : t.precio;
+      const id = "trabajoId" in t ? t.trabajoId : (t as { id: number }).id;
+      const cantidad = (id != null ? trabajoCantidades[id] : null) ?? ("cantidad" in t ? t.cantidad : null) ?? 1;
+      return sum + precio * cantidad;
+    }, 0),
+    [selectedTrabajos, listaPrecios, trabajoCantidades]
   );
 
   const totalRepuestos = useMemo(
@@ -240,14 +245,20 @@ export function TrabajosResumen({
           <div className="pt-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-color-gray)]">
             Trabajos
           </div>
-          {selectedTrabajos.map((t, i) => (
-            <div key={i} className="flex items-baseline justify-between gap-2">
-              <span className="text-[var(--text-color-gray)]">{"trabajoNombre" in t ? t.trabajoNombre : t.nombre}</span>
-              <span className="shrink-0 font-medium text-[var(--text-color-defult)]">
-                {formatPrice("precioLista1" in t ? getPrecioLista(t, listaPrecios) : t.precio)}
-              </span>
-            </div>
-          ))}
+          {selectedTrabajos.map((t, i) => {
+            const nombre = "trabajoNombre" in t ? t.trabajoNombre : t.nombre;
+            const precio = "precioLista1" in t ? getPrecioLista(t, listaPrecios) : t.precio;
+            const id = "trabajoId" in t ? t.trabajoId : (t as { id: number }).id;
+            const cantidad = (id != null ? trabajoCantidades[id] : null) ?? ("cantidad" in t ? t.cantidad : null) ?? 1;
+            return (
+              <div key={i} className="flex items-baseline justify-between gap-2">
+                <span className="text-[var(--text-color-gray)]">{nombre}{cantidad > 1 ? ` x${cantidad}` : ""}</span>
+                <span className="shrink-0 font-medium text-[var(--text-color-defult)]">
+                  {formatPrice(precio * cantidad)}
+                </span>
+              </div>
+            );
+          })}
         </div>
       ) : null}
       {selectedRepuestos.length > 0 ? (

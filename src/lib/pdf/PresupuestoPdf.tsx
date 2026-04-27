@@ -252,7 +252,7 @@ function buildCompanyLocation(empresa: EmpresaConfig) {
 export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empresa }: Props) {
   const groups = groupByCategory(trabajos);
   const repuestoGroups = groupRepuestosByCategory(repuestos);
-  const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio, 0);
+  const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio * t.cantidad, 0);
   const totalRepuestos = repuestos.reduce((sum, r) => sum + r.total, 0);
   const aplicaIva = trabajo.aplica_iva;
   const ivaAmount = aplicaIva ? Math.round(totalTrabajos * 21 / 100) : 0;
@@ -393,6 +393,9 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empres
                 <Text style={[styles.tableHeaderText, styles.colNombre]}>
                   Trabajo
                 </Text>
+                <Text style={[styles.tableHeaderText, styles.colCantidad]}>
+                  Cant.
+                </Text>
                 <Text style={[styles.tableHeaderText, styles.colPrecio]}>
                   Precio
                 </Text>
@@ -416,9 +419,12 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empres
                     <Text style={[styles.tableCell, styles.colNombre]}>
                       {row.item.trabajoNombre}
                     </Text>
+                    <Text style={[styles.tableCell, styles.colCantidad]}>
+                      {row.item.cantidad}
+                    </Text>
                     <Text style={[styles.tableCell, styles.colPrecio]}>
                       {row.item.precio > 0
-                        ? formatPrecio(row.item.precio)
+                        ? formatPrecio(row.item.precio * row.item.cantidad)
                         : "-"}
                     </Text>
                   </View>
