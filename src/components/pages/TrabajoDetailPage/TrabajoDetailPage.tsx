@@ -39,21 +39,25 @@ import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { useCobrado } from "@/components/ui/CobradoToggle/CobradoContext";
 import { TrabajoDatosCard } from "@/components/ui/TrabajoDatosCard";
 import { PrintButton } from "./PrintButton";
+import { Switch } from "@/components/ui/Switch";
 import { useMobileActionsRegister } from "@/components/layout/MobileActions";
 import styles from "./TrabajoDetailPage.module.scss";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
+import { Divider } from "@/components/ui/Divider";
 
 function TrabajoMobileActions({
   formId,
   trabajoId,
   dirty,
   isPending,
+  mostrarPreciosTrabajos,
 }: {
   formId: string;
   trabajoId: number;
   dirty: boolean;
   isPending: boolean;
+  mostrarPreciosTrabajos: boolean;
 }) {
   return (
     <>
@@ -68,7 +72,7 @@ function TrabajoMobileActions({
         {isPending ? "Guardando..." : "Guardar"}
       </PulsatingButton>
       <a
-        href={`/api/trabajos/${trabajoId}/pdf`}
+        href={`/api/trabajos/${trabajoId}/pdf${mostrarPreciosTrabajos ? "?precios=1" : ""}`}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.1)] text-white text-sm font-semibold"
@@ -162,6 +166,7 @@ export function TrabajoDetailPage({
   );
   const [formState, formAction, isPending] = useActionState(action, initialState);
   const [dirty, setDirty] = useState(false);
+  const [mostrarPreciosTrabajos, setMostrarPreciosTrabajos] = useState(false);
   const [selectedEstado, setSelectedEstado] = useState(trabajo.estado);
   const [summary, setSummary] = useState<TrabajoFormSummary>({
     clienteLabel: trabajo.cliente_nombre ?? "",
@@ -207,8 +212,9 @@ export function TrabajoDetailPage({
       trabajoId={trabajo.id}
       dirty={dirty}
       isPending={isPending}
+      mostrarPreciosTrabajos={mostrarPreciosTrabajos}
     />,
-    [dirty, isPending]
+    [dirty, isPending, mostrarPreciosTrabajos]
   );
 
   return (
@@ -336,8 +342,9 @@ export function TrabajoDetailPage({
             <p className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">
               Presupuesto
             </p>
+           
             <a
-              href={`/api/trabajos/${trabajo.id}/pdf`}
+              href={`/api/trabajos/${trabajo.id}/pdf${mostrarPreciosTrabajos ? "?precios=1" : ""}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300"
@@ -345,6 +352,15 @@ export function TrabajoDetailPage({
               <Icon name="download" className="h-4 w-4" />
               Descargar PDF
             </a>
+            <Divider />
+             <Switch
+              label="Mostrar precios de trabajos"
+              labelPosition="left"
+              className="justify-end"
+              checked={mostrarPreciosTrabajos}
+              onChange={setMostrarPreciosTrabajos}
+            />
+            <Divider />
 
             <div id="etiqueta-qr-print" className={styles.etiquetaWrapper}>
               <div className={styles.etiqueta}>

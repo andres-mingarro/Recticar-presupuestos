@@ -243,13 +243,14 @@ type Props = {
   repuestos: RepuestoDetalleItem[];
   qrDataUrl: string;
   empresa: EmpresaConfig;
+  mostrarPreciosTrabajos?: boolean;
 };
 
 function buildCompanyLocation(empresa: EmpresaConfig) {
   return [empresa.direccion, empresa.ciudad, empresa.provincia].filter(Boolean).join(", ");
 }
 
-export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empresa }: Props) {
+export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empresa, mostrarPreciosTrabajos = true }: Props) {
   const groups = groupByCategory(trabajos);
   const repuestoGroups = groupRepuestosByCategory(repuestos);
   const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio * t.cantidad, 0);
@@ -396,9 +397,11 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empres
                 <Text style={[styles.tableHeaderText, styles.colCantidad]}>
                   Cant.
                 </Text>
-                <Text style={[styles.tableHeaderText, styles.colPrecio]}>
-                  Precio
-                </Text>
+                {mostrarPreciosTrabajos && (
+                  <Text style={[styles.tableHeaderText, styles.colPrecio]}>
+                    Precio
+                  </Text>
+                )}
               </View>
 
               {allRows.map((row, i) => {
@@ -422,11 +425,13 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empres
                     <Text style={[styles.tableCell, styles.colCantidad]}>
                       {row.item.cantidad}
                     </Text>
-                    <Text style={[styles.tableCell, styles.colPrecio]}>
-                      {row.item.precio > 0
-                        ? formatPrecio(row.item.precio * row.item.cantidad)
-                        : "-"}
-                    </Text>
+                    {mostrarPreciosTrabajos && (
+                      <Text style={[styles.tableCell, styles.colPrecio]}>
+                        {row.item.precio > 0
+                          ? formatPrecio(row.item.precio * row.item.cantidad)
+                          : "-"}
+                      </Text>
+                    )}
                   </View>
                 );
               })}

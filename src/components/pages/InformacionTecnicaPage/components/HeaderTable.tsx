@@ -47,11 +47,11 @@ export function HeaderTable({
   tabsSlot?: React.ReactNode;
 }) {
   return (
-    <Card as="section" className="HeaderTable overflow-hidden p-0">
+    <Card noPadding as="section" className="HeaderTable overflow-hidden">
       {/* ── Toolbar ── */}
-      <div className="toolbar flex flex-col gap-0 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)]">
+      <div className="toolbar flex flex-col gap-0 border-b border-[var(--color-border)] bg-[var(--gray-40)]">
         {/* Row 1: título + tabs */}
-        <div className="toolbar-inner flex lg:flex-row flex-col items-center gap-2 px-3 py-2">
+        <div className="toolbar-inner flex justify-between lg:flex-row flex-col items-center gap-2 px-4 py-2">
           <div className="toolbar-header">
             <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
             <span className="text-lg lg:text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">

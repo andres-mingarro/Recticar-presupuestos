@@ -46,13 +46,13 @@ export function CategoriaCard({
   }
 
   return (
-    <Card as="section" className="CategoriaCard space-y-0 overflow-hidden !p-0">
+    <Card noPadding as="section" className="CategoriaCard space-y-0 overflow-hidden" >
       <form id={formId} action={saveFormAction} className="hidden">
         <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
       </form>
 
       {/* Header */}
-      <div className="toolbar flex flex-col justify-center md:flex-row md:items-center sm:gap-2 border-b border-[var(--color-border)]  bg-[var(--gray-40)] pt-2 md:px-8 md:py-5">
+      <div className="toolbar flex flex-col justify-center md:flex-row md:items-center sm:gap-2 border-b border-[var(--color-border)] bg-[var(--gray-40)] pt-2 md:px-8 md:py-5">
 
         {/* Fila 1 (siempre): icono + nombre/input */}
         <div className="flex items-center gap-2 px-3 py-2 md:min-w-0 md:flex-1 md:p-0">

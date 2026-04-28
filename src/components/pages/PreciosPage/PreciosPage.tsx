@@ -324,7 +324,7 @@ function CategoriaCard({
   }
 
   return (
-    <Card as="section" className=" HeaderTable space-y-0 overflow-hidden !p-0">
+    <Card noPadding as="section" className=" HeaderTable space-y-0 overflow-hidden">
       {/* Save form — hidden anchor, inputs reference it via form={formId} */}
       <form id={formId} action={saveFormAction} className="hidden">
         <input type="hidden" name="categoriaId" value={grupo.categoriaId} />

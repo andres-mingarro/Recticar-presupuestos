@@ -7,14 +7,22 @@ type SwitchProps = {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label?: string;
+  labelPosition?: "left" | "right";
   className?: string;
 };
 
-export function Switch({ checked, onChange, label, className }: SwitchProps) {
+export function Switch({ checked, onChange, label, labelPosition = "right", className }: SwitchProps) {
   const id = useId();
+
+  const labelEl = label ? (
+    <span className="whitespace-nowrap text-xs font-medium text-[var(--text-color-gray)]">
+      {label}
+    </span>
+  ) : null;
 
   return (
     <label htmlFor={id} className={cn("Switch flex cursor-pointer items-center gap-2", className)}>
+      {labelPosition === "left" && labelEl}
       {/* opacity-0 sobre el track — evita que el browser haga scroll hacia un sr-only fuera de viewport */}
       <span className="relative inline-flex h-5 w-9 shrink-0">
         <input
@@ -38,11 +46,7 @@ export function Switch({ checked, onChange, label, className }: SwitchProps) {
           />
         </span>
       </span>
-      {label && (
-        <span className="whitespace-nowrap text-xs font-medium text-[var(--text-color-gray)]">
-          {label}
-        </span>
-      )}
+      {labelPosition === "right" && labelEl}
     </label>
   );
 }

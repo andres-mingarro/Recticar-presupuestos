@@ -19,7 +19,7 @@ function slugifyFilenamePart(value: string | null | undefined) {
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
@@ -30,6 +30,7 @@ export async function GET(
 
   const { id } = await params;
   const trabajoId = Number(id);
+  const mostrarPreciosTrabajos = new URL(request.url).searchParams.get("precios") === "1";
 
   if (Number.isNaN(trabajoId)) {
     return new Response("ID inválido", { status: 400 });
@@ -51,7 +52,7 @@ export async function GET(
 
   const buffer = await renderToBuffer(
     // @ts-expect-error: @react-pdf/renderer types incompatibles con React 19
-    React.createElement(PresupuestoPdf, { trabajo, trabajos, repuestos, qrDataUrl, empresa })
+    React.createElement(PresupuestoPdf, { trabajo, trabajos, repuestos, qrDataUrl, empresa, mostrarPreciosTrabajos })
   );
   const clienteSlug = slugifyFilenamePart(trabajo.cliente_nombre);
   const fileName = `presupuesto-${trabajo.numero_trabajo}-${clienteSlug}.pdf`;
