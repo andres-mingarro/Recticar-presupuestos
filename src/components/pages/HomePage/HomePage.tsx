@@ -7,6 +7,7 @@ import { Icon } from "@/components/ui/Icon";
 import { PriorityBadge } from "@/components/ui/Badge/Badge";
 import { BusinessDaysDot } from "@/components/ui/BusinessDaysDot";
 import { Card } from "@/components/ui/Card";
+import { useMobileActionsRegister } from "@/components/layout/MobileActions";
 import type { SessionPayload } from "@/lib/auth";
 import type { AppPermiso } from "@/lib/queries/usuarios";
 import type { IconName } from "@/components/ui/Icon";
@@ -78,13 +79,31 @@ export function HomePage({
   const maxMotores = motoresMasUsados[0]?.cantidad ?? 1;
   const maxRepuestos = repuestosMasUsados[0]?.cantidad ?? 1;
 
+  useMobileActionsRegister(
+    (canCrearTrabajo || canVerClientes) ? (
+      <>
+        {canCrearTrabajo && (
+          <Button as="a" href="/trabajos/nuevo" variant="primary" size="sm" icon={<Icon name="plus" className="h-3.5 w-3.5" />}>
+            Trabajo
+          </Button>
+        )}
+        {canVerClientes && (
+          <Button as="a" href="/clientes/nuevo" variant="secondary" size="sm" icon={<Icon name="plus" className="h-3.5 w-3.5" />}>
+            Cliente
+          </Button>
+        )}
+      </>
+    ) : null,
+    [canCrearTrabajo, canVerClientes]
+  );
+
   return (
     <div className={cn("HomePage", styles.HomePage, "space-y-7")}>
 
       {/* Stats + accesos rápidos */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         {(canCrearTrabajo || canVerClientes) && (
-          <div className="col-span-2 flex flex-col justify-center gap-3 rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-[0_4px_16px_rgba(15,23,42,0.06)] lg:col-span-1">
+          <div className="col-span-2 hidden flex-col justify-center gap-3 rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-[0_4px_16px_rgba(15,23,42,0.06)] md:flex lg:col-span-1">
             {canCrearTrabajo && (
               <Button as="a" href="/trabajos/nuevo" variant="primary" icon={<Icon name="plus" />} className="w-full justify-center">
                 Nuevo trabajo
