@@ -8,6 +8,15 @@ export const metadata: Metadata = {
   description:
     "Gestión de presupuestos y seguimiento de clientes para rectificadora de motores.",
   robots: { index: false, follow: false },
+  icons: {
+    icon: [
+      { url: "/favicon/favicon.ico", sizes: "any" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: "/favicon/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
