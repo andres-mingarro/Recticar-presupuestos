@@ -2,7 +2,6 @@ import React from "react";
 import { Document, Font, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { TrabajoAgrupado } from "@/lib/types";
 import type { EmpresaConfig } from "@/lib/queries/empresa";
-import type { ListaPrecio } from "@/lib/db";
 import { LISTAS_PRECIOS, getPrecioLista } from "@/lib/db";
 
 Font.registerHyphenationCallback((word) => [word]);
@@ -14,76 +13,80 @@ const palette = {
   border: "#e2e8f0",
   surface: "#f8fafc",
   white: "#ffffff",
+  altCol: "rgba(0,0,0,0.03)",
 };
+
+const COL_PRECIO_WIDTH = 68;
 
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 9,
     color: palette.foreground,
-    paddingTop: 36,
-    paddingBottom: 48,
-    paddingHorizontal: 36,
+    paddingTop: 32,
+    paddingBottom: 44,
+    paddingHorizontal: 32,
     backgroundColor: palette.white,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    marginBottom: 20,
-    paddingBottom: 14,
+    marginBottom: 18,
+    paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: palette.border,
   },
-  companyName: { fontSize: 16, fontFamily: "Helvetica-Bold", color: palette.accent },
-  companyMeta: { fontSize: 8, color: palette.muted, marginTop: 2 },
+  companyName: { fontSize: 15, fontFamily: "Helvetica-Bold", color: palette.accent },
+  companyMeta: { fontSize: 7.5, color: palette.muted, marginTop: 2 },
+  logo: { width: 120, height: 36, objectFit: "contain" },
   headerRight: { alignItems: "flex-end" },
-  logo: { width: 120, height: 40, objectFit: "contain" },
-  listaTitulo: { fontSize: 14, fontFamily: "Helvetica-Bold", color: palette.foreground },
-  listaFecha: { fontSize: 8, color: palette.muted, marginTop: 2 },
+  titulo: { fontSize: 13, fontFamily: "Helvetica-Bold", color: palette.foreground },
+  fecha: { fontSize: 7.5, color: palette.muted, marginTop: 2 },
   tableHeader: {
     flexDirection: "row",
     backgroundColor: palette.accent,
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
-    paddingHorizontal: 8,
+    paddingLeft: 8,
     paddingVertical: 5,
-    marginTop: 10,
   },
-  tableHeaderText: { fontSize: 8, fontFamily: "Helvetica-Bold", color: palette.white },
+  tableHeaderText: { fontSize: 7.5, fontFamily: "Helvetica-Bold", color: palette.white },
   categoryRow: {
     flexDirection: "row",
-    paddingHorizontal: 8,
+    paddingLeft: 8,
     paddingVertical: 4,
     backgroundColor: "#fff7ed",
     borderBottomWidth: 1,
     borderBottomColor: "#fed7aa",
   },
-  categoryLabel: { fontSize: 8, fontFamily: "Helvetica-Bold", color: palette.accent },
+  categoryLabel: { fontSize: 7.5, fontFamily: "Helvetica-Bold", color: palette.accent },
   tableRow: {
     flexDirection: "row",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingLeft: 8,
+    paddingVertical: 3.5,
     borderBottomWidth: 1,
     borderBottomColor: palette.border,
   },
   tableRowAlt: { backgroundColor: palette.surface },
-  tableCell: { fontSize: 9, color: palette.foreground },
-  tableCellMuted: { fontSize: 9, color: palette.muted },
+  tableCell: { fontSize: 8.5, color: palette.foreground },
+  tableCellRight: { fontSize: 8.5, color: palette.foreground, textAlign: "right", paddingRight: 6 },
+  tableCellRightMuted: { fontSize: 8.5, color: palette.muted, textAlign: "right", paddingRight: 6 },
   colNombre: { flex: 1 },
-  colPrecio: { width: 72, textAlign: "right" },
+  colPrecio: { width: COL_PRECIO_WIDTH },
+  colPrecioAlt: { width: COL_PRECIO_WIDTH, backgroundColor: palette.altCol },
   footer: {
     position: "absolute",
-    bottom: 24,
-    left: 36,
-    right: 36,
+    bottom: 20,
+    left: 32,
+    right: 32,
     flexDirection: "row",
     justifyContent: "space-between",
     borderTopWidth: 1,
     borderTopColor: palette.border,
-    paddingTop: 6,
+    paddingTop: 5,
   },
-  footerText: { fontSize: 8, color: palette.muted },
+  footerText: { fontSize: 7.5, color: palette.muted },
 });
 
 function formatPrecio(value: number) {
@@ -103,85 +106,91 @@ function formatDate(date: Date) {
   }).format(date);
 }
 
-type ListaPageProps = {
-  lista: ListaPrecio;
-  grupos: TrabajoAgrupado[];
-  empresa: EmpresaConfig;
-  fecha: Date;
-  logoDataUrl: string | null;
-};
-
-function ListaPage({ lista, grupos, empresa, fecha, logoDataUrl }: ListaPageProps) {
-  const companyMeta = [empresa.telefono, empresa.email].filter(Boolean).join(" · ");
-
-  return (
-    <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <View style={{ flexDirection: "column", gap: 4 }}>
-          {logoDataUrl ? (
-            // eslint-disable-next-line jsx-a11y/alt-text
-            <Image src={logoDataUrl} style={styles.logo} />
-          ) : (
-            <Text style={styles.companyName}>{empresa.nombre}</Text>
-          )}
-          {empresa.tagline ? <Text style={styles.companyMeta}>{empresa.tagline}</Text> : null}
-          {companyMeta ? <Text style={styles.companyMeta}>{companyMeta}</Text> : null}
-        </View>
-        <View style={styles.headerRight}>
-          <Text style={styles.listaTitulo}>Lista de precios {lista}</Text>
-          <Text style={styles.listaFecha}>{formatDate(fecha)}</Text>
-        </View>
-      </View>
-
-      <View style={{ borderWidth: 1, borderColor: palette.border, borderRadius: 4, overflow: "hidden" }}>
-        <View style={styles.tableHeader}>
-          <Text style={[styles.tableHeaderText, styles.colNombre]}>Trabajo</Text>
-          <Text style={[styles.tableHeaderText, styles.colPrecio]}>Precio</Text>
-        </View>
-
-        {grupos.map((grupo) => [
-          <View key={`cat-${grupo.categoriaId}`} style={styles.categoryRow}>
-            <Text style={styles.categoryLabel}>{grupo.categoriaNombre}</Text>
-          </View>,
-          ...grupo.trabajos.map((trabajo, i) => (
-            <View
-              key={trabajo.id}
-              style={i % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}
-            >
-              <Text style={[styles.tableCell, styles.colNombre]}>{trabajo.nombre}</Text>
-              <Text style={[styles.tableCell, styles.colPrecio]}>
-                {getPrecioLista(trabajo, lista) > 0
-                  ? formatPrecio(getPrecioLista(trabajo, lista))
-                  : "-"}
-              </Text>
-            </View>
-          )),
-        ])}
-      </View>
-
-      <View style={styles.footer} fixed>
-        <Text style={styles.footerText}>{empresa.nombre} — Lista {lista}</Text>
-        <Text style={styles.footerText}>{formatDate(fecha)}</Text>
-      </View>
-    </Page>
-  );
-}
-
 type Props = {
   grupos: TrabajoAgrupado[];
   empresa: EmpresaConfig;
-  listas?: ListaPrecio[];
   logoDataUrl?: string | null;
 };
 
-export function ListaPreciosPdf({ grupos, empresa, listas = LISTAS_PRECIOS as unknown as ListaPrecio[], logoDataUrl = null }: Props) {
+export function ListaPreciosPdf({ grupos, empresa, logoDataUrl = null }: Props) {
   const fecha = new Date();
+  const companyMeta = [empresa.telefono, empresa.email].filter(Boolean).join(" · ");
 
   return (
     <Document title={`Lista de precios — ${empresa.nombre}`} author={empresa.nombre}>
-      {listas.map((lista) => (
-        <ListaPage key={lista} lista={lista} grupos={grupos} empresa={empresa} fecha={fecha} logoDataUrl={logoDataUrl} />
-      ))}
+      <Page size="A4" orientation="landscape" style={styles.page}>
+        {/* HEADER */}
+        <View style={styles.header}>
+          <View style={{ flexDirection: "column", gap: 4 }}>
+            {logoDataUrl ? (
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={logoDataUrl} style={styles.logo} />
+            ) : (
+              <Text style={styles.companyName}>{empresa.nombre}</Text>
+            )}
+            {empresa.tagline ? <Text style={styles.companyMeta}>{empresa.tagline}</Text> : null}
+            {companyMeta ? <Text style={styles.companyMeta}>{companyMeta}</Text> : null}
+          </View>
+          <View style={styles.headerRight}>
+            <Text style={styles.titulo}>Lista de precios</Text>
+            <Text style={styles.fecha}>{formatDate(fecha)}</Text>
+          </View>
+        </View>
+
+        {/* TABLE */}
+        <View style={{ borderWidth: 1, borderColor: palette.border, borderRadius: 4, overflow: "hidden" }}>
+          {/* Column headers */}
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableHeaderText, styles.colNombre]}>Trabajo</Text>
+            {LISTAS_PRECIOS.map((n, i) => (
+              <Text
+                key={n}
+                style={[
+                  styles.tableHeaderText,
+                  i % 2 === 1 ? styles.colPrecioAlt : styles.colPrecio,
+                  { textAlign: "right", paddingRight: 6 },
+                ]}
+              >
+                Lista {n}
+              </Text>
+            ))}
+          </View>
+
+          {/* Rows */}
+          {grupos.map((grupo) => [
+            <View key={`cat-${grupo.categoriaId}`} style={styles.categoryRow}>
+              <Text style={styles.categoryLabel}>{grupo.categoriaNombre}</Text>
+            </View>,
+            ...grupo.trabajos.map((trabajo, i) => (
+              <View
+                key={trabajo.id}
+                style={i % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}
+              >
+                <Text style={[styles.tableCell, styles.colNombre]}>{trabajo.nombre}</Text>
+                {LISTAS_PRECIOS.map((n, j) => {
+                  const precio = getPrecioLista(trabajo, n);
+                  return (
+                    <Text
+                      key={n}
+                      style={[
+                        precio > 0 ? styles.tableCellRight : styles.tableCellRightMuted,
+                        j % 2 === 1 ? styles.colPrecioAlt : styles.colPrecio,
+                      ]}
+                    >
+                      {precio > 0 ? formatPrecio(precio) : "-"}
+                    </Text>
+                  );
+                })}
+              </View>
+            )),
+          ])}
+        </View>
+
+        <View style={styles.footer} fixed>
+          <Text style={styles.footerText}>{empresa.nombre} — Lista de precios</Text>
+          <Text style={styles.footerText}>{formatDate(fecha)}</Text>
+        </View>
+      </Page>
     </Document>
   );
 }

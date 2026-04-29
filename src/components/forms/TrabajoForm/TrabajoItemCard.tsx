@@ -44,7 +44,7 @@ export function TrabajoItemCard({
     >
       <div className={cn("flex flex-col gap-2", styles.TrabajoItemCardContent, contentClassName)}>
         {/* Mobile: dos filas. Desktop: una sola fila */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3 header-card cursor-pointer">
+        <div className="flex flex-col gap-2 md:gap-3 header-card cursor-pointer">
           {/* Fila 1 (mobile) / inline (desktop): checkbox + label */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <CheckboxBeauti
@@ -64,7 +64,7 @@ export function TrabajoItemCard({
           </div>
           {/* Fila 2 (mobile) / inline (desktop): incrementor + precio */}
           {(children || precioLabel) && (
-            <div className="flex items-center justify-between gap-3 pl-8 md:pl-0 md:shrink-0">
+            <div className="flex items-center justify-between gap-3 pl-0 md:shrink-0">
               {children}
               {precioLabel && (
                 <span className="min-w-[100] ml-auto shrink-0 text-sm text-right font-semibold text-[var(--brown-burnt)]">

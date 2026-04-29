@@ -661,30 +661,26 @@ export function TrabajoForm({
                                     />
                                   </div>
 
-                                  {repuesto.stockHabilitado && (
-                                    <>
-                                      <div className={styles.TrabajoFormRepuestoField}>
-                                        <span className={styles.TrabajoFormRepuestoFieldLabel}>Stock restante</span>
-                                        <span className={cn(styles.TrabajoFormRepuestoFieldValue, styles.TrabajoFormRepuestoFieldValueStock)}>
-                                          {stockRestante}
-                                        </span>
-                                      </div>
+                                  <div className={cn(styles.TrabajoFormRepuestoField, "transition-[opacity,visibility] duration-200", repuesto.stockHabilitado ? "opacity-100 visible" : "opacity-0 invisible")}>
+                                    <span className={styles.TrabajoFormRepuestoFieldLabel}>Stock restante</span>
+                                    <span className={cn(styles.TrabajoFormRepuestoFieldValue, styles.TrabajoFormRepuestoFieldValueStock)}>
+                                      {stockRestante}
+                                    </span>
+                                  </div>
 
-                                      <div className={styles.TrabajoFormRepuestoField}>
-                                        <span className={styles.TrabajoFormRepuestoFieldLabel}>Se compra</span>
-                                        <span className={cn(
-                                          styles.TrabajoFormRepuestoFieldValue,
-                                          requiereProveedor
-                                            ? styles.TrabajoFormRepuestoFieldValueWarning
-                                            : styles.TrabajoFormRepuestoFieldValueMuted
-                                        )}>
-                                          {cantFaltante}
-                                        </span>
-                                      </div>
-                                    </>
-                                  )}
+                                  <div className={cn(styles.TrabajoFormRepuestoField, "transition-[opacity,visibility] duration-200", repuesto.stockHabilitado ? "opacity-100 visible" : "opacity-0 invisible")}>
+                                    <span className={styles.TrabajoFormRepuestoFieldLabel}>Se compra</span>
+                                    <span className={cn(
+                                      styles.TrabajoFormRepuestoFieldValue,
+                                      requiereProveedor
+                                        ? styles.TrabajoFormRepuestoFieldValueWarning
+                                        : styles.TrabajoFormRepuestoFieldValueMuted
+                                    )}>
+                                      {cantFaltante}
+                                    </span>
+                                  </div>
 
-                                  <div className={cn(styles.TrabajoFormRepuestoField, styles.TrabajoFormRepuestoFieldPrecio)}>
+                                  <div className={cn(styles.TrabajoFormRepuestoField, styles.PrecioProveedor, styles.TrabajoFormRepuestoFieldPrecio, "transition-[opacity,visibility] duration-200", (!repuesto.stockHabilitado || requiereProveedor) ? "opacity-100 visible" : "opacity-0 invisible")}>
                                     <span className={styles.TrabajoFormRepuestoFieldLabel}>
                                       {repuesto.stockHabilitado ? "Precio proveedor" : "Precio unitario"}
                                     </span>

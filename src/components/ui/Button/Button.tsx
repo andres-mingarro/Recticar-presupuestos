@@ -1,6 +1,21 @@
-import type { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from "react";
+"use client";
+
+import type { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode, MouseEvent } from "react";
 import { cn } from "@/lib/cn";
 import styles from "./Button.module.scss";
+
+function spawnRipple(e: MouseEvent<HTMLElement>) {
+  const el = e.currentTarget;
+  const rect = el.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  const x = e.clientX - rect.left - size / 2;
+  const y = e.clientY - rect.top - size / 2;
+  const span = document.createElement("span");
+  span.className = styles.ripple;
+  span.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px`;
+  el.appendChild(span);
+  span.addEventListener("animationend", () => span.remove(), { once: true });
+}
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "dark" | "warm" | "burnt" | "outline" | "outline-warm" | "outline-dark" | "outline-ghost" | "danger-ghost" | "link" | "danger" | "warning" | "info" | "success" | "outline-danger" | "outline-warning" | "outline-info" | "outline-success" | "hero";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -55,9 +70,9 @@ export function Button({ variant = "primary", variantOnHover, size, icon, iconRi
   };
 
   if (as === "a") {
-    const { href, ...anchorRest } = rest as AsAnchor;
+    const { href, onClick, ...anchorRest } = rest as AsAnchor;
     return (
-      <a href={href} className={cls} {...dataAttrs} {...anchorRest}>
+      <a href={href} className={cls} {...dataAttrs} onClick={(e) => { spawnRipple(e); onClick?.(e); }} {...anchorRest}>
         {icon && <span className={styles.ButtonIcon}>{icon}</span>}
         {children}
         {iconRight && <span className={styles.ButtonIcon}>{iconRight}</span>}
@@ -65,8 +80,9 @@ export function Button({ variant = "primary", variantOnHover, size, icon, iconRi
     );
   }
 
+  const { onClick, ...buttonRest } = rest as AsButton;
   return (
-    <button className={cls} {...dataAttrs} {...(rest as AsButton)}>
+    <button className={cls} {...dataAttrs} onClick={(e) => { spawnRipple(e); onClick?.(e); }} {...buttonRest}>
       {icon && <span className={styles.ButtonIcon}>{icon}</span>}
       {children}
       {iconRight && <span className={styles.ButtonIcon}>{iconRight}</span>}

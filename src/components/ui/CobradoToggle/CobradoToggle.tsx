@@ -1,5 +1,6 @@
 "use client";
 
+import confetti from "canvas-confetti";
 import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import { useCobrado } from "./CobradoContext";
@@ -10,6 +11,25 @@ type CobradoToggleProps = {
 
 export function CobradoToggle({ form }: CobradoToggleProps) {
   const { cobrado, setCobrado } = useCobrado();
+
+  function handleCobrado(e: React.MouseEvent<HTMLButtonElement>) {
+    if (!cobrado) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      confetti({
+        particleCount: 40,
+        spread: 50,
+        startVelocity: 20,
+        ticks: 80,
+        origin: {
+          x: (rect.left + rect.width / 2) / window.innerWidth,
+          y: (rect.top + rect.height / 2) / window.innerHeight,
+        },
+        colors: ["#059669", "#34d399", "#6ee7b7", "#fbbf24", "#f97316"],
+        scalar: 0.7,
+      });
+    }
+    setCobrado(true);
+  }
 
   return (
     <div className="CobradoToggle flex-1 flex flex-col gap-1.5">
@@ -31,7 +51,7 @@ export function CobradoToggle({ form }: CobradoToggleProps) {
         </button>
         <button
           type="button"
-          onClick={() => setCobrado(true)}
+          onClick={(e) => handleCobrado(e)}
           className={cn(
             "inline-flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
             cobrado

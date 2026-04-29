@@ -161,6 +161,11 @@
     //grid-column: 1 / -1;
   }
 
+  .PrecioProveedor {
+    grid-column: span 2;
+  }
+
+
   .TrabajoFormRepuestoField,
   .TrabajoFormRepuestoFieldTotal {
     justify-items: start;
