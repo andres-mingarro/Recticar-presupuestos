@@ -30,9 +30,7 @@ function normalize(formData: FormData, key: string) {
 
 function revalidateTechnicalPages() {
   revalidatePath("/informacion-tecnica");
-  revalidatePath("/trabajos");
   revalidatePath("/trabajos/nuevo");
-  revalidatePath("/clientes");
 }
 
 export async function createMarcaAction(

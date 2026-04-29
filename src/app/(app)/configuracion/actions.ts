@@ -105,7 +105,6 @@ export async function updateEmpresaBusinessDaysConfigAction(formData: FormData) 
   });
 
   revalidatePath("/configuracion");
-  revalidatePath("/trabajos");
   redirect("/configuracion?saved=1");
 }
 
