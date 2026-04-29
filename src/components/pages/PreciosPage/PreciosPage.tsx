@@ -21,6 +21,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { DragHandle } from "@/components/ui/DragHandle";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Incrementor } from "@/components/ui/Incrementor";
+import { PdfShareButton } from "@/components/ui/PdfShareButton";
 
 // ─── Category card ────────────────────────────────────────────────────────────
 
@@ -568,17 +569,14 @@ export function PreciosPage({
         title="Lista de precios"
         description={`${totalTrabajos} trabajos en ${trabajos.length} categorías.`}
         actions={
-          <Button
-            as="a"
+          <PdfShareButton
             href="/api/precios/pdf"
-            target="_blank"
-            rel="noopener noreferrer"
+            filename="lista-de-precios.pdf"
             variant="warm"
             size="md"
-            icon={<Icon name="download" className="h-4 w-4" />}
           >
             Descargar PDF
-          </Button>
+          </PdfShareButton>
         }
       />
 

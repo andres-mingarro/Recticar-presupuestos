@@ -45,6 +45,7 @@ import styles from "./TrabajoDetailPage.module.scss";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { Divider } from "@/components/ui/Divider";
+import { PdfShareButton } from "@/components/ui/PdfShareButton";
 
 function TrabajoMobileActions({
   formId,
@@ -71,15 +72,14 @@ function TrabajoMobileActions({
         {isPending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
         {isPending ? "Guardando..." : "Guardar"}
       </PulsatingButton>
-      <a
+      <PdfShareButton
         href={`/api/trabajos/${trabajoId}/pdf${mostrarPreciosTrabajos ? "?precios=1" : ""}`}
-        target="_blank"
-        rel="noopener noreferrer"
+        filename={`presupuesto-${trabajoId}.pdf`}
+        iconSize="h-3.5 w-3.5"
         className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.1)] text-white text-sm font-semibold"
       >
-        <Icon name="download" className="h-3.5 w-3.5" />
         PDF
-      </a>
+      </PdfShareButton>
     </>
   );
 }
@@ -343,15 +343,13 @@ export function TrabajoDetailPage({
               Presupuesto
             </p>
            
-            <a
+            <PdfShareButton
               href={`/api/trabajos/${trabajo.id}/pdf${mostrarPreciosTrabajos ? "?precios=1" : ""}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              filename={`presupuesto-${trabajo.id}.pdf`}
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300"
             >
-              <Icon name="download" className="h-4 w-4" />
               Descargar PDF
-            </a>
+            </PdfShareButton>
             <Divider />
              <Switch
               label="Mostrar precios de trabajos"

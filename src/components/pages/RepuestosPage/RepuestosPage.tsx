@@ -4,8 +4,7 @@ import type { RepuestosActionState } from "@/app/(app)/repuestos/actions";
 import { AddCategoriaForm } from "@/components/forms/AddCategoriaForm";
 import type { RepuestoAgrupado } from "@/lib/types";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
-import { Icon } from "@/components/ui/Icon";
+import { PdfShareButton } from "@/components/ui/PdfShareButton";
 import { CategoriaCard } from "./components/CategoriaCard";
 
 type RepuestosPageProps = {
@@ -36,17 +35,14 @@ export function RepuestosPage({
         title="Repuestos"
         description={`${totalRepuestos} repuestos en ${repuestos.length} categorías.`}
         actions={
-          <Button
-            as="a"
+          <PdfShareButton
             href="/api/repuestos/pdf"
-            target="_blank"
-            rel="noopener noreferrer"
+            filename="catalogo-repuestos.pdf"
             variant="warm"
             size="md"
-            icon={<Icon name="download" className="h-4 w-4" />}
           >
             Descargar PDF
-          </Button>
+          </PdfShareButton>
         }
       />
 
