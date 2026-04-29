@@ -6,6 +6,7 @@ import { getTrabajosDetalleByTrabajo } from "@/lib/queries/catalogo";
 import { getEmpresaConfig } from "@/lib/queries/empresa";
 import { getRepuestosDetalleByTrabajo } from "@/lib/queries/repuestos";
 import { PresupuestoPdf } from "@/lib/pdf/PresupuestoPdf";
+import { getLogoDataUrl } from "@/lib/pdf/assets";
 import { generateQrDataUrl } from "@/lib/qr";
 
 function slugifyFilenamePart(value: string | null | undefined) {
@@ -48,11 +49,14 @@ export async function GET(
     getEmpresaConfig(),
   ]);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-  const qrDataUrl = await generateQrDataUrl(`${baseUrl}/trabajos/${trabajoId}`);
+  const [qrDataUrl, logoDataUrl] = await Promise.all([
+    generateQrDataUrl(`${baseUrl}/trabajos/${trabajoId}`),
+    getLogoDataUrl(),
+  ]);
 
   const buffer = await renderToBuffer(
     // @ts-expect-error: @react-pdf/renderer types incompatibles con React 19
-    React.createElement(PresupuestoPdf, { trabajo, trabajos, repuestos, qrDataUrl, empresa, mostrarPreciosTrabajos })
+    React.createElement(PresupuestoPdf, { trabajo, trabajos, repuestos, qrDataUrl, empresa, mostrarPreciosTrabajos, logoDataUrl })
   );
   const clienteSlug = slugifyFilenamePart(trabajo.cliente_nombre);
   const fileName = `presupuesto-${trabajo.numero_trabajo}-${clienteSlug}.pdf`;

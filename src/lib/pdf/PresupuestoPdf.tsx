@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
   headerRight: { flexDirection: "row", alignItems: "center", gap: 16 },
   headerInfo: { flexDirection: "column", alignItems: "flex-end", gap: 3 },
   qr: { width: 72, height: 72 },
+  logo: { width: 120, height: 36, objectFit: "contain" },
   presupuestoLabel: { fontSize: 10, color: palette.muted, textTransform: "uppercase" },
   presupuestoNum: { fontSize: 20, fontFamily: "Helvetica-Bold", color: palette.foreground },
   headerMeta: { fontSize: 9, color: palette.muted },
@@ -244,13 +245,14 @@ type Props = {
   qrDataUrl: string;
   empresa: EmpresaConfig;
   mostrarPreciosTrabajos?: boolean;
+  logoDataUrl?: string | null;
 };
 
 function buildCompanyLocation(empresa: EmpresaConfig) {
   return [empresa.direccion, empresa.ciudad, empresa.provincia].filter(Boolean).join(", ");
 }
 
-export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empresa, mostrarPreciosTrabajos = true }: Props) {
+export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empresa, mostrarPreciosTrabajos = true, logoDataUrl = null }: Props) {
   const groups = groupByCategory(trabajos);
   const repuestoGroups = groupRepuestosByCategory(repuestos);
   const totalTrabajos = trabajos.reduce((sum, t) => sum + t.precio * t.cantidad, 0);
@@ -282,7 +284,12 @@ export function PresupuestoPdf({ trabajo, trabajos, repuestos, qrDataUrl, empres
         {/* HEADER */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.companyName}>{empresa.nombre}</Text>
+            {logoDataUrl ? (
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={logoDataUrl} style={styles.logo} />
+            ) : (
+              <Text style={styles.companyName}>{empresa.nombre}</Text>
+            )}
             {empresa.tagline ? (
               <Text style={styles.companyTagline}>{empresa.tagline}</Text>
             ) : null}

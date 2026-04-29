@@ -567,6 +567,19 @@ export function PreciosPage({
         eyebrow="Configuración"
         title="Lista de precios"
         description={`${totalTrabajos} trabajos en ${trabajos.length} categorías.`}
+        actions={
+          <Button
+            as="a"
+            href="/api/precios/pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="warm"
+            size="md"
+            icon={<Icon name="download" className="h-4 w-4" />}
+          >
+            Descargar PDF
+          </Button>
+        }
       />
 
       <div className="space-y-4">
