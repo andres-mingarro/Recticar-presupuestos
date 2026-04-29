@@ -38,26 +38,25 @@ import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { useCobrado } from "@/components/ui/CobradoToggle/CobradoContext";
 import { TrabajoDatosCard } from "@/components/ui/TrabajoDatosCard";
-import { PrintButton } from "./PrintButton";
 import { Switch } from "@/components/ui/Switch";
 import { useMobileActionsRegister } from "@/components/layout/MobileActions";
 import styles from "./TrabajoDetailPage.module.scss";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { Divider } from "@/components/ui/Divider";
+import { PdfViewer } from "@/components/ui/PdfViewer";
+import { EtiquetaViewer } from "@/components/ui/EtiquetaViewer";
 
 function TrabajoMobileActions({
   formId,
-  trabajoId,
   dirty,
   isPending,
-  mostrarPreciosTrabajos,
+  onOpenPdf,
 }: {
   formId: string;
-  trabajoId: number;
   dirty: boolean;
   isPending: boolean;
-  mostrarPreciosTrabajos: boolean;
+  onOpenPdf: () => void;
 }) {
   return (
     <>
@@ -71,15 +70,14 @@ function TrabajoMobileActions({
         {isPending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
         {isPending ? "Guardando..." : "Guardar"}
       </PulsatingButton>
-      <a
-        href={`/api/trabajos/${trabajoId}/pdf${mostrarPreciosTrabajos ? "?precios=1" : ""}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.1)] text-white text-sm font-semibold"
+      <button
+        type="button"
+        onClick={onOpenPdf}
+        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.1)] text-white text-sm font-semibold cursor-pointer"
       >
-        <Icon name="download" className="h-3.5 w-3.5" />
+        <Icon name="filePdf" className="h-3.5 w-3.5" />
         PDF
-      </a>
+      </button>
     </>
   );
 }
@@ -167,6 +165,11 @@ export function TrabajoDetailPage({
   const [formState, formAction, isPending] = useActionState(action, initialState);
   const [dirty, setDirty] = useState(false);
   const [mostrarPreciosTrabajos, setMostrarPreciosTrabajos] = useState(false);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [etiquetaOpen, setEtiquetaOpen] = useState(false);
+  const pdfSrc = `/api/trabajos/${trabajo.id}/pdf${mostrarPreciosTrabajos ? "?precios=1" : ""}`;
+
+  const etiquetaDownloadHref = `/api/trabajos/${trabajo.id}/etiqueta`;
   const [selectedEstado, setSelectedEstado] = useState(trabajo.estado);
   const [summary, setSummary] = useState<TrabajoFormSummary>({
     clienteLabel: trabajo.cliente_nombre ?? "",
@@ -209,12 +212,11 @@ export function TrabajoDetailPage({
   useMobileActionsRegister(
     <TrabajoMobileActions
       formId={formId}
-      trabajoId={trabajo.id}
       dirty={dirty}
       isPending={isPending}
-      mostrarPreciosTrabajos={mostrarPreciosTrabajos}
+      onOpenPdf={() => setPdfOpen(true)}
     />,
-    [dirty, isPending, mostrarPreciosTrabajos]
+    [dirty, isPending]
   );
 
   return (
@@ -343,15 +345,14 @@ export function TrabajoDetailPage({
               Presupuesto
             </p>
            
-            <a
-              href={`/api/trabajos/${trabajo.id}/pdf${mostrarPreciosTrabajos ? "?precios=1" : ""}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300"
+            <button
+              type="button"
+              onClick={() => setPdfOpen(true)}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 hover:border-rose-300"
             >
               <Icon name="download" className="h-4 w-4" />
               Descargar PDF
-            </a>
+            </button>
             <Divider />
              <Switch
               label="Mostrar precios de trabajos"
@@ -362,31 +363,15 @@ export function TrabajoDetailPage({
             />
             <Divider />
 
-            <div id="etiqueta-qr-print" className={styles.etiquetaWrapper}>
-              <div className={styles.etiqueta}>
-                <div
-                  className={styles.etiquetaQr}
-                  // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG generado internamente
-                  dangerouslySetInnerHTML={{ __html: qrSvg }}
-                />
-                <div className={styles.etiquetaInfo}>
-                  <p className={styles.etiquetaNumero}>#{trabajo.numero_trabajo}</p>
-                  <p className={styles.etiquetaCliente}>{trabajo.cliente_nombre ?? "Sin cliente"}</p>
-                  {getVehicleLabel([summary.marcaNombre, summary.modeloNombre, summary.motorNombre]) ? (
-                    <>
-                      <p className={styles.etiquetaVehiculo}>
-                        {getVehicleLabel([summary.marcaNombre, summary.modeloNombre])}
-                      </p>
-                      <p className={styles.etiquetaVehiculo}>
-                        {getVehicleLabel([summary.motorNombre])}
-                      </p>
-                    </>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
-            <PrintButton />
+            <Button
+              type="button"
+              variant="dark"
+              onClick={() => setEtiquetaOpen(true)}
+              className="w-full"
+              icon={<Icon name="qrCode" className="h-4 w-4" />}
+            >
+              VER ETIQUETA QR
+            </Button>
           </Card>
 
           {/* Datos + resumen */}
@@ -436,6 +421,41 @@ export function TrabajoDetailPage({
         </aside>
       </div>
       </TrabajosSeleccionProvider>
+      <PdfViewer
+        src={pdfSrc}
+        title={`Presupuesto #${trabajo.numero_trabajo}`}
+        open={pdfOpen}
+        onClose={() => setPdfOpen(false)}
+      />
+      <EtiquetaViewer
+        open={etiquetaOpen}
+        onClose={() => setEtiquetaOpen(false)}
+        pdfHref={etiquetaDownloadHref}
+      >
+        <div id="etiqueta-qr-print" className={styles.etiquetaWrapper}>
+          <div className={styles.etiqueta}>
+            <div
+              className={styles.etiquetaQr}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG generado internamente
+              dangerouslySetInnerHTML={{ __html: qrSvg }}
+            />
+            <div className={styles.etiquetaInfo}>
+              <p className={styles.etiquetaNumero}>#{trabajo.numero_trabajo}</p>
+              <p className={styles.etiquetaCliente}>{trabajo.cliente_nombre ?? "Sin cliente"}</p>
+              {getVehicleLabel([summary.marcaNombre, summary.modeloNombre, summary.motorNombre]) ? (
+                <>
+                  <p className={styles.etiquetaVehiculo}>
+                    {getVehicleLabel([summary.marcaNombre, summary.modeloNombre])}
+                  </p>
+                  <p className={styles.etiquetaVehiculo}>
+                    {getVehicleLabel([summary.motorNombre])}
+                  </p>
+                </>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </EtiquetaViewer>
     </div>
     </RepuestosSeleccionProvider>
     </IvaProvider>

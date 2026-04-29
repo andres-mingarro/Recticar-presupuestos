@@ -83,20 +83,20 @@
   white-space: nowrap;
 }
 
-/* ─── Print: solo la etiqueta (posicionamiento y sizing vía globals.css) ─── */
+/* ─── Print: solo la etiqueta ─── */
 @media print {
   .etiqueta {
-    width: 8cm;
-    height: 6cm;
-    border: 1px solid #ccc !important;
-    border-radius: 0.5rem;
+    width: var(--etiqueta-ancho);
+    height: var(--etiqueta-alto);
+    border: none !important;
+    border-radius: 0 !important;
     background: white !important;
-    padding: 1rem;
-    gap: 1rem;
+    padding: 0.5rem;
+    gap: 0.75rem;
   }
 
   .etiquetaQr {
-    width: 3.5cm;
-    height: 3.5cm;
+    width: calc(var(--etiqueta-alto) * 0.6);
+    height: calc(var(--etiqueta-alto) * 0.6);
   }
 }

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 
-function startPrintMode() {
+export function startPrintMode() {
   const body = document.body;
   body.classList.add("print-etiqueta");
   const cleanup = () => body.classList.remove("print-etiqueta");

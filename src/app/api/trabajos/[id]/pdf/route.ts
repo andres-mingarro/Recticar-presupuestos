@@ -55,7 +55,7 @@ export async function GET(
     React.createElement(PresupuestoPdf, { trabajo, trabajos, repuestos, qrDataUrl, empresa, mostrarPreciosTrabajos })
   );
   const clienteSlug = slugifyFilenamePart(trabajo.cliente_nombre);
-  const fileName = `presupuesto-${trabajo.numero_trabajo}-${clienteSlug}.pdf`;
+  const fileName = `Recticar Presupuesto #${trabajo.numero_trabajo} - ${clienteSlug}.pdf`;
 
   return new Response(new Uint8Array(buffer), {
     headers: {

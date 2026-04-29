@@ -14,10 +14,13 @@ import {
   faClipboard,
   faClipboardList,
   faClock,
+  faCompress,
   faDownload,
   faEnvelope,
+  faExpand,
   faEye,
   faEyeSlash,
+  faFilePdf,
   faGaugeHigh,
   faGear,
   faHashtag,
@@ -79,8 +82,11 @@ export type IconName =
   | "settings"
   | "sackDollar"
   | "sackXmark"
+  | "compress"
+  | "expand"
   | "eye"
   | "eyeSlash"
+  | "filePdf"
   | "menu"
   | "chartBar";
 
@@ -126,8 +132,11 @@ const ICONS: Record<IconName, IconDefinition> = {
   settings: faGear,
   sackDollar: faSackDollar,
   sackXmark: faSackXmark,
+  compress: faCompress,
+  expand: faExpand,
   eye: faEye,
   eyeSlash: faEyeSlash,
+  filePdf: faFilePdf,
   menu: faBars,
 };
 

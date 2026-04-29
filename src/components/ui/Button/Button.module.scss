@@ -105,6 +105,15 @@
     color: var(--text-color-gray);
     --focus-ring: var(--color-danger-text);
   }
+  &[data-variant="icon-ghost"] {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-color-gray);
+    --focus-ring: var(--color-accent);
+  }
   &[data-variant="link"] {
     height: auto;
     padding-inline: 0;
@@ -207,6 +216,7 @@
     &[data-variant="outline-dark"]:hover    { background: #f1f5f9; }
     &[data-variant="outline-ghost"]:hover   { border-color: var(--color-accent); color: var(--color-accent); }
     &[data-variant="danger-ghost"]:hover    { background: var(--color-danger-bg); color: var(--color-danger-text); }
+    &[data-variant="icon-ghost"]:hover      { background: var(--color-surface-alt); color: var(--text-color-defult); }
     &[data-variant="link"]:hover            { color: var(--color-accent-strong); text-decoration-color: var(--color-accent-strong); }
     &[data-variant="danger"]:hover          { filter: brightness(1.05); }
     &[data-variant="warning"]:hover         { filter: brightness(1.05); }
