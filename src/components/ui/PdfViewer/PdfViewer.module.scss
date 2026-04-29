@@ -79,6 +79,30 @@
   background: var(--color-surface);
 }
 
+.iosFallback {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px 24px;
+  background: var(--color-surface);
+}
+
+.iosFallbackIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--brown-burnt);
+  opacity: 0.4;
+}
+
+.iosFallbackText {
+  font-size: 0.875rem;
+  color: var(--text-color-gray);
+  text-align: center;
+}
+
 .panel:fullscreen {
   display: flex;
   flex-direction: column;

@@ -5,6 +5,14 @@ import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import styles from "./PdfViewer.module.scss";
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    setIsMobile(/Android|iPad|iPhone|iPod/.test(navigator.userAgent));
+  }, []);
+  return isMobile;
+}
+
 type PdfViewerProps = {
   src: string;
   title?: string;
@@ -15,6 +23,7 @@ type PdfViewerProps = {
 export function PdfViewer({ src, title = "PDF", open, onClose }: PdfViewerProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -68,21 +77,36 @@ export function PdfViewer({ src, title = "PDF", open, onClose }: PdfViewerProps)
             >
               Descargar
             </Button>
-            <Button variant="outline-dark" size="sm" onClick={toggleFullscreen} aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}>
-              <Icon name={isFullscreen ? "compress" : "expand"} className="h-4 w-4" />
-            </Button>
+            {!isMobile && (
+              <Button variant="outline-dark" size="sm" onClick={toggleFullscreen} aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}>
+                <Icon name={isFullscreen ? "compress" : "expand"} className="h-4 w-4" />
+              </Button>
+            )}
             <Button variant="icon-ghost" onClick={onClose} aria-label="Cerrar">
               <Icon name="x" className="h-5 w-5" />
             </Button>
           </div>
         </header>
-        <div className={styles.body}>
-          <iframe
-            src={src}
-            title={title}
-            className={styles.iframe}
-          />
-        </div>
+        {isMobile ? (
+          <div className={styles.iosFallback}>
+            <Icon name="filePdf" className={styles.iosFallbackIcon} />
+            <p className={styles.iosFallbackText}>iOS no permite previsualizar PDFs en la app.</p>
+            <Button
+              as="a"
+              href={src}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="primary"
+              icon={<Icon name="filePdf" className="h-4 w-4" />}
+            >
+              Abrir PDF
+            </Button>
+          </div>
+        ) : (
+          <div className={styles.body}>
+            <iframe src={src} title={title} className={styles.iframe} />
+          </div>
+        )}
       </div>
     </div>
   );
