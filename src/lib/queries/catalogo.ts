@@ -1,7 +1,6 @@
 import {
   precioListaColName,
   queryRows,
-  queryRowsFromTechnical,
   templateRows,
   templateRowsFromTechnical,
   type ListaPrecio,
@@ -119,34 +118,6 @@ export async function hydrateTechnicalLabels<T extends TechnicalRef>(items: T[])
   }));
 }
 
-export async function listTechnicalCombinations(limit?: number) {
-  const rows = await queryRowsFromTechnical<{
-    marca_id: number;
-    marca_nombre: string;
-    modelo_id: number;
-    modelo_nombre: string;
-    motor_id: number;
-    motor_nombre: string;
-  }>(
-    `
-      SELECT
-        ma.id AS marca_id,
-        ma.nombre AS marca_nombre,
-        mo.id AS modelo_id,
-        mo.nombre AS modelo_nombre,
-        m.id AS motor_id,
-        m.nombre AS motor_nombre
-      FROM vehiculos v
-      INNER JOIN modelos mo ON mo.id = v.modelo_id
-      INNER JOIN marcas ma ON ma.id = mo.marca_id
-      INNER JOIN motores m ON m.id = v.motor_id
-      ORDER BY ma.nombre ASC, mo.nombre ASC, m.nombre ASC
-      ${limit ? `LIMIT ${limit}` : ""}
-    `
-  );
-
-  return rows;
-}
 
 export async function listTrabajosAgrupados() {
   const rows = await templateRows<{

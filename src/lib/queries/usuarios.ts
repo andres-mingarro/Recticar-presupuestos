@@ -32,7 +32,7 @@ export type UsuarioPublico = Record<string, unknown> & {
 
 export async function getUsuarioByNombre(nombre: string): Promise<Usuario | null> {
   const rows = await queryRows<Usuario>(
-    "SELECT * FROM usuarios WHERE nombre = $1 AND activo = TRUE",
+    "SELECT nombre, password_hash, password_plain, role, activo, created_at, pantalla_inicio FROM usuarios WHERE nombre = $1 AND activo = TRUE",
     [nombre]
   );
   return rows[0] ?? null;
@@ -121,12 +121,11 @@ export async function setUsuarioPermisos(
 ): Promise<void> {
   await queryRows("DELETE FROM usuario_permisos WHERE nombre = $1", [nombre]);
   if (permisos.length === 0) return;
-  for (const permiso of permisos) {
-    await queryRows(
-      "INSERT INTO usuario_permisos (nombre, permiso) VALUES ($1, $2) ON CONFLICT DO NOTHING",
-      [nombre, permiso]
-    );
-  }
+  const values = permisos.map((_, i) => `($1, $${i + 2})`).join(", ");
+  await queryRows(
+    `INSERT INTO usuario_permisos (nombre, permiso) VALUES ${values} ON CONFLICT DO NOTHING`,
+    [nombre, ...permisos]
+  );
 }
 
 export async function getUsuarioPermisos(nombre: string): Promise<AppPermiso[]> {
