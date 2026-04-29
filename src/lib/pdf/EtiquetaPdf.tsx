@@ -61,6 +61,7 @@ export function EtiquetaPdf({ trabajo, qrDataUrl }: EtiquetaPdfProps) {
   return (
     <Document>
       <Page size={[226.77, 170.08]} style={styles.page}>
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <Image src={qrDataUrl} style={styles.qr} />
         <View style={styles.info}>
           <Text style={styles.numero}>#{trabajo.numero_trabajo}</Text>
