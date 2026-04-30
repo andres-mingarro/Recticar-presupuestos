@@ -26,7 +26,7 @@ export async function listModelosByMarca(marcaId: number) {
   return templateRowsFromTechnical<Modelo>`
     SELECT id, nombre, marca_id
     FROM modelos
-    WHERE marca_id = ${marcaId}
+    WHERE marca_id = ${marcaId} AND hidden = false
     ORDER BY nombre ASC
   `;
 }
@@ -35,6 +35,7 @@ export async function listModelos() {
   return templateRowsFromTechnical<Modelo>`
     SELECT id, nombre, marca_id
     FROM modelos
+    WHERE hidden = false
     ORDER BY nombre ASC
   `;
 }
@@ -44,7 +45,7 @@ export async function listMotoresByModelo(modeloId: number) {
     SELECT DISTINCT m.id, m.nombre
     FROM vehiculos v
     INNER JOIN motores m ON m.id = v.motor_id
-    WHERE v.modelo_id = ${modeloId}
+    WHERE v.modelo_id = ${modeloId} AND v.hidden = false
     ORDER BY m.nombre ASC
   `;
 }
@@ -61,6 +62,7 @@ export async function listModeloMotorRelations() {
   return templateRowsFromTechnical<ModeloMotorRelation>`
     SELECT DISTINCT modelo_id, motor_id
     FROM vehiculos
+    WHERE hidden = false
   `;
 }
 

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import type { TechnicalSection } from "@/lib/queries/informacion-tecnica";
+import type { TechnicalSection, TechnicalSectionCounts } from "@/lib/queries/informacion-tecnica";
 import { Icon } from "@/components/ui/Icon";
 import Link from "next/link";
 import { buildSectionHref } from "./buildSectionHref";
@@ -18,6 +18,11 @@ const SECTION_ICONS = {
   vehiculos: "car",
 } as const;
 
+function visibleCount(counts: TechnicalSectionCounts, section: TechnicalSection): number {
+  const c = counts[section];
+  return typeof c === "number" ? c : c.visible;
+}
+
 export function SectionTabs({
   activeSection,
   q,
@@ -25,7 +30,7 @@ export function SectionTabs({
 }: {
   activeSection: TechnicalSection;
   q: string;
-  sectionCounts: Record<TechnicalSection, number>;
+  sectionCounts: TechnicalSectionCounts;
 }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -52,7 +57,7 @@ export function SectionTabs({
                   : "bg-[var(--color-surface-alt)] text-[var(--text-color-defult)]"
               )}
             >
-              {sectionCounts[section]}
+              {visibleCount(sectionCounts, section)}
             </span>
           </Link>
         );

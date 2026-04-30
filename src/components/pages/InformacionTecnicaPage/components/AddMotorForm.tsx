@@ -24,15 +24,15 @@ export function AddMotorForm({ action }: { action: ActionFn }) {
           placeholder="Nuevo motor…"
           required
           disabled={isPending}
-          className={cn("min-w-0 flex-1", addFieldCls)}
+          className={cn("w-full sm:min-w-0 sm:flex-1", addFieldCls)}
         />
         <input
           name="cilindrada"
           placeholder="Cilindrada (ej. 1.6)"
           disabled={isPending}
-          className={cn("w-40 shrink-0", addFieldCls)}
+          className={cn("w-full sm:w-40 sm:shrink-0", addFieldCls)}
         />
-        <Button type="submit" disabled={isPending} className={addBtnClassName} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
+        <Button type="submit" disabled={isPending} className={cn("w-full sm:w-auto", addBtnClassName)} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
           {isPending ? "Agregando…" : "Agregar motor"}
         </Button>
       </form>

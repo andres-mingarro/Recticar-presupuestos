@@ -161,6 +161,7 @@ export type TechnicalModelo = {
   nombre: string;
   marcaId: number;
   marcaNombre: string | null;
+  hidden: boolean;
 };
 
 export type TechnicalMotor = {

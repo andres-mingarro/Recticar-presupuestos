@@ -11,70 +11,93 @@ import type {
 
 export type TechnicalSection = "marcas" | "modelos" | "motores" | "vehiculos";
 
+export type TechnicalSectionCounts = {
+  marcas: { visible: number; hidden: number };
+  modelos: { visible: number; hidden: number };
+  motores: number;
+  vehiculos: { visible: number; hidden: number };
+};
+
 function buildSearch(value?: string) {
   return value?.trim() ? `%${value.trim()}%` : null;
 }
 
-export async function listTechnicalMarcas({ search, limit, offset }: {
+export async function listTechnicalMarcas({ search, limit, offset, hidden }: {
   search?: string;
   limit?: number;
   offset?: number;
+  hidden?: boolean;
 } = {}) {
   const normalizedSearch = buildSearch(search);
   const normalizedLimit = limit ?? 20;
   const normalizedOffset = offset ?? 0;
+
+  const params: (string | number | boolean)[] = [normalizedLimit, normalizedOffset];
+  const conditions: string[] = [];
 
   if (normalizedSearch) {
-    return templateRowsFromTechnical<TechnicalMarca>`
-      SELECT id, nombre, hidden
-      FROM marcas
-      WHERE nombre ILIKE ${normalizedSearch}
-      ORDER BY nombre ASC
-      LIMIT ${normalizedLimit}
-      OFFSET ${normalizedOffset}
-    `;
+    params.push(normalizedSearch);
+    conditions.push(`nombre ILIKE $${params.length}`);
+  }
+  if (hidden !== undefined) {
+    params.push(hidden);
+    conditions.push(`hidden = $${params.length}`);
   }
 
-  return templateRowsFromTechnical<TechnicalMarca>`
-    SELECT id, nombre, hidden
-    FROM marcas
-    ORDER BY nombre ASC
-    LIMIT ${normalizedLimit}
-    OFFSET ${normalizedOffset}
-  `;
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  return queryRowsFromTechnical<TechnicalMarca>(
+    `SELECT id, nombre, hidden FROM marcas ${whereClause} ORDER BY nombre ASC LIMIT $1 OFFSET $2`,
+    params
+  );
 }
 
-export async function listTechnicalModelos({ search, limit, offset }: {
+export async function listTechnicalModelos({ search, limit, offset, hidden }: {
   search?: string;
   limit?: number;
   offset?: number;
+  hidden?: boolean;
 } = {}) {
   const normalizedSearch = buildSearch(search);
   const normalizedLimit = limit ?? 20;
   const normalizedOffset = offset ?? 0;
+
+  const params: (string | number | boolean)[] = [normalizedLimit, normalizedOffset];
+  const conditions: string[] = [];
+
+  if (normalizedSearch) {
+    params.push(normalizedSearch);
+    conditions.push(`(mo.nombre ILIKE $${params.length} OR ma.nombre ILIKE $${params.length})`);
+  }
+  if (hidden !== undefined) {
+    params.push(hidden);
+    conditions.push(`mo.hidden = $${params.length}`);
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const rows = await queryRowsFromTechnical<{
     id: number;
     nombre: string;
     marca_id: number;
     marca_nombre: string | null;
+    hidden: boolean;
   }>(
     `
       SELECT
         mo.id,
         mo.nombre,
         mo.marca_id,
+        mo.hidden,
         ma.nombre AS marca_nombre
       FROM modelos mo
       LEFT JOIN marcas ma ON ma.id = mo.marca_id
-      ${normalizedSearch ? "WHERE mo.nombre ILIKE $3 OR ma.nombre ILIKE $3" : ""}
+      ${whereClause}
       ORDER BY ma.nombre ASC NULLS LAST, mo.nombre ASC
       LIMIT $1
       OFFSET $2
     `,
-    normalizedSearch
-      ? [normalizedLimit, normalizedOffset, normalizedSearch]
-      : [normalizedLimit, normalizedOffset]
+    params
   );
 
   return rows.map((row) => ({
@@ -82,6 +105,7 @@ export async function listTechnicalModelos({ search, limit, offset }: {
     nombre: row.nombre,
     marcaId: row.marca_id,
     marcaNombre: row.marca_nombre,
+    hidden: row.hidden,
   })) as TechnicalModelo[];
 }
 
@@ -118,14 +142,29 @@ export async function listTechnicalMotores({ search, limit, offset }: {
   return rows as TechnicalMotor[];
 }
 
-export async function listTechnicalVehiculos({ search, limit, offset }: {
+export async function listTechnicalVehiculos({ search, limit, offset, hidden }: {
   search?: string;
   limit?: number;
   offset?: number;
+  hidden?: boolean;
 } = {}) {
   const normalizedSearch = buildSearch(search);
   const normalizedLimit = limit ?? 20;
   const normalizedOffset = offset ?? 0;
+
+  const params: (string | number | boolean)[] = [normalizedLimit, normalizedOffset];
+  const conditions: string[] = [];
+
+  if (normalizedSearch) {
+    params.push(normalizedSearch);
+    conditions.push(`(mo.nombre ILIKE $${params.length} OR mt.nombre ILIKE $${params.length} OR COALESCE(ma.nombre, '') ILIKE $${params.length})`);
+  }
+  if (hidden !== undefined) {
+    params.push(hidden);
+    conditions.push(`v.hidden = $${params.length}`);
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const rows = await queryRowsFromTechnical<{
     id: number;
@@ -149,11 +188,7 @@ export async function listTechnicalVehiculos({ search, limit, offset }: {
       INNER JOIN modelos mo ON mo.id = v.modelo_id
       LEFT JOIN marcas ma ON ma.id = mo.marca_id
       INNER JOIN motores mt ON mt.id = v.motor_id
-      ${
-        normalizedSearch
-          ? "WHERE mo.nombre ILIKE $3 OR mt.nombre ILIKE $3 OR COALESCE(ma.nombre, '') ILIKE $3"
-          : ""
-      }
+      ${whereClause}
       ORDER BY
         ma.nombre ASC NULLS LAST,
         mo.nombre ASC,
@@ -161,9 +196,7 @@ export async function listTechnicalVehiculos({ search, limit, offset }: {
       LIMIT $1
       OFFSET $2
     `,
-    normalizedSearch
-      ? [normalizedLimit, normalizedOffset, normalizedSearch]
-      : [normalizedLimit, normalizedOffset]
+    params
   );
 
   return rows.map((row) => ({
@@ -177,32 +210,54 @@ export async function listTechnicalVehiculos({ search, limit, offset }: {
   })) as TechnicalVehiculo[];
 }
 
-export async function countTechnicalMarcas(search?: string) {
+export async function countTechnicalMarcas(search?: string, hidden?: boolean) {
   const normalizedSearch = buildSearch(search);
-  const rows = normalizedSearch
-    ? await templateRowsFromTechnical<{ total: number }>`
-        SELECT COUNT(*)::int AS total
-        FROM marcas
-        WHERE nombre ILIKE ${normalizedSearch}
-      `
-    : await templateRowsFromTechnical<{ total: number }>`
-        SELECT COUNT(*)::int AS total
-        FROM marcas
-      `;
+  const params: (string | boolean)[] = [];
+  const conditions: string[] = [];
+
+  if (normalizedSearch) {
+    params.push(normalizedSearch);
+    conditions.push(`nombre ILIKE $${params.length}`);
+  }
+  if (hidden !== undefined) {
+    params.push(hidden);
+    conditions.push(`hidden = $${params.length}`);
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const rows = await queryRowsFromTechnical<{ total: number }>(
+    `SELECT COUNT(*)::int AS total FROM marcas ${whereClause}`,
+    params
+  );
 
   return rows[0]?.total ?? 0;
 }
 
-export async function countTechnicalModelos(search?: string) {
+export async function countTechnicalModelos(search?: string, hidden?: boolean) {
   const normalizedSearch = buildSearch(search);
+  const params: (string | boolean)[] = [];
+  const conditions: string[] = [];
+
+  if (normalizedSearch) {
+    params.push(normalizedSearch);
+    conditions.push(`(mo.nombre ILIKE $${params.length} OR ma.nombre ILIKE $${params.length})`);
+  }
+  if (hidden !== undefined) {
+    params.push(hidden);
+    conditions.push(`mo.hidden = $${params.length}`);
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
   const rows = await queryRowsFromTechnical<{ total: number }>(
     `
       SELECT COUNT(*)::int AS total
       FROM modelos mo
       LEFT JOIN marcas ma ON ma.id = mo.marca_id
-      ${normalizedSearch ? "WHERE mo.nombre ILIKE $1 OR ma.nombre ILIKE $1" : ""}
+      ${whereClause}
     `,
-    normalizedSearch ? [normalizedSearch] : []
+    params
   );
 
   return rows[0]?.total ?? 0;
@@ -222,8 +277,22 @@ export async function countTechnicalMotores(search?: string) {
   return rows[0]?.total ?? 0;
 }
 
-export async function countTechnicalVehiculos(search?: string) {
+export async function countTechnicalVehiculos(search?: string, hidden?: boolean) {
   const normalizedSearch = buildSearch(search);
+  const params: (string | boolean)[] = [];
+  const conditions: string[] = [];
+
+  if (normalizedSearch) {
+    params.push(normalizedSearch);
+    conditions.push(`(mo.nombre ILIKE $${params.length} OR mt.nombre ILIKE $${params.length} OR COALESCE(ma.nombre, '') ILIKE $${params.length})`);
+  }
+  if (hidden !== undefined) {
+    params.push(hidden);
+    conditions.push(`v.hidden = $${params.length}`);
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
   const rows = await queryRowsFromTechnical<{ total: number }>(
     `
       SELECT COUNT(*)::int AS total
@@ -231,27 +300,41 @@ export async function countTechnicalVehiculos(search?: string) {
       INNER JOIN modelos mo ON mo.id = v.modelo_id
       LEFT JOIN marcas ma ON ma.id = mo.marca_id
       INNER JOIN motores mt ON mt.id = v.motor_id
-      ${
-        normalizedSearch
-          ? "WHERE mo.nombre ILIKE $1 OR mt.nombre ILIKE $1 OR COALESCE(ma.nombre, '') ILIKE $1"
-          : ""
-      }
+      ${whereClause}
     `,
-    normalizedSearch ? [normalizedSearch] : []
+    params
   );
 
   return rows[0]?.total ?? 0;
 }
 
 export async function getTechnicalSectionCounts() {
-  const [marcas, modelos, motores, vehiculos] = await Promise.all([
-    countTechnicalMarcas(),
-    countTechnicalModelos(),
-    countTechnicalMotores(),
-    countTechnicalVehiculos(),
+  const [marcasRows, modelosRows, motoresRows, vehiculosRows] = await Promise.all([
+    queryRowsFromTechnical<{ hidden: boolean; total: number }>(
+      `SELECT hidden, COUNT(*)::int AS total FROM marcas GROUP BY hidden`
+    ),
+    queryRowsFromTechnical<{ hidden: boolean; total: number }>(
+      `SELECT hidden, COUNT(*)::int AS total FROM modelos GROUP BY hidden`
+    ),
+    queryRowsFromTechnical<{ total: number }>(
+      `SELECT COUNT(*)::int AS total FROM motores`
+    ),
+    queryRowsFromTechnical<{ hidden: boolean; total: number }>(
+      `SELECT hidden, COUNT(*)::int AS total FROM vehiculos GROUP BY hidden`
+    ),
   ]);
 
-  return { marcas, modelos, motores, vehiculos };
+  const tally = (rows: { hidden: boolean; total: number }[]) => ({
+    visible: rows.find((r) => !r.hidden)?.total ?? 0,
+    hidden: rows.find((r) => r.hidden)?.total ?? 0,
+  });
+
+  return {
+    marcas: tally(marcasRows),
+    modelos: tally(modelosRows),
+    motores: motoresRows[0]?.total ?? 0,
+    vehiculos: tally(vehiculosRows),
+  };
 }
 
 export async function createTechnicalMarca(nombre: string) {
@@ -267,6 +350,13 @@ export async function updateTechnicalMarca(id: number, nombre: string, hidden?: 
       UPDATE marcas
       SET nombre = ${nombre}, hidden = ${hidden}
       WHERE id = ${id}
+    `;
+    await templateRowsFromTechnical`
+      UPDATE modelos SET hidden = ${hidden} WHERE marca_id = ${id}
+    `;
+    await templateRowsFromTechnical`
+      UPDATE vehiculos SET hidden = ${hidden}
+      WHERE modelo_id IN (SELECT id FROM modelos WHERE marca_id = ${id})
     `;
   } else {
     await templateRowsFromTechnical`

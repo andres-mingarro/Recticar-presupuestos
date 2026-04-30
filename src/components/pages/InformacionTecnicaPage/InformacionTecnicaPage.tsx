@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type {
   TechnicalMarca,
@@ -8,10 +9,10 @@ import type {
   TechnicalMotor,
   TechnicalVehiculo,
 } from "@/lib/types";
-import type { TechnicalSection } from "@/lib/queries/informacion-tecnica";
+import type { TechnicalSection, TechnicalSectionCounts } from "@/lib/queries/informacion-tecnica";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
-import { ButtonGroup } from "@/components/ui/ButtonGroup";
+import { Icon, type IconName } from "@/components/ui/Icon";
 import styles from "./InformacionTecnicaPage.module.scss";
 import { type ActionFn, ColHeaders } from "./components/shared";
 import { buildSectionHref } from "./components/buildSectionHref";
@@ -36,17 +37,24 @@ const SECTION_LABELS: Record<TechnicalSection, string> = {
   vehiculos: "Vehículos",
 };
 
+type MarcasTab = "visible" | "ocultas";
+type ModelosTab = "visible" | "ocultos";
+type VehiculosTab = "visible" | "ocultos";
+
 type Props = {
   activeSection: TechnicalSection;
   q: string;
   currentPage: number;
   pageSize: number;
   totalItems: number;
-  sectionCounts: Record<TechnicalSection, number>;
+  sectionCounts: TechnicalSectionCounts;
   marcas: TechnicalMarca[];
   modelos: TechnicalModelo[];
   motores: TechnicalMotor[];
   vehiculos: TechnicalVehiculo[];
+  marcasTab: MarcasTab;
+  modelosTab: ModelosTab;
+  vehiculosTab: VehiculosTab;
   canEdit: boolean;
   createMarcaAction: ActionFn;
   updateMarcaAction: ActionFn;
@@ -63,6 +71,37 @@ type Props = {
   toggleVehiculoHiddenAction: ActionFn;
 };
 
+function TabLinks<T extends string>({
+  options,
+  activeValue,
+}: {
+  options: { value: T; label: string; icon: IconName; href: string }[];
+  activeValue: T;
+}) {
+  const activeCls =
+    "border-[var(--color-accent)] bg-[var(--color-accent)] text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)]";
+  const inactiveCls =
+    "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]";
+  return (
+    <div className="ButtonGroup inline-flex rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-0.5 scale-[0.82]">
+      {options.map((opt) => (
+        <Link
+          key={opt.value}
+          href={opt.href}
+          aria-pressed={opt.value === activeValue}
+          className={cn(
+            "inline-flex flex-1 items-center justify-center gap-1 rounded-xl border px-2 py-1 text-[11px] font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]",
+            opt.value === activeValue ? activeCls : inactiveCls
+          )}
+        >
+          <Icon name={opt.icon} className="h-4 w-4 shrink-0" />
+          <span className="whitespace-nowrap">{opt.label}</span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export function InformacionTecnicaPage({
   activeSection,
   q,
@@ -74,6 +113,9 @@ export function InformacionTecnicaPage({
   modelos,
   motores,
   vehiculos,
+  marcasTab,
+  modelosTab,
+  vehiculosTab,
   canEdit,
   createMarcaAction,
   updateMarcaAction,
@@ -95,29 +137,12 @@ export function InformacionTecnicaPage({
   const [hiddenVehiculos, setHiddenVehiculos] = useState<Set<number>>(
     () => new Set(vehiculos.filter((v) => v.hidden).map((v) => v.id))
   );
-  const [marcasTab, setMarcasTab] = useState<"visible" | "ocultas">("visible");
-  const [vehiculosTab, setVehiculosTab] = useState<"visible" | "ocultos">("visible");
 
   const confirmMarcaHiddenChange = (marcaId: number, hidden: boolean) => {
     setHiddenMarcas(prev => {
       const newSet = new Set(prev);
-      if (hidden) {
-        newSet.add(marcaId);
-      } else {
-        newSet.delete(marcaId);
-      }
-      return newSet;
-    });
-
-    const modelosDeMarca = modelos.filter(m => m.marcaId === marcaId);
-    const vehiculosDeMarca = vehiculos.filter(v => modelosDeMarca.some(m => m.id === v.modeloId));
-    setHiddenVehiculos(prev => {
-      const newSet = new Set(prev);
-      if (hidden) {
-        vehiculosDeMarca.forEach((v) => newSet.add(v.id));
-      } else {
-        vehiculosDeMarca.forEach((v) => newSet.delete(v.id));
-      }
+      if (hidden) newSet.add(marcaId);
+      else newSet.delete(marcaId);
       return newSet;
     });
   };
@@ -125,26 +150,35 @@ export function InformacionTecnicaPage({
   const confirmVehiculoHiddenChange = (vehiculoId: number, hidden: boolean) => {
     setHiddenVehiculos(prev => {
       const newSet = new Set(prev);
-      if (hidden) {
-        newSet.add(vehiculoId);
-      } else {
-        newSet.delete(vehiculoId);
-      }
+      if (hidden) newSet.add(vehiculoId);
+      else newSet.delete(vehiculoId);
       return newSet;
     });
   };
 
-  const filteredModelos = modelos.filter(m => !hiddenMarcas.has(m.marcaId));
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const hasPreviousPage = currentPage > 1;
   const hasNextPage = currentPage < totalPages;
   const pageStart = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const pageEnd = Math.min(currentPage * pageSize, totalItems);
 
+  const activeTab =
+    activeSection === "marcas" ? marcasTab :
+    activeSection === "modelos" ? modelosTab :
+    activeSection === "vehiculos" ? vehiculosTab :
+    undefined;
+
   const cardCommon = {
     section: activeSection,
-    count: sectionCounts[activeSection],
+    count: activeSection === "motores"
+      ? sectionCounts.motores
+      : activeSection === "marcas"
+        ? (activeTab === "ocultas" ? sectionCounts.marcas.hidden : sectionCounts.marcas.visible)
+        : activeSection === "modelos"
+          ? (activeTab === "ocultos" ? sectionCounts.modelos.hidden : sectionCounts.modelos.visible)
+          : (activeTab === "ocultos" ? sectionCounts.vehiculos.hidden : sectionCounts.vehiculos.visible),
     q,
+    tab: activeTab !== "visible" ? activeTab : undefined,
     currentPage,
     totalPages,
     hasPreviousPage,
@@ -157,9 +191,7 @@ export function InformacionTecnicaPage({
   let sectionContent: React.ReactNode = null;
 
   if (activeSection === "marcas") {
-    const marcasVisibles = marcas.filter(m => !hiddenMarcas.has(m.id));
-    const marcasOcultas = marcas.filter(m => hiddenMarcas.has(m.id));
-    const marcasActivas = marcasTab === "visible" ? marcasVisibles : marcasOcultas;
+    const marcasOcultasCount = sectionCounts.marcas.hidden;
     sectionContent = (
       <HeaderTable
         {...cardCommon}
@@ -170,19 +202,16 @@ export function InformacionTecnicaPage({
         }
         createForm={canEdit && marcasTab === "visible" ? <AddMarcaForm action={createMarcaAction} /> : undefined}
         tabsSlot={
-          <ButtonGroup
+          <TabLinks
             options={[
-              { value: "visible", label: "Visibles", icon: "eye" },
-              { value: "ocultas", label: `Ocultas${marcasOcultas.length > 0 ? ` (${marcasOcultas.length})` : ""}`, icon: "eyeSlash" },
+              { value: "visible", label: "Visibles", icon: "eye", href: buildSectionHref(activeSection, q, 1) },
+              { value: "ocultas", label: `Ocultas${marcasOcultasCount > 0 ? ` (${marcasOcultasCount})` : ""}`, icon: "eyeSlash", href: buildSectionHref(activeSection, q, 1, "ocultas") },
             ]}
-            value={marcasTab}
-            onChange={setMarcasTab}
-            className="scale-[0.82] p-0.5"
-            buttonClassName="gap-1 px-2 py-1 text-[11px]"
+            activeValue={marcasTab}
           />
         }
       >
-        {marcasActivas.map((marca, i) => (
+        {marcas.map((marca, i) => (
           <MarcaRow
             key={marca.id}
             marca={marca}
@@ -199,10 +228,15 @@ export function InformacionTecnicaPage({
   }
 
   if (activeSection === "modelos") {
+    const modelosOcultosCount = sectionCounts.modelos.hidden;
     sectionContent = (
       <HeaderTable
         {...cardCommon}
-        emptyLabel={q ? "Sin resultados para la búsqueda." : "No hay modelos aún."}
+        emptyLabel={
+          modelosTab === "ocultos"
+            ? "No hay modelos ocultos."
+            : q ? "Sin resultados para la búsqueda." : "No hay modelos aún."
+        }
         columnHeaders={
           canEdit ? (
             <ColHeaders
@@ -213,13 +247,18 @@ export function InformacionTecnicaPage({
             />
           ) : undefined
         }
-        createForm={
-          canEdit ? (
-            <AddModeloForm action={createModeloAction} />
-          ) : undefined
+        createForm={canEdit && modelosTab === "visible" ? <AddModeloForm action={createModeloAction} /> : undefined}
+        tabsSlot={
+          <TabLinks
+            options={[
+              { value: "visible", label: "Visibles", icon: "eye", href: buildSectionHref(activeSection, q, 1) },
+              { value: "ocultos", label: `Ocultos${modelosOcultosCount > 0 ? ` (${modelosOcultosCount})` : ""}`, icon: "eyeSlash", href: buildSectionHref(activeSection, q, 1, "ocultos") },
+            ]}
+            activeValue={modelosTab}
+          />
         }
       >
-        {filteredModelos.map((modelo, i) => (
+        {modelos.map((modelo, i) => (
           <ModeloRow
             key={modelo.id}
             modelo={modelo}
@@ -266,9 +305,7 @@ export function InformacionTecnicaPage({
   }
 
   if (activeSection === "vehiculos") {
-    const vehiculosVisibles = vehiculos.filter(v => !hiddenVehiculos.has(v.id));
-    const vehiculosOcultos = vehiculos.filter(v => hiddenVehiculos.has(v.id));
-    const vehiculosActivos = vehiculosTab === "visible" ? vehiculosVisibles : vehiculosOcultos;
+    const vehiculosOcultosCount = sectionCounts.vehiculos.hidden;
     sectionContent = (
       <HeaderTable
         {...cardCommon}
@@ -293,19 +330,16 @@ export function InformacionTecnicaPage({
           ) : undefined
         }
         tabsSlot={
-          <ButtonGroup
+          <TabLinks
             options={[
-              { value: "visible", label: "Visibles", icon: "eye" },
-              { value: "ocultos", label: `Ocultos${vehiculosOcultos.length > 0 ? ` (${vehiculosOcultos.length})` : ""}`, icon: "eyeSlash" },
+              { value: "visible", label: "Visibles", icon: "eye", href: buildSectionHref(activeSection, q, 1) },
+              { value: "ocultos", label: `Ocultos${vehiculosOcultosCount > 0 ? ` (${vehiculosOcultosCount})` : ""}`, icon: "eyeSlash", href: buildSectionHref(activeSection, q, 1, "ocultos") },
             ]}
-            value={vehiculosTab}
-            onChange={setVehiculosTab}
-            className="scale-[0.82] p-0.5"
-            buttonClassName="gap-1 px-2 py-1 text-[11px]"
+            activeValue={vehiculosTab}
           />
         }
       >
-        {vehiculosActivos.map((vehiculo, i) => (
+        {vehiculos.map((vehiculo, i) => (
           <VehiculoRow
             key={vehiculo.id}
             vehiculo={vehiculo}

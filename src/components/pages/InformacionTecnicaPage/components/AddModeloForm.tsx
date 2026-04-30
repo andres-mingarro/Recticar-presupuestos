@@ -25,7 +25,7 @@ export function AddModeloForm({ action }: { action: ActionFn }) {
           placeholder="Nuevo modelo…"
           required
           disabled={isPending}
-          className={cn("min-w-0 flex-1", addFieldCls)}
+          className={cn("w-full sm:min-w-0 sm:flex-1", addFieldCls)}
         />
         <SearchableSelect
           name="marcaId"
@@ -33,9 +33,9 @@ export function AddModeloForm({ action }: { action: ActionFn }) {
           required
           disabled={isPending}
           placeholder="Buscar marca…"
-          className="w-44 shrink-0"
+          className="w-full sm:w-44 sm:shrink-0"
         />
-        <Button type="submit" disabled={isPending} className={addBtnClassName} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
+        <Button type="submit" disabled={isPending} className={cn("w-full sm:w-auto", addBtnClassName)} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
           {isPending ? "Agregando…" : "Agregar modelo"}
         </Button>
       </form>

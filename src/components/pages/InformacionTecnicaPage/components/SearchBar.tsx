@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/cn";
 import type { TechnicalSection } from "@/lib/queries/informacion-tecnica";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
@@ -12,13 +13,15 @@ type Suggestion = { label: string; searchValue: string };
 type SearchBarProps = {
   section: TechnicalSection;
   q: string;
+  tab?: string;
 };
 
-export function SearchBar({ section, q }: SearchBarProps) {
+export function SearchBar({ section, q, tab }: SearchBarProps) {
   const router = useRouter();
   const [value, setValue] = useState(q);
   const [results, setResults] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -45,7 +48,7 @@ export function SearchBar({ section, q }: SearchBarProps) {
 
   function navigate(searchValue: string) {
     setOpen(false);
-    router.push(buildSectionHref(section, searchValue));
+    router.push(buildSectionHref(section, searchValue, 1, tab));
   }
 
   function fetchSuggestions(q: string) {
@@ -54,8 +57,9 @@ export function SearchBar({ section, q }: SearchBarProps) {
 
     debounceRef.current = setTimeout(async () => {
       try {
+        const isHiddenTab = tab === "ocultas" || tab === "ocultos";
         const res = await fetch(
-          `/api/catalogo-tecnico/search?type=${section === "vehiculos" ? "modelos" : section}&q=${encodeURIComponent(q)}`
+          `/api/catalogo-tecnico/search?type=${section}&q=${encodeURIComponent(q)}&hidden=${isHiddenTab}`
         );
         const data = await res.json();
         const suggestions: Suggestion[] = (data.results ?? []).map((r: { label: string; searchValue?: string }) => ({
@@ -101,7 +105,12 @@ export function SearchBar({ section, q }: SearchBarProps) {
     "min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20";
 
   return (
-    <div ref={containerRef} className="flex min-w-0 flex-1 items-center gap-1.5">
+    <div
+      ref={containerRef}
+      className={cn("flex min-w-0 items-center gap-1.5 transition-[width,opacity] duration-200", focused ? "absolute inset-x-3 z-20 sm:relative sm:inset-auto sm:flex-1" : "flex-1")}
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false); }}
+    >
       <div className="relative w-full min-w-0 flex">
         <input
           type="text"
@@ -156,7 +165,7 @@ export function SearchBar({ section, q }: SearchBarProps) {
       {q && (
         <Button
           as="a"
-          href={buildSectionHref(section, "")}
+          href={buildSectionHref(section, "", 1, tab)}
           variant="secondary"
           size="sm"
           className="shrink-0"

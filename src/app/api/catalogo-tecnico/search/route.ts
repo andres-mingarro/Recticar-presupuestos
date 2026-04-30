@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { isSuperAdmin } from "@/lib/permisos";
 import { queryRowsFromTechnical } from "@/lib/db";
 
 export async function GET(request: Request) {
@@ -12,6 +13,10 @@ export async function GET(request: Request) {
   const q = searchParams.get("q")?.trim() ?? "";
   const type = searchParams.get("type") ?? "";
 
+  // hidden=true → solo ocultos (solo super_admin); hidden=false o ausente → solo visibles
+  const rawHidden = searchParams.get("hidden");
+  const wantHidden = rawHidden === "true" && isSuperAdmin(session);
+
   if (!q) {
     return NextResponse.json({ results: [] });
   }
@@ -20,7 +25,7 @@ export async function GET(request: Request) {
 
   if (type === "marcas") {
     const rows = await queryRowsFromTechnical<{ id: number; nombre: string }>(
-      `SELECT id, nombre FROM marcas WHERE nombre ILIKE $1 ORDER BY nombre ASC`,
+      `SELECT id, nombre FROM marcas WHERE nombre ILIKE $1 AND hidden = ${wantHidden} ORDER BY nombre ASC`,
       [pattern]
     );
     return NextResponse.json({
@@ -37,16 +42,35 @@ export async function GET(request: Request) {
       `SELECT mo.id, mo.nombre, ma.nombre AS marca_nombre
        FROM modelos mo
        LEFT JOIN marcas ma ON ma.id = mo.marca_id
-       WHERE mo.nombre ILIKE $1 OR ma.nombre ILIKE $1
+       WHERE (mo.nombre ILIKE $1 OR ma.nombre ILIKE $1) AND mo.hidden = ${wantHidden}
        ORDER BY ma.nombre ASC NULLS LAST, mo.nombre ASC`,
       [pattern]
     );
     return NextResponse.json({
       results: rows.map((r) => ({
         value: r.id,
-        label: (r.marca_nombre ? `${r.marca_nombre} / ` : "") + r.nombre,
+        label: r.nombre,
         searchValue: r.nombre,
       })),
+    });
+  }
+
+  if (type === "vehiculos") {
+    const rows = await queryRowsFromTechnical<{
+      id: number;
+      nombre: string;
+      marca_nombre: string | null;
+    }>(
+      `SELECT DISTINCT mo.id, mo.nombre, ma.nombre AS marca_nombre
+       FROM vehiculos v
+       INNER JOIN modelos mo ON mo.id = v.modelo_id
+       LEFT JOIN marcas ma ON ma.id = mo.marca_id
+       WHERE (mo.nombre ILIKE $1 OR ma.nombre ILIKE $1) AND v.hidden = ${wantHidden}
+       ORDER BY ma.nombre ASC NULLS LAST, mo.nombre ASC`,
+      [pattern]
+    );
+    return NextResponse.json({
+      results: rows.map((r) => ({ value: r.id, label: r.nombre, searchValue: r.nombre })),
     });
   }
 

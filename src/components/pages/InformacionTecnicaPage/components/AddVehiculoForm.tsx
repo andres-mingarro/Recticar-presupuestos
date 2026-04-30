@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -25,7 +26,7 @@ export function AddVehiculoForm({ action }: { action: ActionFn }) {
           required
           disabled={isPending}
           placeholder="Buscar modelo…"
-          className="min-w-0 flex-1"
+          className="w-full sm:min-w-0 sm:flex-1"
         />
         <SearchableSelect
           name="motorId"
@@ -33,9 +34,9 @@ export function AddVehiculoForm({ action }: { action: ActionFn }) {
           required
           disabled={isPending}
           placeholder="Buscar motor…"
-          className="w-52 shrink-0"
+          className="w-full sm:w-52 sm:shrink-0"
         />
-        <Button type="submit" disabled={isPending} className={addBtnClassName} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
+        <Button type="submit" disabled={isPending} className={cn("w-full sm:w-auto", addBtnClassName)} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
           {isPending ? "Agregando…" : "Agregar relación"}
         </Button>
       </form>

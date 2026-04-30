@@ -17,6 +17,7 @@ export function HeaderTable({
   section,
   count,
   q,
+  tab,
   currentPage,
   totalPages,
   hasPreviousPage,
@@ -33,6 +34,7 @@ export function HeaderTable({
   section: TechnicalSection;
   count: number;
   q: string;
+  tab?: string;
   currentPage: number;
   totalPages: number;
   hasPreviousPage: boolean;
@@ -74,8 +76,8 @@ export function HeaderTable({
         </div>
 
         {/* Row 2: búsqueda + paginación */}
-        <div className="flex items-center gap-2 border-t border-[var(--color-border)] px-3 py-2">
-          <SearchBar section={section} q={q} />
+        <div className="relative flex items-center gap-2 border-t border-[var(--color-border)] px-3 py-2">
+          <SearchBar section={section} q={q} tab={tab} />
 
           {(totalPages > 1 || currentPage > 1) && (
             <>
@@ -83,7 +85,7 @@ export function HeaderTable({
               <div className="flex shrink-0 items-center gap-1.5">
                 {hasPreviousPage ? (
                   <Link
-                    href={buildSectionHref(section, q, currentPage - 1)}
+                    href={buildSectionHref(section, q, currentPage - 1, tab)}
                     className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                   >
                     <Icon name="chevronLeft" className="h-3.5 w-3.5" />
@@ -100,7 +102,7 @@ export function HeaderTable({
                 </span>
                 {hasNextPage ? (
                   <Link
-                    href={buildSectionHref(section, q, currentPage + 1)}
+                    href={buildSectionHref(section, q, currentPage + 1, tab)}
                     className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                   >
                     <Icon name="chevronRight" className="h-3.5 w-3.5" />
