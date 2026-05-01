@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { type ActionFn, fieldCls, readCls, saveRowBtnCls, RowError, DeleteButton } from "./shared";
+import { MarcaDialogSelect } from "./MarcaDialogSelect";
 
 export function ModeloRow({
   modelo,
@@ -27,7 +28,7 @@ export function ModeloRow({
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteAction, { error: null });
 
   return (
-    <div className={cn(index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
+    <div className={cn("modelo-row-item", index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
       <form
         action={canEdit ? formAction : undefined}
         className="px-2 py-2.5 lg:px-4"
@@ -43,16 +44,14 @@ export function ModeloRow({
                 disabled={isPending}
                 className={cn("min-w-0 flex-1", fieldCls)}
               />
-              <select
+              <MarcaDialogSelect
                 name="marcaId"
-                defaultValue={modelo.marcaId}
+                marcas={marcas}
+                value={modelo.marcaId}
+                selectedName={modelo.marcaNombre}
                 disabled={isPending}
-                className={cn("w-full sm:w-[220px] lg:w-[200px]", fieldCls)}
-              >
-                {marcas.map((m) => (
-                  <option key={m.id} value={m.id}>{m.nombre}</option>
-                ))}
-              </select>
+                className="w-full sm:w-[220px] lg:w-[200px]"
+              />
             </div>
             <div className="row-footer flex shrink-0 items-center gap-1.5 self-end lg:self-auto">
               <PulsatingButton size="sm" type="submit" pulsing={!isPending} disabled={isPending} className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}>

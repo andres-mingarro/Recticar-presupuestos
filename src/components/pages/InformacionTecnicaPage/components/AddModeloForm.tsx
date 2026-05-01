@@ -2,17 +2,25 @@
 
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
+import type { TechnicalMarca } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
-import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { type ActionFn, addFieldCls, addBtnClassName, AddFooter } from "./shared";
+import { MarcaDialogSelect } from "./MarcaDialogSelect";
 
-export function AddModeloForm({ action }: { action: ActionFn }) {
+export function AddModeloForm({
+  action,
+  marcas,
+}: {
+  action: ActionFn;
+  marcas: TechnicalMarca[];
+}) {
   const [state, formAction, isPending] = useActionState(action, {
     error: null,
     resetKey: 0,
   });
+
   return (
     <AddFooter>
       <form
@@ -22,21 +30,24 @@ export function AddModeloForm({ action }: { action: ActionFn }) {
       >
         <input
           name="nombre"
-          placeholder="Nuevo modelo…"
+          placeholder="Nuevo modelo..."
           required
           disabled={isPending}
           className={cn("w-full sm:min-w-0 sm:flex-1", addFieldCls)}
         />
-        <SearchableSelect
+        <MarcaDialogSelect
           name="marcaId"
-          searchType="marcas"
-          required
+          marcas={marcas}
           disabled={isPending}
-          placeholder="Buscar marca…"
-          className="w-full sm:w-44 sm:shrink-0"
+          className="w-full sm:w-52 sm:shrink-0"
         />
-        <Button type="submit" disabled={isPending} className={cn("w-full sm:w-auto", addBtnClassName)} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
-          {isPending ? "Agregando…" : "Agregar modelo"}
+        <Button
+          type="submit"
+          disabled={isPending}
+          className={cn("w-full sm:w-auto", addBtnClassName)}
+          icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
+        >
+          {isPending ? "Agregando..." : "Agregar modelo"}
         </Button>
       </form>
       {state.error && (

@@ -28,6 +28,14 @@ function normalize(formData: FormData, key: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function parsePositiveId(formData: FormData, key: string) {
+  const raw = normalize(formData, key);
+  if (!raw) return null;
+
+  const id = Number(raw);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
 function revalidateTechnicalPages() {
   revalidatePath("/informacion-tecnica");
   revalidatePath("/trabajos/nuevo");
@@ -95,10 +103,10 @@ export async function createModeloAction(
   formData: FormData
 ): Promise<TechnicalActionState> {
   const nombre = normalize(formData, "nombre");
-  const marcaId = Number(normalize(formData, "marcaId"));
+  const marcaId = parsePositiveId(formData, "marcaId");
 
   if (!nombre) return { error: "El nombre es obligatorio." };
-  if (Number.isNaN(marcaId)) return { error: "Marca inválida." };
+  if (marcaId === null) return { error: "Marca inválida." };
 
   try {
     await createTechnicalModelo(nombre, marcaId);
@@ -116,10 +124,10 @@ export async function updateModeloAction(
 ): Promise<TechnicalActionState> {
   const id = Number(normalize(formData, "modeloId"));
   const nombre = normalize(formData, "nombre");
-  const marcaId = Number(normalize(formData, "marcaId"));
+  const marcaId = parsePositiveId(formData, "marcaId");
 
   if (Number.isNaN(id)) return { error: "Modelo inválido." };
-  if (Number.isNaN(marcaId)) return { error: "Marca inválida." };
+  if (marcaId === null) return { error: "Marca inválida." };
   if (!nombre) return { error: "El nombre es obligatorio." };
 
   try {

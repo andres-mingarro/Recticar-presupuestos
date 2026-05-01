@@ -89,7 +89,7 @@ export default async function Page({
         ? listTechnicalMarcas(
             section === "marcas"
               ? { search: q, limit: PAGE_SIZE, offset, hidden: marcasHiddenFilter }
-              : {}
+              : { limit: 5000, hidden: false }
           )
         : Promise.resolve([]),
       section === "modelos" || section === "vehiculos"

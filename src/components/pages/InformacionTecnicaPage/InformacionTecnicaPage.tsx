@@ -247,7 +247,7 @@ export function InformacionTecnicaPage({
             />
           ) : undefined
         }
-        createForm={canEdit && modelosTab === "visible" ? <AddModeloForm action={createModeloAction} /> : undefined}
+        createForm={canEdit && modelosTab === "visible" ? <AddModeloForm action={createModeloAction} marcas={marcas} /> : undefined}
         tabsSlot={
           <TabLinks
             options={[
