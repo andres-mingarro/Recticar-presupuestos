@@ -5,18 +5,20 @@ import Image from "next/image";
 import type { TechnicalMarca } from "@/lib/types";
 import { cn } from "@/lib/cn";
 import { getBrandLogoUrl } from "@/lib/vehicle-logo";
-import { Button } from "@/components/ui/Button";
+import { Button, type ButtonVariant } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import styles from "./MarcaDialogSelect.module.scss";
 
 type Props = {
-  name: string;
+  name?: string;
   marcas: TechnicalMarca[];
   value?: number | string | null;
   selectedName?: string | null;
   disabled?: boolean;
   className?: string;
+  onChange?: (marca: TechnicalMarca) => void;
+  variant?: ButtonVariant;
 };
 
 function BrandLogo({ nombre }: { nombre: string }) {
@@ -41,7 +43,7 @@ function TriggerLogo({ nombre }: { nombre: string }) {
   const url = getBrandLogoUrl(nombre);
 
   if (url) {
-    return <Image src={url} alt="" width={28} height={22} className={styles.triggerLogo} unoptimized />;
+    return <Image src={url} alt="" width={42} height={32} className={styles.triggerLogo} unoptimized />;
   }
 
   return <span className={styles.triggerFallback}>{nombre[0]?.toUpperCase() ?? "?"}</span>;
@@ -54,6 +56,8 @@ export function MarcaDialogSelect({
   selectedName,
   disabled = false,
   className,
+  onChange,
+  variant = "soft-dark",
 }: Props) {
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(value ? String(value) : "");
@@ -70,15 +74,17 @@ export function MarcaDialogSelect({
 
   function handleSelect(marca: TechnicalMarca) {
     setSelectedId(String(marca.id));
+    onChange?.(marca);
     setOpen(false);
   }
 
   return (
-    <div className={cn("MarcaDialogSelect", styles.MarcaDialogSelect, className)}>
-      <input type="hidden" name={name} value={selectedId} />
+    <div className={cn("marca-dialog-select", styles.MarcaDialogSelect, className)}>
+      {name ? <input type="hidden" name={name} value={selectedId} /> : null}
       <Button
         type="button"
-        variant="outline"
+        variant={variant}
+        size="md"
         disabled={disabled}
         onClick={() => setOpen(true)}
         className={cn("w-full", styles.trigger)}

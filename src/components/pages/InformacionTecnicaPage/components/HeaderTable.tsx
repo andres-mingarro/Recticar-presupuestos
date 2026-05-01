@@ -30,6 +30,8 @@ export function HeaderTable({
   emptyLabel,
   children,
   tabsSlot,
+  toolbarSlot,
+  marcaId,
 }: {
   section: TechnicalSection;
   count: number;
@@ -47,6 +49,8 @@ export function HeaderTable({
   emptyLabel: string;
   children: React.ReactNode;
   tabsSlot?: React.ReactNode;
+  toolbarSlot?: React.ReactNode;
+  marcaId?: string;
 }) {
   return (
     <Card noPadding as="section" className="HeaderTable overflow-hidden">
@@ -77,7 +81,8 @@ export function HeaderTable({
 
         {/* Row 2: búsqueda + paginación */}
         <div className="relative flex items-center gap-2 border-t border-[var(--color-border)] px-3 py-2">
-          <SearchBar section={section} q={q} tab={tab} />
+          <SearchBar section={section} q={q} tab={tab} marcaId={marcaId} />
+          {toolbarSlot}
 
           {(totalPages > 1 || currentPage > 1) && (
             <>
@@ -85,7 +90,7 @@ export function HeaderTable({
               <div className="flex shrink-0 items-center gap-1.5">
                 {hasPreviousPage ? (
                   <Link
-                    href={buildSectionHref(section, q, currentPage - 1, tab)}
+                    href={buildSectionHref(section, q, currentPage - 1, tab, marcaId)}
                     className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                   >
                     <Icon name="chevronLeft" className="h-3.5 w-3.5" />
@@ -102,7 +107,7 @@ export function HeaderTable({
                 </span>
                 {hasNextPage ? (
                   <Link
-                    href={buildSectionHref(section, q, currentPage + 1, tab)}
+                    href={buildSectionHref(section, q, currentPage + 1, tab, marcaId)}
                     className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                   >
                     <Icon name="chevronRight" className="h-3.5 w-3.5" />

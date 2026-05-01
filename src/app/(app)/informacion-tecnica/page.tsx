@@ -48,7 +48,7 @@ type VehiculosTab = (typeof VALID_TABS_VEHICULOS)[number];
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: Promise<{ section?: string; q?: string; page?: string; tab?: string }>;
+  searchParams?: Promise<{ section?: string; q?: string; page?: string; tab?: string; marcaId?: string }>;
 }) {
   const { session } = await getSessionWithPermisos();
   const canEdit = isSuperAdmin(session);
@@ -81,6 +81,11 @@ export default async function Page({
   const marcasHiddenFilter = section === "marcas" ? marcasTab === "ocultas" : undefined;
   const modelosHiddenFilter = section === "modelos" ? modelosTab === "ocultos" : undefined;
   const vehiculosHiddenFilter = section === "vehiculos" ? vehiculosTab === "ocultos" : undefined;
+  const marcaIdParam = typeof params.marcaId === "string" ? Number(params.marcaId) : NaN;
+  const modelosMarcaId =
+    section === "modelos" && Number.isInteger(marcaIdParam) && marcaIdParam > 0
+      ? marcaIdParam
+      : undefined;
 
   const [sectionCounts, [marcas, modelos, motores, vehiculos, totalItems]] = await Promise.all([
     getTechnicalSectionCounts(),
@@ -95,7 +100,7 @@ export default async function Page({
       section === "modelos" || section === "vehiculos"
         ? listTechnicalModelos(
             section === "modelos"
-              ? { search: q, limit: PAGE_SIZE, offset, hidden: modelosHiddenFilter }
+              ? { search: q, limit: PAGE_SIZE, offset, hidden: modelosHiddenFilter, marcaId: modelosMarcaId }
               : { limit: 5000 }
           )
         : Promise.resolve([]),
@@ -108,7 +113,7 @@ export default async function Page({
       section === "marcas"
         ? countTechnicalMarcas(q, marcasHiddenFilter)
         : section === "modelos"
-          ? countTechnicalModelos(q, modelosHiddenFilter)
+          ? countTechnicalModelos(q, modelosHiddenFilter, modelosMarcaId)
           : section === "motores"
             ? countTechnicalMotores(q)
             : countTechnicalVehiculos(q, vehiculosHiddenFilter),
@@ -130,6 +135,7 @@ export default async function Page({
       marcasTab={marcasTab}
       modelosTab={modelosTab}
       vehiculosTab={vehiculosTab}
+      modelosMarcaId={modelosMarcaId ? String(modelosMarcaId) : ""}
       canEdit={canEdit}
       createMarcaAction={createMarcaAction}
       updateMarcaAction={updateMarcaAction}

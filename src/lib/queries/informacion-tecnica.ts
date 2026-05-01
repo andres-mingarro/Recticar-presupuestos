@@ -52,11 +52,12 @@ export async function listTechnicalMarcas({ search, limit, offset, hidden }: {
   );
 }
 
-export async function listTechnicalModelos({ search, limit, offset, hidden }: {
+export async function listTechnicalModelos({ search, limit, offset, hidden, marcaId }: {
   search?: string;
   limit?: number;
   offset?: number;
   hidden?: boolean;
+  marcaId?: number;
 } = {}) {
   const normalizedSearch = buildSearch(search);
   const normalizedLimit = limit ?? 20;
@@ -72,6 +73,10 @@ export async function listTechnicalModelos({ search, limit, offset, hidden }: {
   if (hidden !== undefined) {
     params.push(hidden);
     conditions.push(`mo.hidden = $${params.length}`);
+  }
+  if (marcaId !== undefined) {
+    params.push(marcaId);
+    conditions.push(`mo.marca_id = $${params.length}`);
   }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -234,9 +239,9 @@ export async function countTechnicalMarcas(search?: string, hidden?: boolean) {
   return rows[0]?.total ?? 0;
 }
 
-export async function countTechnicalModelos(search?: string, hidden?: boolean) {
+export async function countTechnicalModelos(search?: string, hidden?: boolean, marcaId?: number) {
   const normalizedSearch = buildSearch(search);
-  const params: (string | boolean)[] = [];
+  const params: (string | number | boolean)[] = [];
   const conditions: string[] = [];
 
   if (normalizedSearch) {
@@ -246,6 +251,10 @@ export async function countTechnicalModelos(search?: string, hidden?: boolean) {
   if (hidden !== undefined) {
     params.push(hidden);
     conditions.push(`mo.hidden = $${params.length}`);
+  }
+  if (marcaId !== undefined) {
+    params.push(marcaId);
+    conditions.push(`mo.marca_id = $${params.length}`);
   }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";

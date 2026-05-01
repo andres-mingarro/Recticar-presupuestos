@@ -14,9 +14,10 @@ type SearchBarProps = {
   section: TechnicalSection;
   q: string;
   tab?: string;
+  marcaId?: string;
 };
 
-export function SearchBar({ section, q, tab }: SearchBarProps) {
+export function SearchBar({ section, q, tab, marcaId }: SearchBarProps) {
   const router = useRouter();
   const [value, setValue] = useState(q);
   const [results, setResults] = useState<Suggestion[]>([]);
@@ -48,7 +49,7 @@ export function SearchBar({ section, q, tab }: SearchBarProps) {
 
   function navigate(searchValue: string) {
     setOpen(false);
-    router.push(buildSectionHref(section, searchValue, 1, tab));
+    router.push(buildSectionHref(section, searchValue, 1, tab, marcaId));
   }
 
   function fetchSuggestions(q: string) {
@@ -155,7 +156,7 @@ export function SearchBar({ section, q, tab }: SearchBarProps) {
       </div>
       <Button
         type="button"
-        size="sm"
+        size="md"
         className="shrink-0"
         icon={<Icon name="search" className="h-4 w-4" />}
         onClick={() => navigate(value)}
@@ -165,7 +166,7 @@ export function SearchBar({ section, q, tab }: SearchBarProps) {
       {q && (
         <Button
           as="a"
-          href={buildSectionHref(section, "", 1, tab)}
+          href={buildSectionHref(section, "", 1, tab, marcaId)}
           variant="secondary"
           size="sm"
           className="shrink-0"

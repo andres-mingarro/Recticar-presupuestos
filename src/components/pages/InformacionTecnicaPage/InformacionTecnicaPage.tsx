@@ -26,6 +26,7 @@ import { AddMarcaForm } from "./components/AddMarcaForm";
 import { AddModeloForm } from "./components/AddModeloForm";
 import { AddMotorForm } from "./components/AddMotorForm";
 import { AddVehiculoForm } from "./components/AddVehiculoForm";
+import { ModeloMarcaFilter } from "./components/ModeloMarcaFilter";
 
 // buildSectionHref is re-exported for use in server components / pages if needed
 export { buildSectionHref };
@@ -55,6 +56,7 @@ type Props = {
   marcasTab: MarcasTab;
   modelosTab: ModelosTab;
   vehiculosTab: VehiculosTab;
+  modelosMarcaId: string;
   canEdit: boolean;
   createMarcaAction: ActionFn;
   updateMarcaAction: ActionFn;
@@ -116,6 +118,7 @@ export function InformacionTecnicaPage({
   marcasTab,
   modelosTab,
   vehiculosTab,
+  modelosMarcaId,
   canEdit,
   createMarcaAction,
   updateMarcaAction,
@@ -248,11 +251,20 @@ export function InformacionTecnicaPage({
           ) : undefined
         }
         createForm={canEdit && modelosTab === "visible" ? <AddModeloForm action={createModeloAction} marcas={marcas} /> : undefined}
+        toolbarSlot={
+          <ModeloMarcaFilter
+            marcas={marcas}
+            q={q}
+            tab={modelosTab !== "visible" ? modelosTab : undefined}
+            marcaId={modelosMarcaId}
+          />
+        }
+        marcaId={modelosMarcaId}
         tabsSlot={
           <TabLinks
             options={[
-              { value: "visible", label: "Visibles", icon: "eye", href: buildSectionHref(activeSection, q, 1) },
-              { value: "ocultos", label: `Ocultos${modelosOcultosCount > 0 ? ` (${modelosOcultosCount})` : ""}`, icon: "eyeSlash", href: buildSectionHref(activeSection, q, 1, "ocultos") },
+              { value: "visible", label: "Visibles", icon: "eye", href: buildSectionHref(activeSection, q, 1, undefined, modelosMarcaId) },
+              { value: "ocultos", label: `Ocultos${modelosOcultosCount > 0 ? ` (${modelosOcultosCount})` : ""}`, icon: "eyeSlash", href: buildSectionHref(activeSection, q, 1, "ocultos", modelosMarcaId) },
             ]}
             activeValue={modelosTab}
           />

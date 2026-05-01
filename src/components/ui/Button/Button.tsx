@@ -17,7 +17,7 @@ function spawnRipple(e: MouseEvent<HTMLElement>) {
   span.addEventListener("animationend", () => span.remove(), { once: true });
 }
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "dark" | "warm" | "burnt" | "outline" | "outline-warm" | "outline-dark" | "outline-ghost" | "danger-ghost" | "link" | "danger" | "warning" | "info" | "success" | "outline-danger" | "outline-warning" | "outline-info" | "outline-success" | "hero";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "dark" | "soft-dark" | "warm" | "burnt" | "outline" | "outline-warm" | "outline-dark" | "outline-ghost" | "danger-ghost" | "link" | "danger" | "warning" | "info" | "success" | "outline-danger" | "outline-warning" | "outline-info" | "outline-success" | "hero";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export function buttonStyles({

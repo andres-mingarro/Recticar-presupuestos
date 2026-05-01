@@ -2,6 +2,15 @@
   min-width: 0;
 }
 
+.MarcaDialogSelect {
+  img {
+    display: flex;
+    transform: translateX(-10px);
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
 .trigger {
   min-width: 0;
   justify-content: space-between;
@@ -13,13 +22,13 @@
   align-items: center;
   gap: 8px;
 }
-
 .triggerLogo {
-  width: 28px;
-  height: 22px;
   flex-shrink: 0;
   object-fit: contain;
+  width: 42px;
+  height: 32px;
 }
+
 
 .triggerFallback {
   display: inline-flex;
