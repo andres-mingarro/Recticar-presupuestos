@@ -112,9 +112,21 @@ export async function createRepuesto(categoriaId: number, nombre: string) {
 }
 
 export async function updateRepuestoNombres(updates: Array<{ id: number; nombre: string }>) {
-  for (const { id, nombre } of updates) {
-    await templateRows`UPDATE repuestos SET nombre = ${nombre} WHERE id = ${id}`;
-  }
+  if (updates.length === 0) return;
+
+  await queryRows(
+    `
+      UPDATE repuestos AS r
+      SET nombre = v.nombre
+      FROM (
+        SELECT
+          unnest($1::int[]) AS id,
+          unnest($2::text[]) AS nombre
+      ) AS v
+      WHERE r.id = v.id
+    `,
+    [updates.map((u) => u.id), updates.map((u) => u.nombre)]
+  );
 }
 
 export async function updateRepuestoPrecios(updates: Array<{ id: number; precio: number }>) {
@@ -150,15 +162,31 @@ export async function reorderRepuestos(orderedIds: number[]) {
 export async function updateRepuestoStock(
   updates: Array<{ id: number; stockHabilitado: boolean; stockCantidad: number; precioStock: number }>
 ) {
-  for (const { id, stockHabilitado, stockCantidad, precioStock } of updates) {
-    await templateRows`
-      UPDATE repuestos
-      SET stock_habilitado = ${stockHabilitado},
-          stock_cantidad = ${stockCantidad},
-          precio_stock = ${precioStock}
-      WHERE id = ${id}
-    `;
-  }
+  if (updates.length === 0) return;
+
+  await queryRows(
+    `
+      UPDATE repuestos AS r
+      SET
+        stock_habilitado = v.stock_habilitado,
+        stock_cantidad = v.stock_cantidad,
+        precio_stock = v.precio_stock
+      FROM (
+        SELECT
+          unnest($1::int[]) AS id,
+          unnest($2::boolean[]) AS stock_habilitado,
+          unnest($3::int[]) AS stock_cantidad,
+          unnest($4::numeric[]) AS precio_stock
+      ) AS v
+      WHERE r.id = v.id
+    `,
+    [
+      updates.map((u) => u.id),
+      updates.map((u) => u.stockHabilitado),
+      updates.map((u) => u.stockCantidad),
+      updates.map((u) => u.precioStock),
+    ]
+  );
 }
 
 export async function deleteRepuesto(id: number) {

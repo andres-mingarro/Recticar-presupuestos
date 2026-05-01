@@ -1,5 +1,5 @@
 import { queryRows, templateRows } from "@/lib/db";
-import { listMarcas, listModelos, listMotores } from "@/lib/queries/catalogo";
+import { hydrateTechnicalLabels } from "@/lib/queries/catalogo";
 import type {
   ClienteDetail,
   ClienteFormValues,
@@ -137,51 +137,39 @@ export async function listPendingTrabajosByClienteIds(clienteIds: number[]) {
     return [] as ClientePendingTrabajoItem[];
   }
 
-  const [rows, [marcas, modelos, motores]] = await Promise.all([
-    queryRows<ClientePendingTrabajoRow>(
-      `
-        SELECT
-          p.cliente_id,
-          p.id,
-          p.numero_trabajo,
-          p.cobrado,
-          p.estado,
-          p.prioridad,
-          p.fecha_creacion,
-          p.marca_id,
-          p.modelo_id,
-          p.motor_id,
-          p.numero_serie_motor
-        FROM ordenes_trabajo p
-        WHERE p.cliente_id = ANY($1::int[])
-          AND p.estado <> 'finalizado'
-        ORDER BY
-          p.cliente_id ASC,
-          CASE
-            WHEN p.prioridad = 'alta' THEN 1
-            WHEN p.prioridad = 'normal' THEN 2
-            ELSE 3
-          END,
-          p.fecha_creacion ASC,
-          p.numero_trabajo ASC
-      `,
-      [clienteIds]
-    ),
-    Promise.all([listMarcas(), listModelos(), listMotores()]),
-  ]);
+  const rows = await queryRows<ClientePendingTrabajoRow>(
+    `
+      SELECT
+        p.cliente_id,
+        p.id,
+        p.numero_trabajo,
+        p.cobrado,
+        p.estado,
+        p.prioridad,
+        p.fecha_creacion,
+        p.marca_id,
+        p.modelo_id,
+        p.motor_id,
+        p.numero_serie_motor
+      FROM ordenes_trabajo p
+      WHERE p.cliente_id = ANY($1::int[])
+        AND p.estado <> 'finalizado'
+      ORDER BY
+        p.cliente_id ASC,
+        CASE
+          WHEN p.prioridad = 'alta' THEN 1
+          WHEN p.prioridad = 'normal' THEN 2
+          ELSE 3
+        END,
+        p.fecha_creacion ASC,
+        p.numero_trabajo ASC
+    `,
+    [clienteIds]
+  );
 
   if (rows.length === 0) return [] as ClientePendingTrabajoItem[];
 
-  const marcasById = new Map(marcas.map((m) => [m.id, m.nombre]));
-  const modelosById = new Map(modelos.map((m) => [m.id, m.nombre]));
-  const motoresById = new Map(motores.map((m) => [m.id, m.nombre]));
-
-  return rows.map((item) => ({
-    ...item,
-    marca_nombre: item.marca_id ? (marcasById.get(item.marca_id) ?? null) : null,
-    modelo_nombre: item.modelo_id ? (modelosById.get(item.modelo_id) ?? null) : null,
-    motor_nombre: item.motor_id ? (motoresById.get(item.motor_id) ?? null) : null,
-  })) as ClientePendingTrabajoItem[];
+  return (await hydrateTechnicalLabels(rows)) as ClientePendingTrabajoItem[];
 }
 
 export async function createCliente(input: ClienteFormValues) {

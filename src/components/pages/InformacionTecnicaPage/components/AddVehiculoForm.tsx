@@ -23,6 +23,7 @@ export function AddVehiculoForm({ action }: { action: ActionFn }) {
         <SearchableSelect
           name="modeloId"
           searchType="modelos"
+          searchMode="nameOnly"
           required
           disabled={isPending}
           placeholder="Buscar modelo…"

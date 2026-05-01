@@ -12,6 +12,9 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q")?.trim() ?? "";
   const type = searchParams.get("type") ?? "";
+  const mode = searchParams.get("mode") ?? "default";
+  const marcaIdParam = Number(searchParams.get("marcaId"));
+  const marcaId = Number.isInteger(marcaIdParam) && marcaIdParam > 0 ? marcaIdParam : null;
 
   // hidden=true → solo ocultos (solo super_admin); hidden=false o ausente → solo visibles
   const rawHidden = searchParams.get("hidden");
@@ -34,6 +37,8 @@ export async function GET(request: Request) {
   }
 
   if (type === "modelos") {
+    const params: (string | number)[] = [pattern];
+    const marcaFilter = marcaId ? ` AND mo.marca_id = $${params.push(marcaId)}` : "";
     const rows = await queryRowsFromTechnical<{
       id: number;
       nombre: string;
@@ -42,9 +47,14 @@ export async function GET(request: Request) {
       `SELECT mo.id, mo.nombre, ma.nombre AS marca_nombre
        FROM modelos mo
        LEFT JOIN marcas ma ON ma.id = mo.marca_id
-       WHERE (mo.nombre ILIKE $1 OR ma.nombre ILIKE $1) AND mo.hidden = ${wantHidden}
+       WHERE ${
+         mode === "nameOnly"
+           ? "mo.nombre ILIKE $1"
+           : "(mo.nombre ILIKE $1 OR ma.nombre ILIKE $1)"
+       } AND mo.hidden = ${wantHidden}
+       ${marcaFilter}
        ORDER BY ma.nombre ASC NULLS LAST, mo.nombre ASC`,
-      [pattern]
+      params
     );
     return NextResponse.json({
       results: rows.map((r) => ({

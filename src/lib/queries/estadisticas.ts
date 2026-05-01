@@ -25,14 +25,23 @@ export async function getAniosConCobrados(): Promise<number[]> {
 export async function getCobradosMensuales(anio: number): Promise<CobradoMensualRow[]> {
   return queryRows<CobradoMensualRow>(
     `
+      WITH totales_trabajos AS (
+        SELECT orden_trabajo_id, SUM(precio_snapshot)::int AS total_trabajos
+        FROM orden_trabajo_trabajos
+        GROUP BY orden_trabajo_id
+      ),
+      totales_repuestos AS (
+        SELECT orden_trabajo_id, SUM(precio * cantidad)::int AS total_repuestos
+        FROM orden_trabajo_repuestos
+        GROUP BY orden_trabajo_id
+      )
       SELECT
         EXTRACT(MONTH FROM ot.fecha_creacion)::int AS mes,
         COUNT(*)::int AS cantidad,
-        COALESCE(SUM(
-          COALESCE((SELECT SUM(precio_snapshot) FROM orden_trabajo_trabajos WHERE orden_trabajo_id = ot.id), 0) +
-          COALESCE((SELECT SUM(precio * cantidad) FROM orden_trabajo_repuestos WHERE orden_trabajo_id = ot.id), 0)
-        ), 0)::int AS total
+        COALESCE(SUM(COALESCE(tt.total_trabajos, 0) + COALESCE(tr.total_repuestos, 0)), 0)::int AS total
       FROM ordenes_trabajo ot
+      LEFT JOIN totales_trabajos tt ON tt.orden_trabajo_id = ot.id
+      LEFT JOIN totales_repuestos tr ON tr.orden_trabajo_id = ot.id
       WHERE ot.cobrado = true
         AND EXTRACT(YEAR FROM ot.fecha_creacion) = $1
       GROUP BY mes
@@ -44,14 +53,23 @@ export async function getCobradosMensuales(anio: number): Promise<CobradoMensual
 
 export async function getResumenAnual(): Promise<CobradoAnualRow[]> {
   return queryRows<CobradoAnualRow>(`
+    WITH totales_trabajos AS (
+      SELECT orden_trabajo_id, SUM(precio_snapshot)::int AS total_trabajos
+      FROM orden_trabajo_trabajos
+      GROUP BY orden_trabajo_id
+    ),
+    totales_repuestos AS (
+      SELECT orden_trabajo_id, SUM(precio * cantidad)::int AS total_repuestos
+      FROM orden_trabajo_repuestos
+      GROUP BY orden_trabajo_id
+    )
     SELECT
       EXTRACT(YEAR FROM ot.fecha_creacion)::int AS anio,
       COUNT(*)::int AS cantidad,
-      COALESCE(SUM(
-        COALESCE((SELECT SUM(precio_snapshot) FROM orden_trabajo_trabajos WHERE orden_trabajo_id = ot.id), 0) +
-        COALESCE((SELECT SUM(precio * cantidad) FROM orden_trabajo_repuestos WHERE orden_trabajo_id = ot.id), 0)
-      ), 0)::int AS total
+      COALESCE(SUM(COALESCE(tt.total_trabajos, 0) + COALESCE(tr.total_repuestos, 0)), 0)::int AS total
     FROM ordenes_trabajo ot
+    LEFT JOIN totales_trabajos tt ON tt.orden_trabajo_id = ot.id
+    LEFT JOIN totales_repuestos tr ON tr.orden_trabajo_id = ot.id
     WHERE ot.cobrado = true
     GROUP BY anio
     ORDER BY anio DESC

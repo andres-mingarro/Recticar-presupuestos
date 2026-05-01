@@ -22,6 +22,10 @@ function buildSearch(value?: string) {
   return value?.trim() ? `%${value.trim()}%` : null;
 }
 
+function buildPrefixSearch(value?: string) {
+  return value?.trim() ? `${value.trim()}%` : null;
+}
+
 export async function listTechnicalMarcas({ search, limit, offset, hidden }: {
   search?: string;
   limit?: number;
@@ -59,7 +63,7 @@ export async function listTechnicalModelos({ search, limit, offset, hidden, marc
   hidden?: boolean;
   marcaId?: number;
 } = {}) {
-  const normalizedSearch = buildSearch(search);
+  const normalizedSearch = buildPrefixSearch(search);
   const normalizedLimit = limit ?? 20;
   const normalizedOffset = offset ?? 0;
 
@@ -68,7 +72,7 @@ export async function listTechnicalModelos({ search, limit, offset, hidden, marc
 
   if (normalizedSearch) {
     params.push(normalizedSearch);
-    conditions.push(`(mo.nombre ILIKE $${params.length} OR ma.nombre ILIKE $${params.length})`);
+    conditions.push(`mo.nombre ILIKE $${params.length}`);
   }
   if (hidden !== undefined) {
     params.push(hidden);
@@ -240,13 +244,13 @@ export async function countTechnicalMarcas(search?: string, hidden?: boolean) {
 }
 
 export async function countTechnicalModelos(search?: string, hidden?: boolean, marcaId?: number) {
-  const normalizedSearch = buildSearch(search);
+  const normalizedSearch = buildPrefixSearch(search);
   const params: (string | number | boolean)[] = [];
   const conditions: string[] = [];
 
   if (normalizedSearch) {
     params.push(normalizedSearch);
-    conditions.push(`(mo.nombre ILIKE $${params.length} OR ma.nombre ILIKE $${params.length})`);
+    conditions.push(`mo.nombre ILIKE $${params.length}`);
   }
   if (hidden !== undefined) {
     params.push(hidden);

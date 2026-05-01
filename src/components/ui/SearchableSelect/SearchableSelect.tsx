@@ -11,6 +11,7 @@ export type SearchableSelectOption = {
 type SearchableSelectProps = {
   name: string;
   searchType: "marcas" | "modelos" | "motores";
+  searchMode?: "default" | "nameOnly";
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
@@ -20,6 +21,7 @@ type SearchableSelectProps = {
 export function SearchableSelect({
   name,
   searchType,
+  searchMode = "default",
   placeholder = "Buscar…",
   disabled = false,
   required = false,
@@ -74,7 +76,7 @@ export function SearchableSelect({
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/catalogo-tecnico/search?type=${searchType}&q=${encodeURIComponent(q)}`
+          `/api/catalogo-tecnico/search?type=${searchType}&mode=${searchMode}&q=${encodeURIComponent(q)}`
         );
         const data = await res.json();
         setResults(data.results ?? []);

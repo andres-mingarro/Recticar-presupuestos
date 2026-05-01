@@ -130,3 +130,96 @@ This repo also has a richer product and implementation guide in `CLAUDE.md`. Tre
 - Check `CLAUDE.md` when touching product behavior, permissions, jobs flow, pricing, technical catalog, or UI conventions that are easy to break.
 - Preserve the existing warm visual language and shared component system unless the task explicitly requires a redesign.
 - Keep this file synchronized with `CLAUDE.md` when new repo-wide conventions are added.
+
+## Optimization And Refactor Skill
+
+Use this section when asked to optimize queries, reduce code size, refactor large files, remove duplication, or simplify implementation.
+
+### General Refactor Rules
+
+- Preserve existing behavior unless the task explicitly asks to change it.
+- Prefer small, reviewable changes over large rewrites.
+- Do not introduce new dependencies unless clearly justified.
+- Do not change public APIs, route behavior, permissions, database schema, or UI flows without explaining the reason.
+- Reduce code only when readability stays the same or improves.
+- Avoid clever one-liners that make debugging harder.
+- Prefer deleting duplicated logic before extracting new abstractions.
+- Keep naming explicit and consistent with the current repo language.
+- Keep the warm visual language and existing shared component system.
+
+### Large File Refactor Rules
+
+Before editing a large file:
+
+1. Identify the main responsibilities of the file.
+2. Find duplicated state, duplicated rendering logic, repeated SQL, repeated form handling, or repeated UI blocks.
+3. Check whether existing shared components already solve the problem.
+4. Propose the smallest safe refactor.
+5. Apply changes incrementally.
+6. Keep server/client component boundaries valid for Next.js App Router.
+7. Preserve existing form submission behavior, especially unified "Guardar" flows.
+
+When refactoring React components:
+
+- Keep each component root `className` with the component name.
+- Use existing shared UI components first: `Card`, `Button`, `Badge`, `Table`, `PageHeader`, `ConfirmDialog`, `Spinner`.
+- Do not replace `Button` or `PulsatingButton` with raw `<button>` styling.
+- Do not use raw icon SVGs if `src/components/ui/Icon` supports the icon.
+- Do not move widgets outside forms unless hidden inputs and `form={formId}` behavior are preserved.
+
+### Query Optimization Rules
+
+When optimizing SQL or DB access:
+
+1. Understand the query purpose before changing it.
+2. Preserve exact returned data shape expected by TypeScript types.
+3. Look for:
+   - N+1 queries
+   - duplicated queries
+   - unnecessary joins
+   - `SELECT *`
+   - filters applied in JS that should be done in SQL
+   - repeated subqueries
+   - inefficient pagination
+   - expensive `ORDER BY`, `GROUP BY`, or `ILIKE`
+   - loading unnecessary columns
+4. Prefer clear SQL over clever SQL.
+5. Suggest indexes only when justified by `WHERE`, `JOIN`, `ORDER BY`, or `GROUP BY`.
+6. Do not add foreign keys from the main database to the technical catalog.
+7. Do not introduce an ORM.
+8. Keep using direct SQL through `queryRows<T>()`.
+9. If changing a query, explain before/after behavior and any expected performance impact.
+
+### Neon / PostgreSQL Rules
+
+- Treat `DATABASE_URL` as the main operational database.
+- Treat `TECHNICAL_DATABASE_URL` as an external technical catalog.
+- If optimizing technical catalog flows, keep fallback behavior to `DATABASE_URL` when `TECHNICAL_DATABASE_URL` is missing.
+- Migrations must go in `migrations/`.
+- Do not change schema silently.
+- If schema changes are needed, explain the migration and how to run `npm run db:migrate`.
+
+### Less Lines Rules
+
+When asked to make code shorter:
+
+- Remove duplicated branches first.
+- Replace repeated mapping/rendering logic with small helpers only when it improves clarity.
+- Avoid abstracting too early.
+- Do not compress code in a way that hides business rules.
+- Keep important TypeScript types explicit.
+- Keep error handling readable.
+- Prefer fewer concepts, not just fewer lines.
+
+### Review Output Format
+
+After completing optimization or refactor work, respond with:
+
+1. Summary
+2. Files changed
+3. What was simplified
+4. Query/performance improvements, if any
+5. Behavior preserved
+6. Risks or assumptions
+7. Commands run
+8. Suggested next refactor

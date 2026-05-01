@@ -59,8 +59,10 @@ export function SearchBar({ section, q, tab, marcaId }: SearchBarProps) {
     debounceRef.current = setTimeout(async () => {
       try {
         const isHiddenTab = tab === "ocultas" || tab === "ocultos";
+        const mode = section === "modelos" ? "&mode=nameOnly" : "";
+        const marcaParam = section === "modelos" && marcaId ? `&marcaId=${encodeURIComponent(marcaId)}` : "";
         const res = await fetch(
-          `/api/catalogo-tecnico/search?type=${section}&q=${encodeURIComponent(q)}&hidden=${isHiddenTab}`
+          `/api/catalogo-tecnico/search?type=${section}&q=${encodeURIComponent(q)}&hidden=${isHiddenTab}${mode}${marcaParam}`
         );
         const data = await res.json();
         const suggestions: Suggestion[] = (data.results ?? []).map((r: { label: string; searchValue?: string }) => ({

@@ -1,5 +1,10 @@
 import { precioListaColName, queryRows, templateRows, type ListaPrecio } from "@/lib/db";
-import { hydrateTechnicalLabels, listMarcas, listModelos, listMotores } from "@/lib/queries/catalogo";
+import {
+  hydrateTechnicalLabels,
+  listMarcasByIds,
+  listModelosByIds,
+  listMotoresByIds,
+} from "@/lib/queries/catalogo";
 import type {
   TrabajoDetail,
   TrabajoEstado,
@@ -223,9 +228,9 @@ async function getVehicleSnapshots(
   fallback?: { marcaNombre: string | null; modeloNombre: string | null; motorNombre: string | null }
 ): Promise<VehicleSnapshot> {
   const [marcas, modelos, motores] = await Promise.all([
-    marcaId ? listMarcas() : Promise.resolve([]),
-    modeloId ? listModelos() : Promise.resolve([]),
-    motorId ? listMotores() : Promise.resolve([]),
+    marcaId ? listMarcasByIds([marcaId]) : Promise.resolve([]),
+    modeloId ? listModelosByIds([modeloId]) : Promise.resolve([]),
+    motorId ? listMotoresByIds([motorId]) : Promise.resolve([]),
   ]);
 
   const marcaNombreSnapshot = marcaId

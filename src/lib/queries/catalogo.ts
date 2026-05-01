@@ -1,6 +1,7 @@
 import {
   precioListaColName,
   queryRows,
+  queryRowsFromTechnical,
   templateRows,
   templateRowsFromTechnical,
   type ListaPrecio,
@@ -22,6 +23,22 @@ export async function listMarcas() {
   `;
 }
 
+export async function listMarcasByIds(ids: number[]) {
+  if (ids.length === 0) {
+    return [] as Marca[];
+  }
+
+  return queryRowsFromTechnical<Marca>(
+    `
+      SELECT id, nombre
+      FROM marcas
+      WHERE hidden = false
+        AND id = ANY($1::int[])
+    `,
+    [ids]
+  );
+}
+
 export async function listModelosByMarca(marcaId: number) {
   return templateRowsFromTechnical<Modelo>`
     SELECT id, nombre, marca_id
@@ -40,6 +57,22 @@ export async function listModelos() {
   `;
 }
 
+export async function listModelosByIds(ids: number[]) {
+  if (ids.length === 0) {
+    return [] as Modelo[];
+  }
+
+  return queryRowsFromTechnical<Modelo>(
+    `
+      SELECT id, nombre, marca_id
+      FROM modelos
+      WHERE hidden = false
+        AND id = ANY($1::int[])
+    `,
+    [ids]
+  );
+}
+
 export async function listMotoresByModelo(modeloId: number) {
   return templateRowsFromTechnical<Motor>`
     SELECT DISTINCT m.id, m.nombre
@@ -56,6 +89,21 @@ export async function listMotores() {
     FROM motores
     ORDER BY nombre ASC
   `;
+}
+
+export async function listMotoresByIds(ids: number[]) {
+  if (ids.length === 0) {
+    return [] as Motor[];
+  }
+
+  return queryRowsFromTechnical<Motor>(
+    `
+      SELECT id, nombre
+      FROM motores
+      WHERE id = ANY($1::int[])
+    `,
+    [ids]
+  );
 }
 
 export async function listModeloMotorRelations() {
@@ -99,10 +147,35 @@ export async function hydrateTechnicalLabels<T extends TechnicalRef>(items: T[])
   let motoresById = new Map<number, string>();
 
   if (needsLookup) {
+    const marcaIds = Array.from(
+      new Set(
+        items
+          .filter((item) => item.marca_id && !item.marca_nombre_snapshot)
+          .map((item) => item.marca_id)
+          .filter((id): id is number => id !== null)
+      )
+    );
+    const modeloIds = Array.from(
+      new Set(
+        items
+          .filter((item) => item.modelo_id && !item.modelo_nombre_snapshot)
+          .map((item) => item.modelo_id)
+          .filter((id): id is number => id !== null)
+      )
+    );
+    const motorIds = Array.from(
+      new Set(
+        items
+          .filter((item) => item.motor_id && !item.motor_nombre_snapshot)
+          .map((item) => item.motor_id)
+          .filter((id): id is number => id !== null)
+      )
+    );
+
     const [marcas, modelos, motores] = await Promise.all([
-      listMarcas(),
-      listModelos(),
-      listMotores(),
+      listMarcasByIds(marcaIds),
+      listModelosByIds(modeloIds),
+      listMotoresByIds(motorIds),
     ]);
     marcasById = new Map(marcas.map((m) => [m.id, m.nombre]));
     modelosById = new Map(modelos.map((m) => [m.id, m.nombre]));
@@ -252,9 +325,21 @@ export async function createTrabajo(categoriaId: number, nombre: string) {
 }
 
 export async function updateTrabajoNombres(updates: Array<{ id: number; nombre: string }>) {
-  for (const { id, nombre } of updates) {
-    await templateRows`UPDATE trabajos SET nombre = ${nombre} WHERE id = ${id}`;
-  }
+  if (updates.length === 0) return;
+
+  await queryRows(
+    `
+      UPDATE trabajos AS t
+      SET nombre = v.nombre
+      FROM (
+        SELECT
+          unnest($1::int[]) AS id,
+          unnest($2::text[]) AS nombre
+      ) AS v
+      WHERE t.id = v.id
+    `,
+    [updates.map((u) => u.id), updates.map((u) => u.nombre)]
+  );
 }
 
 export async function reorderTrabajos(orderedIds: number[]) {
