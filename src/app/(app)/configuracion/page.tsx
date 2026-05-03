@@ -7,12 +7,14 @@ import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
 import { getEmpresaConfig } from "@/lib/queries/empresa";
 import { resolveSearchParams } from "@/lib/search-params";
 import { ConfiguracionFeedback } from "./ConfiguracionFeedback";
+import { EstadisticasButton } from "./EstadisticasButton";
 import styles from "./ConfiguracionPage.module.scss";
 import {
   runPresupuestosCleanupNowAction,
   updateEmpresaBusinessDaysConfigAction,
   updateEmpresaCleanupConfigAction,
   updateEmpresaConfigAction,
+  verificarEstadisticasPasswordAction,
 } from "./actions";
 
 function FieldRow({
@@ -60,21 +62,7 @@ export default async function ConfiguracionPage({
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">Sistema</p>
           <h1 className="text-xl font-bold tracking-tight text-[var(--text-color-defult)]">Configuración</h1>
         </div>
-        <a
-          href="/estadisticas"
-          className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgba(234,88,12,0.08)]"
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#fff7ed,#ffe7d1)] text-[var(--color-accent)]">
-            <Icon name="chartBar" className="h-4 w-4" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-[var(--text-color-defult)]">Estadísticas</p>
-          </div>
-          <Icon
-            name="chevronRight"
-            className="h-3.5 w-3.5 shrink-0 text-[var(--text-color-gray)] transition group-hover:text-[var(--color-accent)]"
-          />
-        </a>
+        <EstadisticasButton action={verificarEstadisticasPasswordAction} />
       </div>
 
       <div className={cn("ConfiguracionPageGrid", styles.ConfiguracionPageGrid)}>

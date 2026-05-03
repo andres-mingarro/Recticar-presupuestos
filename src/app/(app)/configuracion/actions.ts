@@ -2,7 +2,19 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
+
+export async function verificarEstadisticasPasswordAction(
+  formData: FormData
+): Promise<{ ok: boolean }> {
+  const password = (formData.get("password") as string ?? "").trim();
+  const expected = (process.env.ESTADISTICAS_PASSWORD ?? "").trim();
+  if (!expected || password !== expected) return { ok: false };
+  const jar = await cookies();
+  jar.set("estadisticas_auth", "1", { httpOnly: true, sameSite: "lax", path: "/" });
+  return { ok: true };
+}
 import {
   getEmpresaConfig,
   normalizeBusinessDaysThresholds,

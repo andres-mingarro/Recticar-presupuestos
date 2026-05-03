@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getSessionWithPermisos, isSuperAdmin } from "@/lib/permisos";
 import {
   getAniosConCobrados,
@@ -10,6 +11,8 @@ import { EstadisticasPage } from "@/components/pages/EstadisticasPage";
 
 export const dynamic = "force-dynamic";
 
+const ESTADISTICAS_COOKIE = "estadisticas_auth";
+
 export default async function Page({
   searchParams,
 }: {
@@ -17,6 +20,9 @@ export default async function Page({
 }) {
   const { session } = await getSessionWithPermisos();
   if (!isSuperAdmin(session)) redirect("/");
+
+  const jar = await cookies();
+  if (jar.get(ESTADISTICAS_COOKIE)?.value !== "1") redirect("/configuracion");
 
   const params = await searchParams;
 
