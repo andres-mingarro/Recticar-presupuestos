@@ -15,6 +15,7 @@ import { PaymentBadge, StatusBadge } from "@/components/ui/Badge";
 import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { Table } from "@/components/ui/Table";
 import { getVehicleLabel } from "@/lib/format";
 import { ClienteMobileCard } from "@/components/ui/ClienteMobileCard";
@@ -72,6 +73,10 @@ export function ClientesPage({
   const [searchQuery, setSearchQuery] = useState(q);
   const [isSearchCardDocked, setIsSearchCardDocked] = useState(false);
   const submittedQueryRef = useRef(q);
+  useErrorNotification(
+    errorMessage ? `Error al consultar la base de datos: ${errorMessage}` : null,
+    q
+  );
 
   useMobileActionsRegister(
     canEdit ? (
@@ -188,12 +193,6 @@ export function ClientesPage({
           )}
         </div>
       </Card>
-
-      {errorMessage ? (
-        <section className="rounded-[28px] border border-rose-200 bg-rose-50 p-5 text-sm text-rose-700">
-          Error al consultar la base de datos: {errorMessage}
-        </section>
-      ) : null}
 
       <Card as="section" className="space-y-4">
         <div>

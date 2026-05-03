@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { type ActionFn, addBtnClassName, AddFooter } from "./shared";
 
 export function AddVehiculoForm({ action }: { action: ActionFn }) {
@@ -13,6 +14,8 @@ export function AddVehiculoForm({ action }: { action: ActionFn }) {
     error: null,
     resetKey: 0,
   });
+  useErrorNotification(state.error, state.resetKey);
+
   return (
     <AddFooter>
       <form
@@ -41,9 +44,6 @@ export function AddVehiculoForm({ action }: { action: ActionFn }) {
           {isPending ? "Agregando…" : "Agregar relación"}
         </Button>
       </form>
-      {state.error && (
-        <p className="w-full text-xs text-[var(--color-danger-text)]">{state.error}</p>
-      )}
     </AddFooter>
   );
 }

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input/Input";
 import { Icon } from "@/components/ui/Icon";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import type { UsuarioPublico, AppPermiso } from "@/lib/queries/usuarios";
 import {
   crearUsuarioAction,
@@ -324,6 +325,7 @@ export function UsuariosClient({ usuarios, currentNombre, protectedNombre }: Pro
   const [newRole, setNewRole] = useState<"operario" | "super_admin">("operario");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  useErrorNotification(error, newRole);
 
   const superAdmins = usuarios.filter((u) => u.role === "super_admin");
   const operarios = usuarios.filter((u) => u.role === "operario");
@@ -390,7 +392,6 @@ export function UsuariosClient({ usuarios, currentNombre, protectedNombre }: Pro
                 <option value="super_admin">Administrador</option>
               </select>
             </div>
-            {error && <p className="col-span-2 text-sm text-red-600">{error}</p>}
             <div className="col-span-2 flex justify-end">
               <Button type="submit" disabled={pending} className="gap-2">
                 {pending ? <Spinner className="h-4 w-4" /> : null}

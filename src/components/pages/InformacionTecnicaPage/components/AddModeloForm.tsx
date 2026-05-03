@@ -6,6 +6,7 @@ import type { TechnicalMarca } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { type ActionFn, addFieldCls, addBtnClassName, AddFooter } from "./shared";
 import { MarcaDialogSelect } from "./MarcaDialogSelect";
 
@@ -20,6 +21,7 @@ export function AddModeloForm({
     error: null,
     resetKey: 0,
   });
+  useErrorNotification(state.error, state.resetKey);
 
   return (
     <AddFooter>
@@ -50,9 +52,6 @@ export function AddModeloForm({
           {isPending ? "Agregando..." : "Agregar modelo"}
         </Button>
       </form>
-      {state.error && (
-        <p className="w-full text-xs text-[var(--color-danger-text)]">{state.error}</p>
-      )}
     </AddFooter>
   );
 }

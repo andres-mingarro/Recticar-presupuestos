@@ -23,7 +23,7 @@ type RepuestoSeleccionInitialItem = {
 type RepuestosSeleccionContextValue = {
   selectedIds: Set<number>;
   selectedItems: Record<number, RepuestoSeleccionItem>;
-  toggle: (id: number, checked: boolean, precioStockCatalogo?: number) => void;
+  toggle: (id: number, checked: boolean, precioStockCatalogo?: number, precioUnitarioCatalogo?: number) => void;
   setPrecioUnitario: (id: number, precio: number) => void;
   setPrecioStock: (id: number, precio: number) => void;
   incrementCantidad: (id: number) => void;
@@ -71,13 +71,13 @@ export function RepuestosSeleccionProvider({
     [selectedIds, allItems]
   );
 
-  function toggle(id: number, checked: boolean, precioStockCatalogo = 0) {
+  function toggle(id: number, checked: boolean, precioStockCatalogo = 0, precioUnitarioCatalogo = 0) {
     if (checked) {
       setAllItems((prev) => ({
         ...prev,
         [id]: prev[id] ?? {
-          precioUnitario: 0,
-          cantidad: 0,
+          precioUnitario: precioUnitarioCatalogo,
+          cantidad: 1,
           precioStock: precioStockCatalogo,
           cantidadStock: 0,
         },

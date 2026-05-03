@@ -1,0 +1,100 @@
+.ShimmerHighlight {
+  position: relative;
+  border-radius: 30px;
+  padding: var(--shimmer-size, 0.20em);
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    conic-gradient(
+      from var(--shimmer-angle),
+      #15803d 0deg,
+      #22c55e 18deg,
+      #bbf7d0 42deg,
+      #ffffff 58deg,
+      #4ade80 74deg,
+      #15803d 104deg,
+      #15803d 360deg
+    ) border-box;
+  box-shadow:
+    0 0 0 2px rgba(34, 197, 94, 0.28),
+    0 0 0 8px rgba(34, 197, 94, 0.10),
+    0 18px 48px rgba(21, 128, 61, 0.24);
+  animation:
+    shimmerHighlightSpin 1.6s linear infinite,
+    shimmerHighlightPulse 1.8s ease-in-out infinite;
+  transition: background 420ms ease, box-shadow 420ms ease, transform 420ms ease;
+}
+
+.ShimmerHighlight::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  z-index: -1;
+  border-radius: 34px;
+  background: rgba(34, 197, 94, 0.18);
+  filter: blur(10px);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 420ms ease, filter 420ms ease;
+}
+
+.ShimmerHighlightExit {
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    conic-gradient(
+      from var(--shimmer-angle),
+      transparent 0deg,
+      transparent 360deg
+    ) border-box;
+  transform: translateZ(0) scale(1);
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0),
+    0 0 0 0 rgba(34, 197, 94, 0),
+    0 0 0 rgba(21, 128, 61, 0);
+  animation: shimmerHighlightSpin 1.6s linear infinite;
+}
+
+.ShimmerHighlightExit::before {
+  opacity: 0;
+  filter: blur(3px);
+}
+
+.ShimmerHighlightIdle {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  animation: none;
+}
+
+.ShimmerHighlightIdle::before {
+  opacity: 0;
+  filter: blur(0);
+}
+
+@property --shimmer-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes shimmerHighlightSpin {
+  to {
+    --shimmer-angle: 360deg;
+  }
+}
+
+@keyframes shimmerHighlightPulse {
+  0%,
+  100% {
+    transform: translateZ(0) scale(1);
+  }
+
+  50% {
+    transform: translateZ(0) scale(1.006);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ShimmerHighlight {
+    animation: none;
+  }
+}

@@ -1,7 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useRef } from "react";
-import { toast } from "sonner";
+import { useActionState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoAgrupado, TrabajoAgrupado } from "@/lib/types";
 import { getPrecioLista } from "@/lib/db";
@@ -9,6 +8,7 @@ import { useTrabajosSeleccion } from "@/components/forms/TrabajoForm/TrabajosSel
 import { useRepuestosSeleccion } from "@/components/forms/TrabajoForm/RepuestosSeleccionContext";
 import { Button } from "@/components/ui/Button";
 import { ListPriceBadge } from "@/components/ui/Badge";
+import { notifyError, notifySuccess } from "@/components/ui/NotificationToast";
 import { formatPrice } from "@/lib/format";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { useIva, IVA_PORCENTAJE } from "@/components/ui/IvaToggle";
@@ -45,6 +45,26 @@ export function TrabajosResumen({
     { error: null as string | null, success: false, updatedCount: 0 }
   );
   const lastRefreshToastRef = useRef<string | null>(null);
+
+  const repuestosById = useMemo(
+    () => new Map(repuestos.flatMap((g) => g.repuestos).map((repuesto) => [repuesto.id, repuesto])),
+    [repuestos]
+  );
+
+  const getRepuestoTotal = useCallback((id: number, item: {
+    precioUnitario: number;
+    cantidad: number;
+    precioStock: number;
+    cantidadStock: number;
+  }) => {
+    const repuesto = repuestosById.get(id);
+    if (!repuesto?.stockHabilitado) return item.precioUnitario * item.cantidad;
+
+    const stockDisponible = repuesto.stockCantidad + item.cantidadStock;
+    const cantidadStock = Math.min(item.cantidad, stockDisponible);
+    const cantidadProveedor = Math.max(0, item.cantidad - cantidadStock);
+    return item.precioStock * cantidadStock + item.precioUnitario * cantidadProveedor;
+  }, [repuestosById]);
 
   // Tras un refresh exitoso, descartar los snapshots del server y usar precios actuales del catálogo.
   // revalidatePath actualiza el server, pero las props del client component no se refrescan
@@ -84,10 +104,6 @@ export function TrabajosResumen({
   const selectedRepuestos = useMemo(
     () => {
       if (activeSnapshotRepuestos.length === 0) {
-        const repuestosById = new Map(
-          repuestos.flatMap((g) => g.repuestos).map((repuesto) => [repuesto.id, repuesto])
-        );
-
         return Object.entries(selectedRepuestoItems).map(([id, item]) => {
           const numericId = Number(id);
           const repuesto = repuestosById.get(numericId);
@@ -96,14 +112,11 @@ export function TrabajosResumen({
             id: numericId,
             nombre: repuesto?.nombre ?? "Repuesto",
             cantidad: item.cantidad,
-            total: item.precioUnitario * item.cantidad,
+            total: getRepuestoTotal(numericId, item),
           };
         });
       }
 
-      const repuestosById = new Map(
-        repuestos.flatMap((g) => g.repuestos).map((repuesto) => [repuesto.id, repuesto])
-      );
       const snapshotSelected = activeSnapshotRepuestos.filter((item) =>
         item.repuestoId === null || selectedRepuestoItems[item.repuestoId] !== undefined
       );
@@ -120,9 +133,9 @@ export function TrabajosResumen({
           id: item.repuestoId ?? `snapshot-${item.categoriaNombre}-${item.repuestoNombre}`,
           nombre: item.repuestoNombre,
           cantidad: currentSelection?.cantidad ?? item.cantidad,
-          total:
-            (currentSelection?.precioUnitario ?? item.precioUnitario) *
-            (currentSelection?.cantidad ?? item.cantidad),
+          total: currentSelection && item.repuestoId !== null
+            ? getRepuestoTotal(item.repuestoId, currentSelection)
+            : item.total,
         };
       });
       const currentOnlyRows = Object.entries(selectedRepuestoItems).flatMap(([id, item]) => {
@@ -137,13 +150,13 @@ export function TrabajosResumen({
           id: numericId,
           nombre: repuesto?.nombre ?? "Repuesto",
           cantidad: item.cantidad,
-          total: item.precioUnitario * item.cantidad,
+          total: getRepuestoTotal(numericId, item),
         }];
       });
 
       return [...snapshotRows, ...currentOnlyRows];
     },
-    [repuestos, selectedRepuestoItems, activeSnapshotRepuestos]
+    [repuestosById, selectedRepuestoItems, activeSnapshotRepuestos, getRepuestoTotal]
   );
 
   const totalTrabajos = useMemo(
@@ -211,7 +224,7 @@ export function TrabajosResumen({
     if (lastRefreshToastRef.current === toastKey) return;
     lastRefreshToastRef.current = toastKey;
 
-    toast.success(
+    notifySuccess(
       refreshState.updatedCount === 1
         ? "Valores actualizados correctamente. Se actualizó 1 item desde el catálogo actual."
         : `Valores actualizados correctamente. Se actualizaron ${refreshState.updatedCount} items desde el catálogo actual.`
@@ -225,7 +238,7 @@ export function TrabajosResumen({
     if (lastRefreshToastRef.current === toastKey) return;
     lastRefreshToastRef.current = toastKey;
 
-    toast.error(refreshState.error);
+    notifyError(refreshState.error);
   }, [refreshState.error]);
 
   if (selectedTrabajos.length === 0 && selectedRepuestos.length === 0) return null;

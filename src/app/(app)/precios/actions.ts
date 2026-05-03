@@ -16,7 +16,12 @@ import {
 import { registrarAjuste } from "@/lib/queries/ajustes";
 import { LISTAS_PRECIOS, type PreciosLista } from "@/lib/db";
 
-export type CatalogActionState = { error: string | null; resetKey?: number; success?: boolean };
+export type CatalogActionState = {
+  error: string | null;
+  resetKey?: number;
+  success?: boolean;
+  createdCategoriaId?: number;
+};
 
 function normalize(formData: FormData, key: string) {
   const v = formData.get(key);
@@ -89,13 +94,12 @@ export async function createCategoriaAction(
   if (!nombre) return { error: "El nombre es requerido." };
 
   try {
-    await createCategoria(nombre);
+    const categoria = await createCategoria(nombre);
+    revalidatePath("/precios");
+    return { error: null, resetKey: Date.now(), createdCategoriaId: categoria.id };
   } catch {
     return { error: "No se pudo crear la categoría." };
   }
-
-  revalidatePath("/precios");
-  return { error: null, resetKey: Date.now() };
 }
 
 export async function renameCategoriaAction(

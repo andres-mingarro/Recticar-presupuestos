@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
-import { FormErrorMessage } from "@/components/ui/FormErrorMessage";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import type { TrabajoPrioridad } from "@/lib/types";
 import { usePrioridad } from "./PrioridadContext";
 
@@ -44,6 +44,7 @@ type PrioridadSelectorProps = {
 export function PrioridadSelector({ action }: PrioridadSelectorProps) {
   const [state, formAction, isPending] = useActionState(action, { error: null });
   const { prioridad, setPrioridad } = usePrioridad();
+  useErrorNotification(state.error, prioridad);
 
   return (
     <div className="PrioridadSelector space-y-1.5">
@@ -78,7 +79,6 @@ export function PrioridadSelector({ action }: PrioridadSelectorProps) {
           );
         })}
       </div>
-      <FormErrorMessage error={state.error} />
     </div>
   );
 }

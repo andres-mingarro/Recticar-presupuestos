@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import type { ListaPrecio } from "@/lib/db";
 import type {
@@ -46,6 +45,7 @@ import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { Divider } from "@/components/ui/Divider";
 import { PdfShareButton } from "@/components/ui/PdfShareButton";
+import { notifySuccess } from "@/components/ui/NotificationToast";
 
 function TrabajoMobileActions({
   formId,
@@ -185,7 +185,7 @@ export function TrabajoDetailPage({
 
   useEffect(() => {
     if (!wasCreated && !wasUpdated) return;
-    toast.success(
+    notifySuccess(
       wasCreated
         ? `Trabajo #${trabajo.numero_trabajo} creado correctamente.`
         : `Trabajo #${trabajo.numero_trabajo} guardado correctamente.`
@@ -203,7 +203,7 @@ export function TrabajoDetailPage({
     if (formState.error) return;
     if (currentUpdatedAt === lastSuccessfulUpdatedAtRef.current) return;
     lastSuccessfulUpdatedAtRef.current = currentUpdatedAt;
-    toast.success(`Trabajo #${trabajo.numero_trabajo} guardado correctamente.`);
+    notifySuccess(`Trabajo #${trabajo.numero_trabajo} guardado correctamente.`);
   }, [formState.error, formState.values.updatedAt, isPending, trabajo.numero_trabajo]);
 
   useMobileActionsRegister(

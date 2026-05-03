@@ -3,7 +3,6 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { toast } from "sonner";
 import { AddCategoriaForm } from "@/components/forms/AddCategoriaForm";
 import type { TrabajoAgrupado } from "@/lib/types";
 import type { CatalogActionState } from "@/app/(app)/precios/actions";
@@ -19,9 +18,11 @@ import { Icon } from "@/components/ui/Icon";
 import { SortableList } from "@/components/sortable/SortableList";
 import { Spinner } from "@/components/ui/Spinner";
 import { DragHandle } from "@/components/ui/DragHandle";
+import { notifySuccess, useErrorNotification } from "@/components/ui/NotificationToast";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Incrementor } from "@/components/ui/Incrementor";
 import { PdfShareButton } from "@/components/ui/PdfShareButton";
+import { ShimmerHighlight } from "@/components/ui/ShimmerHighlight";
 
 // ─── Category card ────────────────────────────────────────────────────────────
 
@@ -241,6 +242,7 @@ function CategoriaCard({
   deleteTrabajoAction,
   reorderTrabajosAction,
   updateCategoriaAction,
+  onHighlightDismiss,
 }: {
   grupo: TrabajoAgrupado;
   deleteCategoriaAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
@@ -248,6 +250,7 @@ function CategoriaCard({
   deleteTrabajoAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
   reorderTrabajosAction: (orderedIds: number[]) => Promise<void>;
   updateCategoriaAction: (state: CatalogActionState, formData: FormData) => Promise<CatalogActionState>;
+  onHighlightDismiss?: () => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -261,6 +264,8 @@ function CategoriaCard({
 
   const [addState, addFormAction, addPending] = useActionState(createTrabajoAction, { error: null, resetKey: 0 });
   const [saveState, saveFormAction, savePending] = useActionState(updateCategoriaAction, { error: null });
+  useErrorNotification(addState.error, addState.resetKey);
+  useErrorNotification(saveState.error, grupo.categoriaId);
 
   useEffect(() => {
     if (saveState.success) setIsEditing(false);
@@ -273,7 +278,7 @@ function CategoriaCard({
     if (lastToastKeyRef.current === toastKey) return;
     lastToastKeyRef.current = toastKey;
 
-    toast.success(`Cambios guardados en "${grupo.categoriaNombre}".`);
+    notifySuccess(`Cambios guardados en "${grupo.categoriaNombre}".`);
   }, [saveState.success, grupo.categoriaId, grupo.categoriaNombre]);
 
   useEffect(() => {
@@ -418,7 +423,10 @@ function CategoriaCard({
               size="sm"
               variant="dark"
               className="w-full md:w-auto"
-              onClick={() => setIsEditing(true)}
+              onClick={() => {
+                onHighlightDismiss?.();
+                setIsEditing(true);
+              }}
               icon={<Icon name="edit" className="h-3.5 w-3.5" />}
             >
               Editar categoría
@@ -426,13 +434,6 @@ function CategoriaCard({
           )}
         </div>
       </div>
-
-      {/* Errores */}
-      {saveState.error && (
-        <p className="px-5 py-2 text-xs text-[var(--color-danger-text)]">
-          {saveState.error}
-        </p>
-      )}
 
       {/* ── Trabajos ── */}
       {grupo.trabajos.length === 0 ? (
@@ -523,9 +524,6 @@ function CategoriaCard({
             {addPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
             {addPending ? "Agregando…" : "Agregar trabajo"}
           </button>
-          {addState.error && (
-            <p className="text-xs text-[var(--color-danger-text)]">{addState.error}</p>
-          )}
         </form>
       </div>}
 
@@ -561,6 +559,7 @@ export function PreciosPage({
   updateCategoriaAction,
 }: PreciosPageProps) {
   const totalTrabajos = trabajos.reduce((sum, g) => sum + g.trabajos.length, 0);
+  const [highlightedCategoriaId, setHighlightedCategoriaId] = useState<number | null>(null);
 
   return (
     <div className="PreciosPage space-y-6">
@@ -581,20 +580,29 @@ export function PreciosPage({
       />
 
       <div className="space-y-4">
-        {trabajos.map((grupo) => (
-          <CategoriaCard
-            key={grupo.categoriaId}
-            grupo={grupo}
-            deleteCategoriaAction={deleteCategoriaAction}
-            createTrabajoAction={createTrabajoAction}
-            deleteTrabajoAction={deleteTrabajoAction}
-            reorderTrabajosAction={reorderTrabajosAction}
-            updateCategoriaAction={updateCategoriaAction}
-          />
-        ))}
+        {trabajos.map((grupo) => {
+          const highlighted = highlightedCategoriaId === grupo.categoriaId;
+
+          return (
+            <ShimmerHighlight key={grupo.categoriaId} active={highlighted}>
+              <CategoriaCard
+                grupo={grupo}
+                deleteCategoriaAction={deleteCategoriaAction}
+                createTrabajoAction={createTrabajoAction}
+                deleteTrabajoAction={deleteTrabajoAction}
+                reorderTrabajosAction={reorderTrabajosAction}
+                updateCategoriaAction={updateCategoriaAction}
+                onHighlightDismiss={() => setHighlightedCategoriaId(null)}
+              />
+            </ShimmerHighlight>
+          );
+        })}
       </div>
 
-      <AddCategoriaForm action={createCategoriaAction} />
+      <AddCategoriaForm
+        action={createCategoriaAction}
+        onCreatedCategoria={setHighlightedCategoriaId}
+      />
     </div>
   );
 }

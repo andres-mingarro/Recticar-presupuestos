@@ -22,6 +22,7 @@ import { ButtonAdd } from "@/components/ui/ButtonAdd";
 import { useMobileActionsRegister } from "@/components/layout/MobileActions";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { Select } from "@/components/ui/Select";
 import { Table } from "@/components/ui/Table";
 import { Button } from "@/components/ui/Button";
@@ -281,6 +282,10 @@ export function TrabajosPage({
   const hayMas = visibleFinalizados < trabajosFinalizados.length;
 
   const hayFiltros = estado || prioridad || numeroTrabajo;
+  useErrorNotification(
+    errorMessage ? `Error al consultar la base de datos: ${errorMessage}` : null,
+    `${estado ?? ""}:${prioridad ?? ""}:${numeroTrabajo ?? ""}`
+  );
 
   useMobileActionsRegister(
     canEdit ? (
@@ -310,12 +315,6 @@ export function TrabajosPage({
           ) : undefined
         }
       />
-
-      {errorMessage ? (
-        <section className="rounded-2xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-700">
-          Error al consultar la base de datos: {errorMessage}
-        </section>
-      ) : null}
 
       {/* Filtros */}
       <Card as="section">

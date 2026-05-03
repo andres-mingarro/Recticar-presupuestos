@@ -1,7 +1,7 @@
 "use client";
 
 import type { RepuestosActionState } from "@/app/(app)/repuestos/actions";
-import { FormErrorMessage } from "@/components/ui/FormErrorMessage";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 
 export type RepuestosActionFn = (
   state: RepuestosActionState,
@@ -29,5 +29,6 @@ export function AddFooter({ children }: { children: React.ReactNode }) {
 }
 
 export function RowError({ error }: { error: string | null | undefined }) {
-  return <FormErrorMessage error={error} className="px-5 py-2" />;
+  useErrorNotification(error);
+  return null;
 }

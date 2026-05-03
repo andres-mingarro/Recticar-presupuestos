@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { type ActionFn, addFieldCls, addBtnClassName, AddFooter } from "./shared";
 
 export function AddMarcaForm({ action }: { action: ActionFn }) {
@@ -12,6 +13,8 @@ export function AddMarcaForm({ action }: { action: ActionFn }) {
     error: null,
     resetKey: 0,
   });
+  useErrorNotification(state.error, state.resetKey);
+
   return (
     <AddFooter>
       <form
@@ -30,9 +33,6 @@ export function AddMarcaForm({ action }: { action: ActionFn }) {
           {isPending ? "Agregando…" : "Agregar marca"}
         </Button>
       </form>
-      {state.error && (
-        <p className="w-full text-xs text-[var(--color-danger-text)]">{state.error}</p>
-      )}
     </AddFooter>
   );
 }

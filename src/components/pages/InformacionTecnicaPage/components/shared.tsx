@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Icon } from "@/components/ui/Icon";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 
 export type ActionFn = (
   state: TechnicalActionState,
@@ -43,10 +44,8 @@ export function AddFooter({ children }: { children: React.ReactNode }) {
 }
 
 export function RowError({ error }: { error: string | null | undefined }) {
-  if (!error) return null;
-  return (
-    <p className="pb-2 pl-4 text-xs text-[var(--color-danger-text)]">{error}</p>
-  );
+  useErrorNotification(error);
+  return null;
 }
 
 export function ColHeaders({ cols }: { cols: Array<{ label: string; className?: string }> }) {

@@ -5,8 +5,8 @@ import type { CatalogActionState } from "@/app/(app)/precios/actions";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/Dialog";
-import { FormErrorMessage } from "@/components/ui/FormErrorMessage";
 import { Icon } from "@/components/ui/Icon";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { Spinner } from "@/components/ui/Spinner";
 
 type DeleteItemFormProps = {
@@ -33,6 +33,7 @@ export function DeleteItemForm({
   const [confirmedYes, setConfirmedYes] = useState(false);
   const [state, formAction, isPending] = useActionState(action, { error: null });
   const formRef = useRef<HTMLFormElement>(null);
+  useErrorNotification(state.error, `${idFieldName}:${itemId}`);
 
   function submit() {
     formRef.current?.requestSubmit();
@@ -126,8 +127,6 @@ export function DeleteItemForm({
           </DialogContent>
         </Dialog>
       )}
-
-      <FormErrorMessage error={state.error} className="mt-1" />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import type { RepuestoAgrupado } from "@/lib/types";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +10,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { SortableList } from "@/components/sortable/SortableList";
 import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
+import { notifySuccess } from "@/components/ui/NotificationToast";
 import { RowError, type RepuestosActionFn } from "./shared";
 import { SortableRepuestoRow } from "./SortableRepuestoRow";
 import { AddRepuestoForm } from "./AddRepuestoForm";
@@ -21,6 +22,7 @@ export function CategoriaCard({
   deleteRepuestoAction,
   reorderRepuestosAction,
   updateCategoriaAction,
+  onHighlightDismiss,
 }: {
   grupo: RepuestoAgrupado;
   deleteCategoriaAction: RepuestosActionFn;
@@ -28,15 +30,27 @@ export function CategoriaCard({
   deleteRepuestoAction: RepuestosActionFn;
   reorderRepuestosAction: (orderedIds: number[]) => Promise<void>;
   updateCategoriaAction: RepuestosActionFn;
+  onHighlightDismiss?: () => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const lastToastKeyRef = useRef<string | null>(null);
 
   const [saveState, saveFormAction, savePending] = useActionState(updateCategoriaAction, { error: null });
 
   useEffect(() => {
     if (saveState.success) setIsEditing(false);
   }, [saveState]);
+
+  useEffect(() => {
+    if (!saveState.success) return;
+
+    const toastKey = `repuestos-saved-${grupo.categoriaId}`;
+    if (lastToastKeyRef.current === toastKey) return;
+    lastToastKeyRef.current = toastKey;
+
+    notifySuccess(`Cambios guardados en "${grupo.categoriaNombre}".`);
+  }, [saveState.success, grupo.categoriaId, grupo.categoriaNombre]);
 
   const formId = `save-repuestos-cat-${grupo.categoriaId}`;
 
@@ -46,7 +60,7 @@ export function CategoriaCard({
   }
 
   return (
-    <Card noPadding as="section" className="CategoriaCard space-y-0 overflow-hidden" >
+    <Card noPadding as="section" className="CategoriaCard space-y-0 overflow-hidden">
       <form id={formId} action={saveFormAction} className="hidden">
         <input type="hidden" name="categoriaId" value={grupo.categoriaId} />
       </form>
@@ -120,7 +134,10 @@ export function CategoriaCard({
               size="sm"
               variant="dark"
               className="w-full md:w-auto"
-              onClick={() => setIsEditing(true)}
+              onClick={() => {
+                onHighlightDismiss?.();
+                setIsEditing(true);
+              }}
               icon={<Icon name="edit" className="h-3.5 w-3.5" />}
             >
               <span>Editar categoría</span>

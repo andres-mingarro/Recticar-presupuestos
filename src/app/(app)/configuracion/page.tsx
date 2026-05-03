@@ -44,12 +44,12 @@ export default async function ConfiguracionPage({
   const canEdit = isSuperAdmin(session);
   const params = await resolveSearchParams(searchParams);
   const empresa = await getEmpresaConfig();
-  const hasNombreError = params.error === "nombre";
 
   return (
     <div className={cn("ConfiguracionPage", styles.ConfiguracionPage)}>
       <ConfiguracionFeedback
         wasSaved={params.saved === "1"}
+        errorStatus={typeof params.error === "string" ? params.error : undefined}
         cleanupStatus={typeof params.cleanup === "string" ? params.cleanup : undefined}
         deletedCount={typeof params.deleted === "string" ? Number(params.deleted) : undefined}
       />
@@ -310,11 +310,6 @@ export default async function ConfiguracionPage({
               </p>
             </div>
             <div className="flex flex-1 flex-col">
-              {hasNombreError && (
-                <div className="mb-3 rounded-xl border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] px-3 py-2 text-xs text-[var(--color-danger-text)]">
-                  El nombre de la empresa es obligatorio.
-                </div>
-              )}
               <form action={updateEmpresaConfigAction} className="flex h-full flex-col">
                 <div>
                   <FieldRow label="Nombre" icon="settings">

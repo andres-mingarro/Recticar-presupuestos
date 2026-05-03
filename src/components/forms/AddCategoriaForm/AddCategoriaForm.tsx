@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
-import { FormErrorMessage } from "@/components/ui/FormErrorMessage";
 import { Icon } from "@/components/ui/Icon";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { Spinner } from "@/components/ui/Spinner";
 
 type AddCategoriaFormState = {
@@ -17,6 +17,7 @@ type AddCategoriaFormProps = {
   placeholder?: string;
   submitLabel?: string;
   pendingLabel?: string;
+  onCreatedCategoria?: (categoriaId: number) => void;
 };
 
 export function AddCategoriaForm({
@@ -24,11 +25,18 @@ export function AddCategoriaForm({
   placeholder = "Nombre de la nueva categoría…",
   submitLabel = "Nueva categoría",
   pendingLabel = "Creando…",
+  onCreatedCategoria,
 }: AddCategoriaFormProps) {
   const [state, formAction, isPending] = useActionState(action, {
     error: null,
     resetKey: 0,
   });
+  useErrorNotification(state.error, state.resetKey);
+
+  useEffect(() => {
+    if (typeof state.createdCategoriaId !== "number") return;
+    onCreatedCategoria?.(state.createdCategoriaId);
+  }, [state.createdCategoriaId, onCreatedCategoria]);
 
   return (
     <div className="AddCategoriaForm space-y-2">
@@ -54,7 +62,6 @@ export function AddCategoriaForm({
           {isPending ? pendingLabel : submitLabel}
         </Button>
       </form>
-      <FormErrorMessage error={state.error} className="text-sm" />
     </div>
   );
 }

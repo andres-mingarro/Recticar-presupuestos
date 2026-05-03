@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import type { ClienteDetail, ClienteTrabajoItem, TrabajoPrioridad } from "@/lib/types";
 import { formatDate, getVehicleLabel } from "@/lib/format";
@@ -12,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Spinner } from "@/components/ui/Spinner";
 import { Input } from "@/components/ui/Input";
+import { notifySuccess, useErrorNotification } from "@/components/ui/NotificationToast";
 import { Select } from "@/components/ui/Select";
 import { PaymentBadge, PriorityBadge, StatusBadge } from "@/components/ui/Badge";
 import { TrabajoMobileCard } from "@/components/ui/TrabajoMobileCard";
@@ -217,6 +217,7 @@ export function ClienteDetailPage({
   const [state, formAction, isPending] = useActionState(action, initialState);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [dirty, setDirty] = useState(false);
+  useErrorNotification(state.error, `${state.values.nombre}:${state.values.apellido}`);
   const [visibleFinalizados, setVisibleFinalizados] = useState(5);
   const finalizadosVisible = trabajosFinalizados.slice(0, visibleFinalizados);
   const hayMasFinalizados = visibleFinalizados < trabajosFinalizados.length;
@@ -245,7 +246,7 @@ export function ClienteDetailPage({
     const toastKey = `${cliente.id}:${wasCreated ? "created" : "updated"}`;
     if (lastToastKeyRef.current === toastKey) return;
     lastToastKeyRef.current = toastKey;
-    toast.success(
+    notifySuccess(
       wasCreated
         ? `Cliente ${cliente.apellido}, ${cliente.nombre} creado correctamente.`
         : `Cliente ${cliente.apellido}, ${cliente.nombre} guardado correctamente.`
@@ -348,12 +349,6 @@ export function ClienteDetailPage({
               )}
             </div>
           </div>
-
-          {state.error ? (
-            <div className="mt-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {state.error}
-            </div>
-          ) : null}
 
           {/* Info de contacto — modo lectura o edición inline */}
           <div className={cn(styles.infoGrid, isEditOpen && styles.infoGridEditing)}>

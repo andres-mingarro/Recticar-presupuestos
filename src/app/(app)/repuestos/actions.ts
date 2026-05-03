@@ -16,6 +16,7 @@ export type RepuestosActionState = {
   error: string | null;
   resetKey?: number;
   success?: boolean;
+  createdCategoriaId?: number;
 };
 
 function normalize(formData: FormData, key: string) {
@@ -75,13 +76,12 @@ export async function createCategoriaRepuestoAction(
   if (!nombre) return { error: "El nombre es requerido." };
 
   try {
-    await createCategoriaRepuesto(nombre);
+    const categoria = await createCategoriaRepuesto(nombre);
+    revalidatePath("/repuestos");
+    return { error: null, resetKey: Date.now(), createdCategoriaId: categoria.id };
   } catch {
     return { error: "No se pudo crear la categoría." };
   }
-
-  revalidatePath("/repuestos");
-  return { error: null, resetKey: Date.now() };
 }
 
 export async function renameCategoriaRepuestoAction(

@@ -1,0 +1,18 @@
+.NotificationToast {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.title {
+  color: var(--brown-burnt);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.description {
+  color: var(--text-color-gray);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}

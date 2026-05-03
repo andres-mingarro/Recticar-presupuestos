@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import type { RepuestosActionState } from "@/app/(app)/repuestos/actions";
 import { AddCategoriaForm } from "@/components/forms/AddCategoriaForm";
 import type { RepuestoAgrupado } from "@/lib/types";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PdfShareButton } from "@/components/ui/PdfShareButton";
+import { ShimmerHighlight } from "@/components/ui/ShimmerHighlight";
 import { CategoriaCard } from "./components/CategoriaCard";
 
 type RepuestosPageProps = {
@@ -27,6 +29,7 @@ export function RepuestosPage({
   updateCategoriaAction,
 }: RepuestosPageProps) {
   const totalRepuestos = repuestos.reduce((sum, g) => sum + g.repuestos.length, 0);
+  const [highlightedCategoriaId, setHighlightedCategoriaId] = useState<number | null>(null);
 
   return (
     <div className="RepuestosPage space-y-6">
@@ -47,20 +50,29 @@ export function RepuestosPage({
       />
 
       <div className="space-y-4">
-        {repuestos.map((grupo) => (
-          <CategoriaCard
-            key={grupo.categoriaId}
-            grupo={grupo}
-            deleteCategoriaAction={deleteCategoriaAction}
-            createRepuestoAction={createRepuestoAction}
-            deleteRepuestoAction={deleteRepuestoAction}
-            reorderRepuestosAction={reorderRepuestosAction}
-            updateCategoriaAction={updateCategoriaAction}
-          />
-        ))}
+        {repuestos.map((grupo) => {
+          const highlighted = highlightedCategoriaId === grupo.categoriaId;
+
+          return (
+            <ShimmerHighlight key={grupo.categoriaId} active={highlighted}>
+              <CategoriaCard
+                grupo={grupo}
+                deleteCategoriaAction={deleteCategoriaAction}
+                createRepuestoAction={createRepuestoAction}
+                deleteRepuestoAction={deleteRepuestoAction}
+                reorderRepuestosAction={reorderRepuestosAction}
+                updateCategoriaAction={updateCategoriaAction}
+                onHighlightDismiss={() => setHighlightedCategoriaId(null)}
+              />
+            </ShimmerHighlight>
+          );
+        })}
       </div>
 
-      <AddCategoriaForm action={createCategoriaAction} />
+      <AddCategoriaForm
+        action={createCategoriaAction}
+        onCreatedCategoria={setHighlightedCategoriaId}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { LISTAS_PRECIOS, getPrecioLista } from "@/lib/db";
+import { getPrecioLista } from "@/lib/db";
 import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
 import type {
@@ -22,7 +22,6 @@ import { Card } from "@/components/ui/Card";
 import { EstadoStepper } from "@/components/ui/EstadoStepper";
 import { Icon } from "@/components/ui/Icon";
 import { PriceInput } from "@/components/ui/PriceInput";
-import { Textarea } from "@/components/ui/Textarea";
 import { ClienteAutocomplete } from "@/components/search/ClienteAutocomplete";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
 import { Spinner } from "@/components/ui/Spinner";
@@ -34,7 +33,9 @@ import { VehiculoMobileSelector } from "./VehiculoMobileSelector";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { IvaToggle } from "@/components/ui/IvaToggle";
-import { Dialog, DialogContent } from "@/components/ui/Dialog";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
+import { ListaPreciosSelector } from "./ListaPreciosSelector";
+import { ObservacionesField, SectionHeader, TrabajoFormSection } from "./TrabajoFormLayout";
 import styles from "./TrabajoForm.module.scss";
 
 export type TrabajoFormState = {
@@ -75,6 +76,8 @@ type TrabajoFormProps = {
   showCantidad?: boolean;
   onSummaryChange?: (summary: TrabajoFormSummary) => void;
 };
+
+type ItemsTab = "trabajos" | "repuestos";
 
 const prioridadCards: Array<{
   value: TrabajoPrioridad;
@@ -207,10 +210,16 @@ export function TrabajoForm({
   onSummaryChange,
 }: TrabajoFormProps) {
   const [dirty, setDirty] = useState(false);
+  useErrorNotification(
+    state.error,
+    `${state.values.updatedAt ?? ""}:${state.values.estado}:${state.values.clienteId}`
+  );
 
   useEffect(() => {
-    if (isPending) setDirty(false);
+    if (!isPending) return;
+    setDirty(false);
   }, [isPending]);
+
   const {
     selectedIds: selectedTrabajoIds,
     cantidades: trabajoCantidades,
@@ -237,7 +246,7 @@ export function TrabajoForm({
   const [selectedPrioridad, setSelectedPrioridad] = useState(state.values.prioridad);
   const [selectedEstado, setSelectedEstado] = useState(state.values.estado);
   const [selectedClienteLabel, setSelectedClienteLabel] = useState(initialClienteLabel);
-  const [selectedItemsTab, setSelectedItemsTab] = useState<"trabajos" | "repuestos">("trabajos");
+  const [selectedItemsTab, setSelectedItemsTab] = useState<ItemsTab>("trabajos");
   const [wizardOpen, setWizardOpen] = useState(false);
   const [listaDialogOpen, setListaDialogOpen] = useState(false);
   const [wizardInitialStep, setWizardInitialStep] = useState(0);
@@ -375,21 +384,8 @@ export function TrabajoForm({
         />
       ) : null}
 
-      <Card
-        as="section"
-        className={cn(
-          "TrabajoFormSection",
-          styles.TrabajoFormSection
-        )}
-      >
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-            Vehiculo y motor
-          </p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-            Selección técnica
-          </h2>
-        </div>
+      <TrabajoFormSection>
+        <SectionHeader eyebrow="Vehiculo y motor" title="Selección técnica" />
 
         <VehiculoMobileSelector
           marcas={marcas}
@@ -417,7 +413,7 @@ export function TrabajoForm({
 
         {/* Hidden input serie — fuente de verdad para el form en ambos modos */}
         <input type="hidden" name="numeroSerieMotor" value={selectedNumeroSerieMotor ?? ""} />
-      </Card>
+      </TrabajoFormSection>
 
       <div className="space-y-0">
         <Tabs
@@ -430,94 +426,21 @@ export function TrabajoForm({
           ]}
         />
 
-        <Card
-          as="section"
-          className={cn(
-            "TrabajoFormSection -mt-px",
-            styles.TrabajoFormSection
-          )}
-        >
+        <TrabajoFormSection className="-mt-px">
           {selectedItemsTab === "trabajos" ? (
             <>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                  Trabajos
-                </p>
-                <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-                  <Icon name="listCheck" size="lg" className="text-current" />
-                  Checklist por categoria
-                </h2>
-              </div>
+              <SectionHeader
+                eyebrow="Trabajos"
+                title="Checklist por categoria"
+                icon={<Icon name="listCheck" size="lg" className="text-current" />}
+              />
 
-              <div className="rounded-2xl border border-[var(--apricot-light)]/60 bg-[linear-gradient(135deg,var(--cream-warm)/40,var(--peach-soft)/30)] p-3 flex flex-col gap-2.5">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--brown-burnt)]/70">Lista de precios</span>
-
-                {/* Mobile: botón con estilo ButtonGroup */}
-                <div className="md:hidden inline-flex w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setListaDialogOpen(true)}
-                    className="inline-flex flex-1 items-center justify-between gap-2 rounded-xl border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)] transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]"
-                  >
-                    <span className="flex items-center gap-2 uppercase tracking-wider">
-                      <Icon name="clipboardList" className="h-4 w-4 shrink-0" />
-                      Lista {listaPrecios}
-                    </span>
-                    <Icon name="chevronDown" className="h-4 w-4 opacity-80" />
-                  </button>
-                </div>
-
-                {/* Desktop: ButtonGroup */}
-                <div className="hidden md:block w-full">
-                  <ButtonGroup
-                    options={LISTAS_PRECIOS.map((n) => ({ value: n, label: `Lista ${n}`, icon: "clipboardList" as const }))}
-                    value={listaPrecios}
-                    onChange={setListaPrecios}
-                    className="w-full"
-                  />
-                </div>
-
-                <input type="hidden" name="listaPrecios" value={listaPrecios} />
-
-                {/* Modal centrado mobile */}
-                <Dialog open={listaDialogOpen} onOpenChange={setListaDialogOpen}>
-                  <DialogContent variant="centered">
-                    <div className="rounded-t-[20px] bg-[linear-gradient(135deg,var(--cream-warm),rgba(255,255,255,0.95))] border-b border-[rgba(234,88,12,0.12)] pl-6 pr-14 pt-6 pb-4">
-                      <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                        Lista de precios
-                      </p>
-                      <h3 className="mt-1 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-                        Lista {listaPrecios} activa
-                      </h3>
-                      <p className="mt-1 text-xs text-[var(--text-color-gray)]">
-                        Seleccioná la lista activa
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-2 overflow-y-auto p-4">
-                      {LISTAS_PRECIOS.map((n) => {
-                        const isActive = n === listaPrecios;
-                        return (
-                          <button
-                            key={n}
-                            type="button"
-                            onClick={() => { setListaPrecios(n); setListaDialogOpen(false); }}
-                            className={cn(
-                              "flex items-center gap-3 w-full rounded-xl px-4 py-4 text-left text-sm font-semibold transition-all",
-                              isActive
-                                ? "bg-[linear-gradient(135deg,var(--orange-vivid),var(--apricot-light))] text-white shadow-sm"
-                                : "border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--text-color-defult)] hover:bg-[var(--color-surface-alt)]"
-                            )}
-                          >
-                            <Icon name="clipboardList" className="h-5 w-5 shrink-0" />
-                            <span className="flex-1">Lista {n}</span>
-                            {isActive && <Icon name="check" className="h-4 w-4" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+              <ListaPreciosSelector
+                listaPrecios={listaPrecios}
+                listaDialogOpen={listaDialogOpen}
+                onListaChange={setListaPrecios}
+                onDialogOpenChange={setListaDialogOpen}
+              />
 
               <IvaToggle form={formId} />
 
@@ -582,15 +505,11 @@ export function TrabajoForm({
             </>
           ) : (
             <>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                  Repuestos
-                </p>
-                <h2 className="mt-2 inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-                  <Icon name="listCheck" size="lg" className="text-current" />
-                  Checklist por categoria
-                </h2>
-              </div>
+              <SectionHeader
+                eyebrow="Repuestos"
+                title="Checklist por categoria"
+                icon={<Icon name="listCheck" size="lg" className="text-current" />}
+              />
 
               <div className={cn("TrabajoFormChecklist", styles.TrabajoFormChecklist)}>
                 {repuestos.map((grupo) => {
@@ -638,7 +557,7 @@ export function TrabajoForm({
                               key={repuesto.id}
                               checked={isChecked}
                               value={repuesto.id}
-                              onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked, repuesto.precioStock)}
+                              onCheckedChange={(checked) => toggleRepuesto(repuesto.id, checked, repuesto.precioStock, repuesto.precio)}
                               label={
                                 isChecked
                                   ? (snapshotRepuestoNombreById.get(repuesto.id) ?? repuesto.nombre)
@@ -749,25 +668,12 @@ export function TrabajoForm({
               </div>
             </>
           )}
-        </Card>
+        </TrabajoFormSection>
       </div>
 
       {showPrioridadSection ? (
-        <Card
-          as="section"
-          className={cn(
-            "TrabajoFormSection",
-            styles.TrabajoFormSection
-          )}
-        >
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-              Prioridad y estado
-            </p>
-            <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-              Definicion del trabajo
-            </h2>
-          </div>
+        <TrabajoFormSection>
+          <SectionHeader eyebrow="Prioridad y estado" title="Definicion del trabajo" />
 
           <ButtonGroup
             options={prioridadCards}
@@ -784,47 +690,14 @@ export function TrabajoForm({
             allowFinalizado={allowFinalizado}
           />
 
-          <label className={cn("TrabajoFormField", styles.TrabajoFormField)}>
-            <span className="text-sm font-medium text-[var(--text-color-defult)]">
-              Observaciones
-            </span>
-            <Textarea
-              name="observaciones"
-              placeholder="Notas adicionales del trabajo, aclaraciones del trabajo o comentarios del cliente."
-              defaultValue={state.values.observaciones}
-            />
-          </label>
-        </Card>
+          <ObservacionesField withLabel defaultValue={state.values.observaciones} />
+        </TrabajoFormSection>
       ) : (
-        <>
-          <Card
-            as="section"
-            className={cn("TrabajoFormSection", styles.TrabajoFormSection)}
-          >
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                Notas
-              </p>
-              <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-                Observaciones
-              </h2>
-            </div>
-            <label className={cn("TrabajoFormField", styles.TrabajoFormField)}>
-              <Textarea
-                name="observaciones"
-                placeholder="Notas adicionales del trabajo, aclaraciones del trabajo o comentarios del cliente."
-                defaultValue={state.values.observaciones}
-              />
-            </label>
-          </Card>
-        </>
+        <TrabajoFormSection>
+          <SectionHeader eyebrow="Notas" title="Observaciones" />
+          <ObservacionesField defaultValue={state.values.observaciones} />
+        </TrabajoFormSection>
       )}
-
-      {state.error ? (
-        <section className="rounded-[24px] border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] px-5 py-4 text-sm text-[var(--color-danger-text)]">
-          {state.error}
-        </section>
-      ) : null}
 
       {showActions ? (
         <div className={cn("TrabajoFormActions", styles.TrabajoFormActions)}>

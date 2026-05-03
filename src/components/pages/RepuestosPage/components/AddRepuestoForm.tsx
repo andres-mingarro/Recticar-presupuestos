@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Spinner } from "@/components/ui/Spinner";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { AddFooter, addInputCls, type RepuestosActionFn } from "./shared";
 
 export function AddRepuestoForm({
@@ -14,6 +15,7 @@ export function AddRepuestoForm({
   action: RepuestosActionFn;
 }) {
   const [state, formAction, isPending] = useActionState(action, { error: null, resetKey: 0 });
+  useErrorNotification(state.error, state.resetKey);
 
   return (
     <AddFooter>
@@ -38,9 +40,6 @@ export function AddRepuestoForm({
         >
           {isPending ? "Agregando…" : "Agregar repuesto"}
         </Button>
-        {state.error && (
-          <p className="text-xs text-[var(--color-danger-text)]">{state.error}</p>
-        )}
       </form>
     </AddFooter>
   );

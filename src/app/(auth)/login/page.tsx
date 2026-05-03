@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Input } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
+import { useErrorNotification } from "@/components/ui/NotificationToast";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
   const turnstileEnabled = Boolean(turnstileSiteKey);
+  useErrorNotification(error, turnstileResetKey);
 
   const handleTurnstileTokenChange = useCallback((token: string) => {
     setTurnstileToken(token);
@@ -133,8 +135,6 @@ export default function LoginPage() {
               El captcha está desactivado hasta configurar `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
             </p>
           )}
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <Button type="submit" disabled={loading || (turnstileEnabled && !turnstileToken)} className="mt-2 w-full">
             {loading ? "Ingresando..." : "Ingresar"}
