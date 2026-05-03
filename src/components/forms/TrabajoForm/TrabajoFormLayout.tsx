@@ -40,7 +40,7 @@ export function SectionHeader({
       <h2
         className={cn(
           "mt-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]",
-          icon && "inline-flex items-center gap-2"
+          !!icon && "inline-flex items-center gap-2"
         )}
       >
         {icon}
