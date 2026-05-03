@@ -524,6 +524,11 @@ export async function updateTrabajo(
   const cantidadesStock = input.repuestos.map((r) => r.cantidadStock);
   const trabajosCantidades = trabajosIds.map((id) => input.trabajosCantidades[String(id)] ?? 1);
 
+  const totalTrabajos = trabajoSnapshots.reduce((sum, t, i) => sum + t.precioSnapshot * trabajosCantidades[i], 0);
+  const totalRepuestos = input.repuestos.reduce((sum, r) => sum + r.precioUnitario * r.cantidad, 0);
+  const ivaAmount = input.aplicaIva ? Math.round(totalTrabajos * 21 / 100) : 0;
+  const montoCobrado = totalTrabajos + ivaAmount + totalRepuestos;
+
   const rows = await queryRows<{ id: number; updated_at: string }>(
     `
       WITH
@@ -550,6 +555,16 @@ export async function updateTrabajo(
             fecha_aprobacion   = CASE
               WHEN $10::text = 'aprobado' AND fecha_aprobacion IS NULL THEN now()
               ELSE fecha_aprobacion
+            END,
+            fecha_cobrado = CASE
+              WHEN $8::boolean = true AND cobrado = false THEN now()
+              WHEN $8::boolean = false THEN NULL
+              ELSE fecha_cobrado
+            END,
+            monto_cobrado = CASE
+              WHEN $8::boolean = true THEN $29::int
+              WHEN $8::boolean = false THEN NULL
+              ELSE monto_cobrado
             END,
             observaciones      = $13,
             updated_at         = now()
@@ -651,6 +666,7 @@ export async function updateTrabajo(
       vehicleSnapshot.modeloNombreSnapshot,
       vehicleSnapshot.motorNombreSnapshot,
       trabajosCantidades,
+      montoCobrado,
     ]
   );
 

@@ -50,21 +50,21 @@ export async function listHistorialAjustes(): Promise<AjusteListaPreciosRow[]> {
     SELECT
       categoria_id,
       categoria_nombre,
-      ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2)::float AS mes_lista_1,
-      ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2)::float AS mes_lista_2,
-      ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2)::float AS mes_lista_3,
-      ROUND(SUM(ajuste_lista_4) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2)::float AS mes_lista_4,
-      ROUND(SUM(ajuste_lista_5) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2)::float AS mes_lista_5,
-      ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2)::float AS anio_lista_1,
-      ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2)::float AS anio_lista_2,
-      ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2)::float AS anio_lista_3,
-      ROUND(SUM(ajuste_lista_4) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2)::float AS anio_lista_4,
-      ROUND(SUM(ajuste_lista_5) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2)::float AS anio_lista_5,
-      ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2)::float AS doce_meses_lista_1,
-      ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2)::float AS doce_meses_lista_2,
-      ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2)::float AS doce_meses_lista_3,
-      ROUND(SUM(ajuste_lista_4) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2)::float AS doce_meses_lista_4,
-      ROUND(SUM(ajuste_lista_5) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2)::float AS doce_meses_lista_5
+      COALESCE(ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2), 0)::float AS mes_lista_1,
+      COALESCE(ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2), 0)::float AS mes_lista_2,
+      COALESCE(ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2), 0)::float AS mes_lista_3,
+      COALESCE(ROUND(SUM(ajuste_lista_4) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2), 0)::float AS mes_lista_4,
+      COALESCE(ROUND(SUM(ajuste_lista_5) FILTER (WHERE fecha >= date_trunc('month', now()))::numeric, 2), 0)::float AS mes_lista_5,
+      COALESCE(ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2), 0)::float AS anio_lista_1,
+      COALESCE(ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2), 0)::float AS anio_lista_2,
+      COALESCE(ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2), 0)::float AS anio_lista_3,
+      COALESCE(ROUND(SUM(ajuste_lista_4) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2), 0)::float AS anio_lista_4,
+      COALESCE(ROUND(SUM(ajuste_lista_5) FILTER (WHERE fecha >= date_trunc('year', now()))::numeric, 2), 0)::float AS anio_lista_5,
+      COALESCE(ROUND(SUM(ajuste_lista_1) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2), 0)::float AS doce_meses_lista_1,
+      COALESCE(ROUND(SUM(ajuste_lista_2) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2), 0)::float AS doce_meses_lista_2,
+      COALESCE(ROUND(SUM(ajuste_lista_3) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2), 0)::float AS doce_meses_lista_3,
+      COALESCE(ROUND(SUM(ajuste_lista_4) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2), 0)::float AS doce_meses_lista_4,
+      COALESCE(ROUND(SUM(ajuste_lista_5) FILTER (WHERE fecha >= now() - interval '12 months')::numeric, 2), 0)::float AS doce_meses_lista_5
     FROM ajustes_lista_precios
     GROUP BY categoria_id, categoria_nombre
     ORDER BY categoria_nombre ASC
