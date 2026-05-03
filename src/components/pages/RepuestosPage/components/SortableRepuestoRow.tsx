@@ -11,6 +11,7 @@ import { PriceInput } from "@/components/ui/PriceInput";
 import { fieldCls, readCls, type RepuestosActionFn } from "./shared";
 import { DragHandle } from "@/components/ui/DragHandle";
 import { Switch } from "@/components/ui/Switch";
+import { mergeReadableRowTransition, readableRowHoverCls } from "@/components/ui/readableRowHover";
 
 type Repuesto = RepuestoAgrupado["repuestos"][number];
 
@@ -30,7 +31,7 @@ export function SortableRepuestoRow({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: repuesto.id });
 
-  const style = { transform: CSS.Transform.toString(transform), transition };
+  const style = { transform: CSS.Transform.toString(transform), transition: mergeReadableRowTransition(transition) };
 
   const [stockHabilitado, setStockHabilitado] = useState(repuesto.stockHabilitado);
   const [precioStock, setPrecioStock] = useState(repuesto.precioStock);
@@ -41,6 +42,7 @@ export function SortableRepuestoRow({
       style={style}
       className={cn(
         "SortableRepuestoRow flex items-center gap-2 px-3 py-2.5 md:gap-3 md:px-3 md:py-3",
+        readableRowHoverCls,
         index % 2 === 1 && "bg-[var(--color-surface-alt)]/40",
         isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
       )}

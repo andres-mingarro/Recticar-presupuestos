@@ -5,6 +5,7 @@ import type { TechnicalMotor } from "@/lib/types";
 import { cn } from "@/lib/cn";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { readableRowHoverCls } from "@/components/ui/readableRowHover";
 import { type ActionFn, fieldCls, readCls, saveRowBtnCls, RowError, DeleteButton } from "./shared";
 
 export function MotorRow({
@@ -25,7 +26,13 @@ export function MotorRow({
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteAction, { error: null });
 
   return (
-    <div className={cn(index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
+    <div
+      className={cn(
+        "MotorRow",
+        readableRowHoverCls,
+        index % 2 === 1 && "bg-[var(--color-surface-alt)]/40"
+      )}
+    >
       <form
         action={canEdit ? formAction : undefined}
         className="px-2 py-2.5 lg:px-4"

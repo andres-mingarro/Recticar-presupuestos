@@ -7,6 +7,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { readableRowHoverCls } from "@/components/ui/readableRowHover";
 import { type ActionFn, fieldCls, readCls, saveRowBtnCls, RowError, DeleteButton } from "./shared";
 
 export function VehiculoRow({
@@ -54,7 +55,13 @@ export function VehiculoRow({
   }, [togglePending, toggleState.error, pendingHidden, confirmVehiculoHiddenChange, vehiculo.id]);
 
   return (
-    <div className={cn(index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
+    <div
+      className={cn(
+        "VehiculoRow",
+        readableRowHoverCls,
+        index % 2 === 1 && "bg-[var(--color-surface-alt)]/40"
+      )}
+    >
       <form
         action={canEdit ? formAction : undefined}
         className="vehiculos-item px-2 lg:px-4 py-2.5"

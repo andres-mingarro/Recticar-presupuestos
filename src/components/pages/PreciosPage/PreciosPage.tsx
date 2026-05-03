@@ -23,6 +23,12 @@ import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { Incrementor } from "@/components/ui/Incrementor";
 import { PdfShareButton } from "@/components/ui/PdfShareButton";
 import { ShimmerHighlight } from "@/components/ui/ShimmerHighlight";
+import {
+  mergeReadableRowTransition,
+  readableRowGroupCls,
+  readableRowGroupPanelCls,
+  readableRowHoverCls,
+} from "@/components/ui/readableRowHover";
 
 // ─── Category card ────────────────────────────────────────────────────────────
 
@@ -69,7 +75,7 @@ function SortableTrabajoRow({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: trabajo.id });
 
-  const style = { transform: CSS.Transform.toString(transform), transition };
+  const style = { transform: CSS.Transform.toString(transform), transition: mergeReadableRowTransition(transition) };
   const precios = LISTAS_PRECIOS.map((n) => preciosDraft?.[`precioLista${n}`] ?? trabajo[`precioLista${n}`]);
   const names = LISTAS_PRECIOS.map((n) => `precio_lista_${n}`);
   const mobileListLabels = LISTAS_PRECIOS.map((n) => `Precios lista ${n}`);
@@ -79,11 +85,16 @@ function SortableTrabajoRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "precios-item-row border-b-2 md:border-b-0 border-b-[var(--orange-vivid)] last:border-b-0 flex flex-col border-b border-[var(--color-border)]/80 md:flex-row md:items-stretch",
+        "SortableTrabajoRow precios-item-row relative border-b-2 md:border-b-0 border-b-[var(--orange-vivid)] last:border-b-0 flex flex-col border-b border-[var(--color-border)]/80 md:flex-row md:items-stretch",
+        readableRowGroupCls,
+        readableRowHoverCls,
         isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
       )}
     >
-      <div className="precios-item-row-header bg-[var(--gray-30)] md:bg-transparent border-b-[var(--orange-vivid)] flex flex-1 items-start gap-2 px-4 md:px-3 py-3 md:items-center ">
+      <div className={cn(
+        "precios-item-row-header bg-[var(--gray-30)] md:bg-transparent border-b-[var(--orange-vivid)] flex flex-1 items-start gap-2 px-4 md:px-3 py-3 md:items-center md:group-hover/readable-row:bg-transparent md:group-focus-within/readable-row:bg-transparent",
+        readableRowGroupPanelCls
+      )}>
         {isEditing && (
           <div className="mt-1 md:mt-0">
             <DragHandle {...attributes} {...listeners} />
@@ -124,7 +135,10 @@ function SortableTrabajoRow({
         )}
       </div>
 
-      <div className="precios-item-row-footer md:hidden border-t border-[var(--color-border)]/50 bg-[var(--color-surface-alt)]/20 px-4 py-2">
+      <div className={cn(
+        "precios-item-row-footer md:hidden border-t border-[var(--color-border)]/50 bg-[var(--color-surface-alt)]/20 px-4 py-2",
+        readableRowGroupPanelCls
+      )}>
         <div className="divide-y divide-[var(--color-border)]/50">
           {precios.map((precio, i) =>
             isEditing ? (

@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
 import { DeleteItemForm } from "@/components/forms/DeleteItemForm";
+import { readableRowHoverCls } from "@/components/ui/readableRowHover";
 import { type ActionFn, fieldCls, readCls, saveRowBtnCls, RowError } from "./shared";
 
 export function MarcaRow({
@@ -46,7 +47,13 @@ export function MarcaRow({
   const updateFormId = `update-marca-${marca.id}`;
 
   return (
-    <div className={cn(index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
+    <div
+      className={cn(
+        "MarcaRow",
+        readableRowHoverCls,
+        index % 2 === 1 && "bg-[var(--color-surface-alt)]/40"
+      )}
+    >
       {/* form de update: solo campos, sin botones dentro */}
       <form id={updateFormId} action={canEdit ? formAction : undefined}>
         <input type="hidden" name="marcaId" value={marca.id} />

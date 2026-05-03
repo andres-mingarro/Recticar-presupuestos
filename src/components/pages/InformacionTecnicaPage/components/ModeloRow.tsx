@@ -5,6 +5,7 @@ import type { TechnicalMarca, TechnicalModelo } from "@/lib/types";
 import { cn } from "@/lib/cn";
 import { Spinner } from "@/components/ui/Spinner";
 import { PulsatingButton } from "@/components/ui/PulsatingButton";
+import { readableRowHoverCls } from "@/components/ui/readableRowHover";
 import { type ActionFn, fieldCls, readCls, saveRowBtnCls, RowError, DeleteButton } from "./shared";
 import { MarcaDialogSelect } from "./MarcaDialogSelect";
 
@@ -28,7 +29,13 @@ export function ModeloRow({
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteAction, { error: null });
 
   return (
-    <div className={cn("modelo-row-item", index % 2 === 1 && "bg-[var(--color-surface-alt)]/40")}>
+    <div
+      className={cn(
+        "ModeloRow modelo-row-item",
+        readableRowHoverCls,
+        index % 2 === 1 && "bg-[var(--color-surface-alt)]/40"
+      )}
+    >
       <form
         action={canEdit ? formAction : undefined}
         className="px-2 py-2.5 lg:px-4"
