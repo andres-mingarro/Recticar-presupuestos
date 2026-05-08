@@ -15,7 +15,7 @@ type Props = {
 };
 
 export function ModeloMarcaFilter({ marcas, q, tab, marcaId = "" }: Props) {
-  const router = useRouter();
+  const { push } = useRouter();
   const selectedMarca = marcas.find((marca) => String(marca.id) === marcaId) ?? null;
 
   return (
@@ -26,7 +26,7 @@ export function ModeloMarcaFilter({ marcas, q, tab, marcaId = "" }: Props) {
         variant="primary"
         selectedName={selectedMarca?.nombre}
         className="w-[170px] sm:w-[210px]"
-        onChange={(marca) => router.push(buildSectionHref("modelos", q, 1, tab, String(marca.id)))}
+        onChange={(marca) => push(buildSectionHref("modelos", q, 1, tab, String(marca.id)))}
       />
       {marcaId ? (
         <Button
@@ -35,7 +35,7 @@ export function ModeloMarcaFilter({ marcas, q, tab, marcaId = "" }: Props) {
           variant="primary"
           size="md"
           className="shrink-0"
-          icon={<Icon name="x" className="h-4 w-4" />}
+          icon={<Icon name="x" className="size-4" />}
         >
           <span className="hidden sm:inline">Reset</span>
         </Button>

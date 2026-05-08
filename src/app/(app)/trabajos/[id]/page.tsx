@@ -52,11 +52,10 @@ export default async function Page({
     notFound();
   }
 
-  const snapshotTrabajos = await getTrabajosDetalleByTrabajo(
-    trabajoId,
-    (trabajo.lista_precio as 1 | 2 | 3) ?? 1
-  );
-  const snapshotRepuestos = await getRepuestosDetalleByTrabajo(trabajoId);
+  const [snapshotTrabajos, snapshotRepuestos] = await Promise.all([
+    getTrabajosDetalleByTrabajo(trabajoId, (trabajo.lista_precio as 1 | 2 | 3) ?? 1),
+    getRepuestosDetalleByTrabajo(trabajoId),
+  ]);
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const qrSvg = await generateQrSvg(`${baseUrl}/trabajos/${trabajoId}`);

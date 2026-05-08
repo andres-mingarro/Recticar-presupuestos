@@ -26,7 +26,7 @@ export function BusinessDaysDot({
       className={cn(
         "BusinessDaysDot",
         styles.BusinessDaysDot,
-        "inline-block h-2 w-2 shrink-0 rounded-full",
+        "inline-block size-2 shrink-0 rounded-full",
         color,
         className
       )}

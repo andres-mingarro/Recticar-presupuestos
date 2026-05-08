@@ -7,7 +7,7 @@ export function DragHandle(props: React.ButtonHTMLAttributes<HTMLButtonElement>)
       className="DragHandle drag-handle-button flex items-center justify-center cursor-grab touch-none text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)] active:cursor-grabbing"
       {...props}
     >
-      <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" stroke="none">
+      <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="currentColor" stroke="none">
         <circle cx="9" cy="6" r="1.5" />
         <circle cx="15" cy="6" r="1.5" />
         <circle cx="9" cy="12" r="1.5" />

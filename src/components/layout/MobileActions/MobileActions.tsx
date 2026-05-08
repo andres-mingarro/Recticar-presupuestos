@@ -14,7 +14,7 @@ const SWIPE_THRESHOLD = 40;
 
 export function MobileActions() {
   const { actions, menuOpen, setMenuOpen, role, permisos, mobileTotal } = useMobileActions();
-  const router = useRouter();
+  const { back } = useRouter();
   const touchStartY = useRef<number | null>(null);
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -52,10 +52,10 @@ export function MobileActions() {
         <button
           type="button"
           className={styles.btnBack}
-          onClick={() => router.back()}
+          onClick={() => back()}
           aria-label="Volver"
         >
-          <Icon name="chevronLeft" className="h-5 w-5" />
+          <Icon name="chevronLeft" className="size-5" />
         </button>
 
         {/* Acciones de la página actual — crecen en el medio */}

@@ -47,7 +47,7 @@ export function SectionTabs({
                 : "border-[var(--color-border)] bg-white text-[var(--text-color-gray)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
             )}
           >
-            <Icon name={SECTION_ICONS[section]} className="h-4 w-4 shrink-0" />
+            <Icon name={SECTION_ICONS[section]} className="size-4 shrink-0" />
             <span>{SECTION_LABELS[section]}</span>
             <span
               className={cn(

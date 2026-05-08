@@ -83,7 +83,7 @@ export function DeleteButton({ form, disabled, label }: { form: string; disabled
         variant="outline-ghost"
         title="Eliminar"
         className="shrink-0 h-auto p-1.5"
-        icon={<Icon name="trash" className="h-4 w-4" />}
+        icon={<Icon name="trash" className="size-4" />}
         onClick={() => setOpen(true)}
       />
       <ConfirmDialog

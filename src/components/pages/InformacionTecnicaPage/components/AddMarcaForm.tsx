@@ -29,7 +29,7 @@ export function AddMarcaForm({ action }: { action: ActionFn }) {
           disabled={isPending}
           className={cn("w-full sm:min-w-0 sm:flex-1", addFieldCls)}
         />
-        <Button type="submit" disabled={isPending} className={cn("w-full sm:w-auto", addBtnClassName)} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
+        <Button type="submit" disabled={isPending} className={cn("w-full sm:w-auto", addBtnClassName)} icon={isPending ? <Spinner className="size-4" /> : <Icon name="plus" className="size-4" />}>
           {isPending ? "Agregando…" : "Agregar marca"}
         </Button>
       </form>

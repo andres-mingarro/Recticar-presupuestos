@@ -28,7 +28,7 @@ export function SearchForm({
       </label>
 
       <div className="flex w-full gap-3 sm:w-auto">
-        <Button type="submit" className="flex-1 sm:flex-none" icon={<Icon name="search" className="h-4 w-4" />}>
+        <Button type="submit" className="flex-1 sm:flex-none" icon={<Icon name="search" className="size-4" />}>
           Buscar
         </Button>
 
@@ -37,7 +37,7 @@ export function SearchForm({
           href={config.clearHref}
           variant="secondary"
           className="flex-1 sm:flex-none"
-          icon={<Icon name="x" className="h-4 w-4" />}
+          icon={<Icon name="x" className="size-4" />}
         >
           Limpiar
         </Button>

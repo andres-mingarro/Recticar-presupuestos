@@ -26,7 +26,7 @@ type Props = {
 };
 
 export function TrabajoMobileCard({ trabajo, showBusinessDays = true }: Props) {
-  const router = useRouter();
+  const { push } = useRouter();
 
   const businessDays =
     trabajo.estado === "finalizado"
@@ -42,11 +42,11 @@ export function TrabajoMobileCard({ trabajo, showBusinessDays = true }: Props) {
       )}
       role="link"
       tabIndex={0}
-      onClick={() => router.push(`/trabajos/${trabajo.id}`)}
+      onClick={() => push(`/trabajos/${trabajo.id}`)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          router.push(`/trabajos/${trabajo.id}`);
+          push(`/trabajos/${trabajo.id}`);
         }
       }}
     >
@@ -72,7 +72,7 @@ export function TrabajoMobileCard({ trabajo, showBusinessDays = true }: Props) {
 
       {/* Cliente */}
       <div className="flex items-center gap-1.5">
-        <Icon name="user" className="h-3.5 w-3.5 shrink-0 text-[var(--text-color-gray)]" />
+        <Icon name="user" className="size-3.5 shrink-0 text-[var(--text-color-gray)]" />
         {trabajo.cliente_id ? (
           <Link
             href={`/clientes/${trabajo.cliente_id}`}
@@ -108,7 +108,7 @@ export function TrabajoMobileCard({ trabajo, showBusinessDays = true }: Props) {
         <PriorityBadge prioridad={trabajo.prioridad} />
         <div className="flex items-center gap-1 text-[0.7rem] text-[var(--text-color-gray)]">
           <span>{formatDate(trabajo.fecha_creacion)}</span>
-          <Icon name="arrowRight" className="h-3 w-3 text-[var(--color-accent)]/60" />
+          <Icon name="arrowRight" className="size-3 text-[var(--color-accent)]/60" />
           <span className={cn(!getEstadoReferenceDate(trabajo) && "italic opacity-50")}>
             {formatDate(getEstadoReferenceDate(trabajo))}
           </span>

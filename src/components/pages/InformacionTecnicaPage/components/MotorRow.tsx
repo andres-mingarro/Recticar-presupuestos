@@ -35,7 +35,7 @@ export function MotorRow({
     >
       <form
         action={canEdit ? formAction : undefined}
-        className="px-2 py-2.5 lg:px-4"
+        className="p-2.5 lg:px-4"
       >
         <input type="hidden" name="motorId" value={motor.id} />
         {canEdit ? (
@@ -59,7 +59,7 @@ export function MotorRow({
             </div>
             <div className="row-footer flex shrink-0 items-center gap-1.5 self-end lg:self-auto">
               <PulsatingButton size="sm" type="submit" pulsing={!isPending} disabled={isPending} className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}>
-                {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                {isPending ? <Spinner className="size-3.5" /> : null}
                 {isPending ? "Guardando…" : "Guardar"}
               </PulsatingButton>
               <DeleteButton form={deleteFormId} disabled={deletePending} />

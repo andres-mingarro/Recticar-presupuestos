@@ -92,7 +92,7 @@ function SortableTrabajoRow({
       )}
     >
       <div className={cn(
-        "precios-item-row-header bg-[var(--gray-30)] md:bg-transparent border-b-[var(--orange-vivid)] flex flex-1 items-start gap-2 px-4 md:px-3 py-3 md:items-center md:group-hover/readable-row:bg-transparent md:group-focus-within/readable-row:bg-transparent",
+        "precios-item-row-header bg-[var(--gray-30)] md:bg-transparent border-b-[var(--orange-vivid)] flex flex-1 items-start gap-2 px-4 md:p-3 md:items-center md:group-hover/readable-row:bg-transparent md:group-focus-within/readable-row:bg-transparent",
         readableRowGroupPanelCls
       )}>
         {isEditing && (
@@ -365,18 +365,18 @@ function CategoriaCard({
               type="button"
               onClick={() => setEngineIconsOpen(true)}
               title={categoriaIcono ? "Cambiar imagen" : "Asignar imagen"}
-              className="h-8 w-8 shrink-0 rounded-lg border border-dashed border-[var(--color-border)] flex items-center justify-center text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+              className="size-8 shrink-0 rounded-lg border border-dashed border-[var(--color-border)] flex items-center justify-center text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
             >
               {categoriaIcono ? (
-                <EngineIconGlyph name={categoriaIcono} className="h-8 w-8 text-[var(--text-color-defult)]" />
+                <EngineIconGlyph name={categoriaIcono} className="size-8 text-[var(--text-color-defult)]" />
               ) : (
-                <Icon name="plus" className="h-3.5 w-3.5" />
+                <Icon name="plus" className="size-3.5" />
               )}
             </button>
           ) : categoriaIcono ? (
-            <EngineIconGlyph name={categoriaIcono} className="h-8 w-8 shrink-0 text-[var(--text-color-defult)]" />
+            <EngineIconGlyph name={categoriaIcono} className="size-8 shrink-0 text-[var(--text-color-defult)]" />
           ) : (
-            <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+            <Icon name="tag" className="size-4 shrink-0 text-[var(--color-accent)]" />
           )}
           {isEditing ? (
             <input
@@ -409,7 +409,7 @@ function CategoriaCard({
                 disabled={savePending}
                 className="flex flex-1 items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
               >
-                {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
+                {savePending ? <Spinner className="size-3.5" /> : <Icon name="check" className="size-3.5" />}
                 {savePending ? "Guardando…" : "Guardar"}
               </PulsatingButton>
               <Button
@@ -417,7 +417,7 @@ function CategoriaCard({
                 size="sm"
                 variant="outline-dark"
                 onClick={handleCancel}
-                icon={<Icon name="x" className="h-3.5 w-3.5" />}
+                icon={<Icon name="x" className="size-3.5" />}
               >
                 Cancelar
               </Button>
@@ -441,7 +441,7 @@ function CategoriaCard({
                 onHighlightDismiss?.();
                 setIsEditing(true);
               }}
-              icon={<Icon name="edit" className="h-3.5 w-3.5" />}
+              icon={<Icon name="edit" className="size-3.5" />}
             >
               Editar categoría
             </Button>
@@ -535,7 +535,7 @@ function CategoriaCard({
             disabled={addPending}
             className={buttonStyles({ className: "gap-2 w-full md:w-auto !text-white bg-[var(--color-info-text)] uppercase hover:bg-[var(--color-info-text-strong)]" })}
           >
-            {addPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
+            {addPending ? <Spinner className="size-4" /> : <Icon name="plus" className="size-4" />}
             {addPending ? "Agregando…" : "Agregar trabajo"}
           </button>
         </form>

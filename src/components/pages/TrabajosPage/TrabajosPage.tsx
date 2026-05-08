@@ -80,7 +80,7 @@ function TrabajoTable({
   showBusinessDays?: boolean;
   dimmed?: boolean;
 }) {
-  const router = useRouter();
+  const { push } = useRouter();
 
   return (
     <div className="space-y-3">
@@ -142,16 +142,16 @@ function TrabajoTable({
                   )}
                   role="link"
                   tabIndex={0}
-                  onClick={() => router.push(`/trabajos/${trabajo.id}`)}
+                  onClick={() => push(`/trabajos/${trabajo.id}`)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      router.push(`/trabajos/${trabajo.id}`);
+                      push(`/trabajos/${trabajo.id}`);
                     }
                   }}
                 >
                   {/* Número */}
-                  <td className="w-[52px] px-3 py-3.5">
+                  <td className="w-[52px] p-3.5">
                     <span className="font-bold text-[var(--color-accent)]">#</span>
                     <span className="font-bold text-[var(--text-color-defult)]">
                       {trabajo.numero_trabajo}
@@ -159,7 +159,7 @@ function TrabajoTable({
                   </td>
 
                   {/* Cliente */}
-                  <td className="min-w-[130px] px-3 py-3.5">
+                  <td className="min-w-[130px] p-3.5">
                     {trabajo.cliente_id ? (
                       <Link
                         href={`/clientes/${trabajo.cliente_id}`}
@@ -174,7 +174,7 @@ function TrabajoTable({
                   </td>
 
                   {/* Vehículo — marca · modelo · motor en una línea */}
-                  <td className="min-w-[160px] px-3 py-3.5">
+                  <td className="min-w-[160px] p-3.5">
                     <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
                       {trabajo.marca_nombre && (
                         <span className="text-[0.67rem] font-bold uppercase tracking-widest text-[var(--text-color-gray)]">
@@ -193,12 +193,12 @@ function TrabajoTable({
                   </td>
 
                   {/* Estado */}
-                  <td className="w-[110px] px-3 py-3.5">
+                  <td className="w-[110px] p-3.5">
                     <StatusBadge estado={trabajo.estado} compact />
                   </td>
 
                   {/* Cobrado */}
-                  <td className="w-[52px] px-3 py-3.5">
+                  <td className="w-[52px] p-3.5">
                     <span
                       className={cn(
                         "CobroIcon inline-flex items-center justify-center text-xl",
@@ -212,15 +212,15 @@ function TrabajoTable({
                   </td>
 
                   {/* Prioridad */}
-                  <td className="w-[90px] px-3 py-3.5">
+                  <td className="w-[90px] p-3.5">
                     <PriorityBadge prioridad={trabajo.prioridad} />
                   </td>
 
                   {/* Fechas */}
-                  <td className="w-[205px] px-3 py-3.5">
+                  <td className="w-[205px] p-3.5">
                     <div className="flex items-center gap-1.5 text-xs text-[var(--text-color-gray)]">
                       <span>{formatDate(trabajo.fecha_creacion)}</span>
-                      <Icon name="arrowRight" className="h-3 w-3 shrink-0 text-[var(--color-accent)]/60" />
+                      <Icon name="arrowRight" className="size-3 shrink-0 text-[var(--color-accent)]/60" />
                       <span className={cn(!getEstadoReferenceDate(trabajo) && "italic opacity-50")}>
                         {formatDate(getEstadoReferenceDate(trabajo))}
                       </span>
@@ -229,7 +229,7 @@ function TrabajoTable({
 
                   {/* Días hábiles */}
                   {showBusinessDays ? (
-                    <td className="w-[80px] px-3 py-3.5 text-right">
+                    <td className="w-[80px] p-3.5 text-right">
                       {(() => {
                         const days =
                           trabajo.estado === "finalizado"
@@ -293,7 +293,7 @@ export function TrabajosPage({
         href="/trabajos/nuevo"
         className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white text-sm font-semibold shadow-sm"
       >
-        <Icon name="plus" className="h-3.5 w-3.5" />
+        <Icon name="plus" className="size-3.5" />
         Nuevo trabajo
       </Link>
     ) : null
@@ -349,7 +349,7 @@ export function TrabajosPage({
           <div className="flex gap-2">
             <Button
               type="submit"
-              icon={<Icon name="search" className="h-4 w-4" />}
+              icon={<Icon name="search" className="size-4" />}
             >
               Filtrar
             </Button>
@@ -358,7 +358,7 @@ export function TrabajosPage({
                 as="a"
                 href="/trabajos"
                 variant="ghost"
-                icon={<Icon name="x" className="h-4 w-4" />}
+                icon={<Icon name="x" className="size-4" />}
               >
                 Limpiar
               </Button>
@@ -411,7 +411,7 @@ export function TrabajosPage({
             variant="secondary"
             className="w-full"
             onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
-            icon={<Icon name="chevronDown" className="h-4 w-4" />}
+            icon={<Icon name="chevronDown" className="size-4" />}
           >
             Cargar más finalizados
           </Button>
@@ -436,7 +436,7 @@ export function TrabajosPage({
             variant="secondary"
             className="w-full"
             onClick={() => setVisibleFinalizados((v) => v + PAGE_SIZE)}
-            icon={<Icon name="chevronDown" className="h-4 w-4" />}
+            icon={<Icon name="chevronDown" className="size-4" />}
           >
             Cargar más finalizados
           </Button>

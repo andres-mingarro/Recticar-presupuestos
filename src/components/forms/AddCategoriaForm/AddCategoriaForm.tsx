@@ -57,7 +57,7 @@ export function AddCategoriaForm({
           type="submit"
           disabled={isPending}
           className="uppercase bg-[var(--color-info-text)] text-white hover:bg-[var(--color-info-text-strong)]"
-          icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}
+          icon={isPending ? <Spinner className="size-4" /> : <Icon name="plus" className="size-4" />}
         >
           {isPending ? pendingLabel : submitLabel}
         </Button>

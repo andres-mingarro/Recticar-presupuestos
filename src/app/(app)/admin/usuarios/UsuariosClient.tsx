@@ -43,11 +43,11 @@ function EyeToggle({ visible, onToggle }: { visible: boolean; onToggle: () => vo
       aria-label={visible ? "Ocultar" : "Mostrar"}
     >
       {visible ? (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" />
         </svg>
       ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
         </svg>
@@ -98,7 +98,7 @@ function PermisosToggles({
               }`}
             >
               <span
-                className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                className={`pointer-events-none inline-block size-4 rounded-full bg-white shadow transition-transform ${
                   enabled ? "translate-x-4" : "translate-x-0"
                 }`}
               />
@@ -163,7 +163,7 @@ function UsuarioCard({
       {/* Header de la card */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${isSuperAdmin ? "bg-orange-100 text-orange-600" : "bg-slate-100 text-slate-600"}`}>
+          <div className={`flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${isSuperAdmin ? "bg-orange-100 text-orange-600" : "bg-slate-100 text-slate-600"}`}>
             {u.nombre.charAt(0).toUpperCase()}
           </div>
           <div>
@@ -175,7 +175,7 @@ function UsuarioCard({
         </div>
         <div className="flex items-center gap-1">
           <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-semibold ${u.activo ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-100 text-slate-500 border-slate-200"}`}>
-            <span className={`h-1.5 w-1.5 rounded-full ${u.activo ? "bg-emerald-500" : "bg-slate-400"}`} />
+            <span className={`size-1.5 rounded-full ${u.activo ? "bg-emerald-500" : "bg-slate-400"}`} />
             {u.activo ? "Activo" : "Inactivo"}
           </span>
         </div>
@@ -195,7 +195,7 @@ function UsuarioCard({
                 onClick={handleCambiarPassword}
                 className="gap-1.5 shrink-0"
               >
-                {pending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                {pending ? <Spinner className="size-3.5" /> : null}
                 {pending ? "..." : "Guardar"}
               </PulsatingButton>
               <Button size="sm" variant="ghost" onClick={() => { setEditingPassword(false); setNewPassword(""); setShowPassword(false); }}>
@@ -208,7 +208,7 @@ function UsuarioCard({
               size="md"
               variant="outline-ghost"
               onClick={() => { setEditingPassword(true); setNewPassword(""); }}
-              icon={<Icon name="key" className="h-4 w-4" />}
+              icon={<Icon name="key" className="size-4" />}
             >
               Cambiar
             </Button>
@@ -274,7 +274,7 @@ function UsuarioCard({
             title={u.activo ? "Desactivar usuario" : "Activar usuario"}
             onClick={() => toggleActivoAction(u.nombre, !u.activo)}
             className={u.activo ? "text-emerald-600 hover:text-emerald-700" : "text-slate-400 hover:text-slate-600"}
-            icon={<Icon name="power" className="h-4 w-4" />}
+            icon={<Icon name="power" className="size-4" />}
           >
             {u.activo ? "Desactivar" : "Activar"}
           </Button>
@@ -285,7 +285,7 @@ function UsuarioCard({
                 size="sm"
                 variant="danger-ghost"
                 onClick={() => setConfirmEliminar(true)}
-                icon={<Icon name="trash" className="h-4 w-4" />}
+                icon={<Icon name="trash" className="size-4" />}
               >
                 Eliminar
               </Button>
@@ -310,7 +310,7 @@ function UsuarioCard({
             onClick={handleGuardar}
             className="gap-1.5"
           >
-            {pending ? <Spinner className="h-3.5 w-3.5" /> : null}
+            {pending ? <Spinner className="size-3.5" /> : null}
             {pending ? "Guardando..." : "Guardar"}
           </PulsatingButton>
         )}
@@ -394,7 +394,7 @@ export function UsuariosClient({ usuarios, currentNombre, protectedNombre }: Pro
             </div>
             <div className="col-span-2 flex justify-end">
               <Button type="submit" disabled={pending} className="gap-2">
-                {pending ? <Spinner className="h-4 w-4" /> : null}
+                {pending ? <Spinner className="size-4" /> : null}
                 {pending ? "Guardando..." : newRole === "super_admin" ? "Crear administrador" : "Crear operario"}
               </Button>
             </div>

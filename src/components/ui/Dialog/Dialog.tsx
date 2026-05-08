@@ -40,7 +40,7 @@ export function DialogContent({
         <RadixDialog.Title className="sr-only">Diálogo</RadixDialog.Title>
         {children}
         <RadixDialog.Close className={styles.closeButton} aria-label="Cerrar">
-          <Icon name="x" className="h-5 w-5" />
+          <Icon name="x" className="size-5" />
         </RadixDialog.Close>
       </RadixDialog.Content>
     </RadixDialog.Portal>

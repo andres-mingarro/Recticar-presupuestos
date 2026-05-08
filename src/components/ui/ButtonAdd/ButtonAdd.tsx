@@ -21,7 +21,7 @@ export function ButtonAdd({ href, onClick, children, className, classNameInner }
   if (onClick) {
     return (
       <button type="button" onClick={onClick} className={cls}>
-        <Icon name="plus" className="h-4 w-4" />
+        <Icon name="plus" className="size-4" />
         {children}
       </button>
     );
@@ -29,7 +29,7 @@ export function ButtonAdd({ href, onClick, children, className, classNameInner }
 
   return (
     <Link href={href!} className={cn(classNameInner, cls)}>
-      <Icon name="plus" className="h-4 w-4" />
+      <Icon name="plus" className="size-4" />
       {children}
     </Link>
   );

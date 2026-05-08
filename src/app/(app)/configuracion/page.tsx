@@ -29,7 +29,7 @@ function FieldRow({
   return (
     <div className="flex items-center gap-3 border-b border-[var(--color-border)] py-2 last:border-0">
       <span className="flex w-28 shrink-0 items-center gap-1.5 text-xs font-medium text-[var(--text-color-gray)]">
-        <Icon name={icon} className="h-3.5 w-3.5 shrink-0" />
+        <Icon name={icon} className="size-3.5 shrink-0" />
         {label}
       </span>
       <div className="min-w-0 flex-1">{children}</div>
@@ -82,8 +82,8 @@ export default async function ConfiguracionPage({
                   href="/informacion-tecnica"
                   className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgba(234,88,12,0.08)]"
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#fff7ed,#ffe7d1)] text-[var(--color-accent)]">
-                    <Icon name="car" className="h-4 w-4" />
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#fff7ed,#ffe7d1)] text-[var(--color-accent)]">
+                    <Icon name="car" className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-[var(--text-color-defult)]">Información técnica</p>
@@ -91,7 +91,7 @@ export default async function ConfiguracionPage({
                   </div>
                   <Icon
                     name="chevronRight"
-                    className="h-3.5 w-3.5 shrink-0 text-[var(--text-color-gray)] transition group-hover:text-[var(--color-accent)]"
+                    className="size-3.5 shrink-0 text-[var(--text-color-gray)] transition group-hover:text-[var(--color-accent)]"
                   />
                 </a>
 
@@ -100,8 +100,8 @@ export default async function ConfiguracionPage({
                     href="/admin/usuarios"
                     className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgba(234,88,12,0.08)]"
                   >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#fff7ed,#ffe7d1)] text-[var(--color-accent)]">
-                      <Icon name="shieldUser" className="h-4 w-4" />
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#fff7ed,#ffe7d1)] text-[var(--color-accent)]">
+                      <Icon name="shieldUser" className="size-4" />
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-[var(--text-color-defult)]">Usuarios</p>
@@ -109,13 +109,13 @@ export default async function ConfiguracionPage({
                     </div>
                     <Icon
                       name="chevronRight"
-                      className="h-3.5 w-3.5 shrink-0 text-[var(--text-color-gray)] transition group-hover:text-[var(--color-accent)]"
+                      className="size-3.5 shrink-0 text-[var(--text-color-gray)] transition group-hover:text-[var(--color-accent)]"
                     />
                   </a>
                 ) : (
                   <div className="flex items-center gap-3 rounded-xl border border-dashed border-[var(--color-border)] px-3 py-2.5 opacity-40">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-surface-alt)] text-[var(--text-color-gray)]">
-                      <Icon name="shieldUser" className="h-4 w-4" />
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-surface-alt)] text-[var(--text-color-gray)]">
+                      <Icon name="shieldUser" className="size-4" />
                     </span>
                     <div>
                       <p className="text-xs font-semibold text-[var(--text-color-defult)]">Usuarios</p>
@@ -148,7 +148,7 @@ export default async function ConfiguracionPage({
                     <div className="grid grid-cols-2 gap-3">
                       <label className="space-y-1">
                         <span className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-color-gray)]">
-                          <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                          <span className="inline-block size-2 rounded-full bg-emerald-500" />
                           Verde hasta
                         </span>
                         <Input
@@ -164,7 +164,7 @@ export default async function ConfiguracionPage({
                       </label>
                       <label className="space-y-1">
                         <span className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-color-gray)]">
-                          <span className="inline-block h-2 w-2 rounded-full bg-orange-400" />
+                          <span className="inline-block size-2 rounded-full bg-orange-400" />
                           Naranja hasta
                         </span>
                         <Input
@@ -181,17 +181,17 @@ export default async function ConfiguracionPage({
                     </div>
                     <div className="flex items-center gap-4 rounded-xl bg-[var(--color-surface-alt)] px-3 py-2 text-xs text-[var(--text-color-gray)]">
                       <span className="flex items-center gap-1.5">
-                        <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                        <span className="inline-block size-2 rounded-full bg-emerald-500" />
                         0–{empresa.diasHabilesUmbralVerde}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <span className="inline-block h-2 w-2 rounded-full bg-orange-400" />
+                        <span className="inline-block size-2 rounded-full bg-orange-400" />
                         {empresa.diasHabilesUmbralNaranja > empresa.diasHabilesUmbralVerde
                           ? `${empresa.diasHabilesUmbralVerde + 1}–${empresa.diasHabilesUmbralNaranja}`
                           : "Sin tramo naranja"}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <span className="inline-block h-2 w-2 rounded-full bg-rose-500" />
+                        <span className="inline-block size-2 rounded-full bg-rose-500" />
                         +{empresa.diasHabilesUmbralNaranja + 1}
                       </span>
                     </div>
@@ -229,7 +229,7 @@ export default async function ConfiguracionPage({
                           value="true"
                           defaultChecked={empresa.autoEliminarPresupuestosEntregados}
                           disabled={!canEdit}
-                          className="mt-0.5 h-4 w-4 rounded accent-[var(--color-accent)]"
+                          className="mt-0.5 size-4 rounded accent-[var(--color-accent)]"
                         />
                         <span>
                           <span className="block text-sm font-semibold text-[var(--text-color-defult)]">Eliminar automáticamente</span>

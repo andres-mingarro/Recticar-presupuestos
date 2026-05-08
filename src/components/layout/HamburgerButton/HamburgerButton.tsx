@@ -20,7 +20,7 @@ export function HamburgerButton({
       className={cn(
         "HamburgerButton flex shrink-0 items-center justify-center transition-[background,color,border-color] duration-150 ease-in-out",
         type === "header" &&
-          "h-10 w-10 rounded-xl border border-[var(--color-border)] bg-white text-[var(--text-color-defult)] shadow-[0_2px_8px_var(--color-shadow-sm)] hover:border-[var(--color-accent)]",
+          "size-10 rounded-xl border border-[var(--color-border)] bg-white text-[var(--text-color-defult)] shadow-[0_2px_8px_var(--color-shadow-sm)] hover:border-[var(--color-accent)]",
         type === "mobileActions" &&
           "h-full w-[3.2rem] border-l border-[var(--color-sidebar-border)] bg-[var(--color-sidebar-surface)] text-[20px] text-[var(--color-sidebar-text-strong)] active:bg-white/20 active:text-white",
         className
@@ -28,7 +28,7 @@ export function HamburgerButton({
       onClick={onClick}
       aria-label={ariaLabel}
     >
-      <Icon name="menu" className="h-5 w-5" />
+      <Icon name="menu" className="size-5" />
     </button>
   );
 }

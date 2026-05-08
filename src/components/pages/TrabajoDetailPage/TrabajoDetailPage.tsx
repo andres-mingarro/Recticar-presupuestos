@@ -69,13 +69,13 @@ function TrabajoMobileActions({
         pulsing={dirty && !isPending}
         size="sm"
       >
-        {isPending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
+        {isPending ? <Spinner className="size-3.5" /> : <Icon name="check" className="size-3.5" />}
         {isPending ? "Guardando..." : "Guardar"}
       </PulsatingButton>
       <PdfShareButton
         href={`/api/trabajos/${trabajoId}/pdf${mostrarPreciosTrabajos ? "?precios=1" : ""}`}
         filename={`presupuesto-${trabajoId}.pdf`}
-        iconSize="h-3.5 w-3.5"
+        iconSize="size-3.5"
         className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.1)] text-white text-sm font-semibold"
       >
         PDF
@@ -247,7 +247,7 @@ export function TrabajoDetailPage({
           pulsing={dirty && !isPending}
           className="gap-2"
         >
-          {isPending ? <Spinner className="h-4 w-4" /> : null}
+          {isPending ? <Spinner className="size-4" /> : null}
           {isPending ? "Guardando..." : "Guardar trabajo"}
         </PulsatingButton>
       </div>
@@ -281,7 +281,7 @@ export function TrabajoDetailPage({
                   variant="outline"
                   size="sm"
                   className="shrink-0"
-                  icon={<Icon name="idCard" className="h-3.5 w-3.5" />}
+                  icon={<Icon name="idCard" className="size-3.5" />}
                 >
                   Ficha
                 </Button>
@@ -413,19 +413,19 @@ export function TrabajoDetailPage({
             </p>
             <ul className="space-y-2 text-sm leading-relaxed text-[var(--text-color-gray)]">
               <li className="flex gap-2">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--apricot-light)]" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[var(--apricot-light)]" />
                 <span><strong className="text-[var(--text-color-defult)]">Presupuesto entregado</strong> — el cliente ya recibió el presupuesto.</span>
               </li>
               <li className="flex gap-2">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--orange-vivid)]" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[var(--orange-vivid)]" />
                 <span><strong className="text-[var(--text-color-defult)]">Aprobado</strong> — requiere cliente asignado, registra fecha automáticamente.</span>
               </li>
               <li className="flex gap-2">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-emerald-400" />
                 <span><strong className="text-[var(--text-color-defult)]">Finalizado</strong> — mueve el trabajo al historial del cliente.</span>
               </li>
               <li className="flex gap-2">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-border)]" />
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[var(--color-border)]" />
                 <span>La fecha de aprobación se guarda solo la primera vez.</span>
               </li>
             </ul>

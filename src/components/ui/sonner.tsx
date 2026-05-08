@@ -22,16 +22,16 @@ export function Toaster() {
       }}
       icons={{
         success: (
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white shadow-[0_10px_24px_rgba(234,88,12,0.32)]">
-            <Icon name="check" className="h-4 w-4" />
+          <span className="inline-flex size-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white shadow-[0_10px_24px_rgba(234,88,12,0.32)]">
+            <Icon name="check" className="size-4" />
           </span>
         ),
         error: (
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#ef4444,#be123c)] text-white shadow-[0_10px_24px_rgba(190,24,93,0.22)]">
-            <Icon name="x" className="h-4 w-4" />
+          <span className="inline-flex size-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#ef4444,#be123c)] text-white shadow-[0_10px_24px_rgba(190,24,93,0.22)]">
+            <Icon name="x" className="size-4" />
           </span>
         ),
-        close: <Icon name="x" className="h-4 w-4" />,
+        close: <Icon name="x" className="size-4" />,
       }}
       toastOptions={{
         classNames: {
@@ -39,7 +39,7 @@ export function Toaster() {
             "group border-none rounded-[24px] p-0 overflow-hidden",
             "shadow-[0_22px_70px_rgba(15,23,42,0.14)] ring-1 ring-[rgba(128,54,0,0.08)]"
           ),
-          content: "gap-3 px-4 py-4 sm:px-5 sm:py-4",
+          content: "gap-3 p-4 sm:px-5 sm:py-4",
           title: "text-[15px] font-semibold tracking-[-0.01em] text-[var(--brown-burnt)]",
           description: "text-[13px] leading-5 text-[var(--text-color-gray)]",
           icon: "mt-0.5 shrink-0",

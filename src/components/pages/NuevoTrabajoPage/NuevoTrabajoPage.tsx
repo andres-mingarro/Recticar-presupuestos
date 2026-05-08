@@ -165,7 +165,7 @@ function NuevoTrabajoPageContent({
       pulsing={!isPending}
       size="sm"
     >
-      {isPending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
+      {isPending ? <Spinner className="size-3.5" /> : <Icon name="check" className="size-3.5" />}
       {isPending ? "Creando..." : "Crear trabajo"}
     </PulsatingButton>,
     [isPending]

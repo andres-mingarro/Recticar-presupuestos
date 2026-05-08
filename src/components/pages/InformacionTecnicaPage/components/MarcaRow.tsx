@@ -61,7 +61,7 @@ export function MarcaRow({
       </form>
 
       {/* fila visual: ojo + input + botones (fuera del form) */}
-      <div className="flex flex-col gap-2 px-2 py-2.5 sm:flex-row sm:items-center sm:justify-between lg:px-4">
+      <div className="flex flex-col gap-2 p-2.5 sm:flex-row sm:items-center sm:justify-between lg:px-4">
         <div className="row-header flex min-w-0 flex-1 items-center gap-2">
           <Button
             variant="outline-ghost"
@@ -69,7 +69,7 @@ export function MarcaRow({
             disabled={!canEdit}
             className="shrink-0 h-auto p-1.5"
             title={canEdit ? (pendingHidden ? "Ocultar marca (guardar para confirmar)" : "Mostrar marca (guardar para confirmar)") : "Necesitás permisos para guardar"}
-            icon={<Icon name={pendingHidden ? "eyeSlash" : "eye"} className="h-4 w-4" />}
+            icon={<Icon name={pendingHidden ? "eyeSlash" : "eye"} className="size-4" />}
           />
           <input
             form={updateFormId}
@@ -90,7 +90,7 @@ export function MarcaRow({
               disabled={isPending}
               className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}
             >
-              {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
+              {isPending ? <Spinner className="size-3.5" /> : null}
               {isPending ? "Guardando…" : "Guardar"}
             </PulsatingButton>
             <DeleteItemForm

@@ -14,6 +14,8 @@ type ErrorStateAction =
       variant?: Parameters<typeof Button>[0]["variant"];
     };
 
+const EMPTY_ACTIONS: ErrorStateAction[] = [];
+
 type ErrorStateProps = {
   code: string;
   title: string;
@@ -27,13 +29,13 @@ export function ErrorState({
   title,
   description,
   hint,
-  actions = [],
+  actions = EMPTY_ACTIONS,
 }: ErrorStateProps) {
   return (
     <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden px-5 py-10 sm:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.16),transparent_34%)]" />
 
-      <div className="pointer-events-none absolute left-1/2 top-8 h-48 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,209,179,0.45),transparent_68%)] blur-2xl" />
+      <div className="pointer-events-none absolute left-1/2 top-8 size-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,209,179,0.45),transparent_68%)] blur-2xl" />
 
       <Card className="relative z-10 w-full max-w-3xl overflow-hidden border-white/60 bg-white/90 p-0 shadow-[0_32px_100px_rgba(15,23,42,0.12)] backdrop-blur">
         <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
@@ -42,8 +44,8 @@ export function ErrorState({
               Recticar
             </p>
             <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-[var(--color-border)] bg-[var(--cream-warm)] px-4 py-2 text-sm font-semibold text-[var(--brown-burnt)]">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white shadow-[0_12px_24px_rgba(234,88,12,0.26)]">
-                <Icon name="clipboardList" className="h-4 w-4" />
+              <span className="inline-flex size-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white shadow-[0_12px_24px_rgba(234,88,12,0.26)]">
+                <Icon name="clipboardList" className="size-4" />
               </span>
               Estado del sistema
             </div>
@@ -105,7 +107,7 @@ export function ErrorState({
               </ul>
             </div>
 
-            <div className="mt-8 rounded-[24px] border border-dashed border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-4 text-sm leading-6 text-[var(--color-warning-text)]">
+            <div className="mt-8 rounded-[24px] border border-dashed border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-4 text-sm leading-6 text-[var(--color-warning-text)]">
               <p className="font-semibold">Ayuda rápida</p>
               <p className="mt-2">
                 {hint ??

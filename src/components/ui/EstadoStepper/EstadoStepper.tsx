@@ -65,12 +65,12 @@ function StepCircle({
   num: string;
   light?: boolean;
 }) {
-  const base = "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition-all";
+  const base = "flex size-9 shrink-0 items-center justify-center rounded-full border-2 transition-all";
 
   if (status === "completed") {
     return (
       <span className={cn(base, light ? "border-orange-300 bg-orange-100 text-orange-700" : "border-white/40 bg-white/20 text-white")}>
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 6 9 17l-5-5" />
         </svg>
       </span>
@@ -120,7 +120,7 @@ export function EstadoStepperDisplay({ value }: { value: TrabajoEstado }) {
           <div
             key={step.value}
             className={cn(
-              "relative flex flex-1 items-center gap-3 px-4 py-4 text-left text-sm transition sm:px-5",
+              "relative flex flex-1 items-center gap-3 p-4 text-left text-sm transition sm:px-5",
               "cursor-default",
               isPainted ? step.activeBg : "bg-[var(--color-surface)]",
               !isLast && BORDER_RIGHT
@@ -151,7 +151,7 @@ type EstadoStepperProps = {
 };
 
 export function EstadoStepper({ initialValue, name, allowFinalizado, form, value, onChange }: EstadoStepperProps) {
-  const [internalSelected, setInternalSelected] = useState<TrabajoEstado>(normalizeStepperValue(initialValue));
+  const [internalSelected, setInternalSelected] = useState<TrabajoEstado>(() => normalizeStepperValue(initialValue));
   const selected = value ?? internalSelected;
 
   useEffect(() => {
@@ -180,7 +180,7 @@ export function EstadoStepper({ initialValue, name, allowFinalizado, form, value
               onChange?.(step.value);
             }}
             className={cn(
-              "relative flex flex-1 items-center gap-3 px-4 py-4 text-left text-sm transition sm:px-5",
+              "relative flex flex-1 items-center gap-3 p-4 text-left text-sm transition sm:px-5",
               "cursor-pointer hover:brightness-95",
               isPainted ? step.activeBg : "bg-[var(--color-surface)] hover:bg-[var(--color-surface-alt)]",
               !isLast && BORDER_RIGHT

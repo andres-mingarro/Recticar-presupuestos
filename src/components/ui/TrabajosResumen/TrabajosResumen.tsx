@@ -3,6 +3,7 @@
 import { useActionState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoAgrupado, TrabajoAgrupado } from "@/lib/types";
+import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { getPrecioLista } from "@/lib/db";
 import { useTrabajosSeleccion } from "@/components/forms/TrabajoForm/TrabajosSeleccionContext";
 import { useRepuestosSeleccion } from "@/components/forms/TrabajoForm/RepuestosSeleccionContext";
@@ -10,9 +11,12 @@ import { Button } from "@/components/ui/Button";
 import { ListPriceBadge } from "@/components/ui/Badge";
 import { notifyError, notifySuccess } from "@/components/ui/NotificationToast";
 import { formatPrice } from "@/lib/format";
-import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 import { useIva, IVA_PORCENTAJE } from "@/components/ui/IvaToggle";
 import { useMobileActions } from "@/components/layout/MobileActions/MobileActionsContext";
+
+const EMPTY_REPUESTOS: RepuestoAgrupado[] = [];
+const EMPTY_SNAPSHOT_TRABAJOS: TrabajoDetalleItem[] = [];
+const EMPTY_SNAPSHOT_REPUESTOS: RepuestoDetalleItem[] = [];
 
 type TrabajosResumenProps = {
   trabajos: TrabajoAgrupado[];
@@ -28,9 +32,9 @@ type TrabajosResumenProps = {
 
 export function TrabajosResumen({
   trabajos,
-  repuestos = [],
-  snapshotTrabajos = [],
-  snapshotRepuestos = [],
+  repuestos = EMPTY_REPUESTOS,
+  snapshotTrabajos = EMPTY_SNAPSHOT_TRABAJOS,
+  snapshotRepuestos = EMPTY_SNAPSHOT_REPUESTOS,
   refreshSnapshotPricesAction,
 }: TrabajosResumenProps) {
   const { selectedIds, cantidades: trabajoCantidades, listaPrecios } = useTrabajosSeleccion();

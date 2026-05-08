@@ -83,12 +83,12 @@ export function HomePage({
     (canCrearTrabajo || canVerClientes) ? (
       <>
         {canCrearTrabajo && (
-          <Button as="a" href="/trabajos/nuevo" variant="primary" size="sm" icon={<Icon name="plus" className="h-3.5 w-3.5" />}>
+          <Button as="a" href="/trabajos/nuevo" variant="primary" size="sm" icon={<Icon name="plus" className="size-3.5" />}>
             Trabajo
           </Button>
         )}
         {canVerClientes && (
-          <Button as="a" href="/clientes/nuevo" variant="secondary" size="sm" icon={<Icon name="plus" className="h-3.5 w-3.5" />}>
+          <Button as="a" href="/clientes/nuevo" variant="secondary" size="sm" icon={<Icon name="plus" className="size-3.5" />}>
             Cliente
           </Button>
         )}

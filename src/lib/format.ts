@@ -1,13 +1,22 @@
+const DATE_FORMATTER = new Intl.DateTimeFormat("es-AR", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+});
+
+const PRICE_FORMATTER = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
 export function formatDate(value: string | null | undefined) {
   if (!value) {
     return "Sin fecha";
   }
 
-  return new Intl.DateTimeFormat("es-AR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(value));
+  return DATE_FORMATTER.format(new Date(value));
 }
 
 function startOfDay(value: Date) {
@@ -58,12 +67,7 @@ export function getBusinessDaysSince(value: string | null | undefined) {
 }
 
 export function formatPrice(value: number) {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+  return PRICE_FORMATTER.format(value);
 }
 
 export function toIntegerPrice(value: number) {
@@ -75,6 +79,6 @@ export function toIntegerPrice(value: number) {
 }
 
 export function getVehicleLabel(parts: Array<string | null | undefined>) {
-  const filtered = parts.map((part) => part?.trim()).filter(Boolean);
+  const filtered = parts.flatMap((part) => { const t = part?.trim(); return t ? [t] : []; });
   return filtered.length > 0 ? filtered.join(" / ") : "Vehículo sin definir";
 }

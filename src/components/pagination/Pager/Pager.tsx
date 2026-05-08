@@ -35,7 +35,7 @@ export function Pager({
           variant="secondary"
           size="sm"
           className={cn("sm:w-auto", !hasPreviousPage ? "pointer-events-none opacity-50" : undefined)}
-          icon={<Icon name="chevronLeft" className="h-4 w-4" />}
+          icon={<Icon name="chevronLeft" className="size-4" />}
         >
           Anterior
         </Button>
@@ -49,7 +49,7 @@ export function Pager({
           variant="secondary"
           size="sm"
           className={cn("sm:w-auto", !hasNextPage ? "pointer-events-none opacity-50" : undefined)}
-          iconRight={<Icon name="chevronRight" className="h-4 w-4" />}
+          iconRight={<Icon name="chevronRight" className="size-4" />}
         >
           Siguiente
         </Button>

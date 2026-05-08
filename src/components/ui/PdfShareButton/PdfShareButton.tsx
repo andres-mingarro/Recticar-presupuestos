@@ -20,7 +20,7 @@ export function PdfShareButton({
   filename = "presupuesto.pdf",
   variant,
   size,
-  iconSize = "h-4 w-4",
+  iconSize = "size-4",
   className,
   children,
 }: PdfShareButtonProps) {

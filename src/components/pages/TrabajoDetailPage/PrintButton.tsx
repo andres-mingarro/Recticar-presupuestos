@@ -19,7 +19,7 @@ export function PrintButton() {
       variant="dark"
       onClick={startPrintMode}
       className="PrintButton w-full"
-      icon={<Icon name="printer" className="h-4 w-4" />}
+      icon={<Icon name="printer" className="size-4" />}
     >
       IMPRIMIR ETIQUETA
     </Button>

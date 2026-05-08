@@ -214,7 +214,7 @@ export function ClienteForm({
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
-                  className="h-4 w-4"
+                  className="size-4"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -393,7 +393,7 @@ export function ClienteForm({
           )}
         >
           <PulsatingButton type="submit" pulsing={dirty && !isPending} disabled={isPending} className="gap-2">
-            {isPending ? <Spinner className="h-4 w-4" /> : null}
+            {isPending ? <Spinner className="size-4" /> : null}
             {isPending ? pendingLabel : submitLabel}
           </PulsatingButton>
           {cancelMode === "toggle" ? (

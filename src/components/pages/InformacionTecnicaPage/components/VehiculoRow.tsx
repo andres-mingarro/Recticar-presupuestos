@@ -132,7 +132,7 @@ export function VehiculoRow({
                   pendingHidden && "border-[var(--text-color-gray)] text-[var(--text-color-gray)]"
                 )}
                 title={canEdit ? (pendingHidden ? "Mostrar vehículo" : "Ocultar vehículo") : "Necesitás permisos para editar"}
-                icon={<Icon name={pendingHidden ? "eyeSlash" : "eye"} className="h-4 w-4" />}
+                icon={<Icon name={pendingHidden ? "eyeSlash" : "eye"} className="size-4" />}
               />
               {canEdit && (
                 <>
@@ -144,7 +144,7 @@ export function VehiculoRow({
                       disabled={togglePending}
                       className={cn(saveRowBtnCls, "inline-flex items-center gap-1.5")}
                     >
-                      {togglePending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                      {togglePending ? <Spinner className="size-3.5" /> : null}
                       {togglePending ? "Guardando…" : "Guardar"}
                     </PulsatingButton>
                   )}

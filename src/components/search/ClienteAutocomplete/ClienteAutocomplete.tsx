@@ -127,17 +127,17 @@ export function ClienteAutocomplete({
       {selectedId ? (
         /* Selected state: show label + clear button */
         <div className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm">
-          <Icon name="user" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+          <Icon name="user" className="size-4 shrink-0 text-[var(--color-accent)]" />
           <span className="flex-1 font-medium text-[var(--text-color-defult)]">
             {selectedLabel}
           </span>
           <button
             type="button"
             onClick={clearSelection}
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[var(--text-color-gray)] transition hover:bg-[var(--color-surface-alt)] hover:text-[var(--text-color-defult)]"
+            className="flex size-6 shrink-0 items-center justify-center rounded-lg text-[var(--text-color-gray)] transition hover:bg-[var(--color-surface-alt)] hover:text-[var(--text-color-defult)]"
             aria-label="Quitar cliente"
           >
-            <Icon name="x" className="h-3.5 w-3.5" />
+            <Icon name="x" className="size-3.5" />
           </button>
         </div>
       ) : (
@@ -147,7 +147,7 @@ export function ClienteAutocomplete({
             {isLoading ? (
               <svg
                 aria-hidden="true"
-                className="h-4 w-4 animate-spin text-[var(--text-color-gray)]"
+                className="size-4 animate-spin text-[var(--text-color-gray)]"
                 viewBox="0 0 24 24"
                 fill="none"
               >
@@ -155,7 +155,7 @@ export function ClienteAutocomplete({
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
             ) : (
-              <Icon name="search" className="h-4 w-4 text-[var(--text-color-gray)]" />
+              <Icon name="search" className="size-4 text-[var(--text-color-gray)]" />
             )}
           </div>
           <input
@@ -188,7 +188,7 @@ export function ClienteAutocomplete({
                     : "hover:bg-[var(--color-surface-alt)]"
                 )}
               >
-                <Icon name="user" className="h-4 w-4 shrink-0 text-[var(--text-color-gray)]" />
+                <Icon name="user" className="size-4 shrink-0 text-[var(--text-color-gray)]" />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[var(--text-color-defult)]">
                     #{cliente.numero_cliente} · {cliente.apellido}, {cliente.nombre}

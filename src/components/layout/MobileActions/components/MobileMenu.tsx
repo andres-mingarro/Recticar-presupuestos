@@ -36,9 +36,11 @@ type Props = {
   permisos?: string[];
 };
 
-export function MobileMenu({ open, onClose, role, permisos = [] }: Props) {
+const EMPTY_PERMISOS: string[] = [];
+
+export function MobileMenu({ open, onClose, role, permisos = EMPTY_PERMISOS }: Props) {
   const pathname = usePathname();
-  const router = useRouter();
+  const { replace } = useRouter();
   const isSuperAdmin = role === "super_admin";
 
   const items = allItems.filter((item) => {
@@ -50,7 +52,7 @@ export function MobileMenu({ open, onClose, role, permisos = [] }: Props) {
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     onClose();
-    router.replace("/login");
+    replace("/login");
   }
 
   return (
@@ -85,7 +87,7 @@ export function MobileMenu({ open, onClose, role, permisos = [] }: Props) {
 
         <div className={styles.footer}>
           <button type="button" onClick={handleLogout} className={styles.logoutBtn} aria-label="Salir">
-            <Icon name="power" className="h-4 w-4" />
+            <Icon name="power" className="size-4" />
           </button>
           {isSuperAdmin && (
             <Link
@@ -93,7 +95,7 @@ export function MobileMenu({ open, onClose, role, permisos = [] }: Props) {
               onClick={onClose}
               className={cn(styles.configBtn, isActive(pathname, "/configuracion", false) && styles.logoutBtnActive)}
             >
-              <Icon name="settings" className="h-4 w-4" />
+              <Icon name="settings" className="size-4" />
               <span>Configuración</span>
             </Link>
           )}

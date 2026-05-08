@@ -14,6 +14,10 @@ import type {
   TrabajoAgrupado,
 } from "@/lib/types";
 
+const EMPTY_REPUESTOS: RepuestoAgrupado[] = [];
+const EMPTY_SNAPSHOT_TRABAJOS: TrabajoDetalleItem[] = [];
+const EMPTY_SNAPSHOT_REPUESTOS: RepuestoDetalleItem[] = [];
+
 type TrabajoDatosCardProps = {
   estado: TrabajoEstado;
   cobrado: boolean;
@@ -46,7 +50,7 @@ function DataRow({
   return (
     <div className="flex items-center justify-between gap-3">
       <dt className="flex shrink-0 items-center gap-2 text-xs text-[var(--text-color-gray)]">
-        <Icon name={icon} className="h-3.5 w-3.5 shrink-0" />
+        <Icon name={icon} className="size-3.5 shrink-0" />
         {label}
       </dt>
       <dd className="min-w-0 text-right">{children}</dd>
@@ -65,9 +69,9 @@ export function TrabajoDatosCard({
   fechaCreacion,
   fechaAprobacion,
   trabajos,
-  repuestos = [],
-  snapshotTrabajos = [],
-  snapshotRepuestos = [],
+  repuestos = EMPTY_REPUESTOS,
+  snapshotTrabajos = EMPTY_SNAPSHOT_TRABAJOS,
+  snapshotRepuestos = EMPTY_SNAPSHOT_REPUESTOS,
   refreshSnapshotPricesAction,
 }: TrabajoDatosCardProps) {
   const vehicleLabel = getVehicleLabel([marcaNombre, modeloNombre, motorNombre]);

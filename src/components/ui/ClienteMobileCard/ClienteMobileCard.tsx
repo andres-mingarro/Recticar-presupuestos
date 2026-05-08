@@ -12,17 +12,17 @@ type Props = {
 };
 
 export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Props) {
-  const router = useRouter();
+  const { push } = useRouter();
   return (
     <div
       className="ClienteMobileCard flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 cursor-pointer transition-colors hover:border-[rgba(234,88,12,0.3)] hover:bg-[var(--cream-warm)]"
       role="link"
       tabIndex={0}
-      onClick={() => router.push(`/clientes/${cliente.id}`)}
+      onClick={() => push(`/clientes/${cliente.id}`)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          router.push(`/clientes/${cliente.id}`);
+          push(`/clientes/${cliente.id}`);
         }
       }}
     >
@@ -45,7 +45,7 @@ export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Pr
             className="flex items-center gap-1 text-xs text-[var(--text-color-gray)] w-fit"
             onClick={(e) => e.stopPropagation()}
           >
-            <Icon name="phone" className="h-3 w-3 shrink-0" />
+            <Icon name="phone" className="size-3 shrink-0" />
             {cliente.telefono}
           </a>
         ) : (
@@ -77,7 +77,7 @@ export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Pr
         </button>
       ) : (
         <div className="shrink-0 flex items-center justify-center min-w-[2rem]">
-          <Icon name="chevronRight" className="h-4 w-4 text-[var(--text-color-ligth)]" />
+          <Icon name="chevronRight" className="size-4 text-[var(--text-color-ligth)]" />
         </div>
       )}
     </div>

@@ -244,7 +244,7 @@ export function SeleccionTecnicaWizard({
             className="flex-1"
             onClick={() => goTo(step - 1)}
             disabled={!canGoBack}
-            icon={<Icon name="chevronLeft" className="h-4 w-4" />}
+            icon={<Icon name="chevronLeft" className="size-4" />}
           >
             Atrás
           </Button>
@@ -253,7 +253,7 @@ export function SeleccionTecnicaWizard({
             className="flex-1"
             onClick={() => goTo(step + 1)}
             disabled={!canGoNext}
-            iconRight={<Icon name="chevronRight" className="h-4 w-4" />}
+            iconRight={<Icon name="chevronRight" className="size-4" />}
           >
             Adelante
           </Button>

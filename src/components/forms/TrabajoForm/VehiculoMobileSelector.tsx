@@ -54,7 +54,7 @@ function FieldRow({
         hasValue ? "text-[var(--text-color-defult)]" : "text-[var(--text-color-gray)] italic"
       )}>
         {value}
-        <Icon name="chevronRight" className="h-3.5 w-3.5 shrink-0 text-[var(--color-accent)]/60" />
+        <Icon name="chevronRight" className="size-3.5 shrink-0 text-[var(--color-accent)]/60" />
       </span>
     </button>
   );
@@ -98,11 +98,11 @@ export function VehiculoMobileSelector({
                 alt={selectedMarcaNombre ?? ""}
                 width={80}
                 height={80}
-                className="h-20 w-20 shrink-0 object-contain"
+                className="size-20 shrink-0 object-contain"
                 unoptimized
               />
             ) : (
-              <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-2xl font-bold text-[var(--color-accent)]">
+              <span className="flex size-20 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-2xl font-bold text-[var(--color-accent)]">
                 {(selectedMarcaNombre ?? "?")[0].toUpperCase()}
               </span>
             )}
@@ -110,7 +110,7 @@ export function VehiculoMobileSelector({
               <p className="text-[0.65rem] font-bold uppercase tracking-widest text-[var(--text-color-gray)]">Marca</p>
               <p className="truncate text-lg font-bold text-[var(--text-color-defult)]">{selectedMarcaNombre}</p>
             </div>
-            <Icon name="edit" className="h-4 w-4 shrink-0 text-[var(--color-accent)]/60" />
+            <Icon name="edit" className="size-4 shrink-0 text-[var(--color-accent)]/60" />
           </button>
 
           {/* Filas modelo / motor */}
@@ -134,7 +134,7 @@ export function VehiculoMobileSelector({
           type="button"
           variant="hero"
           onClick={() => onOpenWizard(0)}
-          icon={<Icon name="car" className="h-10 w-10" />}
+          icon={<Icon name="car" className="size-10" />}
         >
           Seleccionar vehículo
         </Button>
