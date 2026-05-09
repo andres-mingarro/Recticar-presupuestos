@@ -4,6 +4,18 @@
 
 ---
 
+## Infraestructura de bases de datos
+
+Hay **dos instancias Neon separadas**: dev y prod. El `.env.local` apunta a una u otra según el entorno.
+
+- **Prod** tiene solo datos reales. Al salir a producción tenía ~4 trabajos reales, sin dummy content.
+- **Dev** puede tener datos de seed (`[DS]` y `[DEV-SEED]`) generados por los scripts de seed.
+- El frontend **no filtra ni oculta nada** — todo lo que está en la base se ve en la UI. Si algo no aparece en el front, no está en la base activa.
+- El tamaño reportado por Neon (~65 MB) incluye overhead de WAL, snapshots y la instancia serverless en sí. Los datos reales son mínimos (~9 MB en dev con seed).
+- Scripts de seed corren contra la `DATABASE_URL` del `.env.local` activo — verificar siempre a qué instancia apunta antes de correr cualquier seed.
+
+---
+
 ## Estado actual del proyecto
 
 App interna para gestión de trabajos de rectificación de motores. Empleados logueados (no clientes). Stack: Next.js 15 App Router, React 19, TypeScript, Tailwind CSS v4, SCSS Modules por componente, PostgreSQL (Neon serverless).

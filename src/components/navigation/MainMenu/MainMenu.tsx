@@ -67,7 +67,7 @@ export function MainMenu({ role, permisos = EMPTY_PERMISOS, onClose }: Props) {
               className={cn(styles.link, active && styles.linkActive)}
               onClick={onClose}
             >
-              <Icon name={item.icon} className="h-[1.1rem] w-[1.1rem] shrink-0" />
+              <Icon name={item.icon} className="size-[1.1rem] shrink-0" />
               {item.label}
             </Link>
           );
