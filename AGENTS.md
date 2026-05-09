@@ -82,7 +82,7 @@ This repo also has a richer product and implementation guide in `CLAUDE.md`. Tre
 
 ## Database And Runtime Notes
 
-- Migrations live in `migrations/` and are applied with `npm run db:migrate`.
+- Migrations live in `migrations/` and are applied with `bun run db:migrate`.
 - Pages that read from the database should use `export const dynamic = "force-dynamic"` where the app already expects dynamic DB-backed rendering.
 - Server actions are defined inline in page files with `"use server"`.
 - `redirect()` throws internally in Next.js, so do not wrap it in `try/catch`.
@@ -197,7 +197,7 @@ When optimizing SQL or DB access:
 - If optimizing technical catalog flows, keep fallback behavior to `DATABASE_URL` when `TECHNICAL_DATABASE_URL` is missing.
 - Migrations must go in `migrations/`.
 - Do not change schema silently.
-- If schema changes are needed, explain the migration and how to run `npm run db:migrate`.
+- If schema changes are needed, explain the migration and how to run `bun run db:migrate`.
 
 ### Less Lines Rules
 

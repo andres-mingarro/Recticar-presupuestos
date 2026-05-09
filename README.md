@@ -13,12 +13,12 @@ Aplicación web para gestión de presupuestos y seguimiento de clientes de una r
 ## Scripts
 
 ```bash
-npm run dev
-npm run lint
-npm run build
-npm run db:migrate
-npm run db:reset:dev
-npm run db:seed:dev
+bun dev
+bun run lint
+bun run build
+bun run db:migrate
+bun run db:reset:dev
+bun run db:seed:dev
 ```
 
 ## Variables de entorno
@@ -52,7 +52,7 @@ La base principal guarda `marca_id`, `modelo_id` y `motor_id` en `trabajos`, per
 Las migraciones SQL están en `migrations/` y se ejecutan con:
 
 ```bash
-npm run db:migrate
+bun run db:migrate
 ```
 
 El runner registra cada archivo aplicado en la tabla `schema_migrations`.
@@ -64,7 +64,7 @@ La migración `010_drop_technical_foreign_keys.sql` desacopla `trabajos` del cat
 Reset completo de la base principal:
 
 ```bash
-npm run db:reset:dev
+bun run db:reset:dev
 ```
 
 Esto limpia:
@@ -80,7 +80,7 @@ Esto limpia:
 Seed de desarrollo:
 
 ```bash
-npm run db:seed:dev
+bun run db:seed:dev
 ```
 
 El seed toma combinaciones de marca, modelo y motor desde `TECHNICAL_DATABASE_URL`.

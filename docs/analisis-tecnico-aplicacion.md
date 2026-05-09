@@ -244,7 +244,7 @@ La configuración vive en `empresa_configuracion`: `auto_eliminar_presupuestos_e
 
 Se puede ejecutar manualmente desde `/configuracion`. También existe un endpoint cron en `src/app/api/maintenance/trabajos-cleanup/route.ts` protegido con `CRON_SECRET`.
 
-Para probar: `npm run cleanup:test -- --id=39`
+Para probar: `bun run cleanup:test -- --id=39`
 
 ---
 
@@ -284,7 +284,7 @@ Convenciones:
 
 ## 13. Migraciones
 
-Las migraciones viven en `migrations/` y se aplican con `npm run db:migrate`.
+Las migraciones viven en `migrations/` y se aplican con `bun run db:migrate`.
 
 Migraciones más relevantes para entender el estado actual:
 
@@ -306,10 +306,10 @@ Hay migraciones con números repetidos (`008_*`, `009_*`) — no rompen el runne
 ## 14. Scripts de desarrollo
 
 ```bash
-npm run db:migrate             # Aplica migraciones pendientes
-npm run db:reset:dev           # Borra clientes y trabajos marcados DEV-SEED
-npm run db:seed:dev            # Crea 15 clientes y 15 trabajos de prueba
-npm run cleanup:test -- --id=39  # Prueba limpieza automática sobre un trabajo real
+bun run db:migrate             # Aplica migraciones pendientes
+bun run db:reset:dev           # Borra clientes y trabajos marcados DEV-SEED
+bun run db:seed:dev            # Crea 15 clientes y 15 trabajos de prueba
+bun run cleanup:test -- --id=39  # Prueba limpieza automática sobre un trabajo real
 ```
 
 ---

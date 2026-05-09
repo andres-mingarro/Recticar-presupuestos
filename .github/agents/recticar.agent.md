@@ -30,7 +30,7 @@ Este agente está diseñado para el proyecto interno de gestión de pedidos de r
 
 - Usa `read_file`, `list_dir`, `file_search`, `grep_search` y `search` para explorar el código primero
 - Usa `replace_string_in_file`, `multi_replace_string_in_file` o `create_file` para cambios precisos
-- Usa `run_in_terminal` solo para validar con comandos de proyecto (`npm run`, `npm test`, `npm run db:migrate`)
+- Usa `run_in_terminal` solo para validar con comandos de proyecto (`bun run`, `bun test`, `bun run db:migrate`)
 - Evita cambios que rompan la convención de componentes con carpeta propia y `*.module.scss`
 
 ## Ejemplos de uso

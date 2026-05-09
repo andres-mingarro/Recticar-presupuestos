@@ -219,7 +219,7 @@ El botón `PrintButton` llama a `window.print()`.
 ## Base de datos
 
 - ORM: ninguno. SQL directo con `queryRows<T>()`.
-- Migraciones en `migrations/` (numeradas). Aplicar con `npm run db:migrate`.
+- Migraciones en `migrations/` (numeradas). Aplicar con `bun run db:migrate`.
 - Tipos enum en PostgreSQL: `trabajo_estado` (`pendiente`, `aprobado`, `finalizado`), `trabajo_prioridad` (`baja`, `normal`, `alta`).
 - El valor `pendiente` en `trabajo_estado` es legacy — normalizado a `presupuesto_entregado` al leer. El valor `entregado` existe en el enum (migración 011) pero no se usa en la UI.
 - Migración 014: agrega `precio` y `cantidad` a `trabajo_repuestos`.
@@ -229,9 +229,9 @@ El botón `PrintButton` llama a `window.print()`.
 
 ### Scripts útiles
 ```
-npm run db:migrate       # aplica migraciones sobre la base principal
-npm run db:reset:dev     # borra clientes y trabajos fake marcados como DEV-SEED
-npm run db:seed:dev      # crea 15 clientes fake y 15 trabajos fake
+bun run db:migrate       # aplica migraciones sobre la base principal
+bun run db:reset:dev     # borra clientes y trabajos fake marcados como DEV-SEED
+bun run db:seed:dev      # crea 15 clientes fake y 15 trabajos fake
 ```
 
 ---
