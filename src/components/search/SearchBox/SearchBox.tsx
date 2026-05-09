@@ -165,7 +165,7 @@ export function SearchBox({
                   <Link
                     key={item.id}
                     href={config.getHref(item as never)}
-                    className="flex items-center justify-between gap-3 rounded-xl bg-[var(--color-surface)] px-3 py-3 transition hover:bg-[var(--color-surface-alt)]"
+                    className="flex items-center justify-between gap-3 rounded-xl bg-[var(--color-surface)] p-3 transition hover:bg-[var(--color-surface-alt)]"
                     onClick={() => setIsOpen(false)}
                   >
                     <div className="min-w-0">

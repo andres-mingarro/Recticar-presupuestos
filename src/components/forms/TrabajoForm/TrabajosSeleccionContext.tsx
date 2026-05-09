@@ -15,9 +15,11 @@ type TrabajosSeleccionContextValue = {
 
 const TrabajosSeleccionContext = createContext<TrabajosSeleccionContextValue | null>(null);
 
+const EMPTY_CANTIDADES: Record<number, number> = {};
+
 export function TrabajosSeleccionProvider({
   initialIds,
-  initialCantidades = {},
+  initialCantidades = EMPTY_CANTIDADES,
   initialListaPrecios = 1,
   children,
 }: {

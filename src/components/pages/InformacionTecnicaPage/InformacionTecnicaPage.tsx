@@ -96,7 +96,7 @@ function TabLinks<T extends string>({
             opt.value === activeValue ? activeCls : inactiveCls
           )}
         >
-          <Icon name={opt.icon} className="h-4 w-4 shrink-0" />
+          <Icon name={opt.icon} className="size-4 shrink-0" />
           <span className="whitespace-nowrap">{opt.label}</span>
         </Link>
       ))}

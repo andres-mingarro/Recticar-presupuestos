@@ -11,6 +11,13 @@ import styles from "./EstadisticasPage.module.scss";
 
 const MESES_ABREV = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
+const MONTO_FORMATTER = new Intl.NumberFormat("es-AR");
+const CURRENCY_FORMATTER = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumFractionDigits: 0,
+});
+
 type Props = {
   anioSeleccionado: number;
   aniosDisponibles: number[];
@@ -21,7 +28,7 @@ type Props = {
 
 function formatMonto(value: number) {
   if (value === 0) return null;
-  return `$${new Intl.NumberFormat("es-AR").format(value)}`;
+  return `$${MONTO_FORMATTER.format(value)}`;
 }
 
 function BarChart({ datosMensuales }: { datosMensuales: CobradoMensualRow[] }) {
@@ -136,7 +143,7 @@ export function EstadisticasPage({
             <span className={styles.chartTotalLabel}>cobrados en {anioSeleccionado}</span>
             {totalFacturadoAnio > 0 && (
               <span className={styles.chartTotalMonto}>
-                {new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(totalFacturadoAnio)}
+                {CURRENCY_FORMATTER.format(totalFacturadoAnio)}
               </span>
             )}
           </div>
@@ -167,7 +174,7 @@ export function EstadisticasPage({
                   <span className={styles.summaryAnio}>{row.anio}</span>
                   <span className={styles.summaryCantidad}>{row.cantidad}</span>
                   <span className={styles.summaryTotal}>
-                    {row.total > 0 ? new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(row.total) : "—"}
+                    {row.total > 0 ? CURRENCY_FORMATTER.format(row.total) : "—"}
                   </span>
                 </Link>
               ))}

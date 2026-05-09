@@ -52,7 +52,7 @@ export function DeleteItemForm({
           title={title}
           className="delete-item-form h-auto p-1.5"
           onClick={() => setOpen(true)}
-          icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="trash" className="h-4 w-4" />}
+          icon={isPending ? <Spinner className="size-4" /> : <Icon name="trash" className="size-4" />}
         />
       </form>
 
@@ -119,7 +119,7 @@ export function DeleteItemForm({
                   setConfirmedYes(false);
                   submit();
                 }}
-                icon={<Icon name="trash" className="h-4 w-4" />}
+                icon={<Icon name="trash" className="size-4" />}
               >
                 {isPending ? "Eliminando…" : "Eliminar"}
               </Button>

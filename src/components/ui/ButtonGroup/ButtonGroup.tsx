@@ -46,7 +46,7 @@ export function ButtonGroup<T extends string | number>({
                 : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]"
             )}
           >
-            {option.icon ? <Icon name={option.icon} className="h-4 w-4 shrink-0" /> : null}
+            {option.icon ? <Icon name={option.icon} className="size-4 shrink-0" /> : null}
             <span className="whitespace-nowrap">{option.label}</span>
           </button>
         );

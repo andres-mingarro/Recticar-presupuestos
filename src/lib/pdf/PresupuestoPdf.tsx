@@ -182,22 +182,26 @@ const styles = StyleSheet.create({
   footerText: { fontSize: 9, color: palette.muted },
 });
 
+const PDF_PRICE_FORMATTER = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
+const PDF_DATE_FORMATTER = new Intl.DateTimeFormat("es-AR", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+});
+
 function formatPrecio(value: number) {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+  return PDF_PRICE_FORMATTER.format(value);
 }
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "Sin fecha";
-  return new Intl.DateTimeFormat("es-AR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(value));
+  return PDF_DATE_FORMATTER.format(new Date(value));
 }
 
 function groupByCategory(trabajos: TrabajoDetalleItem[]) {

@@ -40,7 +40,7 @@ export function AddVehiculoForm({ action }: { action: ActionFn }) {
           placeholder="Buscar motor…"
           className="w-full sm:w-52 sm:shrink-0"
         />
-        <Button type="submit" disabled={isPending} className={cn("w-full sm:w-auto", addBtnClassName)} icon={isPending ? <Spinner className="h-4 w-4" /> : <Icon name="plus" className="h-4 w-4" />}>
+        <Button type="submit" disabled={isPending} className={cn("w-full sm:w-auto", addBtnClassName)} icon={isPending ? <Spinner className="size-4" /> : <Icon name="plus" className="size-4" />}>
           {isPending ? "Agregando…" : "Agregar relación"}
         </Button>
       </form>

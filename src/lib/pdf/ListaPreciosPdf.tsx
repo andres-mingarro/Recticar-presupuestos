@@ -89,21 +89,25 @@ const styles = StyleSheet.create({
   footerText: { fontSize: 7.5, color: palette.muted },
 });
 
+const LP_PRICE_FORMATTER = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
+const LP_DATE_FORMATTER = new Intl.DateTimeFormat("es-AR", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+});
+
 function formatPrecio(value: number) {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+  return LP_PRICE_FORMATTER.format(value);
 }
 
 function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("es-AR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(date);
+  return LP_DATE_FORMATTER.format(date);
 }
 
 type Props = {

@@ -67,7 +67,7 @@ export function ClientesPage({
   const hasNextPage = currentPage < totalPages;
   const pageStart = totalClientes === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const pageEnd = Math.min(currentPage * pageSize, totalClientes);
-  const router = useRouter();
+  const { push, replace } = useRouter();
   const [isPendingNavigation, startTransition] = useTransition();
   const [panelClientId, setPanelClientId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState(q);
@@ -84,7 +84,7 @@ export function ClientesPage({
         href="/clientes/nuevo"
         className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white text-sm font-semibold shadow-sm"
       >
-        <Icon name="plus" className="h-3.5 w-3.5" />
+        <Icon name="plus" className="size-3.5" />
         Nuevo cliente
       </Link>
     ) : null
@@ -122,12 +122,12 @@ export function ClientesPage({
       const nextHref = buildClientesHref(normalizedQuery, 1);
       submittedQueryRef.current = normalizedQuery;
       startTransition(() => {
-        router.replace(nextHref);
+        replace(nextHref);
       });
     }, 300);
 
     return () => window.clearTimeout(timeoutId);
-  }, [router, searchQuery]);
+  }, [replace, searchQuery]);
 
   useEffect(() => {
     const scrollContainer = document.querySelector(".AppMain");
@@ -240,25 +240,25 @@ export function ClientesPage({
               <tr>
                 <th className="px-4 py-3 font-semibold w-[140px]">
                   <span className="inline-flex items-center gap-2">
-                    <Icon name="hash" className="h-4 w-4" />
+                    <Icon name="hash" className="size-4" />
                     N° Cliente
                   </span>
                 </th>
                 <th className="px-4 py-3 font-semibold">
                   <span className="inline-flex items-center gap-2">
-                    <Icon name="user" className="h-4 w-4" />
+                    <Icon name="user" className="size-4" />
                     Nombre completo
                   </span>
                 </th>
                 <th className="px-4 py-3 font-semibold w-[150px]">
                   <span className="inline-flex items-center gap-2">
-                    <Icon name="phone" className="h-4 w-4" />
+                    <Icon name="phone" className="size-4" />
                     Teléfono
                   </span>
                 </th>
                 <th className="px-4 py-3 font-semibold w-[180px]">
                   <span className="inline-flex items-center gap-2">
-                    <Icon name="clipboard" className="h-4 w-4" />
+                    <Icon name="clipboard" className="size-4" />
                     Pendientes
                   </span>
                 </th>
@@ -281,18 +281,18 @@ export function ClientesPage({
                     className="group cursor-pointer border-t border-[var(--color-border)] text-[var(--text-color-defult)] transition hover:bg-[var(--color-surface-alt)] focus-within:bg-[var(--color-surface-alt)]"
                     role="link"
                     tabIndex={0}
-                    onClick={() => router.push(`/clientes/${cliente.id}`)}
+                    onClick={() => push(`/clientes/${cliente.id}`)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        router.push(`/clientes/${cliente.id}`);
+                        push(`/clientes/${cliente.id}`);
                       }
                     }}
                   >
-                    <td className="px-4 py-4 font-semibold">
+                    <td className="p-4 font-semibold">
                       #{cliente.numero_cliente}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="p-4">
                       <span
                         className={cn(
                           "ClientesPageTableLink",
@@ -303,7 +303,7 @@ export function ClientesPage({
                         {cliente.apellido}, {cliente.nombre}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="p-4">
                       {cliente.telefono ? (
                         <Button
                           as="a"
@@ -318,7 +318,7 @@ export function ClientesPage({
                         "Sin teléfono"
                       )}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="p-4">
                       {(() => {
                         const count = (pendingTrabajosByCliente[cliente.id] ?? []).length;
                         return (
@@ -402,7 +402,7 @@ export function ClientesPage({
                 variant="ghost"
                 size="sm"
                 onClick={closePanel}
-                icon={<Icon name="x" className="h-4 w-4" />}
+                icon={<Icon name="x" className="size-4" />}
               >
                 Cerrar
               </Button>
@@ -433,7 +433,7 @@ export function ClientesPage({
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-sm font-semibold text-[var(--text-color-defult)]">
                           <span className="inline-flex items-center gap-2">
-                            <Icon name="clipboard" className="h-4 w-4" />
+                            <Icon name="clipboard" className="size-4" />
                             Trabajo #{trabajo.numero_trabajo}
                           </span>
                         </p>
@@ -444,7 +444,7 @@ export function ClientesPage({
                       </div>
                       <p className="text-sm text-[var(--text-color-gray)]">
                         <span className="inline-flex items-center gap-2">
-                          <Icon name="car" className="h-4 w-4" />
+                          <Icon name="car" className="size-4" />
                           {getVehicleLabel([
                             trabajo.marca_nombre,
                             trabajo.modelo_nombre,

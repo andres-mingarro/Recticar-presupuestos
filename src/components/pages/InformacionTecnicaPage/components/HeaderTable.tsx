@@ -59,7 +59,7 @@ export function HeaderTable({
         {/* Row 1: título + tabs */}
         <div className="toolbar-inner flex justify-between lg:flex-row flex-col items-center gap-2 px-4 py-2">
           <div className="toolbar-header">
-            <Icon name="tag" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+            <Icon name="tag" className="size-4 shrink-0 text-[var(--color-accent)]" />
             <span className="text-lg lg:text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
               {SECTION_LABELS[section]}
             </span>
@@ -93,11 +93,11 @@ export function HeaderTable({
                     href={buildSectionHref(section, q, currentPage - 1, tab, marcaId)}
                     className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                   >
-                    <Icon name="chevronLeft" className="h-3.5 w-3.5" />
+                    <Icon name="chevronLeft" className="size-3.5" />
                   </Link>
                 ) : (
                   <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--text-color-gray)] opacity-40">
-                    <Icon name="chevronLeft" className="h-3.5 w-3.5" />
+                    <Icon name="chevronLeft" className="size-3.5" />
                   </span>
                 )}
                 <span className="text-xs text-[var(--text-color-gray)]">
@@ -110,11 +110,11 @@ export function HeaderTable({
                     href={buildSectionHref(section, q, currentPage + 1, tab, marcaId)}
                     className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                   >
-                    <Icon name="chevronRight" className="h-3.5 w-3.5" />
+                    <Icon name="chevronRight" className="size-3.5" />
                   </Link>
                 ) : (
                   <span className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1.5 text-[var(--text-color-gray)] opacity-40">
-                    <Icon name="chevronRight" className="h-3.5 w-3.5" />
+                    <Icon name="chevronRight" className="size-3.5" />
                   </span>
                 )}
               </div>
@@ -132,7 +132,7 @@ export function HeaderTable({
 
       {/* ── Rows ── */}
       {totalItems === 0 ? (
-        <p className="px-4 py-4 text-sm text-[var(--text-color-gray)]">{emptyLabel}</p>
+        <p className="p-4 text-sm text-[var(--text-color-gray)]">{emptyLabel}</p>
       ) : (
         <div>{children}</div>
       )}

@@ -32,6 +32,9 @@ import { EngineIconGlyph, isEngineIconName } from "@/components/ui/EngineIcons";
 import { VehiculoMobileSelector } from "./VehiculoMobileSelector";
 import type { TrabajoDetalleItem } from "@/lib/queries/catalogo";
 import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
+
+const EMPTY_SNAPSHOT_TRABAJOS: TrabajoDetalleItem[] = [];
+const EMPTY_SNAPSHOT_REPUESTOS: RepuestoDetalleItem[] = [];
 import { IvaToggle } from "@/components/ui/IvaToggle";
 import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { ListaPreciosSelector } from "./ListaPreciosSelector";
@@ -143,7 +146,7 @@ function GrupoAccordion({
             className={cn(
               "TrabajoFormAccordionChevron",
               styles.TrabajoFormAccordionChevron,
-              "h-4 w-4 text-[var(--text-color-gray)] transition-transform duration-200",
+              "size-4 text-[var(--text-color-gray)] transition-transform duration-200",
               open && "rotate-180"
             )}
           />
@@ -197,8 +200,8 @@ export function TrabajoForm({
   relations,
   trabajos,
   repuestos,
-  snapshotTrabajos = [],
-  snapshotRepuestos = [],
+  snapshotTrabajos = EMPTY_SNAPSHOT_TRABAJOS,
+  snapshotRepuestos = EMPTY_SNAPSHOT_REPUESTOS,
   allowFinalizado = false,
   formId,
   prioridadValue,
@@ -459,7 +462,7 @@ export function TrabajoForm({
                           {isEngineIconName(grupo.categoriaIcono) ? (
                             <EngineIconGlyph
                               name={grupo.categoriaIcono}
-                              className={cn("h-6 w-6 shrink-0", hasSelected ? "text-[var(--color-accent)]" : "text-[var(--text-color-gray)]")}
+                              className={cn("size-6 shrink-0", hasSelected ? "text-[var(--color-accent)]" : "text-[var(--text-color-gray)]")}
                             />
                           ) : null}
                           <span className={cn("text-sm font-semibold", hasSelected ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-defult)]")}>
@@ -707,7 +710,7 @@ export function TrabajoForm({
             disabled={isPending}
             className="w-full flex-1 gap-2"
           >
-            {isPending ? <Spinner className="h-4 w-4" /> : null}
+            {isPending ? <Spinner className="size-4" /> : null}
             {isPending ? "Guardando..." : "Guardar trabajo"}
           </PulsatingButton>
           <Button

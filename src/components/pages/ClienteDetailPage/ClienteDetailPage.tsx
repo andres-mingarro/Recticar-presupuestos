@@ -127,24 +127,24 @@ function TrabajoTable({
                       PRIORIDAD_ROW_ACCENT[trabajo.prioridad]
                     )}
                   >
-                    <td className="px-3 py-3.5">
+                    <td className="p-3.5">
                       <span className="font-bold text-[var(--color-accent)]">#</span>
                       <span className="font-bold text-[var(--text-color-defult)]">{trabajo.numero_trabajo}</span>
                     </td>
-                    <td className="px-3 py-3.5 text-sm text-[var(--text-color-defult)]">
+                    <td className="p-3.5 text-sm text-[var(--text-color-defult)]">
                       {getVehicleLabel([trabajo.marca_nombre, trabajo.modelo_nombre, trabajo.motor_nombre])}
                     </td>
-                    <td className="px-3 py-3.5"><PriorityBadge prioridad={trabajo.prioridad} /></td>
-                    <td className="px-3 py-3.5"><PaymentBadge cobrado={trabajo.cobrado} /></td>
-                    <td className="px-3 py-3.5"><StatusBadge estado={trabajo.estado} compact /></td>
-                    <td className="px-3 py-3.5 text-xs text-[var(--text-color-gray)]">{formatDate(trabajo.fecha_creacion)}</td>
-                    <td className="px-3 py-3.5 text-right">
+                    <td className="p-3.5"><PriorityBadge prioridad={trabajo.prioridad} /></td>
+                    <td className="p-3.5"><PaymentBadge cobrado={trabajo.cobrado} /></td>
+                    <td className="p-3.5"><StatusBadge estado={trabajo.estado} compact /></td>
+                    <td className="p-3.5 text-xs text-[var(--text-color-gray)]">{formatDate(trabajo.fecha_creacion)}</td>
+                    <td className="p-3.5 text-right">
                       <Button
                         as="a"
                         href={`/trabajos/${trabajo.id}`}
                         variant="ghost"
                         size="sm"
-                        iconRight={<Icon name="arrowRight" className="h-3.5 w-3.5" />}
+                        iconRight={<Icon name="arrowRight" className="size-3.5" />}
                       >
                         Ver trabajo
                       </Button>
@@ -176,7 +176,7 @@ function ClienteMobileActions({
         href={`/trabajos/nuevo?clienteId=${clienteId}`}
         className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white text-sm font-semibold shadow-sm"
       >
-        <Icon name="plus" className="h-3.5 w-3.5" />
+        <Icon name="plus" className="size-3.5" />
         Nuevo trabajo
       </Link>
       {hasPhone && (
@@ -184,9 +184,9 @@ function ClienteMobileActions({
           href={`https://wa.me/${waNumber}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.1)] text-white"
+          className="inline-flex items-center justify-center size-9 rounded-xl border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.1)] text-white"
         >
-          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="currentColor">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
           </svg>
         </a>
@@ -319,7 +319,7 @@ export function ClienteDetailPage({
                     variant="outline"
                     size="sm"
                     onClick={() => setIsEditOpen(true)}
-                    icon={<Icon name="edit" className="h-3.5 w-3.5" />}
+                    icon={<Icon name="edit" className="size-3.5" />}
                   >
                     Editar
                   </Button>
@@ -333,7 +333,7 @@ export function ClienteDetailPage({
                     pulsing={dirty && !isPending}
                     disabled={isPending}
                   >
-                    {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                    {isPending ? <Spinner className="size-3.5" /> : null}
                     {isPending ? "Guardando..." : "Guardar"}
                   </PulsatingButton>
                   <Button
@@ -341,7 +341,7 @@ export function ClienteDetailPage({
                     variant="outline"
                     size="sm"
                     onClick={() => setIsEditOpen(false)}
-                    icon={<Icon name="x" className="h-3.5 w-3.5" />}
+                    icon={<Icon name="x" className="size-3.5" />}
                   >
                     Cancelar
                   </Button>
@@ -356,7 +356,7 @@ export function ClienteDetailPage({
             {/* Teléfono + Ciudad */}
             <div className={styles.infoGridRow}>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}><Icon name="phone" className="h-3.5 w-3.5" />Teléfono</span>
+                <span className={styles.infoLabel}><Icon name="phone" className="size-3.5" />Teléfono</span>
                 {isEditOpen ? (
                   <Input name="telefono" placeholder="Ej. 11 5555 5555" defaultValue={state.values.telefono} className={styles.infoInput} />
                 ) : (
@@ -365,7 +365,7 @@ export function ClienteDetailPage({
                       <span className={styles.infoActions}>
                         <Button as="a" href={`tel:${rawPhone}`} variant="link">{cliente.telefono}</Button>
                         <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className={styles.infoChip}>
-                          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor">
+                          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-3.5" fill="currentColor">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
                           </svg>
                           WhatsApp
@@ -376,7 +376,7 @@ export function ClienteDetailPage({
                 )}
               </div>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}><Icon name="mapPin" className="h-3.5 w-3.5" />Ciudad</span>
+                <span className={styles.infoLabel}><Icon name="mapPin" className="size-3.5" />Ciudad</span>
                 {isEditOpen ? (
                   esChubut ? (
                     <Select name="ciudad" value={selectedCiudad} onChange={(e) => setSelectedCiudad(e.target.value)} className={styles.infoInput}>
@@ -394,7 +394,7 @@ export function ClienteDetailPage({
             {/* Email + Provincia */}
             <div className={styles.infoGridRow}>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}><Icon name="mail" className="h-3.5 w-3.5" />Email</span>
+                <span className={styles.infoLabel}><Icon name="mail" className="size-3.5" />Email</span>
                 {isEditOpen ? (
                   <Input type="email" name="mail" placeholder="cliente@email.com" defaultValue={state.values.mail} className={styles.infoInput} />
                 ) : (
@@ -412,7 +412,7 @@ export function ClienteDetailPage({
                 )}
               </div>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}><Icon name="mapPin" className="h-3.5 w-3.5" />Provincia</span>
+                <span className={styles.infoLabel}><Icon name="mapPin" className="size-3.5" />Provincia</span>
                 {isEditOpen ? (
                   <Select name="provincia" value={selectedProvincia} onChange={(e) => handleProvinciaChange(e.target.value)} className={styles.infoInput}>
                     {PROVINCIAS.map((p) => <option key={p} value={p}>{p}</option>)}
@@ -426,7 +426,7 @@ export function ClienteDetailPage({
             {/* Dirección + CP */}
             <div className={styles.infoGridRow}>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}><Icon name="mapPin" className="h-3.5 w-3.5" />Dirección</span>
+                <span className={styles.infoLabel}><Icon name="mapPin" className="size-3.5" />Dirección</span>
                 {isEditOpen ? (
                   <Input name="direccion" placeholder="Calle, altura, barrio" defaultValue={state.values.direccion} className={styles.infoInput} />
                 ) : (
@@ -445,7 +445,7 @@ export function ClienteDetailPage({
                 )}
               </div>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}><Icon name="hash" className="h-3.5 w-3.5" />Código postal</span>
+                <span className={styles.infoLabel}><Icon name="hash" className="size-3.5" />Código postal</span>
                 {isEditOpen ? (
                   <Input name="cp" placeholder="Ej. 9100" defaultValue={state.values.cp} className={styles.infoInput} />
                 ) : (
@@ -457,7 +457,7 @@ export function ClienteDetailPage({
             {/* DNI + CUIT */}
             <div className={styles.infoGridRow}>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}><Icon name="idCard" className="h-3.5 w-3.5" />DNI</span>
+                <span className={styles.infoLabel}><Icon name="idCard" className="size-3.5" />DNI</span>
                 {isEditOpen ? (
                   <Input name="dni" placeholder="29.645.893" value={dniValue} onChange={(e) => setDniValue(formatDNI(e.target.value))} inputMode="numeric" className={styles.infoInput} />
                 ) : (
@@ -465,7 +465,7 @@ export function ClienteDetailPage({
                 )}
               </div>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}><Icon name="idCard" className="h-3.5 w-3.5" />CUIT</span>
+                <span className={styles.infoLabel}><Icon name="idCard" className="size-3.5" />CUIT</span>
                 {isEditOpen ? (
                   <Input name="cuit" placeholder="20-29645893-8" value={cuitValue} onChange={(e) => setCuitValue(formatCUIT(e.target.value))} inputMode="numeric" className={styles.infoInput} />
                 ) : (
@@ -478,11 +478,11 @@ export function ClienteDetailPage({
             {isEditOpen && (
               <div className={styles.infoGridRow}>
                 <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}><Icon name="user" className="h-3.5 w-3.5" />Nombre</span>
+                  <span className={styles.infoLabel}><Icon name="user" className="size-3.5" />Nombre</span>
                   <Input name="nombre" placeholder="Ej. Juan" defaultValue={state.values.nombre} required className={styles.infoInput} />
                 </div>
                 <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}><Icon name="user" className="h-3.5 w-3.5" />Apellido</span>
+                  <span className={styles.infoLabel}><Icon name="user" className="size-3.5" />Apellido</span>
                   <Input name="apellido" placeholder="Ej. Pérez" defaultValue={state.values.apellido} required className={styles.infoInput} />
                 </div>
               </div>
@@ -499,7 +499,7 @@ export function ClienteDetailPage({
                   size="sm"
                   className="flex-1"
                   onClick={() => setIsEditOpen(true)}
-                  icon={<Icon name="edit" className="h-3.5 w-3.5" />}
+                  icon={<Icon name="edit" className="size-3.5" />}
                 >
                   Editar datos
                 </Button>
@@ -512,7 +512,7 @@ export function ClienteDetailPage({
                     pulsing={dirty && !isPending}
                     disabled={isPending}
                   >
-                    {isPending ? <Spinner className="h-3.5 w-3.5" /> : null}
+                    {isPending ? <Spinner className="size-3.5" /> : null}
                     {isPending ? "Guardando..." : "Guardar"}
                   </PulsatingButton>
                   <Button
@@ -520,7 +520,7 @@ export function ClienteDetailPage({
                     variant="outline"
                     size="sm"
                     onClick={() => setIsEditOpen(false)}
-                    icon={<Icon name="x" className="h-3.5 w-3.5" />}
+                    icon={<Icon name="x" className="size-3.5" />}
                   >
                     Cancelar
                   </Button>
@@ -549,7 +549,7 @@ export function ClienteDetailPage({
             variant="secondary"
             className="w-full"
             onClick={() => setVisibleFinalizados((v) => v + 5)}
-            icon={<Icon name="chevronDown" className="h-4 w-4" />}
+            icon={<Icon name="chevronDown" className="size-4" />}
           >
             Cargar más finalizados
           </Button>

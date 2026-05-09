@@ -34,10 +34,10 @@ export function ListaPreciosSelector({
           className="inline-flex flex-1 items-center justify-between gap-2 rounded-xl border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)] transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]"
         >
           <span className="flex items-center gap-2 uppercase tracking-wider">
-            <Icon name="clipboardList" className="h-4 w-4 shrink-0" />
+            <Icon name="clipboardList" className="size-4 shrink-0" />
             Lista {listaPrecios}
           </span>
-          <Icon name="chevronDown" className="h-4 w-4 opacity-80" />
+          <Icon name="chevronDown" className="size-4 opacity-80" />
         </button>
       </div>
 
@@ -77,15 +77,15 @@ export function ListaPreciosSelector({
                     onDialogOpenChange(false);
                   }}
                   className={cn(
-                    "flex items-center gap-3 w-full rounded-xl px-4 py-4 text-left text-sm font-semibold transition-all",
+                    "flex items-center gap-3 w-full rounded-xl p-4 text-left text-sm font-semibold transition-all",
                     isActive
                       ? "bg-[linear-gradient(135deg,var(--orange-vivid),var(--apricot-light))] text-white shadow-sm"
                       : "border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--text-color-defult)] hover:bg-[var(--color-surface-alt)]"
                   )}
                 >
-                  <Icon name="clipboardList" className="h-5 w-5 shrink-0" />
+                  <Icon name="clipboardList" className="size-5 shrink-0" />
                   <span className="flex-1">Lista {n}</span>
-                  {isActive && <Icon name="check" className="h-4 w-4" />}
+                  {isActive && <Icon name="check" className="size-4" />}
                 </button>
               );
             })}

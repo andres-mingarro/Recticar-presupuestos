@@ -44,7 +44,7 @@ export function EngineIconsDialog({
           <DialogTitle className="EngineIconsTitle text-xl">Íconos de partes del motor</DialogTitle>
         </DialogHeader>
 
-        <div className="EngineIconsGrid grid max-h-[65vh] grid-cols-3 gap-3 overflow-y-auto px-6 py-6">
+        <div className="EngineIconsGrid grid max-h-[65vh] grid-cols-3 gap-3 overflow-y-auto p-6">
           {ENGINE_ICON_OPTIONS.map((option) => {
             const selected = option === value;
 
@@ -67,7 +67,7 @@ export function EngineIconsDialog({
                 <EngineIconGlyph
                   name={option}
                   className={cn(
-                    "h-12 w-12",
+                    "size-12",
                     selected ? "border-[rgba(234,88,12,0.22)] bg-[linear-gradient(180deg,#fff,#ffe7d1)]" : ""
                   )}
                   imageClassName={selected ? "opacity-100" : "opacity-90"}

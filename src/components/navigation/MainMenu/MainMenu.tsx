@@ -34,9 +34,11 @@ type Props = {
   onClose?: () => void;
 };
 
-export function MainMenu({ role, permisos = [], onClose }: Props) {
+const EMPTY_PERMISOS: string[] = [];
+
+export function MainMenu({ role, permisos = EMPTY_PERMISOS, onClose }: Props) {
   const pathname = usePathname();
-  const router = useRouter();
+  const { replace } = useRouter();
 
   const isSuperAdmin = role === "super_admin";
 
@@ -49,7 +51,7 @@ export function MainMenu({ role, permisos = [], onClose }: Props) {
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     onClose?.();
-    router.replace("/login");
+    replace("/login");
   }
 
   return (
@@ -82,13 +84,13 @@ export function MainMenu({ role, permisos = [], onClose }: Props) {
               isActive(pathname, "/configuracion", false) && styles.tecnicaLinkActive
             )}
           >
-            <Icon name="settings" className="h-4 w-4 shrink-0" />
+            <Icon name="settings" className="size-4 shrink-0" />
             Configuración
           </Link>
         )}
         <div className={styles.divider} />
         <button type="button" onClick={handleLogout} className={styles.logoutBtn}>
-          <Icon name="power" className="h-4 w-4" />
+          <Icon name="power" className="size-4" />
           Salir
         </button>
       </div>

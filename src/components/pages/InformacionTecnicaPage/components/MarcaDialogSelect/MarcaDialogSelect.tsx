@@ -92,10 +92,10 @@ export function MarcaDialogSelect({
           selectedId ? (
             <TriggerLogo nombre={label} />
           ) : (
-            <Icon name="car" className="h-3 w-3 shrink-0" />
+            <Icon name="car" className="size-3 shrink-0" />
           )
         }
-        iconRight={<Icon name="chevronDown" className="h-3 w-3 shrink-0" />}
+        iconRight={<Icon name="chevronDown" className="size-3 shrink-0" />}
       >
         <span className={styles.triggerLabel}>
           <span className={styles.triggerText}>{label}</span>

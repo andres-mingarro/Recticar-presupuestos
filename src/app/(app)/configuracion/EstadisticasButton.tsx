@@ -18,7 +18,7 @@ export function EstadisticasButton({
   const [error, setError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+  const { push } = useRouter();
 
   function handleOpen() {
     setOpen(true);
@@ -49,7 +49,7 @@ export function EstadisticasButton({
       const result = await action(formData);
       if (result.ok) {
         handleClose();
-        router.push("/estadisticas");
+        push("/estadisticas");
       } else {
         setError(true);
       }
@@ -85,7 +85,7 @@ export function EstadisticasButton({
                   Acceso restringido
                 </p>
                 <h3 className="mt-1 flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--text-color-defult)]">
-                  <Icon name="chartBar" className="h-5 w-5 text-[var(--color-accent)]" />
+                  <Icon name="chartBar" className="size-5 text-[var(--color-accent)]" />
                   Estadísticas
                 </h3>
                 <p className="mt-1 text-xs text-[var(--text-color-gray)]">
@@ -97,7 +97,7 @@ export function EstadisticasButton({
                 variant="ghost"
                 size="sm"
                 onClick={handleClose}
-                icon={<Icon name="x" className="h-4 w-4" />}
+                icon={<Icon name="x" className="size-4" />}
               >
                 Cerrar
               </Button>
@@ -121,7 +121,7 @@ export function EstadisticasButton({
                     onClick={() => setShowPassword((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[var(--text-color-gray)] hover:text-[var(--text-color-defult)]"
                   >
-                    <Icon name={showPassword ? "eyeSlash" : "eye"} className="h-4 w-4" />
+                    <Icon name={showPassword ? "eyeSlash" : "eye"} className="size-4" />
                   </span>
                 </div>
 
@@ -130,7 +130,7 @@ export function EstadisticasButton({
                 )}
 
                 <Button type="submit" variant="primary" className="w-full" disabled={isPending}>
-                  {isPending ? <Spinner className="h-4 w-4" /> : "Ingresar"}
+                  {isPending ? <Spinner className="size-4" /> : "Ingresar"}
                 </Button>
               </form>
             </div>

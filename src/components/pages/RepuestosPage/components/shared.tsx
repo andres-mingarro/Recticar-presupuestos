@@ -20,7 +20,7 @@ export const readCls =
 export function AddFooter({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="flex flex-wrap items-center gap-3 bg-[var(--color-info-bg)] px-3 py-3 sm:px-5"
+      className="flex flex-wrap items-center gap-3 bg-[var(--color-info-bg)] p-3 sm:px-5"
       style={{ borderTop: "2px dashed var(--color-info-border-strong)" }}
     >
       {children}

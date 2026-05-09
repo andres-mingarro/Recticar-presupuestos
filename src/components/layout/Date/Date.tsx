@@ -5,17 +5,17 @@ import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import styles from "./Date.module.scss";
 
+const LONG_DATE_FORMATTER = new Intl.DateTimeFormat("es-AR", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
 export function Date({ className }: { className?: string }) {
   const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
   useEffect(() => {
-    setFormattedDate(
-      new Intl.DateTimeFormat("es-AR", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }).format(new globalThis.Date())
-    );
+    setFormattedDate(LONG_DATE_FORMATTER.format(new globalThis.Date()));
   }, []);
 
   return (

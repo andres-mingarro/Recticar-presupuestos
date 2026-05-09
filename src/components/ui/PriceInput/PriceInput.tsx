@@ -3,15 +3,17 @@
 import { useState, useRef, useCallback, type CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 
+const DISPLAY_FORMATTER = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
 // Formatea un número como $ 1.000.000 (sin decimales, separador de miles con punto)
 function formatDisplay(value: number): string {
   if (value === 0) return "";
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+  return DISPLAY_FORMATTER.format(value);
 }
 
 // Extrae el número crudo de un string con formato

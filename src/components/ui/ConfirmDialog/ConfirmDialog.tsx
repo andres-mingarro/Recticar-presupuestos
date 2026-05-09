@@ -30,8 +30,8 @@ export function ConfirmDialog({
       <DialogContent variant="centered">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-border)]">
-              <Icon name="trash" className="h-5 w-5 text-[var--color-overlay)]" />
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-border)]">
+              <Icon name="trash" className="size-5 text-[var--color-overlay)]" />
             </span>
             <DialogTitle>{title}</DialogTitle>
           </div>
@@ -53,7 +53,7 @@ export function ConfirmDialog({
             className="h-auto min-h-11 flex-1 whitespace-normal px-3 py-2 text-center leading-5"
             onClick={onConfirm}
             disabled={loading}
-            icon={loading ? undefined : <Icon name="trash" className="h-4 w-4" />}
+            icon={loading ? undefined : <Icon name="trash" className="size-4" />}
           >
             {loading ? "Eliminando…" : confirmLabel}
           </Button>

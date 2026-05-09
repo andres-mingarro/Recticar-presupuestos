@@ -70,7 +70,7 @@ export function CategoriaCard({
 
         {/* Fila 1 (siempre): icono + nombre/input */}
         <div className="flex items-center gap-2 px-3 py-2 md:min-w-0 md:flex-1 md:p-0">
-          <Icon name="package" className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+          <Icon name="package" className="size-4 shrink-0 text-[var(--color-accent)]" />
           {isEditing ? (
             <input
               form={formId}
@@ -106,7 +106,7 @@ export function CategoriaCard({
                 disabled={savePending}
                 className="flex flex-1 items-center gap-1.5 rounded-lg bg-[var(--color-success-text)] text-xs font-semibold text-white transition hover:bg-[var(--color-success-text-strong)] disabled:opacity-60"
               >
-                {savePending ? <Spinner className="h-3.5 w-3.5" /> : <Icon name="check" className="h-3.5 w-3.5" />}
+                {savePending ? <Spinner className="size-3.5" /> : <Icon name="check" className="size-3.5" />}
                 {savePending ? "Guardando…" : "Guardar"}
               </PulsatingButton>
               <Button
@@ -114,7 +114,7 @@ export function CategoriaCard({
                 size="sm"
                  variant="outline-dark"
                 onClick={handleCancel}
-                icon={<Icon name="x" className="h-3.5 w-3.5" />}
+                icon={<Icon name="x" className="size-3.5" />}
               >
                 Cancelar
               </Button>
@@ -138,7 +138,7 @@ export function CategoriaCard({
                 onHighlightDismiss?.();
                 setIsEditing(true);
               }}
-              icon={<Icon name="edit" className="h-3.5 w-3.5" />}
+              icon={<Icon name="edit" className="size-3.5" />}
             >
               <span>Editar categoría</span>
             </Button>

@@ -44,7 +44,7 @@ export function Incrementor({
         className={cn(
           btnBase,
           "border-r border-[var(--color-border)]",
-          sm ? "h-7 w-7 text-sm" : "h-9 w-9 text-base"
+          sm ? "size-7 text-sm" : "size-9 text-base"
         )}
         style={{ background: "white" }}
       >
@@ -70,7 +70,7 @@ export function Incrementor({
         className={cn(
           btnBase,
           "border-l border-[var(--color-border)]",
-          sm ? "h-7 w-7 text-sm" : "h-9 w-9 text-base"
+          sm ? "size-7 text-sm" : "size-9 text-base"
         )}
         style={{ background: "white" }}
       >
