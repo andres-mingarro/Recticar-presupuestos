@@ -29,8 +29,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams?: Promise<{ updated?: string; created?: string }>;
 }) {
-  const { id } = await params;
-  const query = await searchParams;
+  const [{ id }, query] = await Promise.all([params, searchParams ?? Promise.resolve(undefined)]);
   const trabajoId = Number(id);
 
   if (Number.isNaN(trabajoId)) {

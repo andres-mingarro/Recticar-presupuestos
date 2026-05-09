@@ -44,8 +44,10 @@ export default async function ConfiguracionPage({
 }) {
   const { session } = await getSessionWithPermisos();
   const canEdit = isSuperAdmin(session);
-  const params = await resolveSearchParams(searchParams);
-  const empresa = await getEmpresaConfig();
+  const [params, empresa] = await Promise.all([
+    resolveSearchParams(searchParams),
+    getEmpresaConfig(),
+  ]);
 
   return (
     <div className={cn("ConfiguracionPage", styles.ConfiguracionPage)}>
