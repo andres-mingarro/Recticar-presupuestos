@@ -22,6 +22,7 @@ const allItems: MenuItem[] = [
   { href: "/trabajos", label: "Trabajos", icon: "clipboard", exact: false, requiredPermiso: "trabajos.ver" },
   { href: "/precios", label: "Precios", icon: "tag", exact: false, superAdminOnly: true },
   { href: "/repuestos", label: "Repuestos", icon: "package", exact: false, superAdminOnly: true },
+  { href: "/informacion-tecnica", label: "Info. técnica", icon: "car", exact: false, superAdminOnly: true },
 ];
 
 function isActive(pathname: string, href: string, exact: boolean) {
