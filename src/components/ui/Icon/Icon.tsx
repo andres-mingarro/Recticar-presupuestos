@@ -23,6 +23,7 @@ import {
   faHashtag,
   faIdCard,
   faKey,
+  faLink,
   faListCheck,
   faLocationDot,
   faMagnifyingGlass,
@@ -70,6 +71,7 @@ export type IconName =
   | "tag"
   | "trash"
   | "key"
+  | "link"
   | "power"
   | "shieldUser"
   | "idCard"
@@ -117,6 +119,7 @@ const ICONS: Record<IconName, IconDefinition> = {
   tag: faTag,
   trash: faTrash,
   key: faKey,
+  link: faLink,
   power: faPowerOff,
   shieldUser: faShieldHalved,
   idCard: faIdCard,

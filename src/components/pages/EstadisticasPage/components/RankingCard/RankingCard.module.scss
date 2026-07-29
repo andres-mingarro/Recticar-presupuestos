@@ -1,0 +1,164 @@
+.RankingCard {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.headerIcon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  font-size: 0.82rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.15rem;
+  color: var(--color-accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--text-color-defult);
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.description {
+  margin: 0.3rem 0 0;
+  color: var(--text-color-gray);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th:first-child {
+  width: 48%;
+}
+
+.table th:nth-child(2) {
+  width: 18%;
+}
+
+.table th:nth-child(3) {
+  width: 34%;
+}
+
+.table th {
+  padding: 0 0.5rem 0.5rem;
+  color: var(--text-color-gray);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.table th:nth-child(2),
+.table th:nth-child(3),
+.table td:nth-child(2),
+.table td:nth-child(3) {
+  text-align: right;
+}
+
+.table td {
+  padding: 0.65rem 0.5rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--text-color-defult);
+  font-size: 0.78rem;
+  vertical-align: middle;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.table tbody tr:hover td {
+  background: var(--color-accent-soft);
+}
+
+.name,
+.nameLink {
+  display: block;
+  max-width: 22rem;
+  overflow: hidden;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nameLink {
+  color: var(--text-color-defult);
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2rem;
+
+  &:hover {
+    color: var(--color-accent);
+    text-decoration-color: currentColor;
+  }
+
+  &:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+}
+
+.category {
+  display: block;
+  margin-top: 0.12rem;
+  color: var(--text-color-gray);
+  font-size: 0.68rem;
+}
+
+.number {
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-color-gray);
+  font-size: 0.82rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .RankingCard,
+  .table td {
+    transition: none;
+  }
+}

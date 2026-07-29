@@ -204,3 +204,63 @@ export type RepuestoAgrupado = {
     precioStock: number;
   }>;
 };
+
+export type EstadisticaMensual = {
+  mes: number;
+  creados: number;
+  cobrados: number;
+  totalCobrado: number;
+};
+
+export type EstadisticaDistribucion = {
+  clave: string;
+  cantidad: number;
+  total?: number;
+};
+
+export type EstadisticaRanking = {
+  id: number | null;
+  nombre: string;
+  categoria: string | null;
+  cantidad: number;
+  total: number;
+};
+
+export type EstadisticaCliente = {
+  id: number;
+  nombre: string;
+  cantidad: number;
+  total: number;
+};
+
+export type EstadisticaComparacion = {
+  mesReferencia: number | null;
+  cantidadMes: number;
+  totalMes: number;
+  cantidadMesAnterior: number;
+  totalMesAnterior: number;
+  cantidadMismoMesAnterior: number;
+  totalMismoMesAnterior: number;
+};
+
+export type EstadisticasOperativas = {
+  resumen: {
+    creados: number;
+    aprobados: number;
+    tasaAprobacion: number;
+    promedioDiasAprobacion: number | null;
+    pendientesCobro: number;
+    montoPendiente: number;
+    ticketPromedio: number;
+  };
+  mensual: EstadisticaMensual[];
+  estados: EstadisticaDistribucion[];
+  prioridades: EstadisticaDistribucion[];
+  listasPrecio: EstadisticaDistribucion[];
+  iva: EstadisticaDistribucion[];
+  trabajosSolicitados: EstadisticaRanking[];
+  ingresosCategorias: EstadisticaRanking[];
+  repuestosUtilizados: EstadisticaRanking[];
+  clientesPrincipales: EstadisticaCliente[];
+  comparacion: EstadisticaComparacion;
+};
