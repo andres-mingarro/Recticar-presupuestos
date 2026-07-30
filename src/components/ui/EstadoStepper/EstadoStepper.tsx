@@ -16,15 +16,15 @@ const STEPS: Array<{
     value: "presupuesto_entregado",
     label: "Presupuesto entregado",
     num: "1",
-    activeBg: "bg-[linear-gradient(135deg,#fff7ed,#fed7aa)]",
-    activeText: "text-orange-700",
+    activeBg: "bg-[image:var(--gradient-step-soft)]",
+    activeText: "text-[var(--step-soft-ink)]",
     isLight: true,
   },
   {
     value: "aprobado",
     label: "Presupuesto aceptado",
     num: "2",
-    activeBg: "bg-[linear-gradient(135deg,#ea580c,#fb923c)]",
+    activeBg: "bg-[image:var(--gradient-step-mid)]",
     activeText: "text-white",
     isLight: false,
   },
@@ -32,6 +32,7 @@ const STEPS: Array<{
     value: "finalizado",
     label: "Trabajo finalizado",
     num: "3",
+    // Verde fijo: "finalizado" tiene que leerse igual en cualquier theme.
     activeBg: "bg-[linear-gradient(135deg,#059669,#34d399)]",
     activeText: "text-white",
     isLight: false,
@@ -69,7 +70,7 @@ function StepCircle({
 
   if (status === "completed") {
     return (
-      <span className={cn(base, light ? "border-orange-300 bg-orange-100 text-orange-700" : "border-white/40 bg-white/20 text-white")}>
+      <span className={cn(base, light ? "border-[var(--step-soft-border)] bg-[var(--step-soft-from)] text-[var(--step-soft-ink)]" : "border-white/40 bg-[var(--color-surface-raised)]/20 text-white")}>
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 6 9 17l-5-5" />
         </svg>
@@ -78,7 +79,7 @@ function StepCircle({
   }
   if (status === "active") {
     return (
-      <span className={cn(base, light ? "border-orange-500 bg-white text-orange-600" : "border-white bg-white/20 text-white")}>
+      <span className={cn(base, light ? "border-[var(--color-accent)] bg-[var(--color-surface-raised)] text-[var(--color-accent)]" : "border-white bg-[var(--color-surface-raised)]/20 text-white")}>
         <span className="text-xs font-bold">{num}</span>
       </span>
     );
@@ -92,7 +93,7 @@ function StepCircle({
 
 function StepDivider({ light }: { light?: boolean }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 8 40" className={cn("absolute -right-px top-0 hidden h-full w-2 md:block", light ? "text-orange-200" : "text-white/20")} preserveAspectRatio="none">
+    <svg aria-hidden="true" viewBox="0 0 8 40" className={cn("absolute -right-px top-0 hidden h-full w-2 md:block", light ? "text-[var(--step-soft-to)]" : "text-white/20")} preserveAspectRatio="none">
       <polyline points="0,0 8,20 0,40" fill="none" stroke="currentColor" strokeWidth="1" />
     </svg>
   );

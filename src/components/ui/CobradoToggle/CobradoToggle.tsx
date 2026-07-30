@@ -9,6 +9,8 @@ type CobradoToggleProps = {
   form?: string;
 };
 
+// Gris = no cobrado, verde = cobrado. Son colores de estado: van fijos,
+// no siguen el theme.
 export function CobradoToggle({ form }: CobradoToggleProps) {
   const { cobrado, setCobrado } = useCobrado();
 
@@ -43,7 +45,7 @@ export function CobradoToggle({ form }: CobradoToggleProps) {
             "inline-flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
             !cobrado
               ? "border-slate-600 bg-[linear-gradient(135deg,#64748b,#475569)] text-white shadow-[0_10px_24px_rgba(100,116,139,0.28)]"
-              : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]"
+              : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--text-color-defult)]"
           )}
         >
           <Icon name="sackXmark" size="lg" />
@@ -56,7 +58,7 @@ export function CobradoToggle({ form }: CobradoToggleProps) {
             "inline-flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
             cobrado
               ? "border-emerald-600 bg-[linear-gradient(135deg,#059669,#34d399)] text-white shadow-[0_10px_24px_rgba(5,150,105,0.28)]"
-              : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]"
+              : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--text-color-defult)]"
           )}
         >
           <Icon name="sackDollar" size="lg" />

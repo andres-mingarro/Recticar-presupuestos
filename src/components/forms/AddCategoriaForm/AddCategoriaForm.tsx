@@ -51,7 +51,7 @@ export function AddCategoriaForm({
           name="nombre"
           placeholder={placeholder}
           required
-          className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-white/80 px-4 py-2 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40"
+          className="flex-1 rounded-xl border border-[var(--color-info-border)] bg-[var(--color-surface-raised)]/80 px-4 py-2 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40"
         />
         <Button
           type="submit"

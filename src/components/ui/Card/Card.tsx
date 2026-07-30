@@ -22,7 +22,7 @@ export function Card<T extends ElementType = "div">({
       className={cn(
         "Card",
         styles.Card,
-        "rounded-[28px] border border-[var(--color-border)] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)]",
+        "rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[0_20px_60px_var(--color-shadow-sm)]",
         !noPadding && "p-6",
         className
       )}

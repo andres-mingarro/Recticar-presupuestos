@@ -126,7 +126,7 @@ export function SearchableSelect({
   }
 
   const inputCls =
-    "w-full rounded-xl border border-[var(--color-info-border)] bg-white/80 px-3 py-1.5 text-sm placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 disabled:opacity-60 disabled:cursor-not-allowed";
+    "w-full rounded-xl border border-[var(--color-info-border)] bg-[var(--color-surface-raised)]/80 px-3 py-1.5 text-sm placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 disabled:opacity-60 disabled:cursor-not-allowed";
 
   const dropdownPos = openUpward ? "bottom-full mb-1" : "top-full mt-1";
 
@@ -150,13 +150,13 @@ export function SearchableSelect({
       <input type="hidden" name={name} value={selectedValue} required={required} />
 
       {loading && (
-        <div className={cn("absolute z-50 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--text-color-gray)] shadow-lg", dropdownPos)}>
+        <div className={cn("absolute z-50 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 text-sm text-[var(--text-color-gray)] shadow-lg", dropdownPos)}>
           Buscando…
         </div>
       )}
 
       {!loading && open && results.length > 0 && (
-        <ul id={listId} ref={listRef} role="listbox" className={cn("absolute z-50 max-h-56 w-full overflow-y-auto rounded-xl border border-[var(--color-border)] bg-white py-1 shadow-lg", dropdownPos)}>
+        <ul id={listId} ref={listRef} role="listbox" className={cn("absolute z-50 max-h-56 w-full overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-1 shadow-lg", dropdownPos)}>
           {results.map((option, i) => (
             <li
               key={option.value}
@@ -179,7 +179,7 @@ export function SearchableSelect({
       )}
 
       {!loading && open && query.length > 0 && results.length === 0 && (
-        <div className={cn("absolute z-50 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--text-color-gray)] shadow-lg", dropdownPos)}>
+        <div className={cn("absolute z-50 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 text-sm text-[var(--text-color-gray)] shadow-lg", dropdownPos)}>
           Sin resultados para &ldquo;{query}&rdquo;
         </div>
       )}

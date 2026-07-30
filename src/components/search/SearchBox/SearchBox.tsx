@@ -154,7 +154,7 @@ export function SearchBox({
 
       {isOpen ? (
         <div className={cn("SearchBoxDropdown", styles.SearchBoxDropdown)}>
-          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-3 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 shadow-[0_20px_60px_var(--color-shadow-lg)]">
             {results.length === 0 ? (
               <p className="px-2 py-3 text-sm text-[var(--text-color-gray)]">
                 {config.emptyMessage}

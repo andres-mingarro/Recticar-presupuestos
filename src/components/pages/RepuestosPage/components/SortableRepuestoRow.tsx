@@ -44,7 +44,7 @@ export function SortableRepuestoRow({
         "SortableRepuestoRow flex items-center gap-2 px-3 py-2.5 md:gap-3 md:px-3 md:py-3",
         readableRowHoverCls,
         index % 2 === 1 && "bg-[var(--color-surface-alt)]/40",
-        isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
+        isDragging && "z-10 rounded-xl bg-[var(--color-surface-raised)] opacity-90 shadow-lg"
       )}
     >
       {isEditing && <DragHandle {...attributes} {...listeners} />}

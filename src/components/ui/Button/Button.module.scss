@@ -31,17 +31,17 @@
   &[data-hover-variant="burnt"]::after          { background: linear-gradient(135deg, var(--color-accent), var(--brown-burnt)); }
   &[data-hover-variant="outline"]::after        { background: var(--color-accent-soft); }
   &[data-hover-variant="outline-warm"]::after   { background: color-mix(in srgb, var(--peach-soft) 40%, transparent); }
-  &[data-hover-variant="outline-dark"]::after   { background: #f1f5f9; }
+  &[data-hover-variant="outline-dark"]::after   { background: var(--color-surface-alt); }
   &[data-hover-variant="outline-ghost"]::after  { background: transparent; }
   &[data-hover-variant="danger-ghost"]::after   { background: var(--color-danger-bg); }
   &[data-hover-variant="danger"]::after         { background: linear-gradient(135deg, #f87171, #dc2626); }
   &[data-hover-variant="warning"]::after        { background: linear-gradient(135deg, #fbbf24, #d97706); }
   &[data-hover-variant="info"]::after           { background: linear-gradient(135deg, #60a5fa, #2563eb); }
   &[data-hover-variant="success"]::after        { background: linear-gradient(135deg, #4ade80, #16a34a); }
-  &[data-hover-variant="outline-danger"]::after { background: #fef2f2; }
-  &[data-hover-variant="outline-warning"]::after{ background: #fffbeb; }
-  &[data-hover-variant="outline-info"]::after   { background: #eff6ff; }
-  &[data-hover-variant="outline-success"]::after{ background: #f0fdf4; }
+  &[data-hover-variant="outline-danger"]::after { background: var(--color-danger-bg); }
+  &[data-hover-variant="outline-warning"]::after{ background: var(--color-warning-bg); }
+  &[data-hover-variant="outline-info"]::after   { background: var(--color-info-bg); }
+  &[data-hover-variant="outline-success"]::after{ background: var(--color-success-bg); }
 
   // ── Variantes base ─────────────────────────────────────────────────────────
 
@@ -98,10 +98,10 @@
     --focus-ring: var(--brown-burnt);
   }
   &[data-variant="outline-dark"] {
-    border: 1px solid #475569;
+    border: 1px solid var(--text-color-gray);
     background: transparent;
-    color: #475569;
-    --focus-ring: #64748b;
+    color: var(--text-color-gray);
+    --focus-ring: var(--text-color-ligth);
   }
   &[data-variant="outline-ghost"] {
     border-radius: 9999px;
@@ -151,10 +151,10 @@
     --focus-ring: #16a34a;
   }
   &[data-variant="outline-danger"] {
-    border: 1px solid #dc2626;
+    border: 1px solid var(--color-danger-text);
     background: transparent;
-    color: #dc2626;
-    --focus-ring: #dc2626;
+    color: var(--color-danger-text);
+    --focus-ring: var(--color-danger-text);
   }
   &[data-variant="outline-warning"] {
     border: 1px solid #d97706;
@@ -188,7 +188,7 @@
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    box-shadow: 0 10px 28px rgba(234, 88, 12, 0.35);
+    box-shadow: 0 10px 28px rgb(var(--brand-600-rgb) / 0.35);
     --focus-ring: var(--color-accent);
 
     .ButtonIcon {
@@ -205,7 +205,7 @@
   // ── Hover por variante base (sin variantOnHover) ────────────────────────────
 
   &:not([data-hover-variant]):not(:disabled) {
-    &[data-variant="hero"]:hover            { filter: brightness(1.06); box-shadow: 0 14px 36px rgba(234, 88, 12, 0.45); }
+    &[data-variant="hero"]:hover            { filter: brightness(1.06); box-shadow: 0 14px 36px rgb(var(--brand-600-rgb) / 0.45); }
     &[data-variant="primary"]:hover         { filter: brightness(1.05); }
     &[data-variant="secondary"]:hover       { filter: brightness(0.95); }
     &[data-variant="ghost"]:hover           { background: var(--color-surface-alt); }
@@ -215,7 +215,7 @@
     &[data-variant="burnt"]:hover           { filter: brightness(1.1); }
     &[data-variant="outline"]:hover         { background: var(--color-accent-soft); }
     &[data-variant="outline-warm"]:hover    { background: color-mix(in srgb, var(--peach-soft) 40%, transparent); }
-    &[data-variant="outline-dark"]:hover    { background: #f1f5f9; }
+    &[data-variant="outline-dark"]:hover    { background: var(--color-surface-alt); }
     &[data-variant="outline-ghost"]:hover   { border-color: var(--color-accent); color: var(--color-accent); }
     &[data-variant="danger-ghost"]:hover    { background: var(--color-danger-bg); color: var(--color-danger-text); }
     &[data-variant="link"]:hover            { color: var(--color-accent-strong); text-decoration-color: var(--color-accent-strong); }
@@ -223,10 +223,10 @@
     &[data-variant="warning"]:hover         { filter: brightness(1.05); }
     &[data-variant="info"]:hover            { filter: brightness(1.05); }
     &[data-variant="success"]:hover         { filter: brightness(1.05); }
-    &[data-variant="outline-danger"]:hover  { background: #fef2f2; }
-    &[data-variant="outline-warning"]:hover { background: #fffbeb; }
-    &[data-variant="outline-info"]:hover    { background: #eff6ff; }
-    &[data-variant="outline-success"]:hover { background: #f0fdf4; }
+    &[data-variant="outline-danger"]:hover  { background: var(--color-danger-bg); }
+    &[data-variant="outline-warning"]:hover { background: var(--color-warning-bg); }
+    &[data-variant="outline-info"]:hover    { background: var(--color-info-bg); }
+    &[data-variant="outline-success"]:hover { background: var(--color-success-bg); }
   }
 
   // ── variantOnHover: cambia a otra variante completa en hover ───────────────
@@ -281,7 +281,7 @@
   }
   &[data-hover-variant="outline-dark"]:not(:disabled):hover {
     border: 1px solid #475569;
-    background: #f1f5f9;
+    background: var(--color-surface-alt);
     color: #475569;
   }
   &[data-hover-variant="outline-ghost"]:not(:disabled):hover {
@@ -315,22 +315,22 @@
   }
   &[data-hover-variant="outline-danger"]:not(:disabled):hover {
     border: 1px solid #dc2626;
-    background: #fef2f2;
+    background: var(--color-danger-bg);
     color: #dc2626;
   }
   &[data-hover-variant="outline-warning"]:not(:disabled):hover {
     border: 1px solid #d97706;
-    background: #fffbeb;
+    background: var(--color-warning-bg);
     color: #d97706;
   }
   &[data-hover-variant="outline-info"]:not(:disabled):hover {
     border: 1px solid #2563eb;
-    background: #eff6ff;
+    background: var(--color-info-bg);
     color: #2563eb;
   }
   &[data-hover-variant="outline-success"]:not(:disabled):hover {
     border: 1px solid #16a34a;
-    background: #f0fdf4;
+    background: var(--color-success-bg);
     color: #16a34a;
   }
 

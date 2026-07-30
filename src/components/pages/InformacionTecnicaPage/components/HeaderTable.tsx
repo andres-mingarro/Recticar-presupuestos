@@ -91,7 +91,7 @@ export function HeaderTable({
                 {hasPreviousPage ? (
                   <Link
                     href={buildSectionHref(section, q, currentPage - 1, tab, marcaId)}
-                    className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                    className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                   >
                     <Icon name="chevronLeft" className="size-3.5" />
                   </Link>
@@ -108,7 +108,7 @@ export function HeaderTable({
                 {hasNextPage ? (
                   <Link
                     href={buildSectionHref(section, q, currentPage + 1, tab, marcaId)}
-                    className="rounded-lg border border-[var(--color-border)] bg-white p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                    className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 text-[var(--text-color-gray)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
                   >
                     <Icon name="chevronRight" className="size-3.5" />
                   </Link>

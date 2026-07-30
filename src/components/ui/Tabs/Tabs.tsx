@@ -39,7 +39,7 @@ export function Tabs<T extends string>({
               "cursor-pointer inline-flex items-center justify-center gap-2 rounded-t-2xl border border-transparent border-b-0 px-6 py-3.5 text-base font-semibold transition-all duration-200",
               expand && "flex-1 basis-0",
               active
-                ? "border-[var(--color-border)] bg-white text-[var(--color-accent)]"
+                ? "border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-accent)]"
                 : "bg-[var(--color-surface-alt)] text-[var(--text-color-gray)] hover:border-[var(--border-ligth)] hover:bg-gradient-to-b hover:from-[var(--color-surface-alt)] hover:to-white hover:text-[var(--text-color-defult)]"
             )}
             aria-pressed={active}

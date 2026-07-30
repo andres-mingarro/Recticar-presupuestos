@@ -94,7 +94,7 @@ function PermisosToggles({
               aria-checked={enabled}
               onClick={() => toggle(permiso)}
               className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${
-                enabled ? "bg-[var(--color-accent)]" : "bg-slate-200"
+                enabled ? "bg-[var(--color-accent)]" : "bg-[var(--color-neutral-border)]"
               }`}
             >
               <span
@@ -159,22 +159,22 @@ function UsuarioCard({
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm space-y-4">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 shadow-sm space-y-4">
       {/* Header de la card */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className={`flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${isSuperAdmin ? "bg-orange-100 text-orange-600" : "bg-slate-100 text-slate-600"}`}>
+          <div className={`flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${isSuperAdmin ? "bg-[var(--step-soft-from)] text-[var(--step-soft-ink)]" : "bg-[var(--color-surface-alt)] text-[var(--text-color-gray)]"}`}>
             {u.nombre.charAt(0).toUpperCase()}
           </div>
           <div>
             <p className="font-semibold text-[var(--text-color-defult)]">{u.nombre}</p>
-            <span className={`inline-flex items-center gap-1 text-xs font-medium ${isSuperAdmin ? "text-orange-600" : "text-slate-500"}`}>
+            <span className={`inline-flex items-center gap-1 text-xs font-medium ${isSuperAdmin ? "text-[var(--color-accent)]" : "text-[var(--text-color-ligth)]"}`}>
               {isSuperAdmin ? "Administrador" : "Operario"}
             </span>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-semibold ${u.activo ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-100 text-slate-500 border-slate-200"}`}>
+          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-semibold ${u.activo ? "bg-[var(--color-success-bg)] text-[var(--color-success-text)] border-[var(--color-success-border)]" : "bg-[var(--color-neutral-bg)] text-[var(--text-color-ligth)] border-[var(--color-neutral-border)]"}`}>
             <span className={`size-1.5 rounded-full ${u.activo ? "bg-emerald-500" : "bg-slate-400"}`} />
             {u.activo ? "Activo" : "Inactivo"}
           </span>
@@ -235,7 +235,7 @@ function UsuarioCard({
         <div className="divide-y divide-[var(--color-border)] px-4">
           {isSuperAdmin ? (
             <div className="py-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--step-soft-border)] bg-[var(--step-soft-from)] px-2.5 py-1 text-xs font-semibold text-[var(--step-soft-ink)]">
                 Acceso total
               </span>
             </div>
@@ -256,7 +256,7 @@ function UsuarioCard({
         <select
           value={pantallaValue}
           onChange={(e) => { setPantallaValue(e.target.value as PantallaInicio); setPantallaDirty(true); }}
-          className="h-8 rounded-lg border border-[var(--color-border)] bg-white px-2 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]"
+          className="h-8 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]"
         >
           <option value="dashboard">Dashboard</option>
           <option value="trabajos">Trabajos</option>
@@ -273,7 +273,7 @@ function UsuarioCard({
             variant="ghost"
             title={u.activo ? "Desactivar usuario" : "Activar usuario"}
             onClick={() => toggleActivoAction(u.nombre, !u.activo)}
-            className={u.activo ? "text-emerald-600 hover:text-emerald-700" : "text-slate-400 hover:text-slate-600"}
+            className={u.activo ? "text-[var(--color-success-text)]" : "text-[var(--text-color-ligth)] hover:text-[var(--text-color-gray)]"}
             icon={<Icon name="power" className="size-4" />}
           >
             {u.activo ? "Desactivar" : "Activar"}
@@ -386,7 +386,7 @@ export function UsuariosClient({ usuarios, currentNombre, protectedNombre }: Pro
                 name="role"
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value as "operario" | "super_admin")}
-                className="h-10 rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]"
+                className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-soft)]"
               >
                 <option value="operario">Operario</option>
                 <option value="super_admin">Administrador</option>

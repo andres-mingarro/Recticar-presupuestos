@@ -83,7 +83,7 @@
   gap: 8px;
   border: 2px solid var(--color-border);
   border-radius: 16px;
-  background: white;
+  background: var(--color-surface-raised);
   padding: 12px 8px 10px;
   color: var(--text-color-defult);
   cursor: pointer;
@@ -101,7 +101,7 @@
 
 .brandCardSelected {
   border-color: var(--color-accent);
-  background: linear-gradient(135deg, #fff7ed, #fff0e1);
+  background: linear-gradient(135deg, var(--brand-50), var(--brand-200));
   box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 

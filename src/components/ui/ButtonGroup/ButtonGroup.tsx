@@ -4,7 +4,7 @@ import { Icon, type IconName } from "@/components/ui/Icon";
 import { cn } from "@/lib/cn";
 
 const DEFAULT_ACTIVE_TONE =
-  "border-[var(--color-accent)] bg-[var(--color-accent)] text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)]";
+  "border-[var(--color-accent)] bg-[var(--color-accent)] text-white shadow-[0_10px_24px_rgb(var(--brand-600-rgb)_/_0.28)]";
 
 export type ButtonGroupOption<T extends string | number> = {
   value: T;
@@ -43,7 +43,7 @@ export function ButtonGroup<T extends string | number>({
               buttonClassName,
               active
                 ? (option.activeTone ?? DEFAULT_ACTIVE_TONE)
-                : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]"
+                : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--text-color-defult)]"
             )}
           >
             {option.icon ? <Icon name={option.icon} className="size-4 shrink-0" /> : null}

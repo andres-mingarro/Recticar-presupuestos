@@ -1,7 +1,7 @@
 .CheckboxBeauti {
   --checkbox-size: 26px;
-  --checkbox-color-off: #ffc985;
-  --checkbox-color-on: #ff7518;
+  --checkbox-color-off: var(--brand-300);
+  --checkbox-color-on: var(--brand-500);
   --checkbox-color: var(--checkbox-color-off);
   --checkbox-border: color-mix(in srgb, var(--checkbox-color) 28%, transparent);
   --checkbox-surface: color-mix(in srgb, var(--checkbox-color) 12%, white);

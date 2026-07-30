@@ -1,5 +1,311 @@
 @import "tailwindcss";
 
+/* ─── Themes ────────────────────────────────────────────────────────────────
+   Un theme define DOS cosas, y todo el resto del archivo se deriva de acá:
+
+     1. La escala de marca (--brand-*), nombrada por rol y no por color:
+        --brand-500 se sigue llamando igual en el theme azul.
+     2. La neutral teñida, en dos versiones (--l-* clara y --d-* oscura):
+        fondo, superficies, bordes y texto. Esto es lo que hace que el cambio
+        se note — el "blanco" de la app no es blanco puro, arrastra el tono.
+
+   El sidebar y el menú mobile NO entran acá: son superficie de navegación y
+   van en gris slate fijo, igual en las cuatro paletas.
+
+   Los tonos 400 y 500 se repiten como triplets RGB porque se usan con alpha.
+   No usar color-mix para eso: en navegadores sin soporte degrada al color
+   opaco, y son tokens de mucho alcance.
+
+   `src/lib/themes.ts` replica solo la escala de marca, que es lo que los PDF
+   necesitan (@react-pdf/renderer no lee variables CSS). Las superficies viven
+   únicamente acá. */
+:root,
+:root[data-theme="orange"] {
+  --brand-50: #fff0e1;
+  --brand-200: #ffd1b3;
+  --brand-300: #ffc985;
+  --brand-400: #fb923c;
+  --brand-500: #ff7518;
+  --brand-600: #ea580c;
+  --brand-700: #c2410c;
+  --brand-900: #803600;
+  --brand-400-rgb: 251 146 60;
+  --brand-600-rgb: 234 88 12;
+  --brand-500-rgb: 255 117 24;
+
+  /* claro */
+  --l-surface-bg: #fdf6ef;
+  --l-surface: #fffaf4;
+  --l-surface-alt: #fbeadb;
+  --l-surface-raised: #fffdfa;
+  --l-border-rgb: 128 54 0;
+  --l-ink: #2b1a0f;
+  --l-ink-soft: #6b4a33;
+  --l-ink-faint: #8a6b55;
+
+  /* oscuro */
+  --d-surface-bg: #150f0a;
+  --d-surface: #1d1610;
+  --d-surface-alt: #2b2018;
+  --d-surface-raised: #241b13;
+  --d-border-rgb: 255 213 179;
+  --d-ink: #f8ece1;
+  --d-ink-soft: #d0b9a4;
+  --d-ink-faint: #a58c78;
+}
+
+:root[data-theme="blue"] {
+  --brand-50: #eff6ff;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #60a5fa;
+  --brand-500: #3b82f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4ed8;
+  --brand-900: #1e3a8a;
+  --brand-400-rgb: 96 165 250;
+  --brand-600-rgb: 37 99 235;
+  --brand-500-rgb: 59 130 246;
+
+  /* claro */
+  --l-surface-bg: #eff4fd;
+  --l-surface: #f7faff;
+  --l-surface-alt: #e2ebfa;
+  --l-surface-raised: #fcfdff;
+  --l-border-rgb: 30 58 138;
+  --l-ink: #101c38;
+  --l-ink-soft: #3d4f77;
+  --l-ink-faint: #64749b;
+
+  /* oscuro */
+  --d-surface-bg: #0b1120;
+  --d-surface: #121a2c;
+  --d-surface-alt: #1d2942;
+  --d-surface-raised: #162034;
+  --d-border-rgb: 191 219 254;
+  --d-ink: #e8eefb;
+  --d-ink-soft: #b3c2de;
+  --d-ink-faint: #8a9bbd;
+}
+
+:root[data-theme="green"] {
+  --brand-50: #ecfdf5;
+  --brand-200: #a7f3d0;
+  --brand-300: #6ee7b7;
+  --brand-400: #34d399;
+  --brand-500: #10b981;
+  --brand-600: #047857;
+  --brand-700: #065f46;
+  --brand-900: #064e3b;
+  --brand-400-rgb: 52 211 153;
+  --brand-600-rgb: 4 120 87;
+  --brand-500-rgb: 16 185 129;
+
+  /* claro */
+  --l-surface-bg: #eef9f3;
+  --l-surface: #f6fdf9;
+  --l-surface-alt: #dcf3e7;
+  --l-surface-raised: #fbfffd;
+  --l-border-rgb: 6 78 59;
+  --l-ink: #0a241b;
+  --l-ink-soft: #35594a;
+  --l-ink-faint: #587a6d;
+
+  /* oscuro */
+  --d-surface-bg: #08160f;
+  --d-surface: #0f2018;
+  --d-surface-alt: #1a3226;
+  --d-surface-raised: #13271d;
+  --d-border-rgb: 167 243 208;
+  --d-ink: #e6f7ee;
+  --d-ink-soft: #a9cbbb;
+  --d-ink-faint: #7fa695;
+}
+
+:root[data-theme="violet"] {
+  --brand-50: #f5f3ff;
+  --brand-200: #ddd6fe;
+  --brand-300: #c4b5fd;
+  --brand-400: #a78bfa;
+  --brand-500: #8b5cf6;
+  --brand-600: #7c3aed;
+  --brand-700: #6d28d9;
+  --brand-900: #4c1d95;
+  --brand-400-rgb: 167 139 250;
+  --brand-600-rgb: 124 58 237;
+  --brand-500-rgb: 139 92 246;
+
+  /* claro */
+  --l-surface-bg: #f4f1fd;
+  --l-surface: #faf8ff;
+  --l-surface-alt: #e9e3fb;
+  --l-surface-raised: #fdfcff;
+  --l-border-rgb: 76 29 149;
+  --l-ink: #1c1236;
+  --l-ink-soft: #4b3f74;
+  --l-ink-faint: #6f6397;
+
+  /* oscuro */
+  --d-surface-bg: #120e1f;
+  --d-surface: #1a152b;
+  --d-surface-alt: #281f42;
+  --d-surface-raised: #1f1934;
+  --d-border-rgb: 221 214 254;
+  --d-ink: #eee9fb;
+  --d-ink-soft: #bfb4de;
+  --d-ink-faint: #9587bb;
+}
+
+/* ─── Modo claro / oscuro ───────────────────────────────────────────────────
+   El modo es un eje independiente del theme: 4 paletas × 2 modos, no 8 themes.
+   Cada theme ya trae sus dos neutrales (--l-* y --d-*); acá se elige cuál.
+
+   Sin `data-mode` se respeta la preferencia del sistema. `data-mode="light"`
+   o `"dark"` la pisan. Al resolverse en el server no hay parpadeo.
+
+   El bloque oscuro está repetido a propósito: una vez para la media query y
+   otra para el atributo explícito. CSS no permite unificarlos. Si tocás uno,
+   tocá el otro. */
+:root {
+  color-scheme: light;
+
+  --surface-bg: var(--l-surface-bg);
+  --surface: var(--l-surface);
+  --surface-alt: var(--l-surface-alt);
+  --surface-raised: var(--l-surface-raised);
+  --surface-border: var(--l-border-rgb);
+  --ink: var(--l-ink);
+  --ink-soft: var(--l-ink-soft);
+  --ink-faint: var(--l-ink-faint);
+
+  --shadow-rgb: var(--l-border-rgb);
+  --shadow-boost: 1;
+
+  --accent: var(--brand-600);
+  --accent-strong: var(--brand-700);
+
+  /* Chip suave de "presupuesto entregado": claro con texto oscuro. */
+  --step-soft-from: var(--brand-50);
+  --step-soft-to: var(--brand-200);
+  --step-soft-ink: var(--brand-900);
+  --step-soft-border: var(--brand-300);
+
+  --color-success-bg: #f7fee7;
+  --color-success-border: #bef264;
+  --color-success-text: #4d7c0f;
+  --color-success-text-strong: #3f6212;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-text: #be123c;
+  --color-danger-bg-strong: #ffe4e6;
+  --color-info-bg: #f0f9ff;
+  --color-info-bg-strong: #e0f2fe;
+  --color-info-border: #bae6fd;
+  --color-info-border-strong: #7dd3fc;
+  --color-info-text: #0369a1;
+  --color-info-text-strong: #075985;
+  --color-warning-bg: #fff7ed;
+  --color-warning-border: #fed7aa;
+  --color-warning-text: #c2410c;
+  --color-violet-bg: #f5f3ff;
+  --color-violet-border: #d8b4fe;
+  --color-violet-text: #6d28d9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    color-scheme: dark;
+
+    --surface-bg: var(--d-surface-bg);
+    --surface: var(--d-surface);
+    --surface-alt: var(--d-surface-alt);
+    --surface-raised: var(--d-surface-raised);
+    --surface-border: var(--d-border-rgb);
+    --ink: var(--d-ink);
+    --ink-soft: var(--d-ink-soft);
+    --ink-faint: var(--d-ink-faint);
+
+    /* En oscuro la sombra es negra y más marcada, no teñida. */
+    --shadow-rgb: 0 0 0;
+    --shadow-boost: 4;
+
+    /* El acento se aclara: brand-600 sobre fondo oscuro no contrasta. */
+    --accent: var(--brand-400);
+    --accent-strong: var(--brand-300);
+
+    --step-soft-from: var(--brand-900);
+    --step-soft-to: var(--brand-700);
+    --step-soft-ink: var(--brand-50);
+    --step-soft-border: var(--brand-600);
+
+    --color-success-bg: #14261a;
+    --color-success-border: #2f5c3a;
+    --color-success-text: #86efac;
+    --color-success-text-strong: #bbf7d0;
+    --color-danger-bg: #2a1416;
+    --color-danger-border: #6b2733;
+    --color-danger-text: #fda4af;
+    --color-danger-bg-strong: #3a1a1f;
+    --color-info-bg: #0f1f2e;
+    --color-info-bg-strong: #14293c;
+    --color-info-border: #24455f;
+    --color-info-border-strong: #38699a;
+    --color-info-text: #7dd3fc;
+    --color-info-text-strong: #bae6fd;
+    --color-warning-bg: #2a1e0f;
+    --color-warning-border: #5c4520;
+    --color-warning-text: #fcd34d;
+    --color-violet-bg: #1e1733;
+    --color-violet-border: #4c3d80;
+    --color-violet-text: #c4b5fd;
+  }
+}
+
+:root[data-mode="dark"] {
+  color-scheme: dark;
+
+  --surface-bg: var(--d-surface-bg);
+  --surface: var(--d-surface);
+  --surface-alt: var(--d-surface-alt);
+  --surface-raised: var(--d-surface-raised);
+  --surface-border: var(--d-border-rgb);
+  --ink: var(--d-ink);
+  --ink-soft: var(--d-ink-soft);
+  --ink-faint: var(--d-ink-faint);
+
+  --shadow-rgb: 0 0 0;
+  --shadow-boost: 4;
+
+  --accent: var(--brand-400);
+  --accent-strong: var(--brand-300);
+
+  --step-soft-from: var(--brand-900);
+  --step-soft-to: var(--brand-700);
+  --step-soft-ink: var(--brand-50);
+  --step-soft-border: var(--brand-600);
+
+  --color-success-bg: #14261a;
+  --color-success-border: #2f5c3a;
+  --color-success-text: #86efac;
+  --color-success-text-strong: #bbf7d0;
+  --color-danger-bg: #2a1416;
+  --color-danger-border: #6b2733;
+  --color-danger-text: #fda4af;
+  --color-danger-bg-strong: #3a1a1f;
+  --color-info-bg: #0f1f2e;
+  --color-info-bg-strong: #14293c;
+  --color-info-border: #24455f;
+  --color-info-border-strong: #38699a;
+  --color-info-text: #7dd3fc;
+  --color-info-text-strong: #bae6fd;
+  --color-warning-bg: #2a1e0f;
+  --color-warning-border: #5c4520;
+  --color-warning-text: #fcd34d;
+  --color-violet-bg: #1e1733;
+  --color-violet-border: #4c3d80;
+  --color-violet-text: #c4b5fd;
+}
+
 :root {
   /* Typography scale */
   --font-size-xs: 0.75rem;
@@ -19,53 +325,67 @@
   --font-size-4xl: 2.25rem;
   --line-height-4xl: 2.5rem;
 
-  /* Brand palette */
-  --orange-vivid: #ff7518;
-  --apricot-light: #ffc985;
-  --peach-soft: #ffd1b3;
-  --cream-warm: #fff0e1;
-  --brown-burnt: #803600;
+  /* Alias legacy de la escala de marca.
+     No usar en código nuevo — preferir --brand-*. Se van migrando de a poco. */
+  --orange-vivid: var(--brand-500);
+  --apricot-light: var(--brand-300);
+  --peach-soft: var(--brand-200);
+  --cream-warm: var(--brand-50);
+  --brown-burnt: var(--brand-900);
 
-  /* Neutral palette */
-  --background: #f6f7fb;
-  --foreground: #111827;
-  --gray-10: #f8fafc;
-  --gray-20: #f1f5f9;
-  --gray-30: #e2e8f0;
-  --gray-40: #cbd5e1;
-  --gray-50: #94a3b8;
-  --gray-60: #64748b;
-  --gray-70: #475569;
-  --gray-80: #334155;
-  --gray-90: #1e293b;
+  /* Neutral palette — teñida por el theme activo. */
+  --background: var(--surface-bg);
+  --foreground: var(--ink);
+  --gray-10: var(--surface);
+  --gray-20: var(--surface-alt);
+  --gray-30: rgb(var(--surface-border) / 0.16);
+  --gray-40: rgb(var(--surface-border) / 0.3);
+  --gray-50: var(--ink-faint);
+  --gray-60: var(--ink-faint);
+  --gray-70: var(--ink-soft);
+  --gray-80: var(--ink-soft);
+  --gray-90: var(--ink);
 
   /* Core semantic colors */
   --color-background: var(--background);
-  --color-surface: var(--gray-10);
-  --color-surface-alt: #eef2f7;
-  --color-surface-raised: #ffffff;
-  --color-border: rgba(148, 163, 184, 0.26);
-  --color-accent: #ea580c;
-  --color-accent-strong: #c2410c;
-  --color-accent-soft: rgba(251, 146, 60, 0.2);
-  --color-selection: rgba(249, 115, 22, 0.18);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: rgb(var(--surface-border) / 0.18);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: rgb(var(--brand-400-rgb) / 0.2);
+  --color-selection: rgb(var(--brand-500-rgb) / 0.18);
+
+  /* Gradientes de marca, para los estados que SÍ son branding: los dos pasos
+     de presupuesto (entregado / aceptado), que siempre fueron del color de la
+     marca.
+
+     Ojo: los colores que comunican significado —prioridad (gris/celeste/rojo),
+     cobro (gris/verde) y "trabajo finalizado" (verde)— NO usan estos tokens.
+     Van fijos en sus componentes: el usuario los lee como información, así que
+     tienen que significar lo mismo en cualquier paleta. */
+  --gradient-step-soft: linear-gradient(135deg, var(--step-soft-from), var(--step-soft-to));
+  --gradient-step-mid: linear-gradient(135deg, var(--brand-600), var(--brand-400));
 
   /* Text and border aliases */
-  --text-color-defult: var(--gray-90);
-  --text-color-ligth: var(--gray-60);
-  --text-color-gray: var(--gray-70);
-  --text-color-dark: var(--gray-90);
+  --text-color-defult: var(--ink);
+  --text-color-ligth: var(--ink-faint);
+  --text-color-gray: var(--ink-soft);
+  --text-color-dark: var(--ink);
   --border-defult: var(--color-border);
-  --border-ligth: var(--gray-30);
-  --border-dark: var(--gray-50);
+  --border-ligth: rgb(var(--surface-border) / 0.14);
+  --border-dark: rgb(var(--surface-border) / 0.34);
 
-  /* Shadows and overlays */
-  --color-shadow-sm: rgba(15, 23, 42, 0.06);
-  --color-shadow-md: rgba(15, 23, 42, 0.08);
-  --color-shadow-lg: rgba(15, 23, 42, 0.14);
-  --color-shadow-xl: rgba(15, 23, 42, 0.22);
-  --color-overlay: rgba(15, 23, 42, 0.5);
-  --color-overlay-soft: rgba(15, 23, 42, 0.24);
+  /* Shadows and overlays. En claro se tiñen con el theme; en oscuro pasan a
+     negro y --shadow-boost las intensifica (sobre fondo oscuro una sombra
+     suave no se ve). */
+  --color-shadow-sm: rgb(var(--shadow-rgb) / calc(0.07 * var(--shadow-boost)));
+  --color-shadow-md: rgb(var(--shadow-rgb) / calc(0.1 * var(--shadow-boost)));
+  --color-shadow-lg: rgb(var(--shadow-rgb) / calc(0.16 * var(--shadow-boost)));
+  --color-shadow-xl: rgb(var(--shadow-rgb) / calc(0.24 * var(--shadow-boost)));
+  --color-overlay: rgb(var(--shadow-rgb) / calc(0.5 * var(--shadow-boost)));
+  --color-overlay-soft: rgb(var(--shadow-rgb) / calc(0.24 * var(--shadow-boost)));
 
   /* Sidebar */
   --color-sidebar-text: rgba(226, 232, 240, 0.72);
@@ -74,42 +394,36 @@
   --color-sidebar-surface-hover: rgba(255, 255, 255, 0.08);
   --color-sidebar-border: rgba(255, 255, 255, 0.1);
   --color-sidebar-border-strong: rgba(255, 255, 255, 0.2);
-  --color-sidebar-gradient-start: rgba(15, 23, 42, 0.98);
-  --color-sidebar-gradient-end: rgba(30, 41, 59, 0.96);
-  --color-sidebar-accent-glow: rgba(249, 115, 22, 0.28);
+  /* Fijos a propósito: el sidebar y el menú mobile no siguen la paleta.
+     Son superficie de navegación, no branding. */
+  --color-sidebar-gradient-start: #0f172afa;
+  --color-sidebar-gradient-end: #1e293bf5;
+  --color-sidebar-accent-glow: rgb(var(--brand-500-rgb) / 0.28);
   --color-sidebar-highlight: rgba(255, 255, 255, 0.15);
 
-  /* Feedback states */
-  --color-success-bg: #f7fee7;
-  --color-success-border: #bef264;
-  --color-success-text: #4d7c0f;
-  --color-success-text-strong: #3f6212;
-  --color-danger-bg: #fef2f2;
-  --color-danger-border: #fecaca;
-  --color-danger-text: #be123c;
-  --color-danger-bg-strong: #ffe4e6;
-  --color-info-bg: #f0f9ff;
-  --color-info-bg-strong: #e0f2fe;
-  --color-info-border: #bae6fd;
-  --color-info-border-strong: #7dd3fc;
-  --color-info-text: #0369a1;
-  --color-info-text-strong: #075985;
-  --color-warning-bg: #fff7ed;
-  --color-warning-border: #fed7aa;
-  --color-warning-text: #c2410c;
-
-  /* Semantic helpers */
-  --color-neutral-bg: #f1f5f9;
-  --color-neutral-border: #cbd5e1;
-  --color-neutral-text-strong: #334155;
-  --color-violet-bg: #f5f3ff;
-  --color-violet-border: #d8b4fe;
-  --color-violet-text: #6d28d9;
+  /* Neutrales derivados de la superficie: sirven en claro y en oscuro.
+     El resto de los estados de feedback vive en los bloques de modo. */
+  --color-neutral-bg: var(--surface-alt);
+  --color-neutral-border: rgb(var(--surface-border) / 0.28);
+  --color-neutral-text-strong: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* Utilidades de marca (bg-brand-500, text-brand-900, border-brand-200...).
+     `inline` es lo que hace que resuelvan a var(--brand-*) en vez de al valor
+     fijo, así siguen al theme activo. Usar estas en lugar de bg-orange-*. */
+  --color-brand-50: var(--brand-50);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-900: var(--brand-900);
+
   --font-sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
@@ -233,6 +547,32 @@ body {
 
 /* ─── Print: etiqueta QR trabajo ─── */
 @media print {
+  /* El papel siempre es claro. Sin esto, imprimir en modo oscuro deja texto
+     claro sobre la etiqueta, que tiene fondo blanco fijo — ilegible.
+     `:root:root:root` sube la especificidad por encima de
+     `:root[data-mode="dark"]`. No alcanza con empatarla y confiar en el orden:
+     el bundler reordena las reglas. */
+  :root:root:root {
+    color-scheme: light;
+
+    --surface-bg: var(--l-surface-bg);
+    --surface: var(--l-surface);
+    --surface-alt: var(--l-surface-alt);
+    --surface-raised: var(--l-surface-raised);
+    --surface-border: var(--l-border-rgb);
+    --ink: var(--l-ink);
+    --ink-soft: var(--l-ink-soft);
+    --ink-faint: var(--l-ink-faint);
+    --shadow-rgb: var(--l-border-rgb);
+    --shadow-boost: 1;
+    --accent: var(--brand-600);
+    --accent-strong: var(--brand-700);
+    --step-soft-from: var(--brand-50);
+    --step-soft-to: var(--brand-200);
+    --step-soft-ink: var(--brand-900);
+    --step-soft-border: var(--brand-300);
+  }
+
   .print-etiqueta * {
     visibility: hidden !important;
   }

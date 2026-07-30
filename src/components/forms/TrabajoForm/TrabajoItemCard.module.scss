@@ -1,6 +1,6 @@
 .TrabajoItemCard {
   position: relative;
-  background: #fff;
+  background: var(--color-surface-raised);
   transition: color 180ms ease, background 180ms ease;
 }
 
@@ -21,7 +21,7 @@
 }
 
 .TrabajoItemCardUnchecked {
-  background: #fff;
+  background: var(--color-surface-raised);
 }
 
 .TrabajoItemCardUnchecked::after {
@@ -29,7 +29,7 @@
 }
 
 .TrabajoItemCardChecked {
-  background: linear-gradient(135deg, #fff7ed, #fff0e1);
+  background: linear-gradient(135deg, var(--brand-50), var(--brand-200));
 }
 
 .TrabajoItemCardChecked::after {
