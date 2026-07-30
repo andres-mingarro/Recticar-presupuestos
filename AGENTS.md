@@ -63,6 +63,8 @@ This repo also has a richer product and implementation guide in `CLAUDE.md`. Tre
 - `src/app/(app)/precios`: price administration and grouped adjustments.
 - `src/app/(app)/informacion-tecnica`: technical catalog administration.
 - `src/app/(app)/admin/usuarios`: user, role, permission, and home-screen administration.
+- `src/app/(app)/estadisticas`: period reports. Double guard: `super_admin` **and** the `estadisticas_auth` cookie enabled from `/configuracion`.
+- `src/app/(app)/estadisticas/datos`: data map documenting how information moves between tables. Same double guard as its parent; linked only from `/estadisticas`, not in the sidebar. Content lives in `src/components/pages/MapaDatosPage/mapa-datos.ts` and must be updated when the schema changes.
 - `src/app/api/clientes/search`: client autocomplete endpoint.
 
 ## Job Detail Architecture
@@ -87,6 +89,7 @@ This repo also has a richer product and implementation guide in `CLAUDE.md`. Tre
 - Server actions are defined inline in page files with `"use server"`.
 - `redirect()` throws internally in Next.js, so do not wrap it in `try/catch`.
 - Environment variables expected in `.env.local`: `DATABASE_URL`, `TECHNICAL_DATABASE_URL`, `NEXT_PUBLIC_BASE_URL`.
+- **The window does not scroll.** `AppShell` is `100dvh` with `overflow: hidden`; scrolling happens inside `AppMain`, which is `overflow-y-auto`. A `window.addEventListener("scroll", ...)` never fires and fails silently. Listen on the scrolling ancestor instead: walk up `parentElement` looking for `overflow-y` of `auto`/`scroll` rather than hardcoding the class. For in-page anchors use `element.scrollIntoView({ behavior: "smooth" })`, which walks ancestors on its own, and honor `prefers-reduced-motion`.
 
 ## Roles And Permissions
 

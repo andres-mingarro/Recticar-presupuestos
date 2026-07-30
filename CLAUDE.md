@@ -90,6 +90,8 @@ Variables CSS definidas en `src/scss/globals.css`:
 | `src/app/(app)/precios` | Administración de trabajos y listas de precios con ajustes porcentuales por categoría (`Incrementor`) |
 | `src/app/(app)/informacion-tecnica` | Edición del catálogo técnico externo (marcas, modelos, motores, vehículos); búsqueda y paginación server-side; solo `super_admin` puede editar |
 | `src/app/(app)/admin/usuarios` | Gestión de usuarios; solo `super_admin`; cards con switches de permisos por operario |
+| `src/app/(app)/estadisticas` | Reportes por período; doble guard: `super_admin` **y** cookie `estadisticas_auth` que se habilita desde `/configuracion` |
+| `src/app/(app)/estadisticas/datos` | Mapa de datos: cuatro recorridos que documentan cómo se mueve la información entre tablas. Mismo doble guard que su padre; se enlaza solo desde `/estadisticas` y no está en el menú |
 | `src/app/api/clientes/search` | Autocomplete de clientes |
 
 ---
@@ -208,6 +210,7 @@ El botón `PrintButton` llama a `window.print()`.
 | `src/lib/queries/trabajos.ts` | `getTrabajoDetailById`, `updateTrabajo`, `listTrabajos` |
 | `src/lib/queries/catalogo.ts` | `listTrabajosAgrupados`, marcas, modelos, motores |
 | `src/lib/qr.ts` | `generateQrSvg(url)` |
+| `src/components/pages/MapaDatosPage/mapa-datos.ts` | Contenido del mapa de datos (recorridos, pasos, notas y glosario de tablas). **Fuente única**: al cambiar el esquema o una relación, actualizar acá o la doc queda mintiendo |
 | `src/lib/pdf/PresupuestoPdf.tsx` | Componente PDF con `@react-pdf/renderer` |
 | `src/app/api/trabajos/[id]/pdf/route.ts` | Route handler PDF (tiene `@ts-expect-error` por React 19 — no tocar) |
 | `src/lib/types.ts` | Todos los tipos: `TrabajoEstado`, `TrabajoDetail`, `TrabajoAgrupado`, etc. |
@@ -244,6 +247,8 @@ bun run db:seed:dev      # crea 15 clientes fake y 15 trabajos fake
 - Todas las server actions deben envolver la lógica de DB en `try/catch` y retornar `{ error: string | null, values }` — nunca dejar explotar un error de Neon sin capturar.
 - En WSL2 con archivos en Linux FS nativo, el HMR funciona sin `WATCHPACK_POLLING`.
 - `src/middleware.ts` (no en raíz) por la estructura con `src/`.
+- **La ventana no scrollea.** `AppShell` ocupa `100dvh` con `overflow: hidden` y el scroll real pasa dentro de `AppMain`, que tiene `overflow-y-auto`. Un `window.addEventListener("scroll", ...)` no dispara nunca y falla en silencio (scroll-spy, lazy load, botón "volver arriba", scroll infinito). Hay que escuchar al contenedor: subir por `parentElement` hasta encontrar `overflow-y` en `auto`/`scroll` en vez de hardcodear la clase. Ver `useRecorridoActivo` en `MapaDatosPage.tsx`.
+- Por lo mismo, `scroll-behavior: smooth` global no sirve para anclas internas: usar `element.scrollIntoView({ behavior: "smooth" })`, que recorre los ancestros solo. Respetar `prefers-reduced-motion`.
 - Variables de entorno en `.env.local`: `DATABASE_URL`, `TECHNICAL_DATABASE_URL`, `NEXT_PUBLIC_BASE_URL`.
 
 ---
