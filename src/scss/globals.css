@@ -160,8 +160,10 @@
    El modo es un eje independiente del theme: 4 paletas × 2 modos, no 8 themes.
    Cada theme ya trae sus dos neutrales (--l-* y --d-*); acá se elige cuál.
 
-   Sin `data-mode` se respeta la preferencia del sistema. `data-mode="light"`
-   o `"dark"` la pisan. Al resolverse en el server no hay parpadeo.
+   `data-mode="light"` o `"dark"` fijan el modo. El default es claro, así que
+   el server escribe `data-mode="light"` y la media query no aplica: nadie se
+   encuentra la app en oscuro sin haberlo elegido. Solo si el usuario elige
+   "Sistema" se omite el atributo y manda `prefers-color-scheme`.
 
    El bloque oscuro está repetido a propósito: una vez para la media query y
    otra para el atributo explícito. CSS no permite unificarlos. Si tocás uno,

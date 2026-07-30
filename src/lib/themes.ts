@@ -106,15 +106,19 @@ const THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 /**
  * El modo es un eje independiente del theme: cualquier paleta funciona en
- * claro y en oscuro. `"system"` sigue la preferencia del sistema operativo y
- * es el default — en ese caso no se escribe `data-mode` y resuelve el CSS con
+ * claro y en oscuro.
+ *
+ * El default es `"light"`, no `"system"`: si siguiéramos al sistema operativo,
+ * alguien que lo tiene en oscuro entraría por primera vez y se encontraría la
+ * app cambiada sin haber pedido nada. `"system"` queda como opción explícita
+ * del selector; ahí no se escribe `data-mode` y resuelve el CSS con
  * `prefers-color-scheme`, sin JS y sin parpadeo.
  */
 export type ThemeMode = "light" | "dark" | "system";
 
 export const MODE_COOKIE = "theme-mode";
 
-export const DEFAULT_MODE: ThemeMode = "system";
+export const DEFAULT_MODE: ThemeMode = "light";
 
 export const MODE_IDS: ThemeMode[] = ["light", "dark", "system"];
 
