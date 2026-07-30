@@ -44,7 +44,7 @@ function FieldRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full cursor-pointer items-center justify-between gap-3 py-3 text-left transition-colors hover:bg-[var(--cream-warm)]/40"
+      className="flex w-full cursor-pointer items-center justify-between gap-3 py-3 text-left transition-colors hover:bg-[var(--color-surface-brand)]"
     >
       <span className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--text-color-gray)]">
         {label}

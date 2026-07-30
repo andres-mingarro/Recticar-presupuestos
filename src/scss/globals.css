@@ -184,6 +184,11 @@
   --accent: var(--brand-600);
   --accent-strong: var(--brand-700);
 
+  /* Tinte de marca sobre la superficie: hovers de fila y paneles suaves.
+     Translúcido a propósito, así funciona igual en claro y en oscuro sin
+     necesitar un color distinto por modo. */
+  --color-surface-brand: rgb(var(--brand-500-rgb) / 0.1);
+
   /* Chip suave de "presupuesto entregado": claro con texto oscuro. */
   --step-soft-from: var(--brand-50);
   --step-soft-to: var(--brand-200);
@@ -233,7 +238,11 @@
     --accent: var(--brand-400);
     --accent-strong: var(--brand-300);
 
-    --step-soft-from: var(--brand-900);
+    --color-surface-brand: rgb(var(--brand-500-rgb) / 0.18);
+
+    --color-surface-brand: rgb(var(--brand-500-rgb) / 0.18);
+
+  --step-soft-from: var(--brand-900);
     --step-soft-to: var(--brand-700);
     --step-soft-ink: var(--brand-50);
     --step-soft-border: var(--brand-600);
@@ -278,6 +287,8 @@
 
   --accent: var(--brand-400);
   --accent-strong: var(--brand-300);
+
+  --color-surface-brand: rgb(var(--brand-500-rgb) / 0.18);
 
   --step-soft-from: var(--brand-900);
   --step-soft-to: var(--brand-700);
@@ -567,6 +578,7 @@ body {
     --shadow-boost: 1;
     --accent: var(--brand-600);
     --accent-strong: var(--brand-700);
+    --color-surface-brand: rgb(var(--brand-500-rgb) / 0.1);
     --step-soft-from: var(--brand-50);
     --step-soft-to: var(--brand-200);
     --step-soft-ink: var(--brand-900);

@@ -65,7 +65,7 @@
 
 .stepPillDone {
   border-color: var(--apricot-light);
-  background: var(--cream-warm);
+  background: var(--color-surface-brand);
   color: var(--brown-burnt);
 
   .stepPillNumber {
@@ -108,7 +108,7 @@
   cursor: pointer;
 
   &:active {
-    background: var(--cream-warm);
+    background: var(--color-surface-brand);
   }
 }
 
@@ -178,7 +178,7 @@
   gap: 8px;
 
   &:active {
-    background: var(--cream-warm);
+    background: var(--color-surface-brand);
   }
 }
 

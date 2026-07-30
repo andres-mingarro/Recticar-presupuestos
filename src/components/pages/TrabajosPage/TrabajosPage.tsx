@@ -137,7 +137,7 @@ function TrabajoTable({
                   key={trabajo.id}
                   className={cn(
                     "cursor-pointer border-t border-[var(--color-border)] transition-colors",
-                    "hover:bg-[var(--cream-warm)]/40 focus-within:bg-[var(--cream-warm)]/40",
+                    "hover:bg-[var(--color-surface-brand)] focus-within:bg-[var(--color-surface-brand)]",
                     PRIORIDAD_ROW_ACCENT[trabajo.prioridad]
                   )}
                   role="link"

@@ -123,7 +123,7 @@ function TrabajoTable({
                   <tr
                     key={trabajo.id}
                     className={cn(
-                      "border-t border-[var(--color-border)] transition-colors hover:bg-[var(--cream-warm)]",
+                      "border-t border-[var(--color-border)] transition-colors hover:bg-[var(--color-surface-brand)]",
                       PRIORIDAD_ROW_ACCENT[trabajo.prioridad]
                     )}
                   >

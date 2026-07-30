@@ -40,7 +40,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, var(--cream-warm), rgba(255, 255, 255, 0.95));
+  background: linear-gradient(135deg, var(--cream-warm), var(--color-surface-raised));
   border-bottom: 1px solid rgb(var(--brand-600-rgb) / 0.12);
 }
 

@@ -261,7 +261,7 @@ export default async function ConfiguracionPage({
                     </div>
                   </form>
 
-                  <div className="flex flex-col gap-2 rounded-xl border border-[var(--color-border)] bg-[linear-gradient(135deg,rgba(255,247,237,0.7),rgba(255,255,255,0.9))] p-3">
+                  <div className="flex flex-col gap-2 rounded-xl border border-[var(--color-border)] bg-[linear-gradient(135deg,var(--color-surface-alt),rgba(255,255,255,0.9))] p-3">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">Mantenimiento</p>
                     <p className="text-sm font-semibold text-[var(--text-color-defult)]">Ejecutar ahora</p>
                     {empresa.ultimaEjecucionLimpieza ? (

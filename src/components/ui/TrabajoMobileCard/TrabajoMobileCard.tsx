@@ -37,7 +37,7 @@ export function TrabajoMobileCard({ trabajo, showBusinessDays = true }: Props) {
     <div
       className={cn(
         "TrabajoMobileCard",
-        "flex flex-col gap-2.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5 cursor-pointer transition-colors hover:bg-[var(--cream-warm)]/40",
+        "flex flex-col gap-2.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5 cursor-pointer transition-colors hover:bg-[var(--color-surface-brand)]",
         PRIORIDAD_BORDER[trabajo.prioridad]
       )}
       role="link"
