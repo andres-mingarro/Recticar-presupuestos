@@ -31,7 +31,7 @@ export function ListaPreciosSelector({
         <button
           type="button"
           onClick={() => onDialogOpenChange(true)}
-          className="inline-flex flex-1 items-center justify-between gap-2 rounded-xl border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)] transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]"
+          className="inline-flex flex-1 items-center justify-between gap-2 rounded-xl border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgb(var(--brand-600-rgb)_/_0.28)] transition focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-soft)]"
         >
           <span className="flex items-center gap-2 uppercase tracking-wider">
             <Icon name="clipboardList" className="size-4 shrink-0" />
@@ -54,7 +54,7 @@ export function ListaPreciosSelector({
 
       <Dialog open={listaDialogOpen} onOpenChange={onDialogOpenChange}>
         <DialogContent variant="centered">
-          <div className="rounded-t-[20px] bg-[linear-gradient(135deg,var(--cream-warm),rgba(255,255,255,0.95))] border-b border-[rgba(234,88,12,0.12)] pl-6 pr-14 pt-6 pb-4">
+          <div className="rounded-t-[20px] bg-[linear-gradient(135deg,var(--cream-warm),var(--color-surface-raised))] border-b border-[rgb(var(--brand-600-rgb)_/_0.12)] pl-6 pr-14 pt-6 pb-4">
             <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--color-accent)]">
               Lista de precios
             </p>

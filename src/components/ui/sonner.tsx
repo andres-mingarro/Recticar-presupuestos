@@ -22,7 +22,7 @@ export function Toaster() {
       }}
       icons={{
         success: (
-          <span className="inline-flex size-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white shadow-[0_10px_24px_rgba(234,88,12,0.32)]">
+          <span className="inline-flex size-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white shadow-[0_10px_24px_rgb(var(--brand-600-rgb)_/_0.32)]">
             <Icon name="check" className="size-4" />
           </span>
         ),
@@ -37,7 +37,7 @@ export function Toaster() {
         classNames: {
           toast: cn(
             "group border-none rounded-[24px] p-0 overflow-hidden",
-            "shadow-[0_22px_70px_rgba(15,23,42,0.14)] ring-1 ring-[rgba(128,54,0,0.08)]"
+            "shadow-[0_22px_70px_var(--color-shadow-lg)] ring-1 ring-[rgba(128,54,0,0.08)]"
           ),
           content: "gap-3 p-4 sm:px-5 sm:py-4",
           title: "text-[15px] font-semibold tracking-[-0.01em] text-[var(--brown-burnt)]",
@@ -46,14 +46,14 @@ export function Toaster() {
           closeButton: cn(
             "!left-auto !right-0 !top-[6px] !mt-0 !translate-x-0 !translate-y-0",
             "!h-8 !w-8 !rounded-full !border !border-[rgba(128,54,0,0.12)]",
-            "!bg-white/80 !text-[var(--brown-burnt)] !shadow-none",
-            "backdrop-blur transition hover:!bg-[var(--cream-warm)] hover:!border-[rgba(234,88,12,0.2)]"
+            "!bg-[var(--color-surface-raised)]/80 !text-[var(--brown-burnt)] !shadow-none",
+            "backdrop-blur transition hover:!bg-[var(--cream-warm)] hover:!border-[rgb(var(--brand-600-rgb)_/_0.2)]"
           ),
           success: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,var(--orange-vivid),var(--color-accent))]",
           error: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,#ef4444,#be123c)]",
           loading: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,#0ea5e9,#0284c7)]",
           info: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,#38bdf8,#0284c7)]",
-          warning: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,#fb923c,#ea580c)]",
+          warning: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,var(--brand-400),var(--brand-600))]",
           default: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,var(--apricot-light),var(--orange-vivid))]",
         },
         style: {
@@ -62,7 +62,7 @@ export function Toaster() {
           border: "1px solid rgba(128, 54, 0, 0.08)",
           borderRadius: "24px",
           color: "var(--text-color-defult)",
-          boxShadow: "0 22px 70px rgba(15, 23, 42, 0.14)",
+          boxShadow: "0 22px 70px var(--color-shadow-lg)",
         },
       }}
     />

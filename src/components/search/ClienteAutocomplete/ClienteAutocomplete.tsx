@@ -175,7 +175,7 @@ export function ClienteAutocomplete({
       {/* Dropdown */}
       {isOpen && results.length > 0 && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1">
-          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-2 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[0_20px_60px_var(--color-shadow-lg)]">
             {results.map((cliente, index) => (
               <button
                 key={cliente.id}

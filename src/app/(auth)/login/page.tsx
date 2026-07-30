@@ -61,7 +61,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-[28px] border border-white/60 bg-white/80 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.12)] backdrop-blur">
+      <div className="w-full max-w-sm rounded-[28px] border border-white/60 bg-[var(--color-surface-raised)]/80 p-8 shadow-[0_18px_60px_var(--color-shadow-lg)] backdrop-blur">
         <div className="mb-8 flex justify-center">
           <Image
             src="/logo.svg"
@@ -123,7 +123,7 @@ export default function LoginPage() {
           </div>
 
           {turnstileEnabled ? (
-            <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-white p-3">
+            <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3">
               <TurnstileWidget
                 siteKey={turnstileSiteKey}
                 onTokenChange={handleTurnstileTokenChange}

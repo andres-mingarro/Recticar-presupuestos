@@ -3,6 +3,9 @@
 import { cn } from "@/lib/cn";
 import { usePrioridad } from "./PrioridadContext";
 
+// Estos colores NO siguen el theme a propósito: comunican estado (gris =
+// baja, celeste = normal, rojo = alta). Tienen que leerse igual en cualquier
+// paleta, así que van fijos.
 const OPTIONS = [
   {
     value: "baja" as const,
@@ -41,7 +44,7 @@ export function PrioridadToggle({ form }: { form?: string }) {
                 "flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
                 isActive
                   ? option.activeTone
-                  : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]"
+                  : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--text-color-defult)]"
               )}
             >
               {option.label}

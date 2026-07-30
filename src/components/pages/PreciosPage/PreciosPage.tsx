@@ -88,7 +88,7 @@ function SortableTrabajoRow({
         "SortableTrabajoRow precios-item-row relative border-b-2 md:border-b-0 border-b-[var(--orange-vivid)] last:border-b-0 flex flex-col border-b border-[var(--color-border)]/80 md:flex-row md:items-stretch",
         readableRowGroupCls,
         readableRowHoverCls,
-        isDragging && "z-10 rounded-xl bg-white opacity-90 shadow-lg"
+        isDragging && "z-10 rounded-xl bg-[var(--color-surface-raised)] opacity-90 shadow-lg"
       )}
     >
       <div className={cn(
@@ -385,7 +385,7 @@ function CategoriaCard({
               name="nombre"
               defaultValue={grupo.categoriaNombre}
               required
-              className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
+              className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2 py-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/20"
             />
           ) : (
             <span className="flex-1 text-sm font-semibold uppercase tracking-widest text-[var(--text-color-defult)]">
@@ -528,7 +528,7 @@ function CategoriaCard({
             name="nombre"
             placeholder="Nombre del nuevo trabajo…"
             required
-            className="flex-1 w-full md:w-auto rounded-xl border border-[var(--color-info-border)] bg-white/80 px-3 py-1.5 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 backdrop-blur-sm"
+            className="flex-1 w-full md:w-auto rounded-xl border border-[var(--color-info-border)] bg-[var(--color-surface-raised)]/80 px-3 py-1.5 text-sm text-[var(--text-color-defult)] placeholder:text-[var(--color-info-border-strong)] focus:border-[var(--color-info-border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--color-info-border)]/40 backdrop-blur-sm"
           />
           <button
             type="submit"

@@ -44,7 +44,7 @@ export function SectionTabs({
               "inline-flex w-full md:w-auto items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition",
               active
                 ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white"
-                : "border-[var(--color-border)] bg-white text-[var(--text-color-gray)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                : "border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--text-color-gray)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
             )}
           >
             <Icon name={SECTION_ICONS[section]} className="size-4 shrink-0" />
@@ -53,7 +53,7 @@ export function SectionTabs({
               className={cn(
                 "rounded-full px-2 py-0.5 text-xs",
                 active
-                  ? "bg-white/20 text-white"
+                  ? "bg-[var(--color-surface-raised)]/20 text-white"
                   : "bg-[var(--color-surface-alt)] text-[var(--text-color-defult)]"
               )}
             >

@@ -47,7 +47,7 @@ function StatCard({
   return (
     <div
       className={cn(
-        "StatCard flex flex-col gap-2 rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-[0_4px_16px_rgba(15,23,42,0.06)]",
+        "StatCard flex flex-col gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 shadow-[0_4px_16px_var(--color-shadow-sm)]",
         accent
       )}
     >
@@ -103,7 +103,7 @@ export function HomePage({
       {/* Stats + accesos rápidos */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         {(canCrearTrabajo || canVerClientes) && (
-          <div className="col-span-2 hidden flex-col justify-center gap-3 rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-[0_4px_16px_rgba(15,23,42,0.06)] md:flex lg:col-span-1">
+          <div className="col-span-2 hidden flex-col justify-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 shadow-[0_4px_16px_var(--color-shadow-sm)] md:flex lg:col-span-1">
             {canCrearTrabajo && (
               <Button as="a" href="/trabajos/nuevo" variant="primary" icon={<Icon name="plus" />} className="w-full justify-center">
                 Nuevo trabajo
@@ -122,7 +122,7 @@ export function HomePage({
           label="Alta prioridad"
           value={stats.trabajosAltaPrioridad}
           icon="gauge"
-          accent={stats.trabajosAltaPrioridad > 0 ? "border-rose-200 bg-rose-50" : undefined}
+          accent={stats.trabajosAltaPrioridad > 0 ? "border-[var(--color-danger-border)] bg-[var(--color-danger-bg)]" : undefined}
         />
         <StatCard label="Clientes" value={stats.clientesTotales} icon="user" />
       </section>
@@ -208,8 +208,8 @@ export function HomePage({
                         className={cn(
                           "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
                           p.dias_esperando >= 7
-                            ? "bg-rose-100 text-rose-700"
-                            : "bg-amber-100 text-amber-700"
+                            ? "bg-[var(--color-danger-bg-strong)] text-[var(--color-danger-text)]"
+                            : "bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]"
                         )}
                       >
                         {p.dias_esperando}d

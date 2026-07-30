@@ -125,7 +125,7 @@ function GrupoAccordion({
         styles.TrabajoFormAccordion,
         "rounded-2xl border p-4 transition-colors",
         hasSelected
-          ? "border-[var(--apricot-light)] bg-[linear-gradient(135deg,#fff7ed,#fff0e1)]"
+          ? "border-[var(--apricot-light)] bg-[linear-gradient(135deg,var(--brand-50),var(--brand-200))]"
           : "border-[var(--color-border)] bg-[var(--gray-20)]"
       )}
     >

@@ -12,7 +12,7 @@
   &:hover {
     border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
     transform: translateY(-3px);
-    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.09);
+    box-shadow: 0 14px 28px var(--color-shadow-sm);
   }
 }
 

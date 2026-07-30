@@ -105,7 +105,7 @@ export function SearchBar({ section, q, tab, marcaId }: SearchBarProps) {
   }
 
   const inputCls =
-    "min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20";
+    "min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20";
 
   return (
     <div
@@ -134,7 +134,7 @@ export function SearchBar({ section, q, tab, marcaId }: SearchBarProps) {
             id={listId}
             ref={listRef}
             role="listbox"
-            className="absolute left-0 top-full z-50 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-[var(--color-border)] bg-white py-1 shadow-lg"
+            className="absolute left-0 top-full z-50 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-1 shadow-lg"
           >
             {results.map((suggestion, i) => (
               <li

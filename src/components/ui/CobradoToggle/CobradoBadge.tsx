@@ -12,8 +12,8 @@ export function CobradoBadge() {
         "CobradoBadge",
         "inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold",
         cobrado
-          ? "bg-emerald-100 text-emerald-700"
-          : "bg-red-100 text-red-700"
+          ? "bg-[var(--color-success-bg)] text-[var(--color-success-text)]"
+          : "bg-[var(--color-danger-bg)] text-[var(--color-danger-text)]"
       )}
     >
       {cobrado ? "Cobrado" : "No cobrado"}

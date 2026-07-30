@@ -1,0 +1,26 @@
+// El logo es un SVG monocromo negro cargado como <img>, así que no hereda
+// currentColor. En modo oscuro se invierte a blanco por filtro, en vez de
+// mantener un segundo asset que haya que actualizar dos veces.
+//
+// El bloque está repetido a propósito: uno para el atributo explícito y otro
+// para la media query. Si tocás uno, tocá el otro.
+.logo {
+  transition: filter 0.15s ease-in-out;
+}
+
+:root[data-mode="dark"] .logo {
+  filter: brightness(0) invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) .logo {
+    filter: brightness(0) invert(1);
+  }
+}
+
+// En papel siempre va negro, aunque la app esté en oscuro.
+@media print {
+  .logo {
+    filter: none !important;
+  }
+}

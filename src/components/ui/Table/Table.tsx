@@ -8,7 +8,7 @@ export function Table({ children }: { children: ReactNode }) {
       className={cn(
         "Table",
         styles.Table,
-        "overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
+        "overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[0_20px_60px_var(--color-shadow-sm)]"
       )}
     >
       <div className="overflow-x-auto">{children}</div>

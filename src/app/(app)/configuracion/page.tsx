@@ -82,9 +82,9 @@ export default async function ConfiguracionPage({
               <div className="grid gap-2 sm:grid-cols-2">
                 <a
                   href="/informacion-tecnica"
-                  className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgba(234,88,12,0.08)]"
+                  className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgb(var(--brand-600-rgb)_/_0.08)]"
                 >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#fff7ed,#ffe7d1)] text-[var(--color-accent)]">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--brand-50),var(--brand-200))] text-[var(--color-accent)]">
                     <Icon name="car" className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -100,9 +100,9 @@ export default async function ConfiguracionPage({
                 {canEdit ? (
                   <a
                     href="/admin/usuarios"
-                    className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgba(234,88,12,0.08)]"
+                    className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgb(var(--brand-600-rgb)_/_0.08)]"
                   >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#fff7ed,#ffe7d1)] text-[var(--color-accent)]">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--brand-50),var(--brand-200))] text-[var(--color-accent)]">
                       <Icon name="shieldUser" className="size-4" />
                     </span>
                     <div className="min-w-0 flex-1">

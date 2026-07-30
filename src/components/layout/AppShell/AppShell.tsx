@@ -8,15 +8,18 @@ import { AppShellBody } from "@/components/layout/AppShellBody";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppMain } from "@/components/layout/AppMain";
 import { MobileActionsProvider, MobileActions } from "@/components/layout/MobileActions";
+import type { ThemeId, ThemeMode } from "@/lib/themes";
 import styles from "./AppShell.module.scss";
 
 type Props = {
   children: ReactNode;
   role?: string;
   permisos?: string[];
+  theme: ThemeId;
+  mode: ThemeMode;
 };
 
-export function AppShell({ children, role, permisos }: Props) {
+export function AppShell({ children, role, permisos, theme, mode }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -28,7 +31,7 @@ export function AppShell({ children, role, permisos }: Props) {
       permisos={permisos}
     >
       <div className={cn("AppShell", styles.shell)}>
-        <Header />
+        <Header theme={theme} mode={mode} />
         <AppShellBody>
           <AppSidebar role={role} permisos={permisos} />
           <AppMain>{children}</AppMain>

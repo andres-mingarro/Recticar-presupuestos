@@ -113,7 +113,7 @@ export function EstadisticasButton({
                     placeholder="Contraseña"
                     autoFocus
                     autoComplete="current-password"
-                    className="w-full rounded-lg border border-[var(--color-border)] bg-white py-2.5 pl-3 pr-10 text-sm outline-none transition focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--orange-vivid)]/20"
+                    className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2.5 pl-3 pr-10 text-sm outline-none transition focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--orange-vivid)]/20"
                   />
                   <span
                     role="button"

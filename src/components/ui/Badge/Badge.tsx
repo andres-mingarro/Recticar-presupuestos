@@ -19,6 +19,7 @@ type ContactBadgeVariant =
   | "postalCode";
 
 export function PriorityBadge({ prioridad, className }: { prioridad: TrabajoPrioridad; className?: string }) {
+  // Fijos a propósito: la prioridad se lee por color (gris → celeste → rojo).
   const priorityStyles = {
     baja:
       "border-slate-600 bg-[linear-gradient(135deg,#475569,#1e293b)] text-white shadow-[0_10px_24px_rgba(51,65,85,0.18)]",
@@ -62,11 +63,12 @@ export function StatusBadge({
 }) {
   const statusStyles = {
     pendiente:
-      "border-slate-300 bg-[linear-gradient(135deg,#f8fafc,#e2e8f0)] text-slate-700 shadow-[0_10px_24px_rgba(148,163,184,0.16)]",
+      "border-[var(--color-border)] bg-[var(--color-surface-alt)] text-[var(--text-color-gray)] shadow-[0_10px_24px_var(--color-shadow-sm)]",
     presupuesto_entregado:
-      "border-orange-200 bg-[linear-gradient(135deg,#fff7ed,#fed7aa)] text-orange-700 shadow-[0_10px_24px_rgba(251,146,60,0.16)]",
+      "border-[var(--step-soft-border)] bg-[image:var(--gradient-step-soft)] text-[var(--step-soft-ink)] shadow-[0_10px_24px_var(--color-shadow-md)]",
     aprobado:
-      "border-orange-600 bg-[linear-gradient(135deg,#ea580c,#fb923c)] text-white shadow-[0_10px_24px_rgba(234,88,12,0.18)]",
+      "border-[var(--brand-600)] bg-[image:var(--gradient-step-mid)] text-white shadow-[0_10px_24px_var(--color-shadow-lg)]",
+    // Verde fijo: "terminado" no depende de la paleta.
     finalizado:
       "border-emerald-600 bg-[linear-gradient(135deg,#059669,#34d399)] text-white shadow-[0_10px_24px_rgba(5,150,105,0.18)]",
   };
@@ -95,6 +97,7 @@ export function PaymentBadge({ cobrado, className }: { cobrado: boolean; classNa
         "Badge",
         styles.Badge,
         "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold",
+        // Verde/gris fijos: es estado de cobro, no branding.
         cobrado
           ? "border-emerald-600 bg-[linear-gradient(135deg,#059669,#34d399)] text-white shadow-[0_10px_24px_rgba(5,150,105,0.28)]"
           : "border-slate-600 bg-[linear-gradient(135deg,#64748b,#475569)] text-white shadow-[0_10px_24px_rgba(100,116,139,0.28)]",

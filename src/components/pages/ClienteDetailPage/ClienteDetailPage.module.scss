@@ -28,7 +28,7 @@
   font-weight: 700;
   color: var(--brown-burnt);
   box-shadow:
-    0 2px 8px rgba(234, 88, 12, 0.18),
+    0 2px 8px rgb(var(--brand-600-rgb) / 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
   user-select: none;
   letter-spacing: -0.02em;
@@ -58,7 +58,7 @@
 }
 
 .statPillActive {
-  border-color: rgba(234, 88, 12, 0.28);
+  border-color: rgb(var(--brand-600-rgb) / 0.28);
   background: linear-gradient(135deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.9));
   color: var(--color-accent-strong);
 }
@@ -82,8 +82,8 @@
 }
 
 .infoGridEditing {
-  border-color: rgba(234, 88, 12, 0.35);
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.08);
+  border-color: rgb(var(--brand-600-rgb) / 0.35);
+  box-shadow: 0 0 0 3px rgb(var(--brand-600-rgb) / 0.08);
 }
 
 .infoGridRow {
@@ -106,7 +106,7 @@
   transition: background 140ms ease;
 
   &:hover {
-    background: rgba(234, 88, 12, 0.03);
+    background: rgb(var(--brand-600-rgb) / 0.03);
   }
 
   & + .infoRow {
@@ -212,9 +212,9 @@
   transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
 
   &:hover {
-    border-color: rgba(37, 158, 68, 0.45);
-    color: #15803d;
-    background: #f0fdf4;
+    border-color: var(--color-success-border);
+    color: var(--color-success-text);
+    background: var(--color-success-bg);
   }
 }
 

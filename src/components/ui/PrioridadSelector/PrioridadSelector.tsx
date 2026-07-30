@@ -68,7 +68,7 @@ export function PrioridadSelector({ action }: PrioridadSelectorProps) {
                   "rounded-xl border px-3 py-2 text-sm font-semibold transition focus:outline-none",
                   isActive
                     ? option.activeTone
-                    : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]",
+                    : "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--text-color-defult)]",
                   isPending && "opacity-60",
                   isActive ? "cursor-default" : "cursor-pointer"
                 )}

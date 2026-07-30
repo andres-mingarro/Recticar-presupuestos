@@ -7,7 +7,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 16px 34px var(--color-shadow-sm);
   }
 }
 

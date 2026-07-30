@@ -81,9 +81,9 @@ function TabLinks<T extends string>({
   activeValue: T;
 }) {
   const activeCls =
-    "border-[var(--color-accent)] bg-[var(--color-accent)] text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)]";
+    "border-[var(--color-accent)] bg-[var(--color-accent)] text-white shadow-[0_10px_24px_rgb(var(--brand-600-rgb)_/_0.28)]";
   const inactiveCls =
-    "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-white hover:text-[var(--text-color-defult)]";
+    "border-transparent bg-transparent text-[var(--text-color-gray)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--text-color-defult)]";
   return (
     <div className="ButtonGroup inline-flex rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-0.5 scale-[0.82]">
       {options.map((opt) => (
