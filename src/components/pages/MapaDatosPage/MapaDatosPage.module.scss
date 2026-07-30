@@ -1,0 +1,473 @@
+.MapaDatosPage {
+  /* Neutros tintados hacia el naranja de la app. Nada de gris puro ni blanco puro. */
+  --m-ink: oklch(0.26 0.018 58);
+  --m-ink-soft: oklch(0.53 0.014 58);
+  --m-ink-faint: oklch(0.64 0.012 58);
+  --m-line: oklch(0.9 0.008 62);
+  --m-line-soft: oklch(0.945 0.006 62);
+  --m-surface: oklch(0.995 0.003 70);
+  --m-surface-2: oklch(0.973 0.008 68);
+  --m-accent: oklch(0.63 0.17 45);
+  --m-accent-soft: oklch(0.955 0.03 62);
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ---------------- Layout ---------------- */
+
+.layout {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 17rem 1fr;
+    gap: 3rem;
+  }
+}
+
+.contenido {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+/* ---------------- Índice ---------------- */
+
+.indice {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 1024px) {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+.indiceLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--m-ink-faint);
+}
+
+.indiceLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.indiceLink {
+  display: grid;
+  grid-template-columns: 1.45rem 1fr;
+  align-items: start;
+  gap: 0.7rem;
+  border-radius: 10px;
+  padding: 0.55rem 0.6rem;
+  text-decoration: none;
+  transition: background-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:hover {
+    background: var(--m-surface-2);
+  }
+}
+
+.indiceNum {
+  display: grid;
+  height: 1.45rem;
+  width: 1.45rem;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--m-line);
+  background: var(--m-surface);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--m-ink-faint);
+  transition: background-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Recorrido que se está leyendo. */
+.indiceLinkActivo {
+  background: var(--m-accent-soft);
+
+  .indiceNum {
+    border-color: var(--m-accent);
+    background: var(--m-accent);
+    color: oklch(0.99 0.01 70);
+  }
+
+  .indiceNombre {
+    color: var(--m-accent);
+  }
+
+  .indicePregunta {
+    color: var(--m-ink-soft);
+  }
+}
+
+.indiceNombre {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--m-ink);
+}
+
+.indicePregunta {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--m-ink-faint);
+}
+
+/* ---------------- Sección de flujo ---------------- */
+
+.flujo {
+  scroll-margin-top: 1.5rem;
+}
+
+.flujoHead {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--m-line);
+  padding-bottom: 1.25rem;
+}
+
+.flujoIndice {
+  margin-bottom: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--m-accent);
+}
+
+.flujoPregunta {
+  max-width: 30ch;
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--m-ink);
+}
+
+.flujoRespuesta {
+  margin-top: 0.7rem;
+  max-width: 68ch;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--m-ink-soft);
+}
+
+/* ---------------- Pasos ---------------- */
+
+.pasos {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.paso,
+.nota {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  gap: 0.9rem;
+}
+
+.rail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+
+  /* Conector vertical entre pasos. */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    transform: translateX(-50%);
+    background: var(--m-line);
+  }
+}
+
+.pasos > li:last-child .rail::before {
+  display: none;
+}
+
+.numero {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  height: 1.75rem;
+  width: 1.75rem;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.numero_escribe {
+  background: var(--m-accent);
+  color: oklch(0.99 0.01 70);
+}
+
+.numero_lee {
+  border: 1px solid var(--m-line);
+  background: var(--m-surface);
+  color: var(--m-ink-soft);
+}
+
+.numero_intacto {
+  border: 1px dashed var(--m-ink-faint);
+  background: var(--m-surface);
+  color: var(--m-ink-faint);
+}
+
+.pasoCuerpo {
+  min-width: 0;
+  padding-bottom: 1.9rem;
+}
+
+.pasoHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+}
+
+.pasoTitulo {
+  margin-right: 0.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--m-ink);
+}
+
+.pasoQue {
+  max-width: 70ch;
+  font-size: 0.925rem;
+  line-height: 1.65;
+  color: var(--m-ink-soft);
+}
+
+.pasoResaltado .pasoTitulo {
+  color: var(--m-accent);
+}
+
+/* ---------------- Etiquetas ---------------- */
+
+.accion {
+  border-radius: 4px;
+  padding: 0.1rem 0.36rem;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.accion_escribe {
+  background: var(--m-accent-soft);
+  color: oklch(0.45 0.14 45);
+}
+
+.accion_lee {
+  background: var(--m-surface-2);
+  color: var(--m-ink-faint);
+}
+
+.accion_intacto {
+  border: 1px dashed var(--m-line);
+  color: var(--m-ink-faint);
+}
+
+.chipTabla {
+  border-radius: 5px;
+  border: 1px solid var(--m-line);
+  background: var(--m-surface-2);
+  padding: 0.08rem 0.4rem;
+  font-size: 0.75rem;
+  color: var(--m-ink);
+  cursor: default;
+  transition: border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chipTablaActiva {
+  border-color: var(--m-accent);
+  background: var(--m-accent-soft);
+}
+
+.zona {
+  font-size: 0.68rem;
+  color: var(--m-ink-faint);
+}
+
+.columnas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  padding: 0;
+  margin-top: 0.65rem;
+
+  code {
+    display: inline-block;
+    border-radius: 4px;
+    background: var(--m-surface-2);
+    padding: 0.12rem 0.38rem;
+    font-size: 0.7rem;
+    color: var(--m-ink-soft);
+  }
+}
+
+/* ---------------- Notas ---------------- */
+
+.notaMarca {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  height: 1.4rem;
+  width: 1.4rem;
+  margin-top: 0.15rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--m-surface-2);
+  color: var(--m-ink-soft);
+}
+
+.notaCuerpo {
+  min-width: 0;
+  margin-bottom: 1.9rem;
+  border: 1px solid var(--m-line);
+  border-radius: 12px;
+  background: var(--m-surface);
+  padding: 0.9rem 1.1rem;
+}
+
+.nota_clave .notaCuerpo {
+  border-color: oklch(0.87 0.05 62);
+  background: var(--m-accent-soft);
+}
+
+.nota_clave .notaMarca {
+  background: var(--m-accent);
+  color: oklch(0.99 0.01 70);
+}
+
+.notaTitulo {
+  margin-bottom: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--m-ink);
+}
+
+.notaTexto {
+  max-width: 68ch;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--m-ink-soft);
+}
+
+/* ---------------- Pie de flujo ---------------- */
+
+.flujoPie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.9rem;
+  border-top: 1px solid var(--m-line-soft);
+  padding-top: 0.9rem;
+}
+
+.pieLabel {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--m-ink-faint);
+}
+
+.archivos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  code {
+    font-size: 0.72rem;
+    color: var(--m-ink-faint);
+  }
+}
+
+/* ---------------- Glosario ---------------- */
+
+.glosario {
+  border-top: 1px solid var(--m-line);
+  padding-top: 2rem;
+}
+
+.glosarioTitulo {
+  margin-bottom: 1.25rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--m-ink);
+}
+
+.glosarioLista {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.glosarioFila {
+  display: grid;
+  gap: 0.2rem 1.5rem;
+  border-radius: 8px;
+  padding: 0.6rem 0.5rem;
+  transition: background-color 160ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  @media (min-width: 720px) {
+    grid-template-columns: 19rem 1fr;
+    align-items: baseline;
+  }
+
+  dt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  dd {
+    margin: 0;
+    max-width: 66ch;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--m-ink-soft);
+  }
+}
+
+.glosarioFilaActiva {
+  background: var(--m-accent-soft);
+}

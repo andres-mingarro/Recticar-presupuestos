@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { buttonStyles } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
 import type { CobradoMensualRow, CobradoAnualRow } from "@/lib/queries/estadisticas";
 import type { AjusteListaPreciosRow } from "@/lib/queries/ajustes";
 import type { EstadisticasOperativas } from "@/lib/types";
@@ -141,6 +143,16 @@ export function EstadisticasPage({
         eyebrow="Registros"
         title="Estadísticas"
         description="Trabajos cobrados por período"
+        actions={
+          <Link
+            href="/estadisticas/datos"
+            data-variant="outline-dark"
+            className={buttonStyles({ size: "sm", className: "gap-2" })}
+          >
+            <Icon name="link" className="size-3.5" />
+            Mapa de datos
+          </Link>
+        }
       />
 
       <section className={styles.section} aria-labelledby="panorama-title">
