@@ -15,7 +15,7 @@ export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Pr
   const { push } = useRouter();
   return (
     <div
-      className="ClienteMobileCard flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 cursor-pointer transition-colors hover:border-[rgb(var(--brand-600-rgb)_/_0.3)] hover:bg-[var(--cream-warm)]"
+      className="ClienteMobileCard flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 cursor-pointer transition-colors hover:border-[rgb(var(--brand-600-rgb)_/_0.3)] hover:bg-[var(--color-surface-brand)]"
       role="link"
       tabIndex={0}
       onClick={() => push(`/clientes/${cliente.id}`)}
@@ -60,7 +60,7 @@ export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Pr
           className={cn(
             "shrink-0 flex flex-col items-center justify-center gap-0.5",
             "min-w-[3rem] rounded-xl border border-[rgb(var(--brand-600-rgb)_/_0.28)]",
-            "bg-[linear-gradient(135deg,rgba(255,247,237,0.98),rgba(255,255,255,0.9))]",
+            "bg-[linear-gradient(135deg,var(--color-surface-alt),rgba(255,255,255,0.9))]",
             "px-2.5 py-2 text-center transition-all",
             "hover:border-[rgb(var(--brand-600-rgb)_/_0.45)] hover:bg-[var(--brand-200)] active:scale-95"
           )}

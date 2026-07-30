@@ -59,7 +59,7 @@
 
 .statPillActive {
   border-color: rgb(var(--brand-600-rgb) / 0.28);
-  background: linear-gradient(135deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.9));
+  background: linear-gradient(135deg, var(--color-surface-alt), rgba(255, 255, 255, 0.9));
   color: var(--color-accent-strong);
 }
 

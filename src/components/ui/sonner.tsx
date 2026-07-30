@@ -47,7 +47,7 @@ export function Toaster() {
             "!left-auto !right-0 !top-[6px] !mt-0 !translate-x-0 !translate-y-0",
             "!h-8 !w-8 !rounded-full !border !border-[rgba(128,54,0,0.12)]",
             "!bg-[var(--color-surface-raised)]/80 !text-[var(--brown-burnt)] !shadow-none",
-            "backdrop-blur transition hover:!bg-[var(--cream-warm)] hover:!border-[rgb(var(--brand-600-rgb)_/_0.2)]"
+            "backdrop-blur transition hover:!bg-[var(--color-surface-brand)] hover:!border-[rgb(var(--brand-600-rgb)_/_0.2)]"
           ),
           success: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,var(--orange-vivid),var(--color-accent))]",
           error: "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[linear-gradient(180deg,#ef4444,#be123c)]",

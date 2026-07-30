@@ -229,7 +229,7 @@ function NuevoTrabajoPageContent({
           repuestos={repuestos}
         />
 
-        <section className="rounded-[28px] border border-[var(--color-border)] bg-[linear-gradient(135deg,rgba(255,247,237,0.9),rgba(255,255,255,0.98))] p-6 shadow-[0_20px_60px_var(--color-shadow-sm)]">
+        <section className="rounded-[28px] border border-[var(--color-border)] bg-[linear-gradient(135deg,var(--color-surface-alt),var(--color-surface-raised))] p-6 shadow-[0_20px_60px_var(--color-shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
             Reglas clave
           </p>

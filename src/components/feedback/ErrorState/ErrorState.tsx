@@ -43,7 +43,7 @@ export function ErrorState({
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--color-accent)]">
               Recticar
             </p>
-            <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-[var(--color-border)] bg-[var(--cream-warm)] px-4 py-2 text-sm font-semibold text-[var(--brown-burnt)]">
+            <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-brand)] px-4 py-2 text-sm font-semibold text-[var(--brown-burnt)]">
               <span className="inline-flex size-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--orange-vivid),var(--color-accent))] text-white shadow-[0_12px_24px_rgb(var(--brand-600-rgb)_/_0.26)]">
                 <Icon name="clipboardList" className="size-4" />
               </span>
@@ -89,7 +89,7 @@ export function ErrorState({
             ) : null}
           </section>
 
-          <aside className="flex flex-col justify-between bg-[linear-gradient(180deg,rgba(255,247,237,0.92),rgba(255,255,255,0.98))] px-6 py-8 sm:px-8 sm:py-10">
+          <aside className="flex flex-col justify-between bg-[linear-gradient(180deg,var(--color-surface-alt),var(--color-surface-raised))] px-6 py-8 sm:px-8 sm:py-10">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-accent)]">
                 Qué podés hacer
