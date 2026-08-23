@@ -35,7 +35,7 @@ import type { RepuestoDetalleItem } from "@/lib/queries/repuestos";
 
 const EMPTY_SNAPSHOT_TRABAJOS: TrabajoDetalleItem[] = [];
 const EMPTY_SNAPSHOT_REPUESTOS: RepuestoDetalleItem[] = [];
-import { IvaToggle } from "@/components/ui/IvaToggle";
+import { IvaToggle, useIva } from "@/components/ui/IvaToggle";
 import { useErrorNotification } from "@/components/ui/NotificationToast";
 import { ListaPreciosSelector } from "./ListaPreciosSelector";
 import { ObservacionesField, SectionHeader, TrabajoFormSection } from "./TrabajoFormLayout";
@@ -232,6 +232,7 @@ export function TrabajoForm({
     listaPrecios,
     setListaPrecios,
   } = useTrabajosSeleccion();
+  const { aplicaIva } = useIva();
   const {
     selectedIds: selectedRepuestoIds,
     selectedItems: selectedRepuestoItems,
@@ -353,6 +354,15 @@ export function TrabajoForm({
       className={cn("TrabajoForm", styles.TrabajoForm, "mb-12 space-y-6")}
     >
       <input type="hidden" name="updatedAt" value={state.values.updatedAt ?? ""} />
+      {/*
+        listaPrecios y aplicaIva se repiten acá, siempre montados, porque sus únicos otros
+        inputs (dentro de ListaPreciosSelector e IvaToggle) viven en el tab "Trabajos" y se
+        desmontan al pasar a "Repuestos" — si el usuario guarda desde ahí, esos campos
+        desaparecían del FormData y el server caía al default (lista 1 / aplicaIva true),
+        pisando lo que el usuario había elegido.
+      */}
+      <input type="hidden" name="listaPrecios" value={listaPrecios} />
+      <input type="hidden" name="aplicaIva" value={String(aplicaIva)} />
       {Array.from(selectedTrabajoIds).map((id) => (
         <div key={`trabajo-hidden-${id}`}>
           <input type="hidden" name="trabajosIds" value={id} />
