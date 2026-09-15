@@ -25,5 +25,28 @@
 .EngineIconGlyph {
 }
 
+// Los SVG del catálogo son monocromos negros cargados como <img>, así que no
+// heredan currentColor. En modo oscuro se invierten a blanco por filtro, en
+// vez de mantener un segundo asset que haya que actualizar dos veces.
+//
+// El bloque está repetido a propósito: uno para el atributo explícito y otro
+// para la media query. Si tocás uno, tocá el otro. Ver SiteLogo.module.scss.
 .EngineIconGlyphImage {
+  transition: filter 0.15s ease-in-out;
+}
+
+:root[data-mode="dark"] .EngineIconGlyphImage {
+  filter: brightness(0) invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) .EngineIconGlyphImage {
+    filter: brightness(0) invert(1);
+  }
+}
+
+// El selector de íconos (EngineIconsDialog) usa tarjetas siempre claras a
+// propósito, así que ahí el ícono se queda negro fijo sin importar el modo.
+.EngineIconGlyphImageFixed {
+  filter: none !important;
 }

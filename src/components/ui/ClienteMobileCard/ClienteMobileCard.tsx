@@ -60,9 +60,9 @@ export function ClienteMobileCard({ cliente, pendientes, onPendientesClick }: Pr
           className={cn(
             "shrink-0 flex flex-col items-center justify-center gap-0.5",
             "min-w-[3rem] rounded-xl border border-[rgb(var(--brand-600-rgb)_/_0.28)]",
-            "bg-[linear-gradient(135deg,var(--color-surface-alt),rgba(255,255,255,0.9))]",
+            "bg-[linear-gradient(135deg,var(--color-surface-alt),var(--color-surface-raised))]",
             "px-2.5 py-2 text-center transition-all",
-            "hover:border-[rgb(var(--brand-600-rgb)_/_0.45)] hover:bg-[var(--brand-200)] active:scale-95"
+            "hover:border-[rgb(var(--brand-600-rgb)_/_0.45)] hover:bg-[var(--color-surface-brand)] active:scale-95"
           )}
           onClick={(e) => {
             e.stopPropagation();

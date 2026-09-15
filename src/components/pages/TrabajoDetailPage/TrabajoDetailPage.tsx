@@ -179,9 +179,11 @@ export function TrabajoDetailPage({
   });
   const lastSuccessfulUpdatedAtRef = useRef(initialState.values.updatedAt ?? "");
 
-  useEffect(() => {
+  const [prevIsPending, setPrevIsPending] = useState(isPending);
+  if (isPending !== prevIsPending) {
+    setPrevIsPending(isPending);
     if (isPending) setDirty(false);
-  }, [isPending]);
+  }
 
   useEffect(() => {
     if (!wasCreated && !wasUpdated) return;

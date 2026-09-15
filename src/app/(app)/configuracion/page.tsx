@@ -84,7 +84,7 @@ export default async function ConfiguracionPage({
                   href="/informacion-tecnica"
                   className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgb(var(--brand-600-rgb)_/_0.08)]"
                 >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--brand-50),var(--brand-200))] text-[var(--color-accent)]">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--brand-50),var(--brand-200))] text-[var(--brand-600)]">
                     <Icon name="car" className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -102,7 +102,7 @@ export default async function ConfiguracionPage({
                     href="/admin/usuarios"
                     className="group flex items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 transition hover:border-[var(--color-accent)] hover:shadow-[0_2px_10px_rgb(var(--brand-600-rgb)_/_0.08)]"
                   >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--brand-50),var(--brand-200))] text-[var(--color-accent)]">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--brand-50),var(--brand-200))] text-[var(--brand-600)]">
                       <Icon name="shieldUser" className="size-4" />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -261,7 +261,7 @@ export default async function ConfiguracionPage({
                     </div>
                   </form>
 
-                  <div className="flex flex-col gap-2 rounded-xl border border-[var(--color-border)] bg-[linear-gradient(135deg,var(--color-surface-alt),rgba(255,255,255,0.9))] p-3">
+                  <div className="flex flex-col gap-2 rounded-xl border border-[var(--color-border)] bg-[linear-gradient(135deg,var(--color-surface-alt),var(--color-surface-raised))] p-3">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">Mantenimiento</p>
                     <p className="text-sm font-semibold text-[var(--text-color-defult)]">Ejecutar ahora</p>
                     {empresa.ultimaEjecucionLimpieza ? (

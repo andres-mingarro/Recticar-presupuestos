@@ -15,6 +15,9 @@ export function Date({ className }: { className?: string }) {
   const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
   useEffect(() => {
+    // Se calcula solo en el cliente, después del mount, para que coincida con
+    // el HTML renderizado por el server (evita hydration mismatch por "ahora").
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormattedDate(LONG_DATE_FORMATTER.format(new globalThis.Date()));
   }, []);
 

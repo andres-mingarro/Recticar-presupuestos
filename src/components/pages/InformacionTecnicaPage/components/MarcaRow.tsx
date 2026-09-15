@@ -33,9 +33,11 @@ export function MarcaRow({
   const [pendingHidden, setPendingHidden] = useState(isHidden);
   const prevPending = useRef(isPending);
 
-  useEffect(() => {
+  const [prevIsHidden, setPrevIsHidden] = useState(isHidden);
+  if (isHidden !== prevIsHidden) {
+    setPrevIsHidden(isHidden);
     setPendingHidden(isHidden);
-  }, [isHidden]);
+  }
 
   useEffect(() => {
     if (prevPending.current && !isPending && !state.error && pendingHidden !== isHidden) {

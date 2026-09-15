@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { cn } from "@/lib/cn";
 import type {
   Marca,
@@ -72,9 +72,11 @@ export function NuevoTrabajoPage({
     estado: initialState.values.estado,
   });
 
-  useEffect(() => {
+  const [prevEstado, setPrevEstado] = useState(state.values.estado);
+  if (state.values.estado !== prevEstado) {
+    setPrevEstado(state.values.estado);
     setSelectedEstado(state.values.estado);
-  }, [state.values.estado]);
+  }
 
   return (
     <div className={cn("NuevoTrabajoPage", styles.NuevoTrabajoPage, "space-y-6")}>

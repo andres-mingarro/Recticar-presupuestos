@@ -90,7 +90,7 @@ export function VehiculoMobileSelector({
           <button
             type="button"
             onClick={() => onOpenWizard(0)}
-            className="flex w-full cursor-pointer items-center gap-4 border-b border-[var(--color-border)] bg-[linear-gradient(135deg,var(--cream-warm),#fff)] px-4 py-3 transition-colors hover:bg-[var(--peach-soft)]/30"
+            className="flex w-full cursor-pointer items-center gap-4 border-b border-[var(--color-border)] bg-[linear-gradient(135deg,var(--color-surface-alt),var(--color-surface-raised))] px-4 py-3 transition-colors hover:bg-[var(--color-surface-brand)]"
           >
             {logoUrl ? (
               <Image

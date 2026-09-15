@@ -60,17 +60,15 @@ export function EngineIconsDialog({
                   "EngineIconsOption",
                   "flex min-h-20 cursor-pointer flex-col items-center justify-between py-3 gap-1 rounded-[22px] border text-center transition",
                   selected
-                    ? "border-[var(--color-accent)] bg-[linear-gradient(180deg,var(--brand-50),var(--color-surface-raised))] text-[var(--text-color-defult)] shadow-[0_14px_34px_rgb(var(--brand-600-rgb)_/_0.14)]"
-                    : "border-[var(--border-ligth)] bg-[linear-gradient(180deg,#ffffff,#f8fafc)] text-[var(--text-color-gray)] hover:border-[var(--gray-40)] hover:text-[var(--text-color-defult)]"
+                    ? "border-[var(--color-accent)] bg-[linear-gradient(180deg,var(--brand-50),var(--brand-200))] text-[var(--brown-burnt)] shadow-[0_14px_34px_rgb(var(--brand-600-rgb)_/_0.14)]"
+                    : "border-[var(--border-ligth)] bg-[linear-gradient(180deg,#ffffff,#f8fafc)] text-[var(--brown-burnt)]/70 hover:border-[var(--gray-40)] hover:text-[var(--brown-burnt)]"
                 )}
               >
                 <EngineIconGlyph
                   name={option}
-                  className={cn(
-                    "size-12",
-                    selected ? "border-[rgb(var(--brand-600-rgb)_/_0.22)] bg-[linear-gradient(180deg,var(--color-surface-raised),var(--brand-200))]" : ""
-                  )}
+                  className="size-12"
                   imageClassName={selected ? "opacity-100" : "opacity-90"}
+                  fixedColor
                 />
                 <span className="text-xs font-semibold tracking-tight px-2 w-full">
                   {formatEngineIconLabel(option)}

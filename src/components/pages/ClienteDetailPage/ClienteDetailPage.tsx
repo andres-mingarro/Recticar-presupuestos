@@ -232,14 +232,18 @@ export function ClienteDetailPage({
   const rawPhone = (cliente.telefono ?? "").replace(/\D/g, "");
   const waNumber = rawPhone.startsWith("54") ? rawPhone : `54${rawPhone}`;
 
-  useEffect(() => {
+  const [prevIsPending, setPrevIsPending] = useState(isPending);
+  if (isPending !== prevIsPending) {
+    setPrevIsPending(isPending);
     if (isPending) setDirty(false);
-  }, [isPending]);
+  }
 
-  useEffect(() => {
+  const [prevState, setPrevState] = useState(state);
+  if (state !== prevState) {
+    setPrevState(state);
     setSelectedProvincia(state.values.provincia || "Chubut");
     setSelectedCiudad(state.values.ciudad || "Trelew");
-  }, [state.values.provincia, state.values.ciudad]);
+  }
 
   useEffect(() => {
     if (!wasCreated && !wasUpdated) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import type { TechnicalMarca } from "@/lib/types";
 import { cn } from "@/lib/cn";
@@ -62,9 +62,11 @@ export function MarcaDialogSelect({
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(value ? String(value) : "");
 
-  useEffect(() => {
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     setSelectedId(value ? String(value) : "");
-  }, [value]);
+  }
 
   const selectedMarca = useMemo(
     () => marcas.find((marca) => String(marca.id) === selectedId) ?? null,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 import type { TrabajoEstado } from "@/lib/types";
 
@@ -155,9 +155,11 @@ export function EstadoStepper({ initialValue, name, allowFinalizado, form, value
   const [internalSelected, setInternalSelected] = useState<TrabajoEstado>(() => normalizeStepperValue(initialValue));
   const selected = value ?? internalSelected;
 
-  useEffect(() => {
+  const [prevInitialValue, setPrevInitialValue] = useState(initialValue);
+  if (initialValue !== prevInitialValue) {
+    setPrevInitialValue(initialValue);
     setInternalSelected(normalizeStepperValue(initialValue));
-  }, [initialValue]);
+  }
 
   const normalizedSelected = normalizeStepperValue(selected);
   const visibleSteps = getVisibleSteps(allowFinalizado !== false);

@@ -94,8 +94,13 @@ export function ClientesPage({
     panelClientId !== null ? pendingTrabajosByCliente[panelClientId] ?? [] : [];
   const panelClient = clientes.find((cliente) => cliente.id === panelClientId) ?? null;
 
-  useEffect(() => {
+  const [prevQ, setPrevQ] = useState(q);
+  if (q !== prevQ) {
+    setPrevQ(q);
     setSearchQuery(q);
+  }
+
+  useEffect(() => {
     submittedQueryRef.current = q;
   }, [q]);
 

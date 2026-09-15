@@ -42,9 +42,11 @@ export function VehiculoRow({
   const isHidden = hiddenVehiculos.has(vehiculo.id);
   const [pendingHidden, setPendingHidden] = useState(isHidden);
 
-  useEffect(() => {
+  const [prevIsHidden, setPrevIsHidden] = useState(isHidden);
+  if (isHidden !== prevIsHidden) {
+    setPrevIsHidden(isHidden);
     setPendingHidden(isHidden);
-  }, [isHidden]);
+  }
 
   const prevTogglePending = useRef(togglePending);
   useEffect(() => {

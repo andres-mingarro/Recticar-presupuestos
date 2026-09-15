@@ -30,6 +30,7 @@
 
 .TrabajoItemCardChecked {
   background: linear-gradient(135deg, var(--brand-50), var(--brand-200));
+  color: var(--brand-900);
 }
 
 .TrabajoItemCardChecked::after {
