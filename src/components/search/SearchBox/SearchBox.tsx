@@ -68,13 +68,27 @@ export function SearchBox({
   const config = searchConfigs[entity];
   const [query, setQuery] = useState(initialValue);
   const [results, setResults] = useState<SearchItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(() => initialValue.trim().length > 0);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  const [prevInitialValue, setPrevInitialValue] = useState(initialValue);
+  if (initialValue !== prevInitialValue) {
+    setPrevInitialValue(initialValue);
     setQuery(initialValue);
-  }, [initialValue]);
+  }
+
+  const [prevQuery, setPrevQuery] = useState(query);
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    if (query.trim().length < 1) {
+      setResults([]);
+      setIsOpen(false);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
+  }
 
   useEffect(() => {
     onQueryChange?.(query);
@@ -84,13 +98,8 @@ export function SearchBox({
     const controller = new AbortController();
 
     if (query.trim().length < 1) {
-      setResults([]);
-      setIsOpen(false);
-      setIsLoading(false);
       return () => controller.abort();
     }
-
-    setIsLoading(true);
 
     const timeoutId = window.setTimeout(async () => {
       try {

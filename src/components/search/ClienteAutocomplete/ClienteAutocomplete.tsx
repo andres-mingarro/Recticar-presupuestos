@@ -32,19 +32,26 @@ export function ClienteAutocomplete({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [prevQuery, setPrevQuery] = useState(query);
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    if (query.trim().length < 1) {
+      setResults([]);
+      setIsOpen(false);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+      setFocusedIndex(-1);
+    }
+  }
+
   // Debounced search
   useEffect(() => {
     const controller = new AbortController();
 
     if (query.trim().length < 1) {
-      setResults([]);
-      setIsOpen(false);
-      setIsLoading(false);
       return () => controller.abort();
     }
-
-    setIsLoading(true);
-    setFocusedIndex(-1);
 
     const timeoutId = window.setTimeout(async () => {
       try {

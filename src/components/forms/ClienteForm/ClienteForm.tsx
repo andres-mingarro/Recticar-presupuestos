@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useActionState } from "react";
 import { cn } from "@/lib/cn";
@@ -117,9 +117,11 @@ export function ClienteForm({
   const [dirty, setDirty] = useState(false);
   useErrorNotification(state.error, `${state.values.nombre}:${state.values.apellido}`);
 
-  useEffect(() => {
+  const [prevIsPending, setPrevIsPending] = useState(isPending);
+  if (isPending !== prevIsPending) {
+    setPrevIsPending(isPending);
     if (isPending) setDirty(false);
-  }, [isPending]);
+  }
   const [internalIsEditing, setInternalIsEditing] = useState(!startInReadOnly);
   const isEditing = controlledIsEditing ?? internalIsEditing;
   const [selectedProvincia, setSelectedProvincia] = useState(
@@ -133,12 +135,12 @@ export function ClienteForm({
 
   const esChubut = selectedProvincia === "Chubut";
 
-  useEffect(() => {
-    const nextProvincia = state.values.provincia || "Chubut";
-    const nextCiudad = state.values.ciudad || "Trelew";
-    setSelectedProvincia(nextProvincia);
-    setSelectedCiudad(nextCiudad);
-  }, [state.values.provincia, state.values.ciudad]);
+  const [prevState, setPrevState] = useState(state);
+  if (state !== prevState) {
+    setPrevState(state);
+    setSelectedProvincia(state.values.provincia || "Chubut");
+    setSelectedCiudad(state.values.ciudad || "Trelew");
+  }
 
   function handleProvinciaChange(provincia: string) {
     setSelectedProvincia(provincia);

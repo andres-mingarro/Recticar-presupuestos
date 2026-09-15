@@ -38,6 +38,7 @@ export default async function RootLayout({
       lang="es"
       data-theme={theme}
       data-mode={mode === "system" ? undefined : mode}
+      data-scroll-behavior="smooth"
       className="h-full antialiased"
       suppressHydrationWarning
     >

@@ -23,11 +23,14 @@ export function ShimmerHighlight({
   const [isVisible, setIsVisible] = useState(active);
   const isExiting = isVisible && !active;
 
+  const [prevActive, setPrevActive] = useState(active);
+  if (active !== prevActive) {
+    setPrevActive(active);
+    if (active) setIsVisible(true);
+  }
+
   useEffect(() => {
-    if (active) {
-      setIsVisible(true);
-      return;
-    }
+    if (active) return;
 
     const timeout = window.setTimeout(() => setIsVisible(false), 420);
     return () => window.clearTimeout(timeout);

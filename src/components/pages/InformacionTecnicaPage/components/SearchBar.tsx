@@ -29,9 +29,11 @@ export function SearchBar({ section, q, tab, marcaId }: SearchBarProps) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listId = useId();
 
-  useEffect(() => {
+  const [prevQ, setPrevQ] = useState(q);
+  if (q !== prevQ) {
+    setPrevQ(q);
     setValue(q);
-  }, [q]);
+  }
 
   useEffect(() => {
     function onPointerDown(e: PointerEvent) {

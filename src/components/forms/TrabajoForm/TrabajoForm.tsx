@@ -218,10 +218,11 @@ export function TrabajoForm({
     `${state.values.updatedAt ?? ""}:${state.values.estado}:${state.values.clienteId}`
   );
 
-  useEffect(() => {
-    if (!isPending) return;
-    setDirty(false);
-  }, [isPending]);
+  const [prevIsPending, setPrevIsPending] = useState(isPending);
+  if (isPending !== prevIsPending) {
+    setPrevIsPending(isPending);
+    if (isPending) setDirty(false);
+  }
 
   const {
     selectedIds: selectedTrabajoIds,
@@ -260,21 +261,29 @@ export function TrabajoForm({
     setWizardOpen(true);
   };
 
-  useEffect(() => {
+  const [prevPrioridad, setPrevPrioridad] = useState(state.values.prioridad);
+  if (state.values.prioridad !== prevPrioridad) {
+    setPrevPrioridad(state.values.prioridad);
     setSelectedPrioridad(state.values.prioridad);
-  }, [state.values.prioridad]);
+  }
 
-  useEffect(() => {
+  const [prevEstado, setPrevEstado] = useState(state.values.estado);
+  if (state.values.estado !== prevEstado) {
+    setPrevEstado(state.values.estado);
     setSelectedEstado(state.values.estado);
-  }, [state.values.estado]);
+  }
 
-  useEffect(() => {
+  const [prevNumeroSerieMotor, setPrevNumeroSerieMotor] = useState(state.values.numeroSerieMotor ?? "");
+  if ((state.values.numeroSerieMotor ?? "") !== prevNumeroSerieMotor) {
+    setPrevNumeroSerieMotor(state.values.numeroSerieMotor ?? "");
     setSelectedNumeroSerieMotor(state.values.numeroSerieMotor ?? "");
-  }, [state.values.numeroSerieMotor]);
+  }
 
-  useEffect(() => {
+  const [prevInitialClienteLabel, setPrevInitialClienteLabel] = useState(initialClienteLabel);
+  if (initialClienteLabel !== prevInitialClienteLabel) {
+    setPrevInitialClienteLabel(initialClienteLabel);
     setSelectedClienteLabel(initialClienteLabel);
-  }, [initialClienteLabel]);
+  }
 
   const motoresIds = useMemo(
     () =>
@@ -473,6 +482,7 @@ export function TrabajoForm({
                             <EngineIconGlyph
                               name={grupo.categoriaIcono}
                               className={cn("size-6 shrink-0", hasSelected ? "text-[var(--color-accent)]" : "text-[var(--text-color-gray)]")}
+                              fixedColor={hasSelected}
                             />
                           ) : null}
                           <span className={cn("text-sm font-semibold", hasSelected ? "text-[var(--brown-burnt)]" : "text-[var(--text-color-defult)]")}>

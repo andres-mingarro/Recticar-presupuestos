@@ -215,7 +215,7 @@ El botón `PrintButton` llama a `window.print()`.
 | `src/app/api/trabajos/[id]/pdf/route.ts` | Route handler PDF (tiene `@ts-expect-error` por React 19 — no tocar) |
 | `src/lib/types.ts` | Todos los tipos: `TrabajoEstado`, `TrabajoDetail`, `TrabajoAgrupado`, etc. |
 | `src/lib/db.ts` | `queryRows<T>(sql, params)` — cliente PostgreSQL. También exporta `LISTAS_PRECIOS`, `ListaPrecio`, `PreciosLista`, `getPrecioLista()` y `precioListaColName()` — fuente de verdad única para todo lo relacionado a listas de precios |
-| `src/middleware.ts` | Auth JWT con `jose`; roles: `admin`, `superuser`, `operador` |
+| `src/proxy.ts` | Auth JWT con `jose`; roles: `admin`, `superuser`, `operador`. Antes `middleware.ts` — renombrado en el upgrade a Next.js 16 (`middleware` quedó deprecado en favor de `proxy`) |
 
 ---
 
@@ -246,7 +246,7 @@ bun run db:seed:dev      # crea 15 clientes fake y 15 trabajos fake
 - `redirect()` de Next.js lanza una excepción internamente — **no poner dentro de `try/catch`**.
 - Todas las server actions deben envolver la lógica de DB en `try/catch` y retornar `{ error: string | null, values }` — nunca dejar explotar un error de Neon sin capturar.
 - En WSL2 con archivos en Linux FS nativo, el HMR funciona sin `WATCHPACK_POLLING`.
-- `src/middleware.ts` (no en raíz) por la estructura con `src/`.
+- `src/proxy.ts` (no en raíz) por la estructura con `src/`.
 - **La ventana no scrollea.** `AppShell` ocupa `100dvh` con `overflow: hidden` y el scroll real pasa dentro de `AppMain`, que tiene `overflow-y-auto`. Un `window.addEventListener("scroll", ...)` no dispara nunca y falla en silencio (scroll-spy, lazy load, botón "volver arriba", scroll infinito). Hay que escuchar al contenedor: subir por `parentElement` hasta encontrar `overflow-y` en `auto`/`scroll` en vez de hardcodear la clase. Ver `useRecorridoActivo` en `MapaDatosPage.tsx`.
 - Por lo mismo, `scroll-behavior: smooth` global no sirve para anclas internas: usar `element.scrollIntoView({ behavior: "smooth" })`, que recorre los ancestros solo. Respetar `prefers-reduced-motion`.
 - Variables de entorno en `.env.local`: `DATABASE_URL`, `TECHNICAL_DATABASE_URL`, `NEXT_PUBLIC_BASE_URL`.

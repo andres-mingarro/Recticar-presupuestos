@@ -281,9 +281,11 @@ function CategoriaCard({
   useErrorNotification(addState.error, addState.resetKey);
   useErrorNotification(saveState.error, grupo.categoriaId);
 
-  useEffect(() => {
+  const [prevSaveState, setPrevSaveState] = useState(saveState);
+  if (saveState !== prevSaveState) {
+    setPrevSaveState(saveState);
     if (saveState.success) setIsEditing(false);
-  }, [saveState]);
+  }
 
   useEffect(() => {
     if (!saveState.success) return;
@@ -295,11 +297,13 @@ function CategoriaCard({
     notifySuccess(`Cambios guardados en "${grupo.categoriaNombre}".`);
   }, [saveState.success, grupo.categoriaId, grupo.categoriaNombre]);
 
-  useEffect(() => {
+  const [prevGrupo, setPrevGrupo] = useState(grupo);
+  if (grupo !== prevGrupo) {
+    setPrevGrupo(grupo);
     setPrecioDrafts(Object.fromEntries(grupo.trabajos.map((t) => [t.id, extractPrecios(t)])));
     setAjustesPorcentaje(emptyAjustes());
     setCategoriaIcono(isEngineIconName(grupo.categoriaIcono) ? grupo.categoriaIcono : null);
-  }, [grupo]);
+  }
 
   const formId = `save-cat-${grupo.categoriaId}`;
 

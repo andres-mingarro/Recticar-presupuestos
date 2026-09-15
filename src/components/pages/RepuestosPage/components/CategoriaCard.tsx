@@ -38,9 +38,11 @@ export function CategoriaCard({
 
   const [saveState, saveFormAction, savePending] = useActionState(updateCategoriaAction, { error: null });
 
-  useEffect(() => {
+  const [prevSaveState, setPrevSaveState] = useState(saveState);
+  if (saveState !== prevSaveState) {
+    setPrevSaveState(saveState);
     if (saveState.success) setIsEditing(false);
-  }, [saveState]);
+  }
 
   useEffect(() => {
     if (!saveState.success) return;
