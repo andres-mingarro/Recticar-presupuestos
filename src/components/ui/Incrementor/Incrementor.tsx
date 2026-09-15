@@ -30,11 +30,10 @@ export function Incrementor({
   return (
     <div
       className={cn(
-        "Incrementor inline-flex items-center overflow-hidden rounded-full border border-[var(--color-border)]",
+        "Incrementor inline-flex items-center overflow-hidden rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)]",
         disabled && "opacity-40",
         className
       )}
-      style={{ background: "white" }}
     >
       <button
         type="button"
@@ -46,7 +45,6 @@ export function Incrementor({
           "border-r border-[var(--color-border)]",
           sm ? "size-7 text-sm" : "size-9 text-base"
         )}
-        style={{ background: "white" }}
       >
         −
       </button>
@@ -57,7 +55,6 @@ export function Incrementor({
           sm ? "min-w-[28px] px-1.5 text-sm" : "min-w-[36px] px-2 text-sm",
           valueClassName
         )}
-        style={{ background: "white" }}
       >
         {formatValue(value)}
       </span>
@@ -72,7 +69,6 @@ export function Incrementor({
           "border-l border-[var(--color-border)]",
           sm ? "size-7 text-sm" : "size-9 text-base"
         )}
-        style={{ background: "white" }}
       >
         +
       </button>
