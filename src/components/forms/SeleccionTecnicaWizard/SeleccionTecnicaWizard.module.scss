@@ -64,13 +64,13 @@
 }
 
 .stepPillDone {
-  border-color: var(--apricot-light);
-  background: var(--color-surface-brand);
-  color: var(--brown-burnt);
+  border-color: var(--step-soft-border);
+  background: var(--gradient-step-soft);
+  color: var(--step-soft-ink);
 
   .stepPillNumber {
-    background: var(--apricot-light);
-    color: var(--brown-burnt);
+    background: var(--step-soft-to);
+    color: var(--step-soft-ink);
   }
 }
 
@@ -114,8 +114,12 @@
 
 .brandCardSelected {
   border-color: var(--color-accent);
-  background: linear-gradient(135deg, var(--brand-50), var(--brand-200));
+  background: var(--gradient-step-soft);
   box-shadow: 0 0 0 3px var(--color-accent-soft);
+
+  .brandName {
+    color: var(--step-soft-ink);
+  }
 }
 
 .logoWrapper {
@@ -192,12 +196,12 @@
 
 .listItemSelected {
   border-color: var(--color-accent);
-  background: linear-gradient(135deg, var(--brand-50), var(--brand-200));
-  color: var(--color-accent-strong);
+  background: var(--gradient-step-soft);
+  color: var(--step-soft-ink);
   font-weight: 600;
 
   .listItemChevron {
-    color: var(--color-accent);
+    color: var(--step-soft-ink);
     opacity: 1;
   }
 }

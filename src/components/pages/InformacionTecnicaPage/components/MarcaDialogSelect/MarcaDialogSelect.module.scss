@@ -101,7 +101,8 @@
 
 .brandCardSelected {
   border-color: var(--color-accent);
-  background: linear-gradient(135deg, var(--brand-50), var(--brand-200));
+  background: var(--gradient-step-soft);
+  color: var(--step-soft-ink);
   box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
